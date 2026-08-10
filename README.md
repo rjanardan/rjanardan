@@ -1,16 +1,383 @@
-## Hi there 👋
+<!DOCTYPE html>
+<html lang="en" data-theme="ledger">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Janardan Revuru — Director of Engineering</title>
+<meta name="description" content="Janardan Revuru — Director of Engineering, AI Transformation Leader, PhD Researcher (Multi-Agent Systems). 29+ years scaling engineering orgs.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+    --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px;
+    --maxw: 880px;
+  }
 
-<!--
-**rjanardan/rjanardan** is a ✨ _special_ ✨ repository because its `README.md` (this file) appears on your GitHub profile.
+  /* ---------- Theme: Blueprint ---------- */
+  [data-theme="blueprint"]{
+    --bg:#0a2540; --bg-elevated:#0e2f52; --grid-line: rgba(140,195,255,0.08);
+    --text:#eaf2ff; --text-muted:#93b3da; --accent:#5ec8f8; --accent-2:#ffcf6b;
+    --border: rgba(94,200,248,0.32); --border-strong: rgba(94,200,248,0.6);
+    --font-display:'Space Grotesk', sans-serif; --font-body:'IBM Plex Sans', sans-serif; --font-mono:'JetBrains Mono', monospace;
+    --radius:2px; --tracking-eyebrow: 0.14em;
+  }
+  /* ---------- Theme: Terminal ---------- */
+  [data-theme="terminal"]{
+    --bg:#15120e; --bg-elevated:#1d1913; --grid-line: rgba(255,183,107,0.05);
+    --text:#f3ecdd; --text-muted:#b3a186; --accent:#ffb76b; --accent-2:#8fd4ab;
+    --border: rgba(255,183,107,0.28); --border-strong: rgba(255,183,107,0.55);
+    --font-display:'JetBrains Mono', monospace; --font-body:'JetBrains Mono', monospace; --font-mono:'JetBrains Mono', monospace;
+    --radius:0px; --tracking-eyebrow: 0.08em;
+  }
+  /* ---------- Theme: Ledger ---------- */
+  [data-theme="ledger"]{
+    --bg:#f7f4ec; --bg-elevated:#ffffff; --grid-line: rgba(43,58,103,0.07);
+    --text:#242938; --text-muted:#5d6274; --accent:#2b3a67; --accent-2:#8a6a34;
+    --border: rgba(43,58,103,0.22); --border-strong: rgba(43,58,103,0.45);
+    --font-display:'Fraunces', serif; --font-body:'Source Serif 4', serif; --font-mono:'JetBrains Mono', monospace;
+    --radius:2px; --tracking-eyebrow: 0.1em;
+  }
 
-Here are some ideas to get you started:
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{
+    margin:0; background:var(--bg); color:var(--text);
+    font-family:var(--font-body); line-height:1.6; font-size:16px;
+    transition:background .35s ease, color .35s ease;
+    background-image:
+      linear-gradient(var(--grid-line) 1px, transparent 1px),
+      linear-gradient(90deg, var(--grid-line) 1px, transparent 1px);
+    background-size: 28px 28px;
+  }
+  [data-theme="terminal"] body{ background-image:none; }
 
-- 🔭 I’m currently working on ...
-- 🌱 I’m currently learning ...
-- 👯 I’m looking to collaborate on ...
-- 🤔 I’m looking for help with ...
-- 💬 Ask me about ...
-- 📫 How to reach me: ...
-- 😄 Pronouns: ...
-- ⚡ Fun fact: ...
--->
+  a{ color:var(--accent); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 var(--space-5); }
+
+  h1,h2,h3{ font-family:var(--font-display); font-weight:600; margin:0; }
+  .eyebrow{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:var(--tracking-eyebrow);
+    text-transform:uppercase; color:var(--accent); margin:0 0 var(--space-2);
+  }
+
+  /* ---------- Theme switcher ---------- */
+  .theme-switcher{
+    position:fixed; top:var(--space-4); right:var(--space-4); z-index:50;
+    display:flex; gap:6px; background:var(--bg-elevated); border:1px solid var(--border);
+    border-radius:20px; padding:4px;
+  }
+  .theme-switcher button{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:.03em; text-transform:uppercase;
+    background:transparent; border:none; color:var(--text-muted); cursor:pointer;
+    padding:6px 12px; border-radius:16px; transition:all .2s ease;
+  }
+  .theme-switcher button:hover{ color:var(--text); }
+  .theme-switcher button[aria-pressed="true"]{ background:var(--accent); color:var(--bg); font-weight:600; }
+
+  /* ---------- Header / Hero ---------- */
+  header{ padding:var(--space-9) 0 var(--space-7); border-bottom:1px solid var(--border); }
+  .name{ font-size:clamp(32px,5vw,52px); line-height:1.05; margin-bottom:var(--space-2); }
+  .tagline{ font-size:clamp(15px,2vw,18px); color:var(--text-muted); max-width:640px; margin-bottom:var(--space-5); }
+  .contact-row{ display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); font-family:var(--font-mono); font-size:13px; color:var(--text-muted); }
+  .contact-row a{ color:var(--text); }
+  .contact-row span.sep{ color:var(--border-strong); }
+
+  /* ---------- Sections ---------- */
+  section{ padding:var(--space-8) 0; border-bottom:1px solid var(--border); }
+  section:last-of-type{ border-bottom:none; }
+  h2.section-title{ font-size:clamp(22px,3vw,28px); margin-bottom:var(--space-6); }
+
+  .summary p{ max-width:680px; color:var(--text); font-size:16px; }
+
+  /* Experience */
+  .job{ display:grid; grid-template-columns:150px 1fr; gap:var(--space-5); padding:var(--space-5) 0; border-top:1px solid var(--border); }
+  .job:first-of-type{ border-top:none; }
+  .job-period{ font-family:var(--font-mono); font-size:12px; color:var(--accent); }
+  .job-title{ font-family:var(--font-display); font-size:18px; font-weight:600; margin-bottom:2px; }
+  .job-org{ color:var(--text-muted); font-size:14px; margin-bottom:var(--space-3); }
+  .job ul{ margin:0; padding-left:18px; color:var(--text); font-size:14.5px; }
+  .job li{ margin-bottom:4px; }
+
+  /* Grid cards: patents, certs, affiliations */
+  .card-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:var(--space-4); }
+  .card{ border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-4); background:var(--bg-elevated); }
+  .card .card-title{ font-family:var(--font-display); font-weight:600; font-size:14.5px; margin-bottom:6px; }
+  .card .card-meta{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-muted); }
+
+  /* Simple list sections */
+  .simple-list{ list-style:none; margin:0; padding:0; }
+  .simple-list li{
+    display:flex; justify-content:space-between; gap:var(--space-4);
+    padding:var(--space-3) 0; border-top:1px solid var(--border); font-size:14.5px;
+  }
+  .simple-list li:first-child{ border-top:none; }
+  .simple-list .meta{ font-family:var(--font-mono); font-size:12px; color:var(--text-muted); white-space:nowrap; }
+
+  /* Community stats */
+  .stat-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:var(--space-4); margin-bottom:var(--space-6); }
+  .stat{ border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-4); text-align:center; }
+  .stat .num{ font-family:var(--font-display); font-size:28px; font-weight:700; color:var(--accent); }
+  .stat .label{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-top:4px; }
+
+  /* Skills */
+  .tags{ display:flex; flex-wrap:wrap; gap:var(--space-2); }
+  .tag{
+    font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid var(--border);
+    border-radius:20px; color:var(--text-muted);
+  }
+
+  /* ---------- Title block footer (signature element, present across all themes) ---------- */
+  footer{ padding:var(--space-8) 0 var(--space-9); }
+  .titleblock{
+    border:1px solid var(--border-strong); border-radius:var(--radius);
+    font-family:var(--font-mono); font-size:12px;
+  }
+  .titleblock-row{ display:grid; grid-template-columns:1fr 1fr 1fr; border-top:1px solid var(--border); }
+  .titleblock-row:first-child{ border-top:none; }
+  .titleblock-cell{ padding:var(--space-3) var(--space-4); border-left:1px solid var(--border); }
+  .titleblock-cell:first-child{ border-left:none; }
+  .titleblock-cell .k{ color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; font-size:10px; margin-bottom:3px; }
+  .titleblock-cell .v{ color:var(--text); }
+  .footer-links{ margin-top:var(--space-5); display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); font-family:var(--font-mono); font-size:13px; }
+
+  @media (max-width:640px){
+    .job{ grid-template-columns:1fr; gap:var(--space-2); }
+    .titleblock-row{ grid-template-columns:1fr; }
+    .titleblock-cell{ border-left:none; border-top:1px solid var(--border); }
+    .titleblock-cell:first-child{ border-top:none; }
+    .theme-switcher{ top:auto; bottom:var(--space-4); right:var(--space-4); }
+  }
+</style>
+</head>
+<body>
+
+<div class="theme-switcher" role="group" aria-label="Choose visual theme">
+  <button type="button" data-theme-btn="ledger" aria-pressed="true">Ledger</button>
+  <button type="button" data-theme-btn="blueprint" aria-pressed="false">Blueprint</button>
+  <button type="button" data-theme-btn="terminal" aria-pressed="false">Terminal</button>
+</div>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Director of Engineering · AI Transformation · PhD Research Scholar</p>
+    <h1 class="name">Janardan Revuru</h1>
+    <p class="tagline">Scaling global distributed engineering teams and applying AI, from coding assistants to agentic workflows, at enterprise scale. 29+ years across Dell, HPE, Avaya, and Motorola — now building toward VP/Director of Engineering and Head of AI Engineering roles at startups and GCCs.</p>
+    <div class="contact-row">
+      <span>Bengaluru, India</span><span class="sep">/</span>
+      <a href="mailto:janardan.revuru@gmail.com">janardan.revuru@gmail.com</a><span class="sep">/</span>
+      <a href="tel:+918050780608">+91 80507 80608</a><span class="sep">/</span>
+      <a href="https://linkedin.com/in/rjanardan" target="_blank" rel="noopener">linkedin.com/in/rjanardan</a>
+    </div>
+  </header>
+
+  <section id="summary">
+    <h2 class="section-title">Summary</h2>
+    <div class="summary">
+      <p>Director of Engineering with experience setting up and scaling R&amp;D teams of 100–120 people. As AI champion, led the shift from AI-assisted coding to agentic AI workflows across a multi-geography engineering org (~600 people), driving 30% higher people engagement and 3x productivity. Leading transformation through new methodologies — secure software development, scaled Agile, spec-driven development — and flexible across fast-paced startups and large MNCs. Academic and research mindset: M.Tech in Data Science &amp; AI, currently pursuing a PhD in AI (agent-to-agent communication architectures). Co-inventor on 3 granted patents and 1 published application. Built tech communities totaling 22,000+ members across India, with 100+ events hosted at companies including Google, Microsoft, Navi, Brillio, Dell, HPE, Nutanix, IBM, GeekyAnts, and Roku.</p>
+    </div>
+  </section>
+
+  <section id="experience">
+    <h2 class="section-title">Experience</h2>
+
+    <div class="job">
+      <div class="job-period">Aug 2021 – Present</div>
+      <div>
+        <div class="job-title">Director of Engineering</div>
+        <div class="job-org">Dell Technologies, Bangalore</div>
+        <ul>
+          <li>Graduated from Dell's LEAD program — top 2% of leaders company-wide</li>
+          <li>Site leader for manageability teams (~100–120 engineers)</li>
+          <li>Led AI adoption from coding assistants to agentic AI workflows using spec-driven development and an AI harness, across the entire business unit (~600 engineers)</li>
+          <li>Introduced a knowledge bundle and evaluation methods for better AI grounding (AI-native software engineering)</li>
+          <li>Modernized the tech stack from Google Web Toolkit to Angular in the Data Protection domain</li>
+          <li>Transformation leader for the entire portfolio (~1,000–1,200 engineers); scaled Agile coach</li>
+          <li>Rockstar Manager (top team engagement scores) for 5 consecutive years</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-period">Dec 2016 – Jul 2021</div>
+      <div>
+        <div class="job-title">Senior Manager, Software Engineering</div>
+        <div class="job-org">Dell EMC, Bangalore</div>
+        <ul>
+          <li>Web-based application development and integration for the PowerProtectDD appliance (backup &amp; recovery)</li>
+          <li>Owned appliance supportability and serviceability</li>
+          <li>Built a team from 2 to 80 members in India</li>
+          <li>Modernized the tech stack; delivered features end-to-end with full ownership across a cross-geography "one team" culture</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-period">Nov 2007 – Dec 2016</div>
+      <div>
+        <div class="job-title">Engineering Manager</div>
+        <div class="job-org">Nortel, Avaya, HPE — Bangalore</div>
+        <ul>
+          <li>Engineering of networking, storage, and server products; management software for telecom and datacom</li>
+          <li>Worked across all phases of software development, in both waterfall and Agile/Scrum projects</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="job">
+      <div class="job-period">Jan 1997 – Nov 2007</div>
+      <div>
+        <div class="job-title">Software Engineer → Technical Lead</div>
+        <div class="job-org">Wipro, Amber Networks, Tasman Networks, Motorola — Bangalore</div>
+        <ul>
+          <li>Network management software using Java and web technologies</li>
+          <li>Designed and developed Location Update and Lawful Interception features for 2.5G GSM networks</li>
+          <li>Built element manager software for routers</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="patents">
+    <h2 class="section-title">Patents</h2>
+    <div class="card-grid">
+      <div class="card">
+        <div class="card-title">Systems and Methods for Temporary Access with Adaptive Trust Levels for Authentication and Authorization</div>
+        <div class="card-meta">#20220337596 · Issued 20 Oct 2022</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Parameter-Based Adaptive Scheduling of Jobs</div>
+        <div class="card-meta">#20240354154 · Issued 24 Oct 2024</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Systems and Methods for Temporary Access with Adaptive Trust Levels for Authentication and Authorization (Extension)</div>
+        <div class="card-meta">#20240244058 · Issued 08 Apr 2025</div>
+      </div>
+      <div class="card">
+        <div class="card-title">Suggesting and Validating User Interface Elements in Accordance with a Design System</div>
+        <div class="card-meta">US20260203081A1 · Filed 16 Jul 2026</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="education">
+    <h2 class="section-title">Education</h2>
+    <ul class="simple-list">
+      <li><span>Ph.D., Artificial Intelligence — REVA University, Bengaluru<br><span style="color:var(--text-muted); font-size:13px;">Research in multi-agent systems communication architectures; design, development and evaluation of a semantic layer for intent, efficiency and security.</span></span><span class="meta">Exp. Jun 2028</span></li>
+      <li><span>M.Tech, Data Science — Birla Institute of Technology, Pilani<br><span style="color:var(--text-muted); font-size:13px;">Project: Sustainability through Small Generative Models</span></span><span class="meta">Jun 2024</span></li>
+      <li><span>B.E., Computer Science — Vijayanagar Engineering College, Karnataka</span><span class="meta">—</span></li>
+      <li><span>MBA, Marketing — IGNOU, Bengaluru</span><span class="meta">Jun 2010</span></li>
+    </ul>
+  </section>
+
+  <section id="community">
+    <h2 class="section-title">Community Engagement</h2>
+    <div class="stat-row">
+      <div class="stat"><div class="num">22K+</div><div class="label">Members</div></div>
+      <div class="stat"><div class="num">100+</div><div class="label">Events hosted</div></div>
+      <div class="stat"><div class="num">3</div><div class="label">Communities founded</div></div>
+    </div>
+    <ul class="simple-list">
+      <li><span>JavaScript Meetup — co-founder and organizer</span><span class="meta">Since 2015</span></li>
+      <li><span>DARLing — Data Science, AI, Research and Learning Meetup — founder</span><span class="meta">Since 2025</span></li>
+      <li><span>Byte of Python — founder</span><span class="meta">Since 2025</span></li>
+    </ul>
+    <p style="color:var(--text-muted); font-size:13.5px; margin-top:var(--space-4);">Events hosted at Google, Microsoft, Navi, Brillio, Dell, HPE, Nutanix, IBM, GeekyAnts, and Roku.</p>
+  </section>
+
+  <section id="affiliations">
+    <h2 class="section-title">Affiliations &amp; Advisory Roles</h2>
+    <ul class="simple-list">
+      <li><span>Academic Council — Madanapalle Institute of Technology &amp; Science</span><span class="meta">Since 2025</span></li>
+      <li><span>Board of Studies — Kishkindha University</span><span class="meta">Since 2024</span></li>
+      <li><span>Association for Computing Machinery (ACM), Member</span><span class="meta">Since 2024</span></li>
+      <li><span>Community Leader — Google</span><span class="meta">Since 2020</span></li>
+      <li><span>Open Source India Conference</span><span class="meta">Since 2011</span></li>
+      <li><span>Technical Director — Huawei HarmonyOS Platform</span><span class="meta">Till 2021</span></li>
+      <li><span>Web Technologies Advisory Group — Microsoft</span><span class="meta">Till 2018</span></li>
+    </ul>
+  </section>
+
+  <section id="certifications">
+    <h2 class="section-title">Certifications &amp; Awards</h2>
+    <div class="tags">
+      <span class="tag">PMP</span>
+      <span class="tag">Certified Scrum Master</span>
+      <span class="tag">SAFe Agilist</span>
+      <span class="tag">Six Sigma — Green Belt</span>
+      <span class="tag">Certified Financial Manager</span>
+      <span class="tag">Game Changer Award — Agile Transformation</span>
+      <span class="tag">Rockstar Manager — 5 years</span>
+    </div>
+  </section>
+
+  <section id="skills">
+    <h2 class="section-title">Skills</h2>
+    <div class="tags">
+      <span class="tag">Engineering Leadership</span>
+      <span class="tag">AI Transformation</span>
+      <span class="tag">Director-level Strategy</span>
+      <span class="tag">Speaker, Author &amp; Advisor</span>
+      <span class="tag">PhD Research Scholar</span>
+      <span class="tag">Org Design &amp; Team Build-out</span>
+      <span class="tag">Startup Environments</span>
+      <span class="tag">Community Building</span>
+    </div>
+  </section>
+
+  <footer>
+    <div class="titleblock">
+      <div class="titleblock-row">
+        <div class="titleblock-cell"><div class="k">Name</div><div class="v">Janardan Revuru</div></div>
+        <div class="titleblock-cell"><div class="k">Title</div><div class="v">Director of Engineering</div></div>
+        <div class="titleblock-cell"><div class="k">Location</div><div class="v">Bengaluru, India</div></div>
+      </div>
+      <div class="titleblock-row">
+        <div class="titleblock-cell"><div class="k">Scale</div><div class="v">29+ yrs experience</div></div>
+        <div class="titleblock-cell"><div class="k">Rev.</div><div class="v">2026.08</div></div>
+        <div class="titleblock-cell"><div class="k">Status</div><div class="v">Open to VP / Director / Head of AI Eng.</div></div>
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="mailto:janardan.revuru@gmail.com">Email</a>
+      <a href="https://linkedin.com/in/rjanardan" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="https://publish.obsidian.md/janardan" target="_blank" rel="noopener">Notes &amp; Writing (Obsidian Publish)</a>
+      <!-- TODO: replace with your actual meetup group URLs -->
+      <a href="#" target="_blank" rel="noopener">JavaScript Meetup</a>
+      <a href="#" target="_blank" rel="noopener">DARLing Community</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  (function(){
+    var root = document.documentElement;
+    var buttons = document.querySelectorAll('[data-theme-btn]');
+    var saved = null;
+    try { saved = localStorage.getItem('jr-theme'); } catch(e) {}
+    if (saved) { setTheme(saved); }
+
+    function setTheme(name){
+      root.setAttribute('data-theme', name);
+      buttons.forEach(function(b){
+        b.setAttribute('aria-pressed', b.getAttribute('data-theme-btn') === name ? 'true' : 'false');
+      });
+      try { localStorage.setItem('jr-theme', name); } catch(e) {}
+    }
+
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        setTheme(btn.getAttribute('data-theme-btn'));
+      });
+    });
+  })();
+</script>
+
+</body>
+</html>
