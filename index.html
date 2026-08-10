@@ -65,19 +65,48 @@
     text-transform:uppercase; color:var(--accent); margin:0 0 var(--space-2);
   }
 
-  /* ---------- Theme switcher ---------- */
-  .theme-switcher{
-    position:fixed; top:var(--space-4); right:var(--space-4); z-index:50;
-    display:flex; gap:6px; background:var(--bg-elevated); border:1px solid var(--border);
-    border-radius:20px; padding:4px;
+  /* ---------- Fixed bottom-right menu ---------- */
+  .site-menu{ position:fixed; right:var(--space-4); bottom:var(--space-4); z-index:60; }
+  .site-menu-toggle{
+    width:52px; height:52px; border-radius:50%; border:1px solid var(--border-strong);
+    background:var(--accent); color:var(--bg); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25); transition:transform .2s ease;
   }
-  .theme-switcher button{
-    font-family:var(--font-mono); font-size:11px; letter-spacing:.03em; text-transform:uppercase;
-    background:transparent; border:none; color:var(--text-muted); cursor:pointer;
-    padding:6px 12px; border-radius:16px; transition:all .2s ease;
+  .site-menu-toggle:hover{ transform:scale(1.05); }
+  .site-menu-toggle svg{ width:20px; height:20px; }
+  .site-menu-toggle .icon-close{ display:none; }
+  .site-menu[data-open="true"] .icon-open{ display:none; }
+  .site-menu[data-open="true"] .icon-close{ display:block; }
+
+  .site-menu-panel{
+    position:absolute; right:0; bottom:64px; width:260px;
+    background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:0 12px 32px rgba(0,0,0,0.28); padding:var(--space-4);
+    opacity:0; transform:translateY(8px); pointer-events:none; transition:all .18s ease;
   }
-  .theme-switcher button:hover{ color:var(--text); }
-  .theme-switcher button[aria-pressed="true"]{ background:var(--accent); color:var(--bg); font-weight:600; }
+  .site-menu[data-open="true"] .site-menu-panel{ opacity:1; transform:translateY(0); pointer-events:auto; }
+
+  .site-menu-group + .site-menu-group{ margin-top:var(--space-4); padding-top:var(--space-4); border-top:1px solid var(--border); }
+  .site-menu-heading{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--text-muted); margin-bottom:var(--space-2);
+  }
+  .site-menu-links{ list-style:none; margin:0; padding:0; }
+  .site-menu-links li a{
+    display:block; padding:6px 4px; border-radius:4px; font-size:13.5px; color:var(--text);
+    text-decoration:none;
+  }
+  .site-menu-links li a:hover{ background:var(--grid-line); color:var(--accent); text-decoration:none; }
+
+  .theme-options{ display:flex; gap:6px; }
+  .theme-options button{
+    flex:1; font-family:var(--font-mono); font-size:11px; letter-spacing:.02em; text-transform:uppercase;
+    background:transparent; border:1px solid var(--border); color:var(--text-muted); cursor:pointer;
+    padding:8px 4px; border-radius:16px; transition:all .2s ease;
+  }
+  .theme-options button:hover{ color:var(--text); }
+  .theme-options button[aria-pressed="true"]{ background:var(--accent); color:var(--bg); font-weight:600; border-color:var(--accent); }
 
   /* ---------- Header / Hero ---------- */
   header{ padding:var(--space-9) 0 var(--space-7); border-bottom:1px solid var(--border); }
@@ -150,16 +179,40 @@
     .titleblock-row{ grid-template-columns:1fr; }
     .titleblock-cell{ border-left:none; border-top:1px solid var(--border); }
     .titleblock-cell:first-child{ border-top:none; }
-    .theme-switcher{ top:auto; bottom:var(--space-4); right:var(--space-4); }
+    .site-menu-panel{ width:220px; }
   }
 </style>
 </head>
 <body>
 
-<div class="theme-switcher" role="group" aria-label="Choose visual theme">
-  <button type="button" data-theme-btn="ledger" aria-pressed="true">Ledger</button>
-  <button type="button" data-theme-btn="blueprint" aria-pressed="false">Blueprint</button>
-  <button type="button" data-theme-btn="terminal" aria-pressed="false">Terminal</button>
+<div class="site-menu" id="siteMenu" data-open="false">
+  <div class="site-menu-panel" role="menu" aria-label="Page menu">
+    <div class="site-menu-group">
+      <div class="site-menu-heading">Jump to section</div>
+      <ul class="site-menu-links">
+        <li><a href="#summary">Summary</a></li>
+        <li><a href="#experience">Experience</a></li>
+        <li><a href="#patents">Patents</a></li>
+        <li><a href="#education">Education</a></li>
+        <li><a href="#community">Community</a></li>
+        <li><a href="#affiliations">Affiliations</a></li>
+        <li><a href="#certifications">Certifications</a></li>
+        <li><a href="#skills">Skills</a></li>
+      </ul>
+    </div>
+    <div class="site-menu-group">
+      <div class="site-menu-heading">Theme</div>
+      <div class="theme-options" role="group" aria-label="Choose visual theme">
+        <button type="button" data-theme-btn="ledger" aria-pressed="true">Ledger</button>
+        <button type="button" data-theme-btn="blueprint" aria-pressed="false">Blueprint</button>
+        <button type="button" data-theme-btn="terminal" aria-pressed="false">Terminal</button>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="site-menu-toggle" id="siteMenuToggle" aria-expanded="false" aria-controls="siteMenu" aria-label="Open page menu">
+    <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
+    <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+  </button>
 </div>
 
 <div class="wrap">
@@ -375,6 +428,31 @@
       btn.addEventListener('click', function(){
         setTheme(btn.getAttribute('data-theme-btn'));
       });
+    });
+
+    // Fixed bottom-right menu: open/close, section links, click-outside, escape key
+    var menu = document.getElementById('siteMenu');
+    var toggle = document.getElementById('siteMenuToggle');
+
+    function openMenu(){ menu.setAttribute('data-open','true'); toggle.setAttribute('aria-expanded','true'); }
+    function closeMenu(){ menu.setAttribute('data-open','false'); toggle.setAttribute('aria-expanded','false'); }
+    function isOpen(){ return menu.getAttribute('data-open') === 'true'; }
+
+    toggle.addEventListener('click', function(e){
+      e.stopPropagation();
+      isOpen() ? closeMenu() : openMenu();
+    });
+
+    menu.querySelectorAll('.site-menu-links a').forEach(function(link){
+      link.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('click', function(e){
+      if (isOpen() && !menu.contains(e.target)) closeMenu();
+    });
+
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && isOpen()) closeMenu();
     });
   })();
 </script>
