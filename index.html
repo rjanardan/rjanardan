@@ -96,6 +96,19 @@
 
   /* ---------- Header ---------- */
   header{ padding:var(--space-9) 0 var(--space-7); border-bottom:1px solid var(--border); }
+  .header-row{ display:flex; align-items:center; gap:var(--space-6); margin-bottom:var(--space-5); }
+  .headshot{
+    width:120px; height:120px; border-radius:50%; overflow:hidden; flex-shrink:0;
+    border:1px solid var(--border-strong); background:var(--grid-line);
+    display:flex; align-items:center; justify-content:center;
+    font-family:var(--font-mono); font-size:10px; color:var(--text-muted); text-align:center;
+  }
+  .headshot img{ width:100%; height:100%; object-fit:cover; }
+  .header-text .name{ margin-bottom:0; }
+  @media (max-width:560px){
+    .header-row{ flex-direction:column; align-items:flex-start; gap:var(--space-4); }
+    .headshot{ width:96px; height:96px; }
+  }
   .name{ font-size:clamp(32px,5vw,52px); line-height:1.05; margin-bottom:var(--space-2); }
   .tagline{ font-size:clamp(15px,2vw,18px); color:var(--text-muted); max-width:660px; margin-bottom:var(--space-5); }
   .contact-row{ display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); font-family:var(--font-mono); font-size:13px; color:var(--text-muted); }
@@ -205,8 +218,16 @@
 <div class="wrap">
 
   <header>
-    <p class="eyebrow">Engineering Leadership · AI Transformation · Community Building</p>
-    <h1 class="name">Janardan Revuru</h1>
+    <div class="header-row">
+      <!-- Place photo at: images/profile/headshot.jpg -->
+      <div class="headshot">
+        <img src="images/profile/headshot.jpg" alt="Janardan Revuru" onerror="this.style.display='none'; this.parentElement.textContent='Photo';">
+      </div>
+      <div class="header-text">
+        <p class="eyebrow">Engineering Leadership · AI Transformation · Community Building</p>
+        <h1 class="name">Janardan Revuru</h1>
+      </div>
+    </div>
     <p class="tagline">Scaling engineering organizations, leading AI-native transformation, and building research-driven tech communities across India. This page is a hub — start here, then dig into whichever part of the work is relevant to you.</p>
     <div class="contact-row">
       <span>Bengaluru, India</span><span class="sep">/</span>
@@ -261,49 +282,12 @@
   <section id="communities">
     <h2 class="section-title">Communities</h2>
     <p class="section-sub">22,000+ members, 100+ events hosted at companies including Google, Microsoft, Navi, Brillio, Dell, HPE, Nutanix, IBM, GeekyAnts, and Roku.</p>
-    <div class="community-grid">
-      <div class="community-card">
-        <div class="community-photos">
-          <!-- Place image files at: images/javascriptmeetup/gallery-1.jpg, gallery-2.jpg, gallery-3.jpg -->
-          <div class="ph"><img src="images/javascriptmeetup/gallery-1.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';" style="width:100%;height:100%;object-fit:cover;"></div>
-          <div class="ph"><img src="images/javascriptmeetup/gallery-2.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';" style="width:100%;height:100%;object-fit:cover;"></div>
-          <div class="ph"><img src="images/javascriptmeetup/gallery-3.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';" style="width:100%;height:100%;object-fit:cover;"></div>
-        </div>
-        <div class="community-body">
-          <div class="c-title">JavaScript Meetup</div>
-          <div class="c-meta">Since 2015 · Co-founder</div>
-          <p>Bangalore's long-running JS community — talks, workshops, and networking for frontend and full-stack engineers.</p>
-          <a href="javascriptmeetup.html">View community →</a>
-        </div>
+    <div class="cta-banner">
+      <div class="cta-text">
+        <div class="cta-title">JavaScript Meetup · DARLing · Byte of Python</div>
+        <p>Three communities founded and led over more than a decade — photos, host companies, and links to each, on one page.</p>
       </div>
-      <div class="community-card">
-        <div class="community-photos">
-          <!-- Place image files at: images/darling-meetup/gallery-1.jpg, gallery-2.jpg, gallery-3.jpg -->
-          <div class="ph"><img src="images/darling-meetup/gallery-1.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';" style="width:100%;height:100%;object-fit:cover;"></div>
-          <div class="ph"><img src="images/darling-meetup/gallery-2.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';" style="width:100%;height:100%;object-fit:cover;"></div>
-          <div class="ph"><img src="images/darling-meetup/gallery-3.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';" style="width:100%;height:100%;object-fit:cover;"></div>
-        </div>
-        <div class="community-body">
-          <div class="c-title">DARLing</div>
-          <div class="c-meta">Since 2025 · Founder</div>
-          <p>Data Science, AI, Research and Learning — a research-driven AI community relaunched from an earlier ODSC group.</p>
-          <a href="darling-meetup.html">View community →</a>
-        </div>
-      </div>
-      <div class="community-card">
-        <div class="community-photos">
-          <!-- Place image files at: images/byte-of-python/gallery-1.jpg, gallery-2.jpg, gallery-3.jpg -->
-          <div class="ph"><img src="images/byte-of-python/gallery-1.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';" style="width:100%;height:100%;object-fit:cover;"></div>
-          <div class="ph"><img src="images/byte-of-python/gallery-2.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';" style="width:100%;height:100%;object-fit:cover;"></div>
-          <div class="ph"><img src="images/byte-of-python/gallery-3.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';" style="width:100%;height:100%;object-fit:cover;"></div>
-        </div>
-        <div class="community-body">
-          <div class="c-title">Byte of Python</div>
-          <div class="c-meta">Since 2025 · Founder</div>
-          <p>A community for Python practitioners — from fundamentals to applied data science and AI tooling.</p>
-          <a href="byte-of-python.html">View community →</a>
-        </div>
-      </div>
+      <a class="btn primary" href="communities.html">View communities →</a>
     </div>
   </section>
 
