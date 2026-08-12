@@ -143,15 +143,19 @@
   /* Community cards with photo placeholders */
   .community-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:var(--space-5); }
   .community-card{ border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--bg-elevated); }
-  .community-photos{ display:grid; grid-template-columns:repeat(3,1fr); gap:2px; background:var(--border); }
-  .community-photos .ph{
-    aspect-ratio:1/1; background:var(--grid-line); display:flex; align-items:center; justify-content:center;
+  .community-logo{
+    aspect-ratio:3/1; background:var(--bg-elevated); border-bottom:1px solid var(--border);
+    display:flex; align-items:center; justify-content:center; padding:var(--space-4);
     font-family:var(--font-mono); font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em;
   }
+  .community-logo img{ max-width:70%; max-height:70%; object-fit:contain; }
   .community-body{ padding:var(--space-4); }
   .community-body .c-title{ font-family:var(--font-display); font-weight:600; font-size:16px; margin-bottom:4px; }
   .community-body .c-meta{ font-family:var(--font-mono); font-size:11px; color:var(--accent); margin-bottom:8px; text-transform:uppercase; letter-spacing:.04em; }
   .community-body p{ font-size:13.5px; color:var(--text-muted); margin:0 0 var(--space-3); }
+  .c-members{ font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--accent); margin-bottom:var(--space-3); }
+  .community-body a{ display:inline-block; font-size:13.5px; }
+  .community-body a + br + a{ margin-top:6px; }
 
   /* CTA banners */
   .cta-banner{
@@ -282,12 +286,49 @@
   <section id="communities">
     <h2 class="section-title">Communities</h2>
     <p class="section-sub">22,000+ members, 100+ events hosted at companies including Google, Microsoft, Navi, Brillio, Dell, HPE, Nutanix, IBM, GeekyAnts, and Roku.</p>
-    <div class="cta-banner">
-      <div class="cta-text">
-        <div class="cta-title">JavaScript Meetup · DARLing · Byte of Python</div>
-        <p>Three communities founded and led over more than a decade — photos, host companies, and links to each, on one page.</p>
+    <div class="community-grid">
+      <div class="community-card">
+        <div class="community-logo">
+          <!-- Place logo file at: images/javascriptmeetup/logo.png -->
+          <img src="images/javascriptmeetup/logo.png" alt="JavaScript Meetup logo" onerror="this.style.display='none'; this.parentElement.textContent='Logo';">
+        </div>
+        <div class="community-body">
+          <div class="c-title">JavaScript Meetup</div>
+          <div class="c-meta">Since 2015 · Co-founder</div>
+          <p>Bangalore's long-running JS community — talks, workshops, and networking for frontend and full-stack engineers.</p>
+          <div class="c-members">Join 13,050+ members</div>
+          <a href="javascriptmeetup.html">About community →</a><br>
+          <a href="https://www.meetup.com/javascriptmeetup/" target="_blank" rel="noopener">Join community at meetup.com →</a>
+        </div>
       </div>
-      <a class="btn primary" href="communities.html">View communities →</a>
+      <div class="community-card">
+        <div class="community-logo">
+          <!-- Place logo file at: images/darling-meetup/logo.png -->
+          <img src="images/darling-meetup/logo.png" alt="DARLing logo" onerror="this.style.display='none'; this.parentElement.textContent='Logo';">
+        </div>
+        <div class="community-body">
+          <div class="c-title">DARLing</div>
+          <div class="c-meta">Since 2025 · Founder</div>
+          <p>Data Science, AI, Research and Learning — a research-driven AI community relaunched from an earlier ODSC group.</p>
+          <div class="c-members">Join 4,833+ members</div>
+          <a href="darling-meetup.html">About community →</a><br>
+          <a href="https://www.meetup.com/darling-meetup/" target="_blank" rel="noopener">Join community at meetup.com →</a>
+        </div>
+      </div>
+      <div class="community-card">
+        <div class="community-logo">
+          <!-- Place logo file at: images/byte-of-python/logo.png -->
+          <img src="images/byte-of-python/logo.png" alt="Byte of Python logo" onerror="this.style.display='none'; this.parentElement.textContent='Logo';">
+        </div>
+        <div class="community-body">
+          <div class="c-title">Byte of Python</div>
+          <div class="c-meta">Since 2025 · Founder</div>
+          <p>A community for Python practitioners — from fundamentals to applied data science and AI tooling.</p>
+          <div class="c-members">Join 4,771+ members</div>
+          <a href="byte-of-python.html">About community →</a><br>
+          <a href="https://www.meetup.com/byte-of-python/" target="_blank" rel="noopener">Join community at meetup.com →</a>
+        </div>
+      </div>
     </div>
   </section>
 
@@ -300,7 +341,7 @@
         <p>Have something worth sharing on AI, data science, or JavaScript/web engineering? We're lining up speakers for upcoming meetups.</p>
       </div>
       <!-- TODO: replace with your actual CFP form or mailto -->
-      <a class="btn primary" href="https://tinyurl.com/submit-talk">Submit a talk</a>
+      <a class="btn primary" href="https://tinyurl.com/submit-talk" target="_blank" rel="noopener">Submit a talk</a>
     </div>
     <div class="cta-banner">
       <div class="cta-text">
@@ -308,7 +349,7 @@
         <p>Can host or sponsor a meetup — space, food, or swag? We're always looking for partners across Bangalore.</p>
       </div>
       <!-- TODO: replace with your actual sponsorship form or mailto -->
-      <a class="btn primary" href="https://tinyurl.com/venue-support">Get in touch</a>
+      <a class="btn primary" href="https://tinyurl.com/venue-support" target="_blank" rel="noopener">Get in touch</a>
     </div>
   </section>
 
