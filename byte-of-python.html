@@ -109,6 +109,18 @@
   footer{ padding:var(--space-8) 0 var(--space-9); font-family:var(--font-mono); font-size:13px; }
   .footer-links{ display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); }
 
+  .cta-banner{
+    border:1px dashed var(--border-strong); border-radius:var(--radius); padding:var(--space-6);
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-4);
+  }
+  .cta-banner + .cta-banner{ margin-top:var(--space-4); }
+  .cta-banner .cta-text .cta-title{ font-family:var(--font-display); font-weight:600; font-size:18px; margin-bottom:4px; }
+  .cta-banner .cta-text p{ color:var(--text-muted); font-size:13.5px; margin:0; max-width:440px; }
+
+  @media (max-width: 600px) {
+    .cta-banner{ flex-direction:column; align-items:flex-start; }
+  }
+
   @media (max-width:640px){ .site-menu-panel{ width:220px; } }
 </style>
 </head>
@@ -245,6 +257,27 @@
       <li><span class="ev-date">[Month Year]</span><span class="ev-title">[Upcoming event title]</span><a href="#">Details →</a></li>
       <li><span class="ev-date">[Month Year]</span><span class="ev-title">[Past event title]</span><a href="#">Details →</a></li>
     </ul>
+  </section>
+
+  <section id="speak-sponsor">
+    <h2 class="section-title">Speak, Sponsor, or Host</h2>
+    <p class="section-sub">Open calls for our upcoming community events.</p>
+    <div class="cta-banner">
+      <div class="cta-text">
+        <div class="cta-title">Call for Speakers</div>
+        <p>Have something worth sharing on AI, data science, or JavaScript/web engineering? We're lining up speakers for upcoming meetups.</p>
+      </div>
+      <!-- TODO: replace with your actual CFP form or mailto -->
+      <a class="btn primary" href="https://tinyurl.com/submit-talk" target="_blank" rel="noopener">Submit a talk</a>
+    </div>
+    <div class="cta-banner">
+      <div class="cta-text">
+        <div class="cta-title">Call for Venue &amp; Sponsors</div>
+        <p>Can host or sponsor a meetup — space, food, or swag? We're always looking for partners across Bangalore.</p>
+      </div>
+      <!-- TODO: replace with your actual sponsorship form or mailto -->
+      <a class="btn primary" href="https://tinyurl.com/venue-support" target="_blank" rel="noopener">Get in touch</a>
+    </div>
   </section>
 
   <footer>
