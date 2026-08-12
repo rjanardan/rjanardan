@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ledger">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Communities — Janardan Revuru</title>
+<meta name="description" content="JavaScript Meetup, DARLing, and Byte of Python — tech communities founded and led by Janardan Revuru, totaling 22,000+ members and 100+ events across India.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+    --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px;
+    --maxw: 960px;
+  }
+  [data-theme="blueprint"]{
+    --bg:#0a2540; --bg-elevated:#0e2f52; --grid-line: rgba(140,195,255,0.08);
+    --text:#eaf2ff; --text-muted:#93b3da; --accent:#5ec8f8; --accent-2:#ffcf6b;
+    --border: rgba(94,200,248,0.32); --border-strong: rgba(94,200,248,0.6);
+    --font-display:'Space Grotesk', sans-serif; --font-body:'IBM Plex Sans', sans-serif; --font-mono:'JetBrains Mono', monospace;
+    --radius:2px; --tracking-eyebrow: 0.14em;
+  }
+  [data-theme="studio"]{
+    --bg:#ffffff; --bg-elevated:#f6f6f4; --grid-line: transparent;
+    --text:#1a1a18; --text-muted:#68675f; --accent:#146b5c; --accent-2:#b5482a;
+    --border: rgba(0,0,0,0.14); --border-strong: rgba(0,0,0,0.3);
+    --font-display:'Space Grotesk', sans-serif; --font-body:'IBM Plex Sans', sans-serif; --font-mono:'JetBrains Mono', monospace;
+    --radius:4px; --tracking-eyebrow: 0.1em;
+  }
+  [data-theme="ledger"]{
+    --bg:#f7f4ec; --bg-elevated:#ffffff; --grid-line: rgba(43,58,103,0.07);
+    --text:#242938; --text-muted:#5d6274; --accent:#2b3a67; --accent-2:#8a6a34;
+    --border: rgba(43,58,103,0.22); --border-strong: rgba(43,58,103,0.45);
+    --font-display:'Fraunces', serif; --font-body:'Source Serif 4', serif; --font-mono:'JetBrains Mono', monospace;
+    --radius:2px; --tracking-eyebrow: 0.1em;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  html{ overflow-x:hidden; }
+  body{
+    margin:0; overflow-x:hidden; background:var(--bg); color:var(--text);
+    font-family:var(--font-body); line-height:1.6; font-size:16px;
+  }
+
+  a{ color:var(--accent); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 var(--space-5); }
+  h1,h2,h3{ font-family:var(--font-display); font-weight:600; margin:0; }
+  .eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:var(--tracking-eyebrow); text-transform:uppercase; color:var(--accent); margin:0 0 var(--space-2); }
+
+  /* ---------- Fixed bottom-right menu ---------- */
+  .site-menu{ position:fixed; right:max(var(--space-4), env(safe-area-inset-right)); bottom:max(var(--space-4), env(safe-area-inset-bottom)); z-index:60; }
+  .site-menu-toggle{
+    width:52px; height:52px; border-radius:50%; border:1px solid var(--border-strong);
+    background:var(--accent); color:var(--bg); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25); transition:transform .2s ease;
+  }
+  .site-menu-toggle:hover{ transform:scale(1.05); }
+  .site-menu-toggle svg{ width:20px; height:20px; }
+  .site-menu-toggle .icon-close{ display:none; }
+  .site-menu[data-open="true"] .icon-open{ display:none; }
+  .site-menu[data-open="true"] .icon-close{ display:block; }
+  .site-menu-panel{
+    position:absolute; right:0; bottom:64px; width:260px;
+    background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:0 12px 32px rgba(0,0,0,0.28); padding:var(--space-4);
+    opacity:0; transform:translateY(8px); pointer-events:none; transition:all .18s ease;
+    max-height:70vh; overflow-y:auto;
+  }
+  .site-menu[data-open="true"] .site-menu-panel{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .site-menu-group + .site-menu-group{ margin-top:var(--space-4); padding-top:var(--space-4); border-top:1px solid var(--border); }
+  .site-menu-heading{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:var(--space-2); }
+  .site-menu-links{ list-style:none; margin:0; padding:0; }
+  .site-menu-links li a{ display:block; padding:10px 6px; min-height:22px; border-radius:4px; font-size:13.5px; color:var(--text); text-decoration:none; }
+  .site-menu-links li a:hover{ background:var(--grid-line); color:var(--accent); text-decoration:none; }
+  .theme-options{ display:flex; gap:6px; }
+  .theme-options button{
+    flex:1; font-family:var(--font-mono); font-size:11px; letter-spacing:.02em; text-transform:uppercase;
+    background:transparent; border:1px solid var(--border); color:var(--text-muted); cursor:pointer;
+    padding:12px 4px; min-height:20px; border-radius:16px; transition:all .2s ease;
+  }
+  .theme-options button:hover{ color:var(--text); }
+  .theme-options button[aria-pressed="true"]{ background:var(--accent); color:var(--bg); font-weight:600; border-color:var(--accent); }
+
+  /* ---------- Header ---------- */
+  header{ padding:var(--space-9) 0 var(--space-7); border-bottom:1px solid var(--border); }
+  .name{ font-size:clamp(30px,4.5vw,46px); line-height:1.05; margin-bottom:var(--space-2); }
+  .tagline{ font-size:clamp(15px,2vw,18px); color:var(--text-muted); max-width:660px; margin-bottom:var(--space-6); }
+  .stat-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:var(--space-4); }
+  .stat{ border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-4); text-align:center; }
+  .stat .num{ font-family:var(--font-display); font-size:26px; font-weight:700; color:var(--accent); }
+  .stat .label{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-top:4px; }
+
+  /* ---------- Community sections ---------- */
+  .community-section{ padding:var(--space-9) 0; border-bottom:1px solid var(--border); }
+  .community-section:last-of-type{ border-bottom:none; }
+  .community-head{ display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:var(--space-3); margin-bottom:var(--space-2); }
+  .community-title{ font-size:clamp(24px,3.4vw,32px); }
+  .community-meta{ font-family:var(--font-mono); font-size:12px; color:var(--accent); text-transform:uppercase; letter-spacing:.05em; }
+  .community-desc{ color:var(--text-muted); font-size:15px; max-width:640px; margin:var(--space-3) 0 var(--space-6); }
+
+  .gallery{
+    display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,140px);
+    gap:6px; margin-bottom:var(--space-6);
+  }
+  .gallery .ph{
+    background:var(--grid-line); border:1px solid var(--border); border-radius:var(--radius);
+    display:flex; align-items:center; justify-content:center; overflow:hidden;
+    font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em;
+    text-align:center; padding:var(--space-2);
+  }
+  .gallery .ph img{ width:100%; height:100%; object-fit:cover; }
+  .gallery .ph.large{ grid-column:span 2; grid-row:span 2; }
+  @media (max-width:700px){
+    .gallery{ grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(3,120px); }
+    .gallery .ph.large{ grid-column:span 2; grid-row:span 1; }
+  }
+  @media (max-width:420px){
+    .gallery{ grid-template-columns:1fr; grid-template-rows:180px repeat(4,110px); }
+    .gallery .ph.large{ grid-column:span 1; grid-row:span 1; height:180px; }
+  }
+
+  .hosted-by{ margin-bottom:var(--space-6); }
+  .hosted-by .hb-label{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-bottom:var(--space-3); }
+  .logo-strip{ display:flex; flex-wrap:wrap; gap:var(--space-3); }
+  .logo-chip{
+    width:120px; height:52px; border:1px solid var(--border); border-radius:var(--radius);
+    display:flex; align-items:center; justify-content:center; background:var(--bg-elevated);
+    font-family:var(--font-mono); font-size:10px; color:var(--text-muted); text-align:center; padding:4px; overflow:hidden;
+  }
+  .logo-chip img{ max-width:100%; max-height:100%; object-fit:contain; }
+
+  .community-links{ display:flex; flex-wrap:wrap; gap:var(--space-3); }
+  .btn{
+    display:inline-block; font-family:var(--font-mono); font-size:12.5px; text-transform:uppercase; letter-spacing:.04em;
+    padding:11px 18px; border-radius:24px; border:1px solid var(--border-strong); color:var(--text);
+  }
+  .btn:hover{ text-decoration:none; background:var(--grid-line); }
+  .btn.primary{ background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:600; }
+  .btn.primary:hover{ opacity:.9; background:var(--accent); }
+
+  footer{ padding:var(--space-8) 0 var(--space-9); font-family:var(--font-mono); font-size:13px; }
+  .footer-links{ display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); }
+
+  @media (max-width:640px){
+    .site-menu-panel{ width:220px; }
+  }
+</style>
+</head>
+<body>
+
+<div class="site-menu" id="siteMenu" data-open="false">
+  <div class="site-menu-panel" role="menu" aria-label="Page menu">
+    <div class="site-menu-group">
+      <div class="site-menu-heading">Jump to community</div>
+      <ul class="site-menu-links">
+        <li><a href="#js-meetup">JavaScript Meetup</a></li>
+        <li><a href="#darling">DARLing</a></li>
+        <li><a href="#byte-of-python">Byte of Python</a></li>
+        <li><a href="index.html">← Back to Homepage</a></li>
+      </ul>
+    </div>
+    <div class="site-menu-group">
+      <div class="site-menu-heading">Theme</div>
+      <div class="theme-options" role="group" aria-label="Choose visual theme">
+        <button type="button" data-theme-btn="ledger" aria-pressed="true">Ledger</button>
+        <button type="button" data-theme-btn="studio" aria-pressed="false">Studio</button>
+        <button type="button" data-theme-btn="blueprint" aria-pressed="false">Blueprint</button>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="site-menu-toggle" id="siteMenuToggle" aria-expanded="false" aria-controls="siteMenu" aria-label="Open page menu">
+    <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
+    <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+  </button>
+</div>
+
+<div class="wrap">
+
+  <header>
+    <p class="eyebrow">Community Building</p>
+    <h1 class="name">Communities</h1>
+    <p class="tagline">Three communities, founded and led over more than a decade — bringing together engineers, researchers, and practitioners across India for talks, workshops, and hands-on learning.</p>
+    <div class="stat-row">
+      <div class="stat"><div class="num">22K+</div><div class="label">Members</div></div>
+      <div class="stat"><div class="num">100+</div><div class="label">Events hosted</div></div>
+      <div class="stat"><div class="num">3</div><div class="label">Communities founded</div></div>
+      <div class="stat"><div class="num">11+</div><div class="label">Years running</div></div>
+    </div>
+  </header>
+
+  <!-- ============ JAVASCRIPT MEETUP ============ -->
+  <section class="community-section" id="js-meetup">
+    <div class="community-head">
+      <h2 class="community-title">JavaScript Meetup</h2>
+      <span class="community-meta">Since 2015 · Co-founder</span>
+    </div>
+    <p class="community-desc">Bangalore's long-running JavaScript community — talks, workshops, and networking for frontend and full-stack engineers. 11+ years of monthly and quarterly meetups hosted across some of India's leading tech offices.</p>
+
+    <div class="gallery">
+      <!-- Place image files at: images/js-meetup/cover.jpg, gallery-1.jpg … gallery-5.jpg -->
+      <div class="ph large"><img src="images/js-meetup/cover.jpg" alt="JavaScript Meetup event" onerror="this.style.display='none'; this.parentElement.textContent='Cover photo';"></div>
+      <div class="ph"><img src="images/js-meetup/gallery-1.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+      <div class="ph"><img src="images/js-meetup/gallery-2.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+      <div class="ph"><img src="images/js-meetup/gallery-3.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+      <div class="ph"><img src="images/js-meetup/gallery-4.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+    </div>
+
+    <div class="hosted-by">
+      <div class="hb-label">Hosted by</div>
+      <div class="logo-strip">
+        <!-- Place logo files at: images/logos/[company].png -->
+        <div class="logo-chip"><img src="images/logos/google.png" alt="Google" onerror="this.style.display='none'; this.parentElement.textContent='Google';"></div>
+        <div class="logo-chip"><img src="images/logos/microsoft.png" alt="Microsoft" onerror="this.style.display='none'; this.parentElement.textContent='Microsoft';"></div>
+        <div class="logo-chip"><img src="images/logos/navi.png" alt="Navi" onerror="this.style.display='none'; this.parentElement.textContent='Navi';"></div>
+        <div class="logo-chip"><img src="images/logos/brillio.png" alt="Brillio" onerror="this.style.display='none'; this.parentElement.textContent='Brillio';"></div>
+        <div class="logo-chip"><img src="images/logos/dell.png" alt="Dell" onerror="this.style.display='none'; this.parentElement.textContent='Dell';"></div>
+        <div class="logo-chip"><img src="images/logos/hpe.png" alt="HPE" onerror="this.style.display='none'; this.parentElement.textContent='HPE';"></div>
+        <div class="logo-chip"><img src="images/logos/nutanix.png" alt="Nutanix" onerror="this.style.display='none'; this.parentElement.textContent='Nutanix';"></div>
+        <div class="logo-chip"><img src="images/logos/ibm.png" alt="IBM" onerror="this.style.display='none'; this.parentElement.textContent='IBM';"></div>
+        <div class="logo-chip"><img src="images/logos/geekyants.png" alt="GeekyAnts" onerror="this.style.display='none'; this.parentElement.textContent='GeekyAnts';"></div>
+        <div class="logo-chip"><img src="images/logos/roku.png" alt="Roku" onerror="this.style.display='none'; this.parentElement.textContent='Roku';"></div>
+      </div>
+    </div>
+
+    <div class="community-links">
+      <!-- TODO: replace with your actual JS Meetup group URL -->
+      <a class="btn primary" href="#" target="_blank" rel="noopener">Visit meetup page</a>
+      <!-- TODO: replace with your actual YouTube channel URL -->
+      <a class="btn" href="#" target="_blank" rel="noopener">YouTube channel</a>
+    </div>
+  </section>
+
+  <!-- ============ DARLING ============ -->
+  <section class="community-section" id="darling">
+    <div class="community-head">
+      <h2 class="community-title">DARLing</h2>
+      <span class="community-meta">Since 2025 · Founder</span>
+    </div>
+    <p class="community-desc">Data Science, AI, Research and Learning — a research-driven AI community relaunched from an earlier ODSC group. 4,800+ members, part of a broader network of 22,000+ across India.</p>
+
+    <div class="gallery">
+      <!-- Place image files at: images/darling/cover.jpg, gallery-1.jpg … gallery-5.jpg -->
+      <div class="ph large"><img src="images/darling/cover.jpg" alt="DARLing event" onerror="this.style.display='none'; this.parentElement.textContent='Cover photo';"></div>
+      <div class="ph"><img src="images/darling/gallery-1.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+      <div class="ph"><img src="images/darling/gallery-2.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+      <div class="ph"><img src="images/darling/gallery-3.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+      <div class="ph"><img src="images/darling/gallery-4.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+    </div>
+
+    <div class="hosted-by">
+      <div class="hb-label">Hosted by</div>
+      <div class="logo-strip">
+        <!-- TODO: add host company logos once confirmed, same convention as above: images/logos/[company].png -->
+        <div class="logo-chip">Add host logos</div>
+      </div>
+    </div>
+
+    <div class="community-links">
+      <!-- TODO: replace with your actual DARLing group/page URL -->
+      <a class="btn primary" href="#" target="_blank" rel="noopener">Visit meetup page</a>
+      <!-- TODO: replace with your actual YouTube channel URL -->
+      <a class="btn" href="#" target="_blank" rel="noopener">YouTube channel</a>
+    </div>
+  </section>
+
+  <!-- ============ BYTE OF PYTHON ============ -->
+  <section class="community-section" id="byte-of-python">
+    <div class="community-head">
+      <h2 class="community-title">Byte of Python</h2>
+      <span class="community-meta">Since 2025 · Founder</span>
+    </div>
+    <p class="community-desc">A community for Python practitioners — from fundamentals to applied data science and AI tooling.</p>
+
+    <div class="gallery">
+      <!-- Place image files at: images/byte-of-python/cover.jpg, gallery-1.jpg … gallery-5.jpg -->
+      <div class="ph large"><img src="images/byte-of-python/cover.jpg" alt="Byte of Python event" onerror="this.style.display='none'; this.parentElement.textContent='Cover photo';"></div>
+      <div class="ph"><img src="images/byte-of-python/gallery-1.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+      <div class="ph"><img src="images/byte-of-python/gallery-2.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+      <div class="ph"><img src="images/byte-of-python/gallery-3.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+      <div class="ph"><img src="images/byte-of-python/gallery-4.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
+    </div>
+
+    <div class="hosted-by">
+      <div class="hb-label">Hosted by</div>
+      <div class="logo-strip">
+        <!-- TODO: add host company logos once confirmed, same convention as above: images/logos/[company].png -->
+        <div class="logo-chip">Add host logos</div>
+      </div>
+    </div>
+
+    <div class="community-links">
+      <!-- TODO: replace with your actual Byte of Python group/page URL -->
+      <a class="btn primary" href="#" target="_blank" rel="noopener">Visit meetup page</a>
+      <!-- TODO: replace with your actual YouTube channel URL -->
+      <a class="btn" href="#" target="_blank" rel="noopener">YouTube channel</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="footer-links">
+      <a href="index.html">← Back to Homepage</a>
+      <a href="janardan-profile.html">Full Profile</a>
+      <a href="mailto:janardan.revuru@gmail.com">Email</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  (function(){
+    var root = document.documentElement;
+    var buttons = document.querySelectorAll('[data-theme-btn]');
+    var saved = null;
+    try { saved = localStorage.getItem('jr-theme'); } catch(e) {}
+    var validThemes = ['ledger','studio','blueprint'];
+    if (saved && validThemes.indexOf(saved) !== -1) { setTheme(saved); }
+
+    function setTheme(name){
+      root.setAttribute('data-theme', name);
+      buttons.forEach(function(b){
+        b.setAttribute('aria-pressed', b.getAttribute('data-theme-btn') === name ? 'true' : 'false');
+      });
+      try { localStorage.setItem('jr-theme', name); } catch(e) {}
+    }
+
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){ setTheme(btn.getAttribute('data-theme-btn')); });
+    });
+
+    var menu = document.getElementById('siteMenu');
+    var toggle = document.getElementById('siteMenuToggle');
+    function openMenu(){ menu.setAttribute('data-open','true'); toggle.setAttribute('aria-expanded','true'); }
+    function closeMenu(){ menu.setAttribute('data-open','false'); toggle.setAttribute('aria-expanded','false'); }
+    function isOpen(){ return menu.getAttribute('data-open') === 'true'; }
+    toggle.addEventListener('click', function(e){ e.stopPropagation(); isOpen() ? closeMenu() : openMenu(); });
+    menu.querySelectorAll('.site-menu-links a').forEach(function(link){ link.addEventListener('click', closeMenu); });
+    document.addEventListener('click', function(e){ if (isOpen() && !menu.contains(e.target)) closeMenu(); });
+    document.addEventListener('keydown', function(e){ if (e.key === 'Escape' && isOpen()) closeMenu(); });
+  })();
+</script>
+
+</body>
+</html>
