@@ -140,6 +140,12 @@
   .pillar-card .pillar-desc{ color:var(--text-muted); font-size:13.5px; flex:1; }
   .pillar-card .pillar-link{ font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:.04em; }
 
+  /* Executive metrics scorecard */
+  .stat-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:var(--space-4); margin-bottom:var(--space-4); }
+  .stat{ border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-4); text-align:center; background:var(--bg-elevated); }
+  .stat .num{ font-family:var(--font-display); font-size:28px; font-weight:700; color:var(--accent); }
+  .stat .label{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-top:4px; }
+
   /* Community cards with photo placeholders */
   .community-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:var(--space-5); }
   .community-card{ border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--bg-elevated); }
@@ -198,6 +204,7 @@
     <div class="site-menu-group">
       <div class="site-menu-heading">Jump to section</div>
       <ul class="site-menu-links">
+        <li><a href="#playbook">Leadership Playbook</a></li>
         <li><a href="#pillars">Profile &amp; Work</a></li>
         <li><a href="#communities">Communities</a></li>
         <li><a href="#universities">Universities</a></li>
@@ -243,6 +250,54 @@
       <a class="btn" href="https://publish.obsidian.md/janardan" target="_blank" rel="noopener">Research Blog</a>
     </div>
   </header>
+
+  <section id="metrics">
+    <div class="stat-row">
+      <div class="stat">
+        <div class="num">25+ Yrs</div>
+        <div class="label">Tech Experience</div>
+      </div>
+      <div class="stat">
+        <div class="num">120+</div>
+        <div class="label">Org Size Led</div>
+      </div>
+      <div class="stat">
+        <div class="num">4</div>
+        <div class="label">US Patents</div>
+      </div>
+      <div class="stat">
+        <div class="num">22K+</div>
+        <div class="label">Community Members</div>
+      </div>
+      <div class="stat">
+        <div class="num">Top 2%</div>
+        <div class="label">LEAD Graduate</div>
+      </div>
+      <div class="stat">
+        <div class="num">5x</div>
+        <div class="label">Rockstar Manager</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="playbook">
+    <h2 class="section-title">Leadership &amp; Strategy Playbook</h2>
+    <p class="section-sub">My core pillars for building high-performing organizations and driving technological transformation.</p>
+    <div class="pillar-grid">
+      <div class="pillar-card">
+        <div class="pillar-title">AI-Native Engineering Transformation</div>
+        <div class="pillar-desc">Pioneered transition from AI coding assistants to agentic AI workflows across a 600-engineer business unit at Dell, yielding 3x productivity and 30% higher team engagement. Researching multi-agent system communication architectures (Ph.D. Candidate in AI).</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-title">Organizational Scaling &amp; Culture</div>
+        <div class="pillar-desc">Built and led software R&amp;D organizations of 100–120 engineers from scratch (scaled Dell EMC team from 2 to 80). Graduated from Dell's executive LEAD program and named Rockstar Manager for 5 consecutive years.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-title">Portfolio Architecture &amp; Methodology</div>
+        <div class="pillar-desc">Led Agile/Scrum transformation for a portfolio of 1,200+ developers. Standardized secure, spec-driven engineering methodologies and directed the modernization of legacy technologies (e.g., GWT to Angular).</div>
+      </div>
+    </div>
+  </section>
 
   <section id="pillars">
     <h2 class="section-title">Profile &amp; Work</h2>
