@@ -146,6 +146,20 @@
   .stat .num{ font-family:var(--font-display); font-size:28px; font-weight:700; color:var(--accent); }
   .stat .label{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-top:4px; }
 
+  /* Company logo wall */
+  .company-wall { display:grid; grid-template-columns:1fr 1fr; gap:var(--space-5); margin-top:var(--space-4); }
+  .company-bucket { border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-5); background:var(--bg-elevated); }
+  .bucket-title { font-family:var(--font-mono); font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:.08em; margin-bottom:var(--space-4); border-bottom:1px solid var(--border); padding-bottom:var(--space-2); }
+  .logo-strip { display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-5) var(--space-6); }
+  .logo-item { height:28px; filter:grayscale(100%) contrast(85%); opacity:0.7; transition:all .2s ease; display:flex; align-items:center; }
+  .logo-item:hover { filter:none; opacity:1; }
+  .logo-item img { height:100%; width:auto; max-width:110px; object-fit:contain; }
+  .logo-badge { font-family:var(--font-display); font-weight:700; font-size:13px; color:var(--text); letter-spacing:-0.01em; padding:4px 8px; border:1px solid var(--border-strong); border-radius:2px; background:var(--bg); text-transform:uppercase; white-space:nowrap; }
+
+  @media (max-width:768px) {
+    .company-wall { grid-template-columns:1fr; gap:var(--space-4); }
+  }
+
   /* Community cards with photo placeholders */
   .community-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:var(--space-5); }
   .community-card{ border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; background:var(--bg-elevated); }
@@ -204,6 +218,7 @@
     <div class="site-menu-group">
       <div class="site-menu-heading">Jump to section</div>
       <ul class="site-menu-links">
+        <li><a href="#career-pedigree">Companies</a></li>
         <li><a href="#playbook">Leadership Playbook</a></li>
         <li><a href="#pillars">Profile &amp; Work</a></li>
         <li><a href="#communities">Communities</a></li>
@@ -276,6 +291,35 @@
       <div class="stat">
         <div class="num">5x</div>
         <div class="label">People Engagement Award</div>
+      </div>
+    </div>
+  </section>
+
+  <section id="career-pedigree">
+    <h2 class="section-title">Scale &amp; Execution Pedigree</h2>
+    <p class="section-sub">A career spanning large-scale global enterprise systems and early-stage engineering startups.</p>
+    
+    <div class="company-wall">
+      <!-- MNC Bucket -->
+      <div class="company-bucket">
+        <div class="bucket-title">Global Enterprises &amp; MNCs</div>
+        <div class="logo-strip">
+          <div class="logo-item" title="Dell Technologies"><img src="images/logos/dell.png" alt="Dell Technologies"></div>
+          <div class="logo-item" title="Hewlett Packard Enterprise"><img src="images/logos/hpe.png" alt="HPE"></div>
+          <div class="logo-item" title="Motorola"><img src="images/logos/motorola.svg" alt="Motorola"></div>
+          <div class="logo-item" title="Avaya"><img src="images/logos/avaya.svg" alt="Avaya"></div>
+          <div class="logo-item" title="Nortel"><img src="images/logos/nortel.svg" alt="Nortel"></div>
+          <div class="logo-item" title="Wipro"><img src="images/logos/wipro.svg" alt="Wipro"></div>
+        </div>
+      </div>
+      
+      <!-- Startups Bucket -->
+      <div class="company-bucket">
+        <div class="bucket-title">Startups &amp; Growth Tech</div>
+        <div class="logo-strip">
+          <div class="logo-item" title="Tasman Networks (Acquired by Nortel)"><span class="logo-badge">Tasman Networks</span></div>
+          <div class="logo-item" title="Amber Networks (Acquired by Nokia)"><span class="logo-badge">Amber Networks</span></div>
+        </div>
       </div>
     </div>
   </section>
