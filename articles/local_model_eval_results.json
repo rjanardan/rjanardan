@@ -1,0 +1,1051 @@
+{
+  "generated_at": "2026-08-22T11:26:34",
+  "models": [
+    "qwen3:1.7b",
+    "qwen3:4b",
+    "llama3.2:3b",
+    "deepseek-r1:1.5b",
+    "nemotron-3-ultra-free",
+    "deepseek-v4-flash"
+  ],
+  "tests": [
+    {
+      "id": "org_summary",
+      "name": "Structured notes review",
+      "ideal": "States 3 TODOs, identifies legal/counsel feedback as the blocker, excludes SOMEDAY from immediate work, and prioritizes landing copy, backups, then staging secrets.",
+      "results": {
+        "qwen3:1.7b": {
+          "response": "**Executive Summary:**\n- Launch website is pending, with a draft landing page copy in progress.\n- Legal review is pending for privacy text.\n- Analytics vendor selection is complete.\n- Backups and staging secrets rotation are pending.\n- A comparison page is planned for later.\n\n**Blocked Work:**\n- Legal review of privacy text (blocked by counsel feedback).\n\n**Next 3 Actions in Priority Order:**\n1. **Enable backups** \u2013 critical for data integrity and system functionality.\n2. **Rotate staging secrets** \u2013 essential for maintaining secure and compliant operations.\n3. **Draft landing page copy** \u2013 necessary for the website launch to ensure user engagement and brand consistency.",
+          "seconds": 4.34,
+          "score_10": 10.0,
+          "matched": [
+            "landing",
+            "legal",
+            "privacy",
+            "backup",
+            "secret"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "qwen3:4b": {
+          "response": "We are given an org file snippet. Let's break it down.\n\n The org file structure:\n\n * Launch website\n   ** TODO Draft landing page copy\n      DEADLINE: <2026-08-28 Fri>\n      ** WAITING Legal review of privacy text\n         :PROPERTIES:\n         :BLOCKER: counsel feedback\n         :END:\n   ** TODO Enable backups\n   ** TODO Rotate staging secrets\n * Ideas\n   ** SOMEDAY Add comparison page\n\n Steps:\n\n 1. Review the org file and understand the current state.\n\n 2. Give a 4-bullet executive summary.\n\n 3. Identify blocked work.\n\n 4. List the next 3 actions in priority order (without inventing dates).\n\n Let's analyze:\n\n - The top-level item is \"Launch website\", which has several sub-items.\n\n   a. \"TODO Draft landing page",
+          "seconds": 13.03,
+          "score_10": 10.0,
+          "matched": [
+            "landing",
+            "legal",
+            "privacy",
+            "backup",
+            "secret"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "llama3.2:3b": {
+          "response": "Here is a 4-bullet executive summary, identification of blocked work, and prioritized next actions:\n\nExecutive Summary:\n\n\u2022 The organization has several open tasks, including drafting landing page copy, enabling backups, rotating staging secrets, and adding a comparison page.\n\u2022 A critical task is pending legal review of privacy text due to counsel feedback, which blocks progress on the website launch.\n\u2022 The organization has made progress with selecting an analytics vendor and completing other tasks.\n\nBlocked Work:\n\n* Drafting landing page copy is blocked due to waiting for legal review of privacy text from counsel feedback.\n\nPrioritized Next Actions:\n\n1. **Address Counsel Feedback**: Resolve the issue with counsel feedback on the privacy text to allow drafting of landing page copy.\n2. **Enable Backups**: Complete enabling backups as a critical infrastructure task to ensure website stability and data security.\n3. **Rotate Staging Secrets**: Rotate staging secrets to",
+          "seconds": 10.89,
+          "score_10": 10.0,
+          "matched": [
+            "landing",
+            "legal",
+            "privacy",
+            "backup",
+            "secret"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-r1:1.5b": {
+          "response": "<think>\nOkay, so I need to create a 4-bullet executive summary for this org file. The user has provided some tasks and deadlines, which is helpful. Let me go through each part step by step.\n\nFirst, the Launch website section. They have three bullet points: a TODO for drafting landing page copy due in August 2026, a WAITING status with a property blocker labeled \"BLOCKER\" from counsel feedback, and DONE for selecting an analytics vendor. I should list these as tasks with their statuses.\n\nNext, the Infrastructure section has two TODOs: enabling backups and rotating staging secrets. These are immediate tasks that need to be prioritized.\n\nThen, there's some ideas: adding a comparison page which is due in a couple of weeks. That seems like an important task but not urgent yet.\n\nI also notice that the user wants me to identify any blocked",
+          "seconds": 17.57,
+          "score_10": 6.0,
+          "matched": [
+            "landing",
+            "backup",
+            "secret"
+          ],
+          "missing": [
+            "legal",
+            "privacy"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "nemotron-3-ultra-free": {
+          "response": "**Executive Summary**\n- Website launch is the primary active project with a hard deadline (Aug 28) for landing page copy\n- Legal review of privacy text is blocking progress \u2014 awaiting counsel feedback\n- Infrastructure has two pending operational tasks (backups, secret rotation) with no deadlines\n- A comparison page exists as a future idea with no committed timeline\n\n**Blocked Work**\n- *Legal review of privacy text* \u2014 status `WAITING`, blocker: \"counsel feedback\" \u2014 this prevents finalizing the landing page\n\n**Next 3 Actions (Priority Order)**\n1. **Draft landing page copy** \u2014 deadline Aug 28, unblocked and time-critical\n2. **Follow up on legal review** \u2014 clear the blocker so privacy text can be finalized alongside the copy\n3. **Enable backups** \u2014 infrastructure hygiene, no deadline but reduces operational risk",
+          "seconds": 21.3,
+          "score_10": 10.0,
+          "matched": [
+            "landing",
+            "legal",
+            "privacy",
+            "backup",
+            "secret"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-v4-flash": {
+          "response": "No .org file found in the working directory, so I'm reviewing the org content you pasted inline.\n\nEXECUTIVE SUMMARY\n\n- Launch website is the active project: landing page copy is in progress with a hard deadline of 2026-08-28 (six days out), and analytics vendor selection is complete.\n- Privacy text is parked in WAITING state \u2014 the only explicitly blocked item in the file, held on the BLOCKER property \"counsel feedback\".\n- Infrastructure has two unstarted TODOs (enable backups, rotate staging secrets), both with no deadline or owner assigned.\n- The Ideas tree holds one SOMEDAY item (comparison page) that is properly deferred, so no planning noise there; overall the file has no overdue items, but nothing in Infrastructure is scheduled.\n\nBLOCKED WORK\n\n- Legal review of privacy text (Launch website) \u2014 blocked on counsel feedback per the :BLOCKER: property. No other task carries a blocker; the remaining TODOs are unstarted rather than stuck. If the landing page ships before this clears, privacy text becomes the critical path item.\n\nNEXT 3 ACTIONS (priority order)\n\n1. Draft landing page copy \u2014 only item with a deadline (2026-08-28); everything else can slide, this cannot. Do this first.\n2. Rotate staging secrets \u2014 security-sensitive, unstarted, and typically a 15-minute job once access is available; gets it off the books before it becomes an incident.\n3. Enable backups \u2014 no deadline, but it's the one unstarted task whose failure mode is silent data loss; schedule it now and it costs nothing to run.\n\nNote: chasing counsel on the privacy text is the only unblock path for the WAITING item \u2014 worth a nudge in parallel with action 1, but it's follow-up on blocked work, not a next action in its own right.",
+          "seconds": 23.63,
+          "score_10": 10.0,
+          "matched": [
+            "landing",
+            "legal",
+            "privacy",
+            "backup",
+            "secret"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        }
+      }
+    },
+    {
+      "id": "calendar",
+      "name": "Calendar conflict review",
+      "ideal": "Flags the 10:30-to-10:45 Office A\u2192Clinic B travel impossibility and the 11:30 vendor call overlapping dentist/travel; recommends rescheduling the vendor call and retaining a travel buffer.",
+      "results": {
+        "qwen3:1.7b": {
+          "response": "### Calendar Review for Tue 2026-08-25\n\n---\n\n### (1) Conflicts\n\n**Conflict Identified:**\n- **15:30\u201316:00** \u2013 1:1 with Maya (video)  \n- **13:00\u201314:00** \u2013 Deep work (home)  \n- **10:45\u201311:30** \u2013 Dentist (Clinic B)  \n- **11:30\u201312:00** \u2013 Vendor call (video)  \n- **09:30\u201310:30** \u2013 Product review (Office A)  \n- **09:00\u201309:30** \u2013 Team standup (video)\n\n**Conflict Summary:**\n- The **15:30\u201316:",
+          "seconds": 7.04,
+          "score_10": 8.0,
+          "matched": [
+            "conflict",
+            "10:45",
+            "11:30",
+            "vendor"
+          ],
+          "missing": [
+            "travel"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "qwen3:4b": {
+          "response": "Okay, the user wants me to review a calendar for Tuesday, August 25, 2026. They need three things: conflicts, a realistic schedule, and preparation needed. They also mentioned that travel between locations takes 30 minutes. Let me look at the calendar entries they provided.\n\nFirst, I'll list out all the events with their times and locations:\n\n- 09:00-09:30: Team standup (video) - location? Not specified, but since it's video, probably remote. I'll assume it's from home or office without travel.\n- 09:30-10:30: Product review (Office A) - so this is at Office A.\n- 10:45-11:30: Dentist (Clinic B) - at Clinic B.\n- ",
+          "seconds": 13.26,
+          "score_10": 8.0,
+          "matched": [
+            "conflict",
+            "10:45",
+            "11:30",
+            "travel"
+          ],
+          "missing": [
+            "vendor"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "llama3.2:3b": {
+          "response": "Based on the provided calendar for Tue, 2026-08-25, here's a review of:\n\n(1) Conflicts:\nThere are no direct conflicts mentioned in the calendar. However, it's worth noting that there is a 30-minute travel time between locations, which might be considered a buffer zone or a transition period. If any of these activities overlap with each other due to the travel time, they could potentially conflict.\n\n(2) Realistic schedule:\nThe schedule seems realistic and allows for a good balance of work, personal appointments, and breaks. The team standup and vendor call are scheduled in the morning, followed by a dentist appointment, which is a necessary break from work. The deep work session and project sync are scheduled in the afternoon, allowing for focused work time. The 1:1 with Maya is also scheduled at the end of the day.\n\n(3)",
+          "seconds": 10.9,
+          "score_10": 6.0,
+          "matched": [
+            "conflict",
+            "travel",
+            "vendor"
+          ],
+          "missing": [
+            "10:45",
+            "11:30"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-r1:1.5b": {
+          "response": "<think>\nOkay, so I need to review this calendar for Tue 2026-08-25. The user has asked me to check for three things: conflicts, a realistic schedule, and preparation needed. They also mentioned that travel between locations takes 30 minutes.\n\nFirst, let's look at the times provided:\n\n- Team standup: 9:00-9:30\n- Product review: 9:30-10:30\n- Dentist: 10:45-11:30\n- Vendor call: 11:30-12:00\n- Deep work: 13:00-14:00\n- Project sync: 14:00-15:00\n- 1:1 with Maya: 15",
+          "seconds": 6.95,
+          "score_10": 10.0,
+          "matched": [
+            "conflict",
+            "10:45",
+            "11:30",
+            "travel",
+            "vendor"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "nemotron-3-ultra-free": {
+          "response": "**Calendar Review \u2014 Tue 2026-08-25**\n\n---\n\n### 1 Conflicts\n\n| Conflict | Details |\n|----------|---------|\n| **Standup \u2192 Product review** | Standup ends 09:30 (video). Product review starts 09:30 at Office A. Requires 30 min travel \u2192 must be at Office A by 09:00 to attend standup there, or miss first 30 min of product review. |\n| **Product review \u2192 Dentist** | Product review ends 10:30 at Office A. Dentist at 10:45 at Clinic B. 30 min travel \u2192 must leave Office A by 10:15, missing last 15 min of product review. |\n| **Dentist \u2192 Vendor call** | Dentist ends 11:30 at Clinic B. Vendor call starts 11:30 (video). Zero buffer \u2014 only works if dentist runs exactly on time and you can take the call from Clinic B. |\n\n---\n\n### 2 Realistic Schedule (with 30 min travel)\n\n| Time | Activity | Location | Notes |\n|------|----------|----------|-------|\n| 08:30\u201309:00 | Travel to Office A | \u2014 | Arrive by 09:00 |\n| 09:00\u201309:30 | Team standup (video) | Office A | Take from Office A meeting room |\n| 09:30\u201310:30 | Product review | Office A | Full attendance |\n| 10:30\u201311:00 | Travel Office A \u2192 Clinic B | \u2014 | |\n| 11:00\u201311:45 | Dentist | Clinic B | **Reschedule from 10:45 to 11:00** (or accept 15 min late arrival) |\n| 11:45\u201312:15 | Vendor call (video) | Clinic B | Take from quiet room at clinic |\n| 12:15\u201312:45 | Travel Clinic B \u2192 Home | \u2014 | |\n| 13:00\u201314:00 | Deep work | Home | |\n| 14:00\u201315:00 | Project sync (video) | Home | |\n| 15:30\u201316:00 | 1:1 with Maya (video) | Home | |\n\n**Key change:** Dentist moved to 11:00 (call clinic now). Everything else works from home after 12:45.\n\n---\n\n### 3 Preparation Needed\n\n| Item | Action |\n|------|--------|\n| **Dentist reschedule** | Call Clinic B today \u2014 request 11:00 slot (or 11:15 latest). |\n| **Office A setup** | Book a meeting room for 09:00\u201310:30 for standup + product review. Test video/audio. |\n| **Product review** | Review agenda/documents tonight. Prepare 2\u20133 talking points. |\n| **Vendor call** | Confirm dial-in details. Have contract/pricing doc open. |\n| **Project sync** | Update status in tracker (Jira/Linear). Note blockers. |\n| **1:1 with Maya** | Review her last 1:1 notes. Prepare feedback/career discussion points. |\n| **Deep work block** | Define the single output you want (e.g., \"draft PRD section 3\"). Close Slack/email. |\n\n---\n\n**Bottom line:** Only the dentist appointment needs moving. Once that\u2019s at 11:00, the day flows with one commute (home \u2192 Office A \u2192 Clinic B \u2192 home) and zero overlaps.",
+          "seconds": 43.12,
+          "score_10": 10.0,
+          "matched": [
+            "conflict",
+            "10:45",
+            "11:30",
+            "travel",
+            "vendor"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-v4-flash": {
+          "response": "Day starts at home (video standup, home deep work later), so I assumed home as base with 30-min travel between sites. Review below.\n\nCONFLICTS (3)\n\n1. 09:00 standup (home) -> 09:30 product review (Office A)\n   Earliest arrival at Office A is 10:00. You miss the first 30 minutes of the review, or the standup entirely. Hard conflict.\n\n2. 10:30 product review ends (Office A) -> 10:45 dentist (Clinic B)\n   Arrival at the clinic is 11:00, 15 minutes late for the appointment slot. Dental clinics rarely hold a late slot; expect rescheduling or a long wait. Hard conflict.\n\n3. 11:30 vendor call vs dentist slot end\n   The call starts the minute the dentist slot ends. No buffer, and you'd be taking a vendor call from the clinic. Soft conflict \u2014 manageable only if the dentist finishes exactly on time.\n\nThe rest of the day clears: clinic -> home by 12:30 leaves a clean 30-minute gap before deep work at 13:00; 14:00 project sync and 15:30 Maya 1:1 are both at home with no travel. The 13:00-14:00 deep work -> 14:00 sync handoff is tight but same-room, so fine.\n\nREALISTIC SCHEDULE\n\n08:30-09:00  Team standup (video, home) \u2014 moved 30 min earlier\n09:00-09:30  Travel to Office A\n09:30-10:30  Product review (Office A)\n10:30-11:00  Travel to Clinic B\n11:00-11:30  Dentist (Clinic B) \u2014 slot moved 15 min earlier\n11:30-12:00  Vendor call (video, from clinic or en route)\n12:00-12:30  Travel home\n12:30-13:00  Buffer / lunch\n13:00-14:00  Deep work (home)\n14:00-15:00  Project sync (video, home)\n15:00-15:30  Buffer\n15:30-16:00  1:1 with Maya (video, home)\n\nTwo levers, pick one:\n- Move the dentist slot 15 minutes earlier (11:00). Everything else then fits as written except the standup, which must start by 08:30.\n- If the clinic won't shift, move the vendor call to 12:00-12:30 (take it from home right after travel) and ask the clinic to start you at 11:15 \u2014 you arrive 11:00, so you only need 15 minutes of goodwill rather than a full reslot.\n\nPREPARATION\n\n- Call the dentist today and move the slot to 11:00 (or 11:15 if that's all they offer) \u2014 this is the linchpin; nothing else fixes the morning.\n- Move the standup invite to 08:30 so the 09:00 departure to Office A is realistic.\n- Product review: materials/agenda ready the night before, since you're walking in at 09:30 sharp.\n- Vendor call: dial-in link and agenda on your phone so it can run from the clinic waiting room or the car without a laptop.\n- Pack for the outbound leg: charger, headset, water \u2014 you leave home at 09:00 and don't return until 12:30.\n- Maya 1:1: notes prepped in the 15:00-15:30 buffer, not at 15:31.\n\nNet: the day works only with the dentist moved earlier and the standup moved earlier; as written, the 09:30-10:45 stretch is over-committed by design.",
+          "seconds": 37.59,
+          "score_10": 10.0,
+          "matched": [
+            "conflict",
+            "10:45",
+            "11:30",
+            "travel",
+            "vendor"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        }
+      }
+    },
+    {
+      "id": "investment_email",
+      "name": "Labeled mail digest",
+      "ideal": "Accurately distinguishes company/regulatory facts from analyst opinion, surfaces margin compression and higher duration as risks, and avoids investment advice.",
+      "results": {
+        "qwen3:1.7b": {
+          "response": "**Weekly Digest: Investments**\n\n**Facts:**\n- Acme Solar's Q2 revenue grew by 18% year-over-year.\n- Acme Solar's gross margin fell from 31% to 26%.\n- Bond fund duration increased from 4.2 to 5.8 years.\n- Proposed rules may delay wind permits, with consultation closing on September 5.\n\n**Opinions:**\n- Analyst note suggests Acme Solar is uninvestable due to margin pressure.",
+          "seconds": 4.82,
+          "score_10": 8.6,
+          "matched": [
+            "18%",
+            "26%",
+            "opinion",
+            "duration",
+            "5.8",
+            "permit"
+          ],
+          "missing": [
+            "guidance"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "qwen3:4b": {
+          "response": "Okay, the user wants me to create a concise weekly digest from some investment emails. They specifically asked to separate facts from opinions and give no buy/sell advice. Let me go through each point carefully.\n\nFirst, I see four items labeled as \"investments\". I need to extract pure facts from any opinions. \n\nFor point 1: CFO of Acme Solar says Q2 revenue grew 18% YoY and gross margin fell from 31% to 26%. Guidance unchanged. That's all factual data - revenue growth percentage, margin change, guidance status. No opinions here.\n\nPoint .2 is tricky: \"Analyst note: 'Margin pressure makes Acme Solar uninvestable.'\" The phrase \"uninvestable\" is clearly an opinion. The analyst is stating a judgment, not a fact. So I should only include the context that an analyst made this",
+          "seconds": 12.98,
+          "score_10": 3.7,
+          "matched": [
+            "18%",
+            "26%",
+            "guidance",
+            "opinion"
+          ],
+          "missing": [
+            "duration",
+            "5.8",
+            "permit"
+          ],
+          "forbidden_found": [
+            "sell "
+          ],
+          "valid_json": null
+        },
+        "llama3.2:3b": {
+          "response": "Weekly Digest: Investments\n\n**Acme Solar**\n\n* Q2 revenue grew 18% YoY\n* Gross margin fell from 31% to 26%\n* Guidance remains unchanged\n\n**Investment Analysis**\n\n* Analyst note: Margin pressure may impact Acme Solar's investability (opinion)\n* Proposed rules by regulator may delay wind permits, affecting the company's operations (fact)\n\n**Bond Fund**\n\n* Duration increased from 4.2 to 5.8 years\n* No specific information on market performance or returns\n\n**Regulatory Update**\n\n* Proposed rules may delay wind permits; consultation closes Sep 5 (fact)",
+          "seconds": 8.48,
+          "score_10": 10.0,
+          "matched": [
+            "18%",
+            "26%",
+            "guidance",
+            "opinion",
+            "duration",
+            "5.8",
+            "permit"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-r1:1.5b": {
+          "response": "<think>\nOkay, so I need to create a weekly digest based on these four emails labeled as investments. The user wants me to separate the facts from opinions and give no buy/sell advice. Let's break this down.\n\nFirst, looking at each email:\n\n1) CFO of Acme Solar: Q2 revenue grew 18% YoY; gross margin fell from 31% to 26%; guidance unchanged.\n   - Fact: Revenue growth of 18% YoY is positive.\n   - Fact: Gross margin decreased from 31% to 26%, which could be a concern.\n\n2) Analyst note: \"Margin pressure makes Acme Solar uninvestable.\"\n   - Opinions here. The analyst thinks the company's margins are too high, making it uninvestable.\n\n3) Bond fund statement: duration increased from 4.2 to ",
+          "seconds": 6.88,
+          "score_10": 5.1,
+          "matched": [
+            "18%",
+            "26%",
+            "guidance",
+            "opinion",
+            "duration"
+          ],
+          "missing": [
+            "5.8",
+            "permit"
+          ],
+          "forbidden_found": [
+            "sell "
+          ],
+          "valid_json": null
+        },
+        "nemotron-3-ultra-free": {
+          "response": "**Weekly Investment Digest**\n\n---\n\n**Facts**\n\n- **Acme Solar (Q2)**: Revenue +18% YoY; gross margin declined from 31% to 26%; company guidance unchanged.\n- **Bond fund**: Portfolio duration extended from 4.2 to 5.8 years.\n- **Regulatory**: Proposed rules may delay wind-permit issuance; consultation period closes 5 September.\n\n---\n\n**Opinions**\n\n- **Analyst note on Acme Solar**: \"Margin pressure makes Acme Solar uninvestable.\" (Unsourced attribution; reflects the analyst's view, not a verifiable data point.)",
+          "seconds": 10.54,
+          "score_10": 10.0,
+          "matched": [
+            "18%",
+            "26%",
+            "guidance",
+            "opinion",
+            "duration",
+            "5.8",
+            "permit"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-v4-flash": {
+          "response": "WEEKLY DIGEST \u2014 INVESTMENTS (Aug 22, 2026)\n\nFACTS\n1. Acme Solar (Q2, per CFO): revenue up 18% YoY; gross margin fell from 31% to 26%; guidance unchanged.\n2. Bond fund: portfolio duration increased from 4.2 to 5.8 years.\n3. Wind permits: regulator proposed rule changes that could slow permitting; consultation open until Sep 5.\n\nOPINIONS (flagged as such)\n- Analyst note calls Acme Solar \"uninvestable,\" citing margin pressure. This is the analyst's judgment, not a company-reported figure.\n\nNotes\n- The regulator's \"may delay\" is forward-looking: the proposal is a fact; its effect on permit timelines is uncertain until final rules and consultation outcomes.\n- No buy/sell advice is offered here, explicitly or implicitly.\n\nWant me to save this format as a reusable template for the weekly digest run?",
+          "seconds": 16.76,
+          "score_10": 8.0,
+          "matched": [
+            "18%",
+            "26%",
+            "guidance",
+            "opinion",
+            "duration",
+            "5.8",
+            "permit"
+          ],
+          "missing": [],
+          "forbidden_found": [
+            "sell "
+          ],
+          "valid_json": null
+        }
+      }
+    },
+    {
+      "id": "paper_trends",
+      "name": "Paper trend synthesis",
+      "ideal": "Identifies the trend as deployable agent/system improvements (efficiency, privacy, tool reliability), cites metrics faithfully, and notes narrow/synthetic benchmark limitations.",
+      "results": {
+        "qwen3:1.7b": {
+          "response": "**Trend Brief:**\n\n**Common Theme:**  \nThe abstracts highlight advancements in model optimization, privacy protection, and task execution efficiency, with a focus on reducing computational costs, improving performance, and enhancing security in AI systems.\n\n**One Practical Implication:**  \nThe use of sparse training techniques, such as SparseRoute, can significantly reduce inference FLOPs, making models more efficient and cost-effective for deployment.\n\n**One Caveat:**  \nWhile the proposed methods show promising results in specific benchmarks, their real-world effectiveness may vary due to the complexity of real-world environments and the diversity of tasks.",
+          "seconds": 5.45,
+          "score_10": 2.9,
+          "matched": [
+            "efficiency",
+            "privacy"
+          ],
+          "missing": [
+            "tool",
+            "28%",
+            "synthetic",
+            "6%",
+            "1,200"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "qwen3:4b": {
+          "response": "Okay, the user wants me to create a concise trend brief based on three paper abstracts. They need me to identify a common theme, one practical implication, and one caveat - all while strictly sticking to what's in the abstracts without claiming results beyond them.\n\nLet me carefully analyze each abstract:\n\nFor Paper A: It's about SparseRoute which trains a 7B model to route tokens to 4 experts. It reports 28% lower inference FLOPs on two translation benchmarks. So this is about model efficiency through sparse routing.\n\nPaper B: CacheGuard proposes a privacy filter for KV caches. On a synthetic membership benchmark, it reduces attack AUC from 0.71 to 0.58 with 6% latency overhead. This is about privacy protection in cache mechanisms.\n\nPaper C: ToolTrace introduces a benchmark of 1,200 multi-step tool",
+          "seconds": 13.76,
+          "score_10": 10.0,
+          "matched": [
+            "efficiency",
+            "privacy",
+            "tool",
+            "28%",
+            "synthetic",
+            "6%",
+            "1,200"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "llama3.2:3b": {
+          "response": "Trend Brief:\n\n**Common Theme:** Energy Efficiency and Performance Optimization in AI Models\n\n**Practical Implication:** The increasing demand for efficient AI models that balance performance and power consumption is driving innovation in optimization techniques, such as sparse routing and caching mechanisms.\n\n**Caveat:** While these advancements show promise, the trade-offs between energy efficiency and model performance may vary depending on specific use cases and applications, highlighting the need for further research to optimize these techniques for diverse scenarios.",
+          "seconds": 8.5,
+          "score_10": 1.4,
+          "matched": [
+            "efficiency"
+          ],
+          "missing": [
+            "privacy",
+            "tool",
+            "28%",
+            "synthetic",
+            "6%",
+            "1,200"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-r1:1.5b": {
+          "response": "<think>\nOkay, so I need to write a trend brief based on the three paper abstracts provided. The user wants it in three parts: common theme, one practical implication, and one caveat. They also specified not to claim results beyond what's in the abstracts.\n\nFirst, let me read through each abstract carefully to understand their main points.\n\nAbstract A talks about SparseRoute trains a 7B model for route tokens to be routed by 4 experts. The inference FLOPs are reduced by 28% on two translation benchmarks. So, this is about improving efficiency in model training and inference performance.\n\nAbstract B discusses CacheGuard introducing a privacy filter for KV caches. It reduces attack AUC from .71 to .58 with a 6% latency overhead. This seems like an improvement in security while maintaining or reducing performance slightly.\n\nAbstract C introduces ToolTrace's benchmark of",
+          "seconds": 7.24,
+          "score_10": 7.1,
+          "matched": [
+            "efficiency",
+            "privacy",
+            "tool",
+            "28%",
+            "6%"
+          ],
+          "missing": [
+            "synthetic",
+            "1,200"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "nemotron-3-ultra-free": {
+          "response": "**Common Theme**  \nArchitectural and system-level interventions that make LLM deployment more efficient, private, or reliable \u2014 sparse expert routing, KV-cache privacy filtering, and explicit agent state tracking.\n\n**Practical Implication**  \nTeams running LLMs in production can adopt these techniques independently: sparse routing cuts FLOPs ~28% on translation tasks; a KV-cache filter drops membership-inference AUC from .71 to .58 at ~6% latency cost; adding structured state tracking lifts multi-step tool-use success from 44% to 57% on the ToolTrace benchmark.\n\n**Caveat**  \nEach result is benchmark-specific (two translation tasks, a synthetic membership-inference setup, and the 1,200-task ToolTrace suite). Gains may not transfer to other languages, threat models, or tool-use domains without further validation.",
+          "seconds": 13.51,
+          "score_10": 8.6,
+          "matched": [
+            "privacy",
+            "tool",
+            "28%",
+            "synthetic",
+            "6%",
+            "1,200"
+          ],
+          "missing": [
+            "efficiency"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-v4-flash": {
+          "response": "Common theme: All three target practical deployment costs of LLM systems rather than raw capability \u2014 cheaper inference via token routing, privacy risk in KV caches, and reliability on multi-step tool use. Each is a system-level intervention (routing, cache filtering, state tracking) that trades a small overhead or design change for a measured gain.\n\nPractical implication: Measurable wins are available from how models are deployed, not just which model is used \u2014 a 7B router cut inference FLOPs by 28%, a cache filter cut attack AUC from .71 to .58 at 6% latency overhead, and explicit state tracking lifted tool-use success from 44% to 57%. Teams with tight compute or trust budgets can pilot these levers before upgrading models.\n\nCaveat: Every result is benchmark-bound \u2014 two translation tasks, one synthetic membership test, and a single 1,200-task suite \u2014 so none of the gains are shown to generalize to real workloads, and the abstracts don't report whether any gain comes with quality or safety costs outside those benchmarks.",
+          "seconds": 13.25,
+          "score_10": 8.6,
+          "matched": [
+            "privacy",
+            "tool",
+            "28%",
+            "synthetic",
+            "6%",
+            "1,200"
+          ],
+          "missing": [
+            "efficiency"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        }
+      }
+    },
+    {
+      "id": "news_curation",
+      "name": "News-link curation",
+      "ideal": "Chooses central-bank minutes, emergency browser patch, and grid warning; labels the grid warning as watchlist only and omits low-signal startup/celebrity items.",
+      "results": {
+        "qwen3:1.7b": {
+          "response": "**My Notes \u2014 links to follow**\n\n- **Startup raises $8M seed round**: A promising early-stage investment opportunity.  \n- **Major browser publishes emergency security patch**: A critical update to protect users from potential threats.  \n- **Grid operator reports a record peak-demand warning**: A sign of increasing energy demand, potentially impacting electricity prices.\n\n**Watchlist only**: **Major browser publishes emergency security patch** \u2013 this is a high-priority update with immediate relevance to users.",
+          "seconds": 4.39,
+          "score_10": 3.5,
+          "matched": [
+            "security",
+            "grid",
+            "watchlist"
+          ],
+          "missing": [
+            "central bank"
+          ],
+          "forbidden_found": [
+            "$8m",
+            "$8M"
+          ],
+          "valid_json": null
+        },
+        "qwen3:4b": {
+          "response": "Okay, the user wants me to draft a WhatsApp-ready note titled \"My Notes \u2014 links to follow\" based on specific links they provided. They need me to pick the 3 highest-signal items, explain each in one short line, and mark one as \"watchlist only.\" \n\nFirst, I need to understand what \"highest-signal\" means here. In finance and business contexts, high-signal items are those that have the most impact on markets, investments, or critical systems. I should focus on things that could cause significant market movements, security risks, or operational disruptions. \n\nLooking at the list:\n- Central bank meeting minutes: policy vote 7-2; inflation forecast revised up. This seems important because central bank actions directly affect interest rates and economic policies. A revised inflation forecast up could signal tightening monetary policy, which impacts stocks, bonds, and inflation expectations.\n- Startup",
+          "seconds": 13.14,
+          "score_10": 7.5,
+          "matched": [
+            "central bank",
+            "security",
+            "watchlist"
+          ],
+          "missing": [
+            "grid"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "llama3.2:3b": {
+          "response": "Here's the WhatsApp-ready note:\n\n\"My Notes \u2014 links to follow\"\n\n1. **Watchlist Only**: Central Bank Meeting Minutes: Policy vote was 7\u20132; inflation forecast revised up (Significant policy shift expected)\n2. Startup Raises $8M Seed Round (New funding for emerging tech company)\n3. Major Browser Publishes Emergency Security Patch (High-risk vulnerability fixed)\n\nLet me know if you'd like any changes!",
+          "seconds": 7.34,
+          "score_10": 3.5,
+          "matched": [
+            "central bank",
+            "security",
+            "watchlist"
+          ],
+          "missing": [
+            "grid"
+          ],
+          "forbidden_found": [
+            "$8m",
+            "$8M"
+          ],
+          "valid_json": null
+        },
+        "deepseek-r1:1.5b": {
+          "response": "<think>\nOkay, so I need to draft a WhatsApp-ready note titled \"My Notes \u2014 links to follow\" based on the provided links. The user has given me five items to choose from, and I have to pick the three highest-signal ones. Let me go through each one step by step.\n\nFirst, looking at the links:\n\n1. Central bank meeting minutes: policy vote was 7\u20132; inflation forecast revised up.\n2. Startup raises $8M seed round.\n3. Major browser publishes emergency security patch for exploited vulnerability.\n4. Celebrity launches a perfume.\n5. Grid operator reports a record peak-demand warning for next week.\n\nI need to pick the three highest-signal items. I think \"Central bank meeting minutes\" is pretty significant because it's about policy changes and economic indicators, which can affect market sentiment. The policy vote being 7\u20132 suggests there might",
+          "seconds": 7.4,
+          "score_10": 3.5,
+          "matched": [
+            "central bank",
+            "security",
+            "grid"
+          ],
+          "missing": [
+            "watchlist"
+          ],
+          "forbidden_found": [
+            "perfume",
+            "$8m",
+            "$8M"
+          ],
+          "valid_json": null
+        },
+        "nemotron-3-ultra-free": {
+          "response": "**My Notes \u2014 links to follow**\n\n1. Central bank minutes: 7\u20132 vote, inflation forecast revised up \u2014 policy tightening risk elevated  \n2. Major browser emergency patch for exploited zero-day \u2014 apply immediately, check extensions  \n3. \u26a0\ufe0f *Watchlist only* \u2014 Grid operator flags record peak-demand warning next week; monitor for load-shedding alerts",
+          "seconds": 11.36,
+          "score_10": 7.5,
+          "matched": [
+            "central bank",
+            "grid",
+            "watchlist"
+          ],
+          "missing": [
+            "security"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-v4-flash": {
+          "response": "My Notes \u2014 links to follow\n\n1. Central bank minutes: 7\u20132 vote, inflation forecast revised up \u2014 policy stays tight, rate-sensitive assets at risk\n2. Major browser ships emergency patch for an exploited zero-day \u2014 update now, don't wait\n3. \u26a0\ufe0f Watchlist only \u2014 grid operator flags record peak-demand warning for next week; watch for load-shedding alerts\n\nSelection: minutes and the browser patch are immediate-action items; the grid warning is real but its event lands next week, so it earns watchlist status. Startup raise and celebrity perfume add no decision-relevant signal without more context.\n\nNote: the same prompt ran earlier today in @session:default/20260822_121658_bf3195 (nemotron). If you're comparing outputs, this draft agrees with it on selection but keeps the wording tighter.",
+          "seconds": 23.87,
+          "score_10": 5.5,
+          "matched": [
+            "central bank",
+            "grid",
+            "watchlist"
+          ],
+          "missing": [
+            "security"
+          ],
+          "forbidden_found": [
+            "perfume"
+          ],
+          "valid_json": null
+        }
+      }
+    },
+    {
+      "id": "diary",
+      "name": "Daily log drafting",
+      "ideal": "Uses all supplied events in a restrained first-person reflection and avoids fabricated details.",
+      "results": {
+        "qwen3:1.7b": {
+          "response": "Today, I tested two local models. The smaller one responded quickly but missed details. I reorganized my research folder to improve clarity. I walked for 25 minutes in the evening, enjoying the fresh air. I postponed a non-urgent call to address more important tasks. The day was focused and purposeful, with a calm and reflective mindset.",
+          "seconds": 3.74,
+          "score_10": 10.0,
+          "matched": [
+            "local model",
+            "research folder",
+            "25",
+            "walk",
+            "postpon"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "qwen3:4b": {
+          "response": "Hmm, the user wants me to write a reflective diary entry of 100-130 words using only specific facts they provided. They need it to be first person, calm tone, and I can't invent any emotions, events, people, or outcomes. The facts are: I tested two local models; the smaller model answered quickly but missed details; I reorganized a research folder; I walked for 25 minutes in the evening; I postponed a non-urgent call.\n\nI need to be careful not to add anything extra. The user is probably testing my ability to follow instructions precisely\u2014maybe they're a student, teacher, or someone interested in AI or writing exercises. They might be looking for a model that stays factual without creativity, which could be for educational purposes or to see how I handle constraints.\n\nFor the diary entry, I'll start with a calm, reflective",
+          "seconds": 13.62,
+          "score_10": 10.0,
+          "matched": [
+            "local model",
+            "research folder",
+            "25",
+            "walk",
+            "postpon"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "llama3.2:3b": {
+          "response": "Today was a day of productivity and organization. I spent time evaluating two local models, which allowed me to assess their performance. The smaller model proved efficient, but its limitations became apparent when it missed crucial details. Afterward, I reorganized my research folder, streamlining the information for easier access. In the evening, I took a 25-minute walk, clearing my mind and refreshing my perspective. Later, I postponed a non-urgent call, giving myself time to focus on other tasks. These small actions demonstrate my commitment to efficiency and self-care. By prioritizing organization and taking care of myself, I can approach challenges with clarity and confidence.",
+          "seconds": 9.74,
+          "score_10": 10.0,
+          "matched": [
+            "local model",
+            "research folder",
+            "25",
+            "walk",
+            "postpon"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-r1:1.5b": {
+          "response": "<think>\nAlright, so the user wants me to write a reflective diary entry using specific facts. Let me break this down.\n\nFirst, they mentioned it should be between 100\u2013130 words. That's concise, so I need to be precise with each sentence. They specified using only the given facts and not inventing anything. So no adding emotions or events; just stick strictly to the provided data.\n\nLooking at the facts: two local models were tested\u2014smaller one quick but missed details, larger one took longer. Then reorganizing a research folder, walking for 25 minutes, and postponing a non-urgent call. Each of these is an event that happened on different days.\n\nI need to structure this in first person, so it's personal and reflective. Maybe start with the day when both models were tested, then move through each fact in sequence.",
+          "seconds": 6.65,
+          "score_10": 10.0,
+          "matched": [
+            "local model",
+            "research folder",
+            "25",
+            "walk",
+            "postpon"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "nemotron-3-ultra-free": {
+          "response": "I tested two local models today. The smaller one answered quickly but missed details the larger model caught. I reorganized a research folder that had been sitting untouched for weeks \u2014 files now grouped by project instead of date. In the evening I walked for 25 minutes without my phone. The air was cooler than expected. I postponed a non-urgent call to tomorrow; it can wait. The day felt measured, not productive in any loud sense, but the folder is cleaner and the models are compared. That counts.",
+          "seconds": 11.27,
+          "score_10": 10.0,
+          "matched": [
+            "local model",
+            "research folder",
+            "25",
+            "walk",
+            "postpon"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-v4-flash": {
+          "response": "Today I tested two local models. The smaller one answered quickly, but its reply missed details that the larger model caught. The same query produced both responses, and the difference was plain to see.\n\nI reorganized a research folder. The task took a while, and at the end the folder was in better order than when I started.\n\nIn the evening I walked for 25 minutes and then returned.\n\nI postponed a non-urgent call. It can wait, so it will. There was no need to fit it into today.\n\nFour things made up the day: a model comparison, a folder reorganization, an evening walk, and one call deferred.\n\n(108 words)",
+          "seconds": 34.25,
+          "score_10": 10.0,
+          "matched": [
+            "local model",
+            "research folder",
+            "25",
+            "walk",
+            "postpon"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        }
+      }
+    },
+    {
+      "id": "math",
+      "name": "Numerical accuracy",
+      "ideal": "Computes 12000\u00d70.85\u00d71.10 = $11,220, which is a 6.5% loss versus the start.",
+      "results": {
+        "qwen3:1.7b": {
+          "response": "**Start Value:** $12,000  \n**Fall 15%:**  \n$$\n12,000 \\times (1 - 0.15) = 12,000 \\times 0.85 = 10,200\n$$\n\n**Rise 10% from $10,200:**  \n$$\n10,200 \\times (1 + 0.10) = 10,200 \\times 1.10 = 11,220\n$$\n\n**Ending Value:** $11,220  \n**Total Percentage Change:**  \n$$\n\\frac{11,220 - 12,000}{12,000} \\times 100 = \\",
+          "seconds": 7.13,
+          "score_10": 3.0,
+          "matched": [
+            "$11,220"
+          ],
+          "missing": [
+            "6.5%"
+          ],
+          "forbidden_found": [
+            "5%"
+          ],
+          "valid_json": null
+        },
+        "qwen3:4b": {
+          "response": "Okay, let's see. I need to figure out the ending value of the portfolio after it falls 15% and then rises 10% from the reduced value. The starting value is $12,000. Hmm, first, let's break down the problem step by step.\n\nFirst, the portfolio starts at $12,000. Then it falls 15%. So a 15% decrease from the starting value. To find the value after the 15% fall, I need to calculate 15% of $12,000 and subtract that from $12,000. Alternatively, it's the same as 85% of the starting value because it's a 15% decrease.\n\nLet me write that down. The value after the 15% fall would be 12",
+          "seconds": 13.37,
+          "score_10": 0,
+          "matched": [],
+          "missing": [
+            "$11,220",
+            "6.5%"
+          ],
+          "forbidden_found": [
+            "5%"
+          ],
+          "valid_json": null
+        },
+        "llama3.2:3b": {
+          "response": "To find the ending value:\n\n1. Calculate the initial fall: \n$12,000 x 0.15 = $1,800\nNew value after fall: $12,000 - $1,800 = $10,200\n\n2. Calculate the subsequent rise:\n$10,200 x 0.10 = $1,020\nNew value after rise: $10,200 + $1,020 = $11,220\n\nThe ending value is $11,220.\n\nTo find the total percentage change from the start:\n\n($11,220 - $12,000) / $12,000 x 100% \u2248 -6.83%\n\nSo, the portfolio ends with a decrease of approximately 6.83%.",
+          "seconds": 10.51,
+          "score_10": 5.0,
+          "matched": [
+            "$11,220"
+          ],
+          "missing": [
+            "6.5%"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-r1:1.5b": {
+          "response": "<think>\nFirst, I'll calculate the decrease of 15% from the initial $12,000.\n\nTo find 15% of $12,000, I multiply 12,000 by 0.15, which equals $1,800.\n\nSubtracting this amount from the original value gives me the reduced portfolio value: $12,000 - $1,800 = $10,200.\n\nNext, I'll calculate a rise of 10% from the reduced value of $10,200.\n\nTo find 10% of $10,200, I multiply 10,200 by 0.10, which equals $1,020.\n\nAdding this amount to the reduced value gives me the final",
+          "seconds": 6.63,
+          "score_10": 0,
+          "matched": [],
+          "missing": [
+            "$11,220",
+            "6.5%"
+          ],
+          "forbidden_found": [
+            "5%"
+          ],
+          "valid_json": null
+        },
+        "nemotron-3-ultra-free": {
+          "response": "**Step 1: After 15% fall**\n$12,000 \u00d7 (1 \u2212 0.15) = $12,000 \u00d7 0.85 = **$10,200**\n\n**Step 2: After 10% rise on reduced value**\n$10,200 \u00d7 (1 + 0.10) = $10,200 \u00d7 1.10 = **$11,220**\n\n**Ending value: $11,220**\n\n**Total percentage change from start:**\n(($11,220 \u2212 $12,000) / $12,000) \u00d7 100 = (\u2212$780 / $12,000) \u00d7 100 = **\u22126.5%**\n\nThe portfolio ends at $11,220, down 6.5% from the original $12,000.",
+          "seconds": 11.26,
+          "score_10": 8.0,
+          "matched": [
+            "$11,220",
+            "6.5%"
+          ],
+          "missing": [],
+          "forbidden_found": [
+            "5%"
+          ],
+          "valid_json": null
+        },
+        "deepseek-v4-flash": {
+          "response": "Ending value: $11,220\n\nArithmetic:\n  $12,000 x 0.85 = $10,200   (after 15% fall)\n  $10,200 x 1.10 = $11,220   (after 10% rise)\n\nTotal change: 11,220 / 12,000 = 0.935, so -6.5% from start.\n\nWhy it isn't -5%: the 10% gain applies to the reduced base ($10,200, +$1,020), which only partially offsets the 15% loss ($1,800). Percentage moves compound multiplicatively, not additively: 0.85 x 1.10 = 0.935.",
+          "seconds": 18.58,
+          "score_10": 8.0,
+          "matched": [
+            "$11,220",
+            "6.5%"
+          ],
+          "missing": [],
+          "forbidden_found": [
+            "5%"
+          ],
+          "valid_json": null
+        }
+      }
+    },
+    {
+      "id": "code_review",
+      "name": "Code-review bug detection",
+      "ideal": "Finds the erroneous minus-one, corrects it, and notes that an empty input causes division by zero (with an optional policy for it).",
+      "results": {
+        "qwen3:1.7b": {
+          "response": "### \u2705 Bug Identification:\n\nThe bug in the function is that it **divides by `len(values) - 1` instead of `len(values)`**.\n\n### \ud83d\udccc Explanation of the Consequence:\n\nThis is a **common mistake** in data analysis. The function is trying to compute the **average** of a list of numbers, but it's using the wrong formula.\n\n- The correct formula for the **average** is:  \n  $$\n  \\text{average} = \\frac{\\text{sum of values}}{\\text{number of values}}\n  $$\n- The function currently computes:\n  $$\n  \\frac{\\text{sum}}{\\text{len(values)} - 1}\n  $$\n  which is **not the average** but the **sample mean** (using **n-1** as the denominator, which is used in **",
+          "seconds": 7.15,
+          "score_10": 2.5,
+          "matched": [
+            "- 1"
+          ],
+          "missing": [
+            "subtract",
+            "return total / len(values)",
+            "empty"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "qwen3:4b": {
+          "response": "We are given a function `average` that is supposed to compute the average of a list of numbers.\n However, the function has a bug.\n\n Let's look at the function:\n\n   def average(values):\n        total = 0\n        for value in values:\n            total += value\n        return total / len(values) - 1\n\n The function does:\n   - Initialize total to 0.\n   - Iterate over each value in `values` and add it to total.\n   - Then return (total / len(values)) - 1.\n\n The intended behavior of the average function is to return the mean (average) of the numbers.\n But note: the function subtracts 1 at the end.\n\n Why is that a bug?\n   The average of the numbers should be (total / len(values)).\n   However, the function returns (total / len(values)) - 1.\n\n Con",
+          "seconds": 12.89,
+          "score_10": 7.5,
+          "matched": [
+            "- 1",
+            "subtract",
+            "return total / len(values)"
+          ],
+          "missing": [
+            "empty"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "llama3.2:3b": {
+          "response": "**Bug Review**\n\nThe bug in this function is that it subtracts 1 from the calculated average. This is incorrect because the average of a set of numbers should be the sum of all numbers divided by the count of numbers, without any adjustments.\n\n**Consequence**\n\nThe consequence of this bug is that the function will return an incorrect result for most inputs. For example, if the input values are [1, 2, 3], the function will return (1+2+3)/3 - 1 = 0, which is not the correct average.\n\n**Corrected Version**\n\nHere's the corrected version of the function:\n\n```python\ndef average(values):\n    \"\"\"\n    Calculate the average of a list of numbers.\n\n    Args:\n        values (list): A list of numbers.\n\n    Returns:\n        float: The average of the input values.\n    \"\"\"\n    total = ",
+          "seconds": 10.82,
+          "score_10": 5.0,
+          "matched": [
+            "- 1",
+            "subtract"
+          ],
+          "missing": [
+            "return total / len(values)",
+            "empty"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-r1:1.5b": {
+          "response": "<think>\nOkay, I'm trying to figure out if there's a bug in this Python function. Let me read it again carefully.\n\nThe function is called average and takes 'values' as an argument. It initializes 'total' to zero. Then, for each value in 'values', it adds the value to 'total'. After that, it returns total divided by the length of values minus one.\n\nHmm, wait a minute. So what's happening here? Let me think about how this function is supposed to work. If I have a list of numbers, say [1, 2, 3], and I call average([1,2,3]), it should compute the sum (6) divided by 3 (which is 2), then subtract one, giving 1.\n\nBut wait, that doesn't seem right. The function as written would return total / len(values)",
+          "seconds": 6.62,
+          "score_10": 5.0,
+          "matched": [
+            "subtract",
+            "return total / len(values)"
+          ],
+          "missing": [
+            "- 1",
+            "empty"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "nemotron-3-ultra-free": {
+          "response": "**Bug:** The return statement has incorrect operator precedence.\n\n```python\nreturn total / len(values) - 1\n```\n\nThis evaluates as `(total / len(values)) - 1` because division binds tighter than subtraction.\n\n**Consequence:** The function returns the average *minus one*, not the average. For example, `average([10, 20, 30])` returns `19.0` instead of `20.0`.\n\n**Corrected version:**\n\n```python\ndef average(values):\n    total = 0\n    for value in values:\n        total += value\n    return total / len(values)\n```\n\nOr more idiomatically:\n\n```python\ndef average(values):\n    return sum(values) / len(values)\n```",
+          "seconds": 54.91,
+          "score_10": 7.5,
+          "matched": [
+            "- 1",
+            "subtract",
+            "return total / len(values)"
+          ],
+          "missing": [
+            "empty"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-v4-flash": {
+          "response": "\u250a review diff\na//tmp/avg_check.py \u2192 b//tmp/avg_check.py\n@@ -0,0 +1,10 @@\n+def average(values):\n+    total = 0\n+    for value in values:\n+        total += value\n+    return total / len(values) - 1\n+\n+print('average([1,2,3])    =', average([1,2,3]))     # true mean: 2.0\n+print('average([10,20,30]) =', average([10,20,30]))  # true mean: 20.0\n+print('true mean of 1,2,3  =', (1+2+3)/3)\n+print('n-1 denominator     =', (1+2+3)/(3-1))        # if that was the intent\nVerified. Here's the review.\n\nTHE BUG: operator precedence on the return line.\n\n  return total / len(values) - 1\n\nIn Python, `*` and `/` bind tighter than `+` and `-`, so this parses as:\n\n  return (total / len(values)) - 1\n\nThe `- 1` is applied to the computed average, not to the length in the denominator. If the intent was to divide by n-1 (as the expression visually suggests), the parentheses are missing:\n\n  return total / (len(values) - 1)\n\nCONSEQUENCE (confirmed by running it):\n  average([1,2,3])    -> 1.0   (true mean 2.0)\n  average([10,20,30]) -> 19.0  (true mean 20.0)\n\nSo the function silently returns mean - 1 for every input. That's worse than an exception: it's a consistent, plausible-looking off-by-one that will corrupt any downstream statistic (sums of residuals, differences between group means) without any error signal. If the n-1 denominator was intended, the results are wrong in a different way, and for a single-element list `len(values) - 1` would also raise ZeroDivisionError.\n\nCORRECTED VERSION (assuming the standard mean is intended):\n\n  def average(values):\n      total = 0\n      for value in values:\n          total += value\n      return total / len(values)\n\nIf you genuinely wanted the n-1 denominator, the fix is:\n\n  return total / (len(values) - 1)\n\nTwo side notes. The loop is just `sum(values)`, so `return sum(values) / len(values)` is the idiomatic form. And both versions raise ZeroDivisionError on an empty list; if that's a real input, guard it:\n\n  def average(values):\n      if not values:\n          return 0.0\n      return sum(values) / len(values)",
+          "seconds": 30.95,
+          "score_10": 7.5,
+          "matched": [
+            "- 1",
+            "return total / len(values)",
+            "empty"
+          ],
+          "missing": [
+            "subtract"
+          ],
+          "forbidden_found": [],
+          "valid_json": null
+        }
+      }
+    },
+    {
+      "id": "privacy",
+      "name": "Privacy-preserving contact summary",
+      "ideal": "Retains 80% migration status and firewall-approval blocker while omitting phone/address PII.",
+      "results": {
+        "qwen3:1.7b": {
+          "response": "- Project migration is 80% complete with firewall approval remaining as the key blocker.  \n- Priya will work from 14 Oak Lane, Flat 3, on Friday.",
+          "seconds": 3.37,
+          "score_10": 6.0,
+          "matched": [
+            "80%",
+            "firewall",
+            "approval"
+          ],
+          "missing": [],
+          "forbidden_found": [
+            "14 oak lane",
+            "flat 3"
+          ],
+          "valid_json": null
+        },
+        "qwen3:4b": {
+          "response": "We are given a note: \"Priya (555-018-2233) confirmed the migration is 80% complete. The remaining blocker is firewall approval. She will be working from 14 Oak Lane, Flat 3, on Friday.\"\n\n Requirements:\n 1. Summarize in two bullets for a team update.\n 2. Preserve the project status.\n 3. Redact personal phone numbers (so we remove the phone number).\n 4. Do not repeat the full home address (so we can only mention the street and building number without the full address? But note: the requirement says \"do not repeat the full home address\", meaning we shouldn't write the entire address. However, the example has a specific address: \"14 Oak Lane, Flat 3\". We are to redact the full home address? Actually, the",
+          "seconds": 13.31,
+          "score_10": 6.0,
+          "matched": [
+            "80%",
+            "firewall",
+            "approval"
+          ],
+          "missing": [],
+          "forbidden_found": [
+            "555-018-2233",
+            "14 oak lane",
+            "flat 3"
+          ],
+          "valid_json": null
+        },
+        "llama3.2:3b": {
+          "response": "I can't help you with that. I can, however, rephrase the note to remove personal contact information while preserving the project status:\n\n* Project status update: The migration is currently at 80% completion, with firewall approval as the remaining blocker.\n* Team member Priya will be working remotely from her home on Friday and can be reached through other means.",
+          "seconds": 7.21,
+          "score_10": 10.0,
+          "matched": [
+            "80%",
+            "firewall",
+            "approval"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-r1:1.5b": {
+          "response": "<think>\nOkay, so I need to help summarize this note into two bullets for a team update. Let me read through the original note again.\n\nThe note says: \"Priya (555-018-2233) confirmed the migration is 80% complete. The remaining blocker is firewall approval. She will be working from 14 Oak Lane, Flat 3, on Friday.\"\n\nAlright, so I need to capture the key points here. First, Priya has confirmed that the migration is 80% done. That's a significant milestone, so it's important to mention that.\n\nNext, the remaining part of the process is about firewall approval. So, I should note that as the next step after 80%.\n\nShe will be working from 14 Oak Lane, Flat 3. I need to make sure not to repeat her phone",
+          "seconds": 6.87,
+          "score_10": 6.0,
+          "matched": [
+            "80%",
+            "firewall",
+            "approval"
+          ],
+          "missing": [],
+          "forbidden_found": [
+            "555-018-2233",
+            "14 oak lane",
+            "flat 3"
+          ],
+          "valid_json": null
+        },
+        "nemotron-3-ultra-free": {
+          "response": "- Migration is 80% complete; remaining blocker is firewall approval\n- Priya will be remote on Friday (location redacted)",
+          "seconds": 10.52,
+          "score_10": 10.0,
+          "matched": [
+            "80%",
+            "firewall",
+            "approval"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        },
+        "deepseek-v4-flash": {
+          "response": "Here's the two-bullet summary:\n\n\u2022 Migration is 80% complete (confirmed by Priya); the only remaining blocker is firewall approval.\n\u2022 Priya will be working from home on Friday.\n\nPhone number omitted, and the address is reduced to just \"working from home\" \u2014 project status and blocker are preserved.",
+          "seconds": 10.12,
+          "score_10": 10.0,
+          "matched": [
+            "80%",
+            "firewall",
+            "approval"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": null
+        }
+      }
+    },
+    {
+      "id": "structured_output",
+      "name": "Structured action-item extraction",
+      "ideal": "Valid JSON array with exactly three items; captures the stated owners/due dates and represents Mei due date as null or an explicit empty value.",
+      "results": {
+        "qwen3:1.7b": {
+          "response": "[\n  {\n    \"owner\": \"Operations\",\n    \"task\": \"Archive the old dashboard\",\n    \"due\": \"next Monday\"\n  },\n  {\n    \"owner\": \"Mei\",\n    \"task\": \"Confirm the calendar integration\",\n    \"due\": \"\"\n  },\n  {\n    \"owner\": \"Ravi\",\n    \"task\": \"Send the vendor comparison\",\n    \"due\": \"Thursday\"\n  }\n]",
+          "seconds": 5.58,
+          "score_10": 10,
+          "matched": [
+            "ravi",
+            "vendor comparison",
+            "thursday",
+            "mei",
+            "calendar integration",
+            "operations",
+            "archive",
+            "next monday"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": true
+        },
+        "qwen3:4b": {
+          "response": "We are given a text: \"Ravi will send the vendor comparison by Thursday. Mei needs to confirm the calendar integration; no due date was agreed. The team decided to archive the old dashboard next Monday, owner: Operations.\"\n\nWe need to extract action items as an array of objects with exactly keys: owner, task, due.\n\nSteps:\n1. Identify each action item in the text.\n2. For each action item, we need to extract:\n   - owner: the person or team that owns the task (e.g., \"Operations\" in the last sentence)\n   - task: the task description (e.g., \"send the vendor comparison\", \"confirm the calendar integration\", \"archive the old dashboard\")\n   - due: the due date (if any) - note: the text says \"no due date was agreed\" for one task, so we have to handle that.\n\nLet",
+          "seconds": 12.87,
+          "score_10": 3,
+          "matched": [
+            "ravi",
+            "vendor comparison",
+            "thursday",
+            "mei",
+            "calendar integration",
+            "operations",
+            "archive",
+            "next monday"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": false
+        },
+        "llama3.2:3b": {
+          "response": "{\"owner\": \"Operations\", \"task\": \"archive the old dashboard\", \"due\": \"next Monday\"}",
+          "seconds": 3.69,
+          "score_10": 3,
+          "matched": [
+            "operations",
+            "archive",
+            "next monday"
+          ],
+          "missing": [
+            "ravi",
+            "vendor comparison",
+            "thursday",
+            "mei",
+            "calendar integration"
+          ],
+          "forbidden_found": [],
+          "valid_json": false
+        },
+        "deepseek-r1:1.5b": {
+          "response": "<think>\nOkay, so I need to extract action items from this text and turn them into an array of objects with keys owner, task, and due. Let me read through the text carefully.\n\nThe first sentence says Ravi will send a vendor comparison by Thursday. That's one item. The second part mentions Mei needs to confirm the calendar integration but there was no due date agreed. So that's another item. The third part is about the team archiving the old dashboard next Monday, with owner Operations. \n\nI should make sure I'm only including valid JSON objects. Each sentence can be an object. Let me structure them:\n\n1. Ravi sends comparison on Thursday: owner is Ravi? Wait, no, the task is to extract action items from this text as an array of objects. So maybe each item is a separate object.\n\nWait, looking back at the example given earlier,",
+          "seconds": 6.78,
+          "score_10": 3,
+          "matched": [
+            "ravi",
+            "vendor comparison",
+            "thursday",
+            "mei",
+            "calendar integration",
+            "operations",
+            "next monday"
+          ],
+          "missing": [
+            "archive"
+          ],
+          "forbidden_found": [],
+          "valid_json": false
+        },
+        "nemotron-3-ultra-free": {
+          "response": "[\n  {\n    \"owner\": \"Ravi\",\n    \"task\": \"send the vendor comparison\",\n    \"due\": \"Thursday\"\n  },\n  {\n    \"owner\": \"Mei\",\n    \"task\": \"confirm the calendar integration\",\n    \"due\": null\n  },\n  {\n    \"owner\": \"Operations\",\n    \"task\": \"archive the old dashboard\",\n    \"due\": \"next Monday\"\n  }\n]",
+          "seconds": 21.02,
+          "score_10": 10,
+          "matched": [
+            "ravi",
+            "vendor comparison",
+            "thursday",
+            "mei",
+            "calendar integration",
+            "operations",
+            "archive",
+            "next monday"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": true
+        },
+        "deepseek-v4-flash": {
+          "response": "[{\"owner\": \"Ravi\", \"task\": \"send the vendor comparison\", \"due\": \"Thursday\"}, {\"owner\": \"Mei\", \"task\": \"confirm the calendar integration\", \"due\": null}, {\"owner\": \"Operations\", \"task\": \"archive the old dashboard\", \"due\": \"next Monday\"}]",
+          "seconds": 9.9,
+          "score_10": 10,
+          "matched": [
+            "ravi",
+            "vendor comparison",
+            "thursday",
+            "mei",
+            "calendar integration",
+            "operations",
+            "archive",
+            "next monday"
+          ],
+          "missing": [],
+          "forbidden_found": [],
+          "valid_json": true
+        }
+      }
+    }
+  ],
+  "note": "Synthetic representative fixtures only; this does not read Gmail, Calendar, WhatsApp, or private org files."
+}

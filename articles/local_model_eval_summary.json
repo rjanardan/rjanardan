@@ -1,0 +1,26 @@
+{
+  "qwen3:1.7b": {
+    "mean_score_10": 6.45,
+    "mean_seconds_per_prompt": 5.3
+  },
+  "qwen3:4b": {
+    "mean_score_10": 6.57,
+    "mean_seconds_per_prompt": 13.22
+  },
+  "llama3.2:3b": {
+    "mean_score_10": 6.39,
+    "mean_seconds_per_prompt": 8.81
+  },
+  "deepseek-r1:1.5b": {
+    "mean_score_10": 5.57,
+    "mean_seconds_per_prompt": 7.96
+  },
+  "nemotron-3-ultra-free": {
+    "mean_score_10": 9.16,
+    "mean_seconds_per_prompt": 20.88
+  },
+  "deepseek-v4-flash": {
+    "mean_score_10": 8.76,
+    "mean_seconds_per_prompt": 21.89
+  }
+}
