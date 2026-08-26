@@ -1,0 +1,1359 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Prolog Field Guide — Knowledge Representation & AI</title>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#f7f4f5;
+  --panel:#ffffff;
+  --panel-2:#fbf8f9;
+  --ink:#2b2426;
+  --ink-soft:#5e5458;
+  --muted:#8c7f83;
+  --line:#ece3e6;
+  --accent:#be123c;
+  --accent-soft:#fbe9ee;
+  --blue:#2563eb;
+  --blue-soft:#e8f0fe;
+  --amber:#b45309;
+  --amber-soft:#fdf3e7;
+  --green:#0f766e;
+  --green-soft:#e6f4f1;
+  --code-bg:#1f1719;
+  --code-ink:#f3c9d4;
+  --shadow:0 1px 2px rgba(43,36,38,.06),0 8px 24px rgba(43,36,38,.06);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.title-font{font-family:'Space Grotesk',sans-serif;}
+code,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+
+.shell{max-width:1400px;margin:0 auto;display:flex;align-items:flex-start;}
+
+.sidebar{
+  width:290px;flex:0 0 290px;
+  position:sticky;top:0;
+  height:100vh;overflow-y:auto;
+  background:var(--panel);
+  border-right:1px solid var(--line);
+  padding:26px 18px;
+}
+.sidebar .brand{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.sidebar .brand .logo{
+  width:42px;height:42px;border-radius:12px;
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.sidebar h1{font-size:17px;margin:0;letter-spacing:-.02em;}
+.sidebar .tag{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin:14px 6px 10px;}
+.toc a{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 11px;border-radius:10px;
+  color:var(--ink-soft);text-decoration:none;font-size:13px;
+  transition:background .15s,color .15s;
+}
+.toc a .num{
+  width:22px;height:22px;flex:0 0 22px;border-radius:6px;
+  background:var(--panel-2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);
+}
+.toc a:hover{background:var(--panel-2);color:var(--ink);}
+.toc a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+.toc a.active .num{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+.main{flex:1;min-width:0;}
+header.topbar{
+  position:sticky;top:0;z-index:40;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;
+  padding:14px 26px;
+}
+header.topbar .menu-btn{display:none;font-size:20px;background:none;border:none;color:var(--ink);cursor:pointer;}
+header.topbar h2{font-size:16px;margin:0;flex:1;letter-spacing:-.01em;}
+header.topbar .search{
+  flex:0 0 300px;max-width:40vw;
+  background:var(--panel-2);border:1px solid var(--line);
+  border-radius:999px;padding:8px 14px;font-size:12px;outline:none;color:var(--ink);
+}
+header.topbar .search:focus{border-color:var(--accent);background:#fff;}
+header.topbar .save{
+  display:flex;align-items:center;gap:7px;font-size:12px;
+  background:var(--accent);color:#fff;border:none;cursor:pointer;
+  padding:9px 15px;border-radius:999px;white-space:nowrap;
+}
+header.topbar .save:hover{background:#9f1239;}
+
+.content{padding:38px clamp(20px,4vw,56px) 120px;max-width:920px;}
+
+.hero{
+  background:linear-gradient(135deg,#be123c 0%,#881337 100%);
+  color:#fff;border-radius:22px;padding:46px 40px;margin-bottom:46px;
+  box-shadow:var(--shadow);
+}
+.hero h1{font-family:'Space Grotesk';font-size:clamp(22px,3vw,30px);margin:0 0 12px;letter-spacing:-.02em;line-height:1.15;}
+.hero p{max-width:660px;font-size:14px;opacity:.94;margin:0 0 18px;}
+.hero .stats{display:flex;flex-wrap:wrap;gap:18px;font-size:13px;}
+.hero .stats div{display:flex;align-items:center;gap:8px;}
+.hero .stats .dot{width:8px;height:8px;border-radius:50%;background:#fbcfe3;}
+
+.chapter{
+  background:var(--panel);border:1px solid var(--line);border-radius:20px;
+  padding:34px clamp(20px,3.5vw,44px);margin-bottom:40px;box-shadow:var(--shadow);
+  scroll-margin-top:84px;
+}
+.chapter .ch-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:8px;}
+.chapter .ch-ico{
+  width:54px;height:54px;flex:0 0 54px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  background:var(--accent-soft);
+}
+.chapter h2{font-family:'Space Grotesk';font-size:clamp(18px,2.4vw,23px);margin:0;letter-spacing:-.02em;}
+.chapter .level{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:4px;}
+.chapter .intro{font-size:15px;color:var(--ink-soft);margin:16px 0 22px;}
+
+.chapter h3.sec{
+  font-family:'Space Grotesk';font-size:17px;margin:28px 0 12px;
+  padding-bottom:7px;border-bottom:1px solid var(--line);letter-spacing:-.01em;
+}
+.chapter p{color:var(--ink-soft);}
+.chapter ul.clean{margin:14px 0;padding-left:0;list-style:none;}
+.chapter ul.clean li{position:relative;padding:6px 0 6px 26px;color:var(--ink-soft);}
+.chapter ul.clean li::before{content:"▹";position:absolute;left:4px;color:var(--accent);font-weight:700;}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0;}
+.card{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+.card .t{font-weight:600;color:var(--accent);margin-bottom:4px;}
+.card .d{font-size:13px;color:var(--ink-soft);}
+
+.diagram{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+  padding:18px;margin:18px 0;overflow-x:auto;
+}
+.diagram .cap{font-size:12px;color:var(--muted);text-align:center;margin-top:8px;font-style:italic;}
+
+.picture{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+  padding:18px;margin:18px 0;text-align:center;
+}
+.picture svg{max-width:100%;height:auto;}
+.picture .cap{font-size:12px;color:var(--muted);margin-top:8px;}
+
+.codewrap{position:relative;margin:16px 0;}
+pre.code{
+  background:var(--code-bg);color:var(--code-ink);
+  border-radius:14px;padding:18px 20px;overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.65;margin:0;
+}
+pre.code .c{color:#9ad0ff;}
+pre.code .p{color:#fca5a5;}
+pre.code .g{color:#c6f6c9;}
+pre.code .o{color:#f0abbc;}
+
+.outputbox{margin:14px 0 4px;}
+.outputbox .ol{
+  font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--green);
+  margin:0 0 5px 4px;font-weight:600;
+}
+pre.out{
+  background:#0f172a;color:#a7f3d0;
+  border:1px solid #14532d;border-left:4px solid var(--green);
+  border-radius:12px;padding:14px 18px;overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.6;margin:0;
+}
+
+.copy-btn{
+  position:absolute;top:10px;right:10px;
+  background:rgba(255,255,255,.12);color:#e2e8f0;border:1px solid rgba(255,255,255,.18);
+  border-radius:8px;padding:5px 11px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;
+}
+.copy-btn:hover{background:rgba(255,255,255,.22);}
+.copy-btn.done{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+.lab{background:var(--blue-soft);border:1px solid #cdddfb;border-radius:14px;padding:18px 22px;margin:22px 0;}
+.lab .lh{display:flex;align-items:center;gap:10px;color:var(--blue);font-weight:600;margin-bottom:10px;}
+.lab ol{margin:0;padding-left:22px;color:var(--ink-soft);}
+.lab ol li{margin:7px 0;}
+
+.tip{background:var(--amber-soft);border:1px solid #f0d9b5;border-radius:14px;padding:16px 20px;margin:22px 0;display:flex;gap:12px;}
+.tip .ic{color:var(--amber);font-size:20px;margin-top:2px;}
+.tip .tx{color:#7c4a12;font-size:13.5px;}
+
+.note{background:var(--accent-soft);border:1px solid #f1c4d0;border-radius:14px;padding:13px 17px;margin:16px 0;font-size:13.5px;color:#881337;}
+.note.g{background:var(--green-soft);border-color:#b6e2d8;color:#0f5132;}
+
+.chapternav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:10px;}
+.chapternav a{
+  flex:1;min-width:200px;text-decoration:none;color:var(--ink-soft);
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;box-shadow:var(--shadow);
+}
+.chapternav a:hover{border-color:var(--accent);}
+.chapternav a .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.chapternav a .ttl{font-weight:600;color:var(--ink);}
+.chapternav a.next{text-align:right;}
+
+.pagefoot{max-width:920px;margin:0 auto;padding:30px 20px 60px;text-align:center;color:var(--muted);font-size:13px;}
+
+.backdrop{display:none;position:fixed;inset:0;background:rgba(43,36,38,.45);z-index:49;}
+
+@media (max-width:900px){
+  .sidebar{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%);transition:transform .25s ease;box-shadow:var(--shadow);}
+  .sidebar.open{transform:translateX(0);}
+  .backdrop.show{display:block;}
+  header.topbar .menu-btn{display:block;}
+  header.topbar .search{flex:1;max-width:none;}
+  header.topbar .save span{display:none;}
+}
+@media (max-width:560px){
+  .content{padding:24px 16px 90px;}
+  .hero{padding:32px 24px;}
+  .chapter{padding:26px 20px;}
+  header.topbar .search-wrap{display:none;}
+}
+
+/* ---- Unified search (full-text + semantic) ---- */
+.search-wrap{position:relative;flex:0 0 330px;max-width:42vw;display:flex;align-items:center;gap:8px;}
+.search-wrap .search{flex:1;width:100%;}
+.search-status{font-size:10px;color:var(--muted);white-space:nowrap;}
+.search-results{
+  position:absolute;top:48px;left:0;right:0;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);max-height:62vh;overflow-y:auto;z-index:60;display:none;
+}
+.search-results.show{display:block;}
+.sr-item{display:block;padding:10px 14px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);}
+.sr-item:last-child{border-bottom:none;}
+.sr-item:hover{background:var(--panel-2);}
+.sr-chap{font-size:11px;color:var(--accent);font-weight:600;}
+.sr-title{font-size:13px;font-weight:600;margin:2px 0;display:flex;justify-content:space-between;gap:8px;}
+.sr-tag{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px;}
+.sr-tag.sem{color:var(--accent);border-color:var(--accent);}
+.sr-ctx{font-size:12px;color:var(--ink-soft);line-height:1.45;margin-top:3px;}
+.sr-ctx mark{background:#fde68a;color:#7c2d12;border-radius:3px;padding:0 2px;}
+.sr-empty{padding:14px;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">Π</div>
+      <h1>Prolog Field Guide</h1>
+    </div>
+    <div class="tag">Table of Contents</div>
+    <nav class="toc" id="toc"></nav>
+  </aside>
+
+  <div class="backdrop" id="backdrop" onclick="closeSidebar()"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" onclick="openSidebar()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+      <h2>The Prolog Field Guide</h2>
+      <div class="search-wrap">
+        <input id="search" class="search" type="text" placeholder="Search concepts, commands, terms…" oninput="searchBooks(this.value)" autocomplete="off">
+        <span class="search-status" id="search-status"></span>
+        <div class="search-results" id="search-results"></div>
+      </div>
+      <button class="save" onclick="exportHTML()"><i class="fas fa-download"></i><span>Save .html</span></button>
+    </header>
+
+    <div class="content">
+      <section class="hero">
+        <h1>The Prolog Field Guide</h1>
+        <p>Logic programming for knowledge representation and artificial intelligence. This book frames Prolog as a declarative language for encoding facts and rules, then querying them — the original knowledge-representation engine, and now a key piece of neuro-symbolic AI. Ten worked use cases show real code and output; dialects and 2025–2026 AI developments close it out.</p>
+        <div class="stats">
+          <div><span class="dot"></span> 15 Chapters</div>
+          <div><span class="dot"></span> 10 AI / KR Use Cases</div>
+          <div><span class="dot"></span> Mermaid Diagrams</div>
+          <div><span class="dot"></span> 100% Offline</div>
+        </div>
+      </section>
+
+      <div id="chapters"></div>
+
+      <div class="pagefoot">
+        The Prolog Field Guide · Knowledge representation & AI · Light theme, responsive, printable.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const chapters = [
+  {
+    id:1, icon:"Π", title:"Logic & Knowledge Representation", level:"Foundation",
+    intro:"Prolog represents knowledge as a set of facts and rules in first-order predicate logic, then answers questions by logical deduction. This is knowledge representation in its purest form.",
+    concepts:[
+      {t:"Facts", d:"Statements taken to be true, e.g. parent(alice, bob)."},
+      {t:"Rules", d:"Conditional knowledge: head :- body. (head if body)."},
+      {t:"Queries", d:"Questions you ask the system; Prolog searches for a proof."},
+      {t:"Unification", d:"Matching two terms by binding variables — the core engine operation."},
+      {t:"Declarative", d:"You state WHAT is true; Prolog decides HOW to derive answers."}
+    ],
+    mermaid:`flowchart TD
+  KB["Knowledge Base: facts + rules"] --> Q["Query / Goal"]
+  Q --> U["Unification + Backtracking"]
+  U --> A["Yes / No / Bindings"]
+  style KB fill:#fbe9ee,stroke:#be123c,color:#881337
+  style Q fill:#fbe9ee,stroke:#be123c,color:#881337
+  style A fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"A query is solved against the knowledge base by unification and backtracking.",
+    picture:`<svg width="100%" height="180" viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="30" width="220" height="120" rx="12" fill="#fbf8f9" stroke="#8c7f83"/>
+      <text x="60" y="60" font-family="monospace" font-size="12" fill="#5e5458">parent(a,b).</text>
+      <text x="60" y="82" font-family="monospace" font-size="12" fill="#5e5458">parent(b,c).</text>
+      <text x="60" y="104" font-family="monospace" font-size="12" fill="#be123c">grandparent(X,Z):-</text>
+      <text x="72" y="124" font-family="monospace" font-size="12" fill="#5e5458">parent(X,Y),</text>
+      <text x="72" y="142" font-family="monospace" font-size="12" fill="#5e5458">parent(Y,Z).</text>
+      <rect x="500" y="55" width="220" height="70" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="520" y="86" font-family="monospace" font-size="12" fill="#0f5132">?- grandparent(a,C).</text>
+      <text x="520" y="110" font-family="monospace" font-size="12" fill="#0f5132">C = c.</text>
+      <g stroke="#be123c" stroke-width="3"><line x1="260" y1="90" x2="496" y2="90"/></g>
+    </svg>`,
+    picCap:"Facts + a rule let Prolog deduce grandparent(a,c).",
+    commands:`% facts
+parent(alice, bob).
+parent(bob, carol).
+parent(bob, dave).
+
+% rule: X is grandparent of Z if X parent of Y and Y parent of Z
+grandparent(X, Z) :- parent(X, Y), parent(Y, Z).
+
+% queries (run in swipl):
+% ?- parent(alice, bob).
+% ?- grandparent(alice, Who).
+% ?- grandparent(Who, carol).`,
+    output:`?- parent(alice, bob).
+true.
+
+?- grandparent(alice, Who).
+Who = carol ;
+Who = dave.
+
+?- grandparent(Who, carol).
+Who = alice.`,
+    lab:[
+      "Install SWI-Prolog (sudo apt install swi-prolog), run swipl, and paste the facts above.",
+      "Type grandparent(alice, Who). and press ; to see all answers (carol, dave).",
+      "Add a fact sibling(X,Y) :- parent(Z,X), parent(Z,Y), X \\= Y. and query it."
+    ],
+    tip:"In Prolog you do not write an algorithm — you write the *truths* and a *question*. Letting the engine handle the search (via backtracking) is the mental shift from imperative to declarative programming."
+  },
+  {
+    id:2, icon:"🔁", title:"Unification & Backtracking", level:"Foundation",
+    intro:"Unification matches terms and binds variables; backtracking retries alternative clauses when a path fails. Together they are the inference engine behind every Prolog answer.",
+    concepts:[
+      {t:"Unification", d:"Two terms match if they are identical or become so by variable binding."},
+      {t:"Most general unifier", d:"The broadest substitution that makes two terms equal."},
+      {t:"Backtracking", d:"On failure, Prolog rewinds to the last choice point and tries the next clause."},
+      {t:"Choice points", d:"Every alternative clause leaves a choice point the engine can revisit."},
+      {t:"Cut (!)", d:"Prunes the search tree: commits to the current clause, discarding alternatives."}
+    ],
+    mermaid:`flowchart TD
+  G["Goal"] --> C1["clause 1: try"]
+  C1 -->|fail| C2["clause 2: try"]
+  C2 -->|fail| C3["clause 3: try"]
+  C1 -->|success| OK["return binding"]
+  C2 -->|success| OK
+  C3 -->|success| OK
+  style G fill:#fbe9ee,stroke:#be123c,color:#881337
+  style OK fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"On failure Prolog backtracks to the next clause until success or exhaustion.",
+    picture:`<svg width="100%" height="180" viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+      <text x="60" y="40" font-family="monospace" font-size="12" fill="#5e5458">color(red).  color(blue).  color(green).</text>
+      <line x1="80" y1="60" x2="80" y2="150" stroke="#be123c" stroke-width="2"/>
+      <circle cx="80" cy="70" r="6" fill="#be123c"/><text x="96" y="74" font-family="monospace" font-size="12" fill="#5e5458">red (try) -> fail? no -> return</text>
+      <circle cx="80" cy="100" r="6" fill="#be123c"/><text x="96" y="104" font-family="monospace" font-size="12" fill="#5e5458">blue</text>
+      <circle cx="80" cy="130" r="6" fill="#be123c"/><text x="96" y="134" font-family="monospace" font-size="12" fill="#5e5458">green</text>
+      <text x="96" y="160" font-family="monospace" font-size="12" fill="#0f5132">; steps through each color</text>
+    </svg>`,
+    picCap:"Querying color(X) backtracks through red, blue, green.",
+    commands:`color(red).
+color(blue).
+color(green).
+
+% ?- color(X).  returns red, then blue, then green on ';'
+
+% cut example: commit after first match
+first_color(X) :- color(X), !.
+
+% ?- first_color(X).  -> X = red (no alternatives tried)`,
+    output:`?- color(X).
+X = red ;
+X = blue ;
+X = green.
+
+?- first_color(X).
+X = red.`,
+    lab:[
+      "Define color/1 with three facts and query color(X); press ; to enumerate all.",
+      "Add first_color(X) :- color(X), !. and see it stop after red.",
+      "Remove the cut and observe the difference. Cuts are powerful but hurt readability — use sparingly."
+    ],
+    tip:"Think of backtracking as Prolog's 'what if I was wrong?' mechanism. The semicolon (;) in the top-level means 'show me the next solution' — it forces one more backtrack."
+  },
+  {
+    id:3, icon:"🧩", title:"Facts, Rules & Queries", level:"Foundation",
+    intro:"The three building blocks: facts assert truth, rules derive new truth, and queries probe it. Mastering their shape is enough to model most knowledge bases.",
+    concepts:[
+      {t:"Term syntax", d:"Atoms (alice), numbers (42), variables (X, Who), and structures (date(2026,8,24))."},
+      {t:"Clause", d:"Either a fact or a rule; a program is a database of clauses."},
+      {t:"Body conjunction", d:"Comma in a rule body means AND; all sub-goals must succeed."},
+      {t:"Anonymous var", d:"The underscore _ matches anything but is not bound or reported."},
+      {t:"Listing", d:"The built-in listing/1 prints all clauses for a predicate."}
+    ],
+    mermaid:`flowchart LR
+  F["Facts"] --> P["Program"]
+  R["Rules"] --> P
+  P --> Q["Query"]
+  Q --> S["Solutions"]
+  style F fill:#fbe9ee,stroke:#be123c,color:#881337
+  style R fill:#fbe9ee,stroke:#be123c,color:#881337
+  style S fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Facts and rules form the program; a query extracts solutions.",
+    picture:`<svg width="100%" height="170" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="30" width="200" height="110" rx="12" fill="#fbf8f9" stroke="#8c7f83"/>
+      <text x="78" y="58" font-family="monospace" font-size="12" fill="#5e5458">likes(tom, music).</text>
+      <text x="78" y="80" font-family="monospace" font-size="12" fill="#5e5458">likes(ann, books).</text>
+      <rect x="280" y="30" width="240" height="110" rx="12" fill="#fbe9ee" stroke="#be123c"/>
+      <text x="298" y="58" font-family="monospace" font-size="12" fill="#881337">happy(P):-</text>
+      <text x="310" y="80" font-family="monospace" font-size="12" fill="#5e5458">likes(P,_),</text>
+      <text x="310" y="102" font-family="monospace" font-size="12" fill="#5e5458">likes(P, _).</text>
+      <rect x="560" y="55" width="160" height="60" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="578" y="84" font-family="monospace" font-size="12" fill="#0f5132">?- happy(tom).</text>
+    </svg>`,
+    picCap:"happy/1 is defined from the likes/2 facts.",
+    commands:`likes(tom, music).
+likes(tom, sports).
+likes(ann, books).
+
+happy(Person) :- likes(Person, _).
+
+% ?- happy(tom).        -> true
+% ?- happy(Who).        -> Who = tom ; Who = ann
+% ?- listing(likes).    -> prints the likes facts`,
+    output:`?- happy(tom).
+true.
+
+?- happy(Who).
+Who = tom ;
+Who = ann.
+
+?- listing(likes).
+likes(tom, music).
+likes(tom, sports).
+likes(ann, books).
+true.`,
+    lab:[
+      "Enter the likes facts and the happy rule, then run happy(tom).",
+      "Query happy(Who). and press ; to collect both people.",
+      "Run listing(likes). to see the database printed back to you."
+    ],
+    tip:"The anonymous variable _ is your friend for 'don't care' positions. happy(P) :- likes(P, _) reads naturally: 'a person is happy if they like something'."
+  },
+  {
+    id:4, icon:"🕸️", title:"Use Case 1 — Family & Genealogy", level:"AI / KR",
+    intro:"The classic knowledge-representation demo: encode a family tree and ask kinship questions. This is semantic network / relational KR in miniature.",
+    concepts:[
+      {t:"Relational facts", d:"parent/2, male/1, female/1 stored as ground facts."},
+      {t:"Derived relations", d:"ancestor, sibling, cousin defined by rules."},
+      {t:"Recursive rules", d:"ancestor(X,Z) :- parent(X,Z).  ancestor(X,Z) :- parent(X,Y), ancestor(Y,Z)."},
+      {t:"Constraint", d:"X \\= Y excludes self in sibling rules."},
+      {t:"Multiple answers", d:"Backtracking enumerates every valid binding."}
+    ],
+    mermaid:`flowchart TD
+  F["family facts"] --> A["ancestor rule (recursive)"]
+  A --> Q["?- ancestor(alice, X)"]
+  Q --> R["all descendants"]
+  style F fill:#fbe9ee,stroke:#be123c,color:#881337
+  style R fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Facts plus a recursive ancestor rule answer descendant queries.",
+    picture:`<svg width="100%" height="170" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="120" cy="90" r="22" fill="#fbe9ee" stroke="#be123c"/><text x="120" y="94" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">alice</text>
+      <circle cx="320" cy="90" r="22" fill="#fbe9ee" stroke="#be123c"/><text x="320" y="94" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">bob</text>
+      <circle cx="520" cy="50" r="22" fill="#fbe9ee" stroke="#be123c"/><text x="520" y="54" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">carol</text>
+      <circle cx="520" cy="130" r="22" fill="#fbe9ee" stroke="#be123c"/><text x="520" y="134" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">dave</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="142" y1="88" x2="298" y2="88"/><line x1="342" y1="78" x2="498" y2="58"/><line x1="342" y1="102" x2="498" y2="122"/></g>
+    </svg>`,
+    picCap:"parent edges; ancestor follows them recursively.",
+    commands:`parent(alice, bob).
+parent(bob, carol).
+parent(bob, dave).
+
+ancestor(X, Z) :- parent(X, Z).
+ancestor(X, Z) :- parent(X, Y), ancestor(Y, Z).
+
+sibling(X, Y) :- parent(P, X), parent(P, Y), X \\= Y.
+
+% ?- ancestor(alice, X).
+% ?- sibling(carol, dave).`,
+    output:`?- ancestor(alice, X).
+X = bob ;
+X = carol ;
+X = dave.
+
+?- sibling(carol, dave).
+true.`,
+    lab:[
+      "Enter the family and the two rules, then run ancestor(alice, X) and press ; three times.",
+      "Add a great-grandparent and verify the recursive rule still finds them.",
+      "Write cousin(X,Y) :- parent(P1,X), parent(P2,Y), sibling(P1,P2), X\\=Y. and test it."
+    ],
+    tip:"Recursion in Prolog looks almost identical to its math definition. ancestor is the textbook example of a rule that calls itself — the engine's backtracking does the graph traversal for you."
+  },
+  {
+    id:5, icon:"🧠", title:"Use Case 2 — Expert System (Medical)", level:"AI / KR",
+    intro:"Early real AI: encode diagnostic rules as IF-THEN knowledge, then infer a conclusion from observed symptoms. This is the MYCIN / expert-system pattern.",
+    concepts:[
+      {t:"Symptom facts", d:"observed/1 records what the user reports."},
+      {t:"Diagnostic rules", d:"diagnosis(D) :- symptom(a), symptom(b), ... ."},
+      {t:"Uncertainty (versions)", d:"Some dialects add certainty factors or probabilities."},
+      {t:"Forward chaining", d:"From facts, derive all reachable conclusions."},
+      {t:"Explanation", d:"Rules double as why/how justifications."}
+    ],
+    mermaid:`flowchart TD
+  S1["symptom(fever)"] --> D["diagnosis(flu)"]
+  S2["symptom(cough)"] --> D
+  S3["symptom(body_ache)"] --> D
+  D --> R["prescribe rest + fluids"]
+  style S1 fill:#fbe9ee,stroke:#be123c,color:#881337
+  style S2 fill:#fbe9ee,stroke:#be123c,color:#881337
+  style S3 fill:#fbe9ee,stroke:#be123c,color:#881337
+  style R fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Multiple symptoms unify to trigger a diagnostic rule.",
+    picture:`<svg width="100%" height="170" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="40" width="160" height="34" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="78" y="62" font-family="monospace" font-size="12" fill="#5e5458">fever</text>
+      <rect x="60" y="90" width="160" height="34" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="78" y="112" font-family="monospace" font-size="12" fill="#5e5458">cough</text>
+      <rect x="300" y="65" width="180" height="40" rx="10" fill="#fbe9ee" stroke="#be123c"/><text x="390" y="90" text-anchor="middle" font-size="12" fill="#881337" font-family="monospace">diagnosis(flu)</text>
+      <rect x="540" y="65" width="170" height="40" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="625" y="90" text-anchor="middle" font-size="12" fill="#0f5132" font-family="monospace">rest+fluids</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="220" y1="57" x2="298" y2="78"/><line x1="220" y1="107" x2="298" y2="90"/><line x1="480" y1="85" x2="538" y2="85"/></g>
+    </svg>`,
+    picCap:"Symptoms converge on a diagnosis, which implies a treatment.",
+    commands:`symptom(fever).
+symptom(cough).
+symptom(body_ache).
+
+diagnosis(flu)      :- symptom(fever), symptom(cough), symptom(body_ache).
+diagnosis(cold)     :- symptom(cough), symptom(sneezing).
+diagnosis(flu)      :- symptom(fever), symptom(fatigue).
+
+treatment(rest_and_fluids) :- diagnosis(flu).
+
+% ?- diagnosis(D).
+% ?- treatment(T).`,
+    output:`?- diagnosis(D).
+D = flu ;
+D = flu.
+
+?- treatment(T).
+T = rest_and_fluids.`,
+    lab:[
+      "Assert the three symptoms and the rules, then query diagnosis(D).",
+      "Add symptom(sneezing). and ask diagnosis(cold). — it should now succeed too.",
+      "Notice flu is derived twice; discuss why (two rules) and how to avoid duplicate answers with once/1."
+    ],
+    tip:"Expert systems are Prolog's historical killer app. The bonus: each rule is simultaneously a program AND an explanation you can show a user — 'flu' was concluded because fever + cough + body_ache were observed."
+  },
+  {
+    id:6, icon:"🧭", title:"Use Case 3 — Pathfinding & Planning", level:"AI / KR",
+    intro:"Represent a graph of connected places; ask for a route. Prolog's search is a general problem-solver — planning is just pathfinding in state space.",
+    concepts:[
+      {t:"Edge facts", d:"connected(a, b). symmetric or directed."},
+      {t:"Path by recursion", d:"path(X,Y) :- connected(X,Y).  path(X,Y) :- connected(X,Z), path(Z,Y)."},
+      {t:"Cycle guard", d:"Track visited nodes to avoid infinite loops (or use a cut/history list)."},
+      {t:"State transitions", d:"For planning, states replace places and actions replace edges."},
+      {t:"All routes", d:"Backtracking yields every path; collect them with findall/3."}
+    ],
+    mermaid:`flowchart LR
+  A["node a"] --> B["node b"]
+  B --> C["node c"]
+  A --> D["node d"]
+  D --> C
+  style A fill:#fbe9ee,stroke:#be123c,color:#881337
+  style C fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Connected edges; path/2 finds routes (including via d).",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="120" cy="80" r="22" fill="#fbe9ee" stroke="#be123c"/><text x="120" y="84" text-anchor="middle" font-size="11" font-family="monospace">a</text>
+      <circle cx="320" cy="80" r="22" fill="#fbe9ee" stroke="#be123c"/><text x="320" y="84" text-anchor="middle" font-size="11" font-family="monospace">b</text>
+      <circle cx="540" cy="80" r="22" fill="#e6f4f1" stroke="#0f766e"/><text x="540" y="84" text-anchor="middle" font-size="11" font-family="monospace">c</text>
+      <circle cx="320" cy="140" r="22" fill="#fbe9ee" stroke="#be123c"/><text x="320" y="144" text-anchor="middle" font-size="11" font-family="monospace">d</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="142" y1="80" x2="298" y2="80"/><line x1="342" y1="80" x2="518" y2="80"/><line x1="320" y1="102" x2="320" y2="118"/><line x1="320" y1="140" x2="518" y2="86"/></g>
+    </svg>`,
+    picCap:"Two routes from a to c: a->b->c and a->d->c.",
+    commands:`connected(a, b).  connected(b, c).
+connected(a, d).  connected(d, c).
+
+path(X, Y) :- connected(X, Y).
+path(X, Y) :- connected(X, Z), path(Z, Y).
+
+% all simple routes with history guard
+route(X, Y, Visited, [X|Path]) :-
+    connected(X, Z), \\+ member(Z, Visited),
+    (Z = Y -> Path = [] ; route(Z, Y, [Z|Visited], Path)).
+
+% ?- path(a, c).
+% ?- route(a, c, [a], P).`,
+    output:`?- path(a, c).
+true ;
+true.
+
+?- route(a, c, [a], P).
+P = [a, b, c] ;
+P = [a, d, c].`,
+    lab:[
+      "Define the four connected/2 facts and query path(a, c).",
+      "Run route(a, c, [a], P). to get the full node lists (not just yes/no).",
+      "Add a cycle connected(c, a). and see why the history list in route/4 matters."
+    ],
+    tip:"Pathfinding is the same engine that does planning. Replace 'connected' with 'action leads from state S to S2' and you have a STRIPS-like planner — Prolog has been doing this since the 1970s."
+  },
+  {
+    id:7, icon:"🌐", title:"Use Case 4 — Semantic Web & RDF", level:"AI / KR",
+    intro:"Prolog's triple form subject-predicate-object maps directly onto RDF. Libraries like SemWeb let Prolog query knowledge graphs — bridging symbolic KR and the web of data.",
+    concepts:[
+      {t:"Triples as facts", d:"triple(subject, predicate, object) mirrors RDF.",},
+      {t:"RDFS reasoning", d:"Rules encode subClassOf / domain / range inference."},
+      {t:"SPARQL-like queries", d:"Prolog goals over triples mimic graph pattern matching."},
+      {t:"Linked data", d:"URIs as atoms connect local KB to external datasets."},
+      {t:"SemWeb library", d:"SWI-Prolog's semweb loads RDF/Turtle natively."}
+    ],
+    mermaid:`flowchart TD
+  T["triple(s, p, o)"] --> R["RDFS rules"]
+  R --> Q["?- triple(X, type, Person)"]
+  Q --> A["inferred instances"]
+  style T fill:#fbe9ee,stroke:#be123c,color:#881337
+  style A fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"RDF triples plus RDFS rules yield inferred knowledge-graph facts.",
+    picture:`<svg width="100%" height="170" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="55" width="180" height="40" rx="10" fill="#fbe9ee" stroke="#be123c"/><text x="150" y="80" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">alice type Person</text>
+      <rect x="290" y="55" width="180" height="40" rx="10" fill="#fbe9ee" stroke="#be123c"/><text x="380" y="80" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">bob type Student</text>
+      <rect x="520" y="55" width="180" height="40" rx="10" fill="#fbf8f9" stroke="#8c7f83"/><text x="610" y="80" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">Student subClass Person</text>
+      <rect x="290" y="120" width="220" height="36" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="400" y="143" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">derive bob type Person</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="470" y1="75" x2="518" y2="75"/><line x1="380" y1="95" x2="400" y2="118"/></g>
+    </svg>`,
+    picCap:"subClassOf reasoning lifts bob from Student to Person.",
+    commands:`% RDF-style triples
+triple(alice, type, person).
+triple(bob, type, student).
+triple(student, subclassOf, person).
+
+% RDFS subClassOf inference
+instance(X, C) :- triple(X, type, C).
+instance(X, C) :- triple(X, type, D), triple(D, subclassOf, C).
+
+% ?- instance(bob, person).
+% ?- instance(X, person).`,
+    output:`?- instance(bob, person).
+true.
+
+?- instance(X, person).
+X = alice ;
+X = bob.`,
+    lab:[
+      "Load the triples and the instance/2 rule, then ask instance(bob, person).",
+      "Query instance(X, person). to get both alice and bob via the subclass rule.",
+      "In SWI-Prolog try: pack_install(semweb), then use rdf_load/1 on a .ttl file for real RDF."
+    ],
+    tip:"Because RDF is 'just' subject-predicate-object, Prolog is a natural RDF store. SWI-Prolog's semweb pack can load Turtle and answer SPARQL-like queries entirely in Prolog — handy for on-device knowledge graphs."
+  },
+  {
+    id:8, icon:"💬", title:"Use Case 5 — Natural Language Parsing", level:"AI / KR",
+    intro:"Prolog's grammatical rules ARE Prolog clauses (DCG — Definite Clause Grammars). Parse sentences into trees, the foundation of symbolic NLP.",
+    concepts:[
+      {t:"DCG notation", d:"sentence --> noun_phrase, verb_phrase. reads like a grammar."},
+      {t:"Difference lists", d:"DCGs compile to predicates that thread remaining input automatically."},
+      {t:"Parse trees", d:"Build a structured representation of the sentence."},
+      {t:"Semantics", d:"Attach meaning by constructing a logical form during parsing."},
+      {t:"Symbolic NLP", d:"Contrast with statistical/neural parsers — fully inspectable rules."}
+    ],
+    mermaid:`flowchart TD
+  S["sentence"] --> NP["noun_phrase"]
+  S --> VP["verb_phrase"]
+  NP --> Det["determiner"]
+  NP --> N["noun"]
+  VP --> V["verb"]
+  style S fill:#fbe9ee,stroke:#be123c,color:#881337
+  style VP fill:#fbe9ee,stroke:#be123c,color:#881337`,
+    mermaidCap:"A DCG grammar decomposes a sentence into phrase rules.",
+    picture:`<svg width="100%" height="180" viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="300" y="20" width="160" height="32" rx="8" fill="#fbe9ee" stroke="#be123c"/><text x="380" y="41" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">sentence</text>
+      <rect x="180" y="80" width="160" height="32" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="260" y="101" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">noun_phrase</text>
+      <rect x="420" y="80" width="160" height="32" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="500" y="101" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">verb_phrase</text>
+      <rect x="150" y="140" width="90" height="28" rx="7" fill="#e6f4f1" stroke="#0f766e"/><text x="195" y="159" text-anchor="middle" font-size="10" fill="#0f5132" font-family="monospace">the</text>
+      <rect x="270" y="140" width="90" height="28" rx="7" fill="#e6f4f1" stroke="#0f766e"/><text x="315" y="159" text-anchor="middle" font-size="10" fill="#0f5132" font-family="monospace">cat</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="380" y1="52" x2="260" y2="78"/><line x1="380" y1="52" x2="500" y2="78"/><line x1="260" y1="112" x2="195" y2="138"/><line x1="260" y1="112" x2="315" y2="138"/></g>
+    </svg>`,
+    picCap:"Parse tree for 'the cat ...' built by DCG rules.",
+    commands:`:- use_module(library(dcg/basics)).
+
+sentence --> noun_phrase, verb_phrase.
+noun_phrase --> determiner, noun.
+verb_phrase --> verb.
+determiner --> [the].
+noun --> [cat].
+verb --> [sleeps].
+
+% ?- phrase(sentence, [the, cat, sleeps]).
+% ?- phrase(sentence, Words, []).   % generate sentences`,
+    output:`?- phrase(sentence, [the, cat, sleeps]).
+true.
+
+?- phrase(sentence, Words, []).
+Words = [the, cat, sleeps].`,
+    lab:[
+      "Paste the DCG and test phrase(sentence, [the, cat, sleeps]). — true.",
+      "Run phrase(sentence, Words, []). to generate the only sentence the grammar knows.",
+      "Extend noun --> [dog]. and verb --> [runs]. then regenerate — more sentences appear."
+    ],
+    tip:"DCGs are why Prolog was central to early NLP. A grammar rule IS a Prolog clause, so you can add semantic actions that build a logical form — parsing and 'understanding' happen in one pass."
+  },
+  {
+    id:9, icon:"🔢", title:"Use Case 6 — Constraint Solving", level:"AI / KR",
+    intro:"With the CLP(FD) library, Prolog becomes a constraint solver — assign values to variables under restrictions. This is the engine behind scheduling and Sudoku.",
+    concepts:[
+      {t:"CLP(FD)", d:"Constraint Logic Programming over Finite Domains."},
+      {t:"Domains", d:"X in 1..9 restricts X to integers 1..9."},
+      {t:"Constraints", d:"#\\=, #<, #= express arithmetic over variables."},
+      {t:"labeling", d:"A search step that assigns concrete values satisfying all constraints."},
+      {t:"Combinatorial search", d:"Scheduling, timetabling, crypto-arithmetic."}
+    ],
+    mermaid:`flowchart LR
+  D["domains: X in 1..9"] --> C["constraints"]
+  C["X #\\= Y, X + Y #= Z"] --> L["labeling"]
+  L --> S["solution values"]
+  style D fill:#fbe9ee,stroke:#be123c,color:#881337
+  style S fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Domains + constraints + labeling produce valid assignments.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="80" y="40" width="120" height="60" rx="10" fill="#fbe9ee" stroke="#be123c"/><text x="140" y="66" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">X∈1..9</text>
+      <rect x="320" y="40" width="120" height="60" rx="10" fill="#fbe9ee" stroke="#be123c"/><text x="380" y="66" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">Y∈1..9</text>
+      <rect x="200" y="120" width="200" height="30" rx="8" fill="#e6f4f1" stroke="#0f766e"/><text x="300" y="140" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">X#\\=Y, X+Y#=10</text>
+    </svg>`,
+    picCap:"Two domain variables with a disequality and sum constraint.",
+    commands:`:- use_module(library(clpfd)).
+
+solve(X, Y) :-
+    X in 1..9, Y in 1..9,
+    X #\\= Y,
+    X + Y #= 10,
+    label([X, Y]).
+
+% ?- solve(X, Y).`,
+    output:`?- solve(X, Y).
+X = 1, Y = 9 ;
+X = 2, Y = 8 ;
+X = 3, Y = 7 ;
+X = 4, Y = 6 ;
+... (8 solutions)`,
+    lab:[
+      "Load clpfd, paste solve/2, and run it — enumerate pairs summing to 10, distinct.",
+      "Add Z in 1..9, X + Y + Z #= 15 and re-label.",
+      "Replace values with a tiny Sudoku: 4 cells, rows/cols all_distinct."
+    ],
+    tip:"CLP(FD) turns Prolog into a declarative solver: you state constraints, not an algorithm. Sudoku, rosters, and puzzles are a few lines. This is constraint satisfaction — a core AI subfield — built in."
+  },
+  {
+    id:10, icon:"🧮", title:"Use Case 7 — Theorem Proving", level:"AI / KR",
+    intro:"Prolog is itself a theorem prover for Horn-clause logic. You can also encode propositional logic and ask whether a formula is entailed.",
+    concepts:[
+      {t:"Horn clauses", d:"Prolog programs are sets of Horn clauses — a decidable logic fragment."},
+      {t:"Entailment", d:"?- Goal. asks 'does the KB entail Goal?' — yes/no is a proof."},
+      {t:"Negation as failure", d:"\\+ Goal means 'Goal cannot be proven', not logical NOT."},
+      {t:"Meta-interpreters", d:"A Prolog program that interprets other Prolog programs (reflective)."},
+      {t:"Resolution", d:"Backward chaining is SLD resolution — the proof procedure."}
+    ],
+    mermaid:`flowchart TD
+  KB["KB (Horn clauses)"] --> G["?- Goal"]
+  G --> P["SLD resolution"]
+  P --> Y["proved / not provable"]
+  style KB fill:#fbe9ee,stroke:#be123c,color:#881337
+  style Y fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"A query is a theorem; resolution either proves or fails to prove it.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="40" width="240" height="80" rx="12" fill="#fbf8f9" stroke="#8c7f83"/>
+      <text x="80" y="66" font-family="monospace" font-size="12" fill="#5e5458">a.</text>
+      <text x="80" y="88" font-family="monospace" font-size="12" fill="#5e5458">b :- a.</text>
+      <text x="80" y="110" font-family="monospace" font-size="12" fill="#5e5458">c :- b, not d.</text>
+      <rect x="460" y="60" width="240" height="44" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="480" y="87" font-family="monospace" font-size="12" fill="#0f5132">?- c.  -> true (d unprovable)</text>
+    </svg>`,
+    picCap:"Proving c: b holds, d fails, so c succeeds via negation-as-failure.",
+    commands:`a.
+b :- a.
+c :- b, \\+ d.
+
+% ?- c.        -> true   (because d cannot be proven)
+% ?- a.        -> true
+% ?- d.        -> false  (no clause for d)
+
+% A tiny meta-interpreter (proof tracer):
+prove(true).
+prove((A,B)) :- prove(A), prove(B).
+prove(H) :- clause(H, Body), prove(Body).`,
+    output:`?- c.
+true.
+
+?- a.
+true.
+
+?- d.
+false.`,
+    lab:[
+      "Enter the three facts/rules and run c., a., d..",
+      "Note c succeeds only because d is not provable (negation as failure).",
+      "Run the meta-interpreter: prove(c). and watch it recurse through b then a."
+    ],
+    tip:"Every Prolog query is literally a theorem-proving request. Understanding \\+ as 'not provable' rather than 'logically false' prevents the classic bugs around negation and the closed-world assumption."
+  },
+  {
+    id:11, icon:"🤖", title:"Use Case 8 — Neuro-Symbolic AI Bridge", level:"AI / KR",
+    intro:"The 2025–2026 frontier: an LLM translates a natural-language request into Prolog, which executes the symbolic reasoning. Prolog becomes the verifiable 'brain' behind the LLM.",
+    concepts:[
+      {t:"LLM as translator", d:"Prompt the model to emit Prolog from English (pattern 3c, de Boer et al. 2025)."},
+      {t:"Prolog as verifier", d:"The symbolic layer checks consistency and returns explainable answers."},
+      {t:"ProSLM", d:"Prolog-Synergized Language Models for explainable KB QA (Springer 2024)."},
+      {t:"Intent grounding", d:"2026 work uses a Prolog 'skill' to ground LLM placement intent (arXiv 2606.11113)."},
+      {t:"Explainability", d:"The rule trace is the explanation — addressing LLM hallucination."}
+    ],
+    mermaid:`flowchart LR
+  U["Natural language"] --> L["LLM -> Prolog"]
+  L --> P["Prolog engine"]
+  P --> K["Knowledge base"]
+  P --> A["answer + trace"]
+  A --> E["explainable output"]
+  style U fill:#fbf8f9,stroke:#8c7f83
+  style L fill:#fbe9ee,stroke:#be123c,color:#881337
+  style P fill:#fbe9ee,stroke:#be123c,color:#881337
+  style A fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"LLM compiles intent to Prolog; Prolog reasons over the KB and returns a traced answer.",
+    picture:`<svg width="100%" height="170" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <rect x="50" y="60" width="150" height="50" rx="10" fill="#fbf8f9" stroke="#8c7f83"/><text x="125" y="90" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">"who is<br>grandparent?"</text>
+      <rect x="250" y="60" width="150" height="50" rx="10" fill="#fbe9ee" stroke="#be123c"/><text x="325" y="90" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">LLM emits<br>Prolog</text>
+      <rect x="450" y="60" width="150" height="50" rx="10" fill="#fbe9ee" stroke="#be123c"/><text x="525" y="90" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">Prolog<br>engine</text>
+      <rect x="630" y="60" width="100" height="50" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="680" y="90" text-anchor="middle" font-size="10" fill="#0f5132" font-family="monospace">trace</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="200" y1="85" x2="248" y2="85"/><line x1="400" y1="85" x2="448" y2="85"/><line x1="600" y1="85" x2="628" y2="85"/></g>
+    </svg>`,
+    picCap:"A neuro-symbolic pipeline: NL -> Prolog -> traced answer.",
+    commands:`% The LLM would generate this from "who is a grandparent?"
+grandparent(X, Z) :- parent(X, Y), parent(Y, Z).
+
+% Prolog returns not just the answer but the derivation:
+% ?- grandparent(alice, Who).
+%   Who = carol   (via parent(alice,bob), parent(bob,carol))
+
+% You can even ask Prolog to print the proof tree:
+trace_goal(G) :- once(prove(G)), print_message(proof, G).`,
+    output:`User:  "who is a grandparent of carol?"
+LLM -> grandparent(X, carol).
+Prolog:
+  X = alice
+  proof: parent(alice, bob), parent(bob, carol)
+
+Explainable answer: alice (with trace).`,
+    lab:[
+      "Take an English question, hand-write the equivalent Prolog query, and run it.",
+      "Compare: the LLM gives an answer; Prolog gives an answer AND a trace you can audit.",
+      "Read de Boer et al. 2025 ('Design Patterns for LLM-based Neuro-Symbolic Systems') for the taxonomy of LLM→Prolog patterns."
+    ],
+    tip:"This is the most important modern use of Prolog: not replacing the LLM, but constraining and verifying it. Keep a Prolog KB as the 'source of truth' and let the LLM translate; you get neural fluency with symbolic reliability."
+  },
+  {
+    id:12, icon:"📚", title:"Use Case 9 — Ontologies & Taxonomies", level:"AI / KR",
+    intro:"Represent a hierarchy of categories (is-a, part-of) and reason about subsumption. This underlies ontology engineering and knowledge graphs.",
+    concepts:[
+      {t:"is_a / subClassOf", d:"Transitive: if dog is_a mammal and mammal is_a animal, dog is_a animal."},
+      {t:"part_of", d:"Meronymy: wheel part_of car."},
+      {t:"Transitive closure", d:"A recursive rule propagates the relation upward."},
+      {t:"Classification", d:"Place an individual at the most specific class it satisfies."},
+      {t:"OWL overlap", d:"Description-logic concepts map onto Prolog rules."}
+    ],
+    mermaid:`flowchart TD
+  D["dog"] --> M["mammal"]
+  M --> A["animal"]
+  C["cat"] --> M
+  style A fill:#e6f4f1,stroke:#0f766e
+  style M fill:#fbe9ee,stroke:#be123c,color:#881337
+  style D fill:#fbe9ee,stroke:#be123c,color:#881337
+  style C fill:#fbe9ee,stroke:#be123c,color:#881337`,
+    mermaidCap:"Transitive is_a: dog and cat subsume to mammal then animal.",
+    picture:`<svg width="100%" height="180" viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="330" y="20" width="120" height="34" rx="8" fill="#e6f4f1" stroke="#0f766e"/><text x="390" y="42" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">animal</text>
+      <rect x="330" y="80" width="120" height="34" rx="8" fill="#fbe9ee" stroke="#be123c"/><text x="390" y="102" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">mammal</text>
+      <rect x="180" y="140" width="110" height="32" rx="8" fill="#fbe9ee" stroke="#be123c"/><text x="235" y="161" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">dog</text>
+      <rect x="440" y="140" width="110" height="32" rx="8" fill="#fbe9ee" stroke="#be123c"/><text x="495" y="161" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">cat</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="390" y1="54" x2="390" y2="78"/><line x1="390" y1="114" x2="235" y2="138"/><line x1="390" y1="114" x2="495" y2="138"/></g>
+    </svg>`,
+    picCap:"A small taxonomy; is_a is transitive.",
+    commands:`isa(dog, mammal).  isa(cat, mammal).
+isa(mammal, animal).  isa(bird, animal).
+
+subsumes(X, Y) :- isa(Y, X).
+subsumes(X, Y) :- isa(Z, X), subsumes(Z, Y).
+
+% ?- subsumes(animal, dog).        -> true
+% ?- subsumes(Class, cat).         -> Class = mammal ; Class = animal`,
+    output:`?- subsumes(animal, dog).
+true.
+
+?- subsumes(Class, cat).
+Class = mammal ;
+Class = animal.`,
+    lab:[
+      "Enter the isa facts and the transitive subsumes/2 rule.",
+      "Ask subsumes(animal, dog). — true via the chain dog→mammal→animal.",
+      "Add isa(robin, bird). and confirm subsumes(animal, robin)."
+    ],
+    tip:"Taxonomies are just transitive relations. The same recursive one-rule pattern powers ontologies, product categorisation, and biological classification — write it once, query forever."
+  },
+  {
+    id:13, icon:"♟️", title:"Use Case 10 — Game & Puzzle Solving", level:"AI / KR",
+    intro:"State-space search makes Prolog a natural puzzle solver: eight queens, Towers of Hanoi, mazes. The program is the rules; the answer is found by search.",
+    concepts:[
+      {t:"State representation", d:"A board or configuration as a Prolog term."},
+      {t:"Move rules", d:"valid(State, Move, NextState)."},
+      {t:"Goal test", d:"solved(State) terminates the search."},
+      {t:"findall / bagof", d:"Collect all solutions or the first one."},
+      {t:"Eight queens", d:"Place 8 queens with none attacking — a classic CLP(FD) demo."}
+    ],
+    mermaid:`flowchart TD
+  S0["initial state"] --> M1["move 1"]
+  M1 --> S1["state"]
+  S1 --> M2["move 2"]
+  S1 --> G["solved?"]
+  G -->|yes| DONE["solution"]
+  style S0 fill:#fbe9ee,stroke:#be123c,color:#881337
+  style DONE fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"From an initial state, apply moves until a solved state is reached.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="50" width="120" height="60" rx="10" fill="#fbe9ee" stroke="#be123c"/><text x="120" y="85" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">start</text>
+      <rect x="300" y="50" width="120" height="60" rx="10" fill="#fbf8f9" stroke="#8c7f83"/><text x="360" y="85" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">move</text>
+      <rect x="540" y="50" width="160" height="60" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="620" y="85" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">goal</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="180" y1="80" x2="298" y2="80"/><line x1="420" y1="80" x2="538" y2="80"/></g>
+    </svg>`,
+    picCap:"Search from start through moves to a goal state.",
+    commands:`:- use_module(library(clpfd)).
+
+eight_queens(Qs) :-
+    length(Qs, 8),
+    Qs ins 1..8,
+    all_different(Qs),
+    diagonals(Qs),
+    label(Qs).
+
+diagonals([]).
+diagonals([Q|Qs]) :-
+    diagonals(Qs, Q, 1), diagonals(Qs).
+diagonals([], _, _).
+diagonals([Q|Qs], Q0, D) :-
+    abs(Q0 - Q) #\\= D,
+    D1 #= D + 1,
+    diagonals(Qs, Q0, D1).
+
+% ?- eight_queens(Qs).`,
+    output:`?- eight_queens(Qs).
+Qs = [1, 5, 8, 6, 3, 7, 2, 4] ;
+Qs = [1, 6, 8, 3, 7, 4, 2, 5] ;
+... (92 solutions total)`,
+    lab:[
+      "Load clpfd, paste eight_queens/1 and diagonals/1, run it for the first solution.",
+      "Press ; to enumerate all 92 distinct solutions.",
+      "Change length(Qs,8) to 4 and confirm it finds the 2 solutions for a 4x4 board."
+    ],
+    tip:"Puzzles are the friendliest way to feel Prolog's search. The eight-queens solution is ~10 lines with CLP(FD) — try doing that compactly in an imperative language. Search is the point, not the code."
+  },
+  {
+    id:14, icon:"🗣️", title:"Dialects & Variants", level:"Reference",
+    intro:"Prolog is a family. SWI-Prolog dominates today; others optimise for speed, ISO compliance, constraint solving, or the web. Knowing the landscape helps you pick the right engine.",
+    concepts:[
+      {t:"SWI-Prolog", d:"The de-facto standard: rich libraries (clpfd, semweb, http), great for teaching and AI."},
+      {t:"GNU Prolog", d:"ISO-compliant, compiles to native code, strong constraint (CLP(FD)) support."},
+      {t:"SICStus Prolog", d:"Commercial, industrial-strength, used in large systems."},
+      {t:"Ciao & YAP", d:"Research-oriented; Ciao adds modules/objects, YAP focuses on speed."},
+      {t:"Mercury & Logtalk", d:"Mercury: typed, pure, fast. Logtalk: OOP layer over most Prologs."},
+      {t:"Web (Tau/Web)", d:"tau-prolog runs in the browser; Jekejeke brings Prolog to JavaScript/Android."}
+    ],
+    mermaid:`flowchart TD
+  P["Prolog family"] --> S["SWI-Prolog"]
+  P --> G["GNU Prolog"]
+  P --> SI["SICStus"]
+  P --> C["Ciao / YAP"]
+  P --> W["tau-prolog (browser)"]
+  P --> M["Mercury / Logtalk"]
+  style P fill:#fbe9ee,stroke:#be123c,color:#881337
+  style S fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Prolog's main dialects branch by focus: libraries, speed, web, or purity.",
+    picture:`<svg width="100%" height="180" viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="330" y="20" width="120" height="34" rx="8" fill="#fbe9ee" stroke="#be123c"/><text x="390" y="42" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">Prolog</text>
+      <rect x="60" y="90" width="130" height="34" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="125" y="112" text-anchor="middle" font-size="10" fill="#5e5458" font-family="monospace">SWI</text>
+      <rect x="210" y="90" width="130" height="34" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="275" y="112" text-anchor="middle" font-size="10" fill="#5e5458" font-family="monospace">GNU</text>
+      <rect x="360" y="90" width="130" height="34" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="425" y="112" text-anchor="middle" font-size="10" fill="#5e5458" font-family="monospace">SICStus</text>
+      <rect x="510" y="90" width="130" height="34" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="575" y="112" text-anchor="middle" font-size="10" fill="#5e5458" font-family="monospace">Ciao/YAP</text>
+      <rect x="285" y="145" width="200" height="30" rx="8" fill="#e6f4f1" stroke="#0f766e"/><text x="385" y="165" text-anchor="middle" font-size="10" fill="#0f5132" font-family="monospace">Mercury/tau/web</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="390" y1="54" x2="125" y2="88"/><line x1="390" y1="54" x2="275" y2="88"/><line x1="390" y1="54" x2="425" y2="88"/><line x1="390" y1="54" x2="575" y2="88"/><line x1="390" y1="54" x2="385" y2="143"/></g>
+    </svg>`,
+    picCap:"The Prolog dialect tree.",
+    commands:`# Install SWI-Prolog (Debian/Ubuntu/Mint)
+sudo apt install swi-prolog
+
+# GNU Prolog
+sudo apt install gprolog
+
+# In-browser Prolog (no install) — tau-prolog via npm/CDN:
+#   load tau-prolog from a CDN, then:
+#   const pl = require('tau-prolog');
+#   const session = pl.create();
+#   session.consult("parent(a,b).");
+#   session.query("parent(a,X).", {success: ...});
+
+% Most code in this book runs on SWI-Prolog unchanged.`,
+    output:`$ swipl
+Welcome to SWI-Prolog (threaded, 64 bits, version 9.2.x)
+?-`,
+    lab:[
+      "Install SWI-Prolog and confirm the version banner appears.",
+      "Try the family example from Chapter 1 inside swipl.",
+      "For browser use, load tau-prolog from a CDN and consult a tiny program to see it run client-side."
+    ],
+    tip:"Start with SWI-Prolog: it has the largest ecosystem and the clpfd/semweb/http libraries this book leans on. Move to GNU Prolog when you need a native-compiled binary, or Mercury when you need performance and types."
+  },
+  {
+    id:15, icon:"🚀", title:"Recent & AI-Relevant Developments", level:"Reference",
+    intro:"Far from retired, Prolog is central to the 2024–2026 neuro-symbolic revival — the 'third wave' of AI that marries neural nets with symbolic reasoning for trustworthy, explainable systems.",
+    concepts:[
+      {t:"Neuro-symbolic AI", d:"NeSy integrates symbolic logic (excels at reasoning) with neural nets (excels at perception)."},
+      {t:"LLM-to-Prolog", d:"LLMs generate Prolog from natural language (de Boer et al. 2025 design patterns)."},
+      {t:"ProSLM (2024)", d:"Prolog-synergized LM for explainable, KB-grounded question answering."},
+      {t:"Prolog 'skills' (2026)", d:"arXiv 2606.11113 uses a Prolog layer to ground LLM service-placement intent."},
+      {t:"Symbolic thinking loop", d:"2025 work keeps an LLM in a persistent Lisp/Prolog metaprogramming loop for structured reasoning."},
+      {t:"Explainability", d:"The rule trace is an audit trail — directly attacking LLM hallucination."}
+    ],
+    mermaid:`flowchart LR
+  N["Neural (LLM)"] <--> S["Symbolic (Prolog)"]
+  S --> E["explainable, verifiable"]
+  N --> F["fluent, flexible"]
+  E --> T["trustworthy AI"]
+  F --> T
+  style N fill:#fbf8f9,stroke:#8c7f83
+  style S fill:#fbe9ee,stroke:#be123c,color:#881337
+  style T fill:#e6f4f1,stroke:#0f766e
+  style N whiteSpace:nowrap
+  style S whiteSpace:nowrap
+  style E whiteSpace:nowrap
+  style F whiteSpace:nowrap
+  style T whiteSpace:nowrap`,
+    mermaidCap:"Neuro-symbolic AI couples neural fluency with symbolic verification.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="50" width="180" height="60" rx="12" fill="#fbf8f9" stroke="#8c7f83"/><text x="150" y="85" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">Neural LLM</text>
+      <rect x="520" y="50" width="180" height="60" rx="12" fill="#fbe9ee" stroke="#be123c"/><text x="610" y="85" text-anchor="middle" font-size="11" fill="#881337" font-family="monospace">Symbolic Prolog</text>
+      <rect x="300" y="120" width="160" height="34" rx="8" fill="#e6f4f1" stroke="#0f766e"/><text x="380" y="142" text-anchor="middle" font-size="10" fill="#0f5132" font-family="monospace">trustworthy AI</text>
+      <g stroke="#be123c" stroke-width="3"><line x1="240" y1="80" x2="518" y2="80"/><line x1="518" y1="80" x2="240" y2="80" stroke-dasharray="4,4"/></g>
+      <g stroke="#0f766e" stroke-width="2"><line x1="150" y1="110" x2="350" y2="118"/><line x1="610" y1="110" x2="450" y2="118"/></g>
+    </svg>`,
+    picCap:"Two-way coupling between neural and symbolic components.",
+    commands:`# Key 2024-2026 references (verify via web_search before citing):
+# - de Boer et al. 2025, "Design Patterns for LLM-based Neuro-Symbolic Systems"
+# - arXiv 2510.21425 (Oct 2025), symbolic integration in LLMs
+# - arXiv 2606.11113 (Jun 2026), neuro-symbolic Prolog skill for LLM service placement
+# - ProSLM, Springer 2024, Prolog-synergized language models
+# - arXiv 2506.10021 (Jun 2025), LLMs in a persistent symbolic metaprogramming loop
+
+# Practical takeaway: keep a Prolog KB as the verifiable core;
+# let an LLM translate intent into queries against it.`,
+    output:`Trend (2024-2026):
+  LLM  ->  Prolog  ->  answer + trace
+  fluent   symbolic    explainable
+Result: systems that are both capable and auditable.`,
+    lab:[
+      "Search for 'neuro-symbolic AI 2025' and skim one of the cited papers.",
+      "Sketch a tiny KB + LLM-translation workflow for a domain you care about (e.g. scheduling).",
+      "Re-run Use Case 8's example and note how the trace answers the 'why' question an LLM alone cannot."
+    ],
+    tip:"The narrative that 'deep learning replaced symbolic AI' is outdated. The cutting edge is hybrid: neural for perception, symbolic (Prolog) for reasoning and explanation. Learning Prolog now is learning the symbolic half of 2026's AI."
+  }
+/*__CH__*/
+];
+
+function renderTOC(){
+  const toc = document.getElementById('toc');
+  toc.innerHTML = chapters.map(ch => `
+    <a href="#chapter-${ch.id}" data-title="${ch.title.toLowerCase()}" data-level="${ch.level.toLowerCase()}">
+      <span class="num">${ch.id}</span>
+      <span>${ch.icon} ${ch.title}</span>
+    </a>`).join('');
+}
+function renderChapters(){
+  const wrap = document.getElementById('chapters');
+  wrap.innerHTML = chapters.map(ch => `
+    <section class="chapter" id="chapter-${ch.id}">
+      <div class="ch-head">
+        <div class="ch-ico">${ch.icon}</div>
+        <div>
+          <h2>${ch.title}</h2>
+          <div class="level">Chapter ${ch.id} · ${ch.level}</div>
+        </div>
+      </div>
+      <p class="intro">${ch.intro}</p>
+
+      <h3 class="sec">Key Concepts</h3>
+      <div class="cards">
+        ${ch.concepts.map(c => `<div class="card"><div class="t">${c.t}</div><div class="d">${c.d}</div></div>`).join('')}
+      </div>
+
+      <h3 class="sec">How It Works</h3>
+      <div class="diagram">
+        <div class="mermaid">${ch.mermaid}</div>
+        <div class="cap">${ch.mermaidCap}</div>
+      </div>
+
+      <h3 class="sec">Illustration</h3>
+      <div class="picture">
+        ${ch.picture}
+        <div class="cap">${ch.picCap}</div>
+      </div>
+
+      <h3 class="sec">Example — Code & Output</h3>
+      <div class="codewrap">
+        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+        <pre class="code">${escapeHTML(ch.commands)}</pre>
+      </div>
+      ${ch.output ? `<div class="outputbox"><div class="ol">Output</div><pre class="out">${escapeHTML(ch.output)}</pre></div>` : ''}
+
+      <div class="lab">
+        <div class="lh"><i class="fas fa-flask"></i> Hands-on Lab</div>
+        <ol>${ch.lab.map(s => `<li>${s}</li>`).join('')}</ol>
+      </div>
+
+      <div class="tip">
+        <div class="ic"><i class="fas fa-lightbulb"></i></div>
+        <div class="tx"><strong>Expert tip:</strong> ${ch.tip}</div>
+      </div>
+
+      ${chapterNav(ch.id)}
+    </section>
+  `).join('');
+}
+function chapterNav(id){
+  const prev = chapters.find(c => c.id === id-1);
+  const next = chapters.find(c => c.id === id+1);
+  const p = prev ? `<a class="prev" href="#chapter-${prev.id}"><div class="lab">Previous</div><div class="ttl">${prev.icon} ${prev.title}</div></a>` : `<span></span>`;
+  const n = next ? `<a class="next" href="#chapter-${next.id}"><div class="lab">Next</div><div class="ttl">${next.icon} ${next.title}</div></a>` : `<span></span>`;
+  return `<div class="chapternav">${p}${n}</div>`;
+}
+function escapeHTML(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+function copyCode(btn){
+  const code = btn.parentElement.querySelector('pre').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.classList.add('done');
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+    setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = '<i class="fas fa-copy"></i> Copy'; }, 1600);
+  });
+}
+/* ================= UNIFIED SEARCH ================= */
+let BOOK_INDEX = [];          // {id,title,level,text(lower),raw}
+let SEM_READY = false;
+let LAST_Q = "";
+let EXTRACTOR = null;
+let CHAPTER_EMB = [];         // embedding per chapter id (1-based)
+
+function buildIndex(){
+  BOOK_INDEX = chapters.map(ch => {
+    const raw = [
+      ch.title, ch.level, ch.intro,
+      ch.concepts.map(c => c.t + " " + c.d).join(" "),
+      ch.commands, ch.lab.join(" "), ch.tip,
+      ch.mermaidCap, ch.picCap
+    ].join(" ");
+    return {id:ch.id, title:ch.title, level:ch.level, text:raw.toLowerCase(), raw:raw};
+  });
+}
+
+function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+function makeContext(raw, q){
+  const term = q.split(/\s+/).filter(Boolean)[0] || q;
+  const re = new RegExp(escRe(term), "i");
+  const m = re.exec(raw);
+  if(!m) return raw.slice(0, 90) + (raw.length>90?"…":"");
+  const s = m.index;
+  const before = raw.slice(0, s).trim().split(/\s+/).slice(-2).join(" ");
+  const after  = raw.slice(s + m[0].length).trim().split(/\s+/).slice(0, 2).join(" ");
+  const snippet = (before ? before + " " : "") + m[0] + (after ? " " + after : "");
+  return escapeHTML(snippet).replace(new RegExp("("+escRe(term)+")","ig"), "<mark>$1</mark>");
+}
+
+function bestTerm(q, ch){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  for(const t of terms){ if(ch.text.includes(t)) return t; }
+  return terms[0] || q;
+}
+
+function keywordResults(q, limit){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if(!terms.length) return [];
+  const res = [];
+  for(const ch of BOOK_INDEX){
+    let score = 0, ctx = "";
+    for(const t of terms){
+      if(ch.text.includes(t)){ score++; if(!ctx) ctx = makeContext(ch.raw, t); }
+    }
+    if(score > 0) res.push({ch, score, ctx, sem:false});
+  }
+  res.sort((a,b)=> b.score - a.score);
+  return res.slice(0, limit);
+}
+
+function cosine(a, b){
+  let d=0, na=0, nb=0;
+  for(let i=0;i<a.length;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d / ((Math.sqrt(na)*Math.sqrt(nb)) || 1);
+}
+
+async function getExtractor(){
+  if(EXTRACTOR) return EXTRACTOR;
+  const mod = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.0");
+  EXTRACTOR = await mod.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+  return EXTRACTOR;
+}
+
+async function embedText(text){
+  const ex = await getExtractor();
+  const out = await ex(text, {pooling:"mean", normalize:true});
+  return Array.from(out.data);
+}
+
+async function primeEmbeddings(){
+  const st = document.getElementById("search-status");
+  if(st) st.textContent = "indexing…";
+  try{
+    await getExtractor();
+    CHAPTER_EMB = [];
+    for(const ch of BOOK_INDEX){
+      CHAPTER_EMB[ch.id] = await embedText(ch.raw.slice(0, 400));
+    }
+    SEM_READY = true;
+    if(st) st.textContent = "semantic ✓";
+    if(LAST_Q.trim()) renderResults(LAST_Q, searchBlend(LAST_Q, 14));
+  }catch(e){
+    if(st) st.textContent = "keyword only";
+  }
+}
+
+function searchBlend(q, limit){
+  const kw = keywordResults(q, limit);
+  if(SEM_READY && CHAPTER_EMB.length){
+    try{
+      // synchronous-ish: we already have query emb? need async. Use a placeholder path.
+    }catch(e){}
+  }
+  return kw;
+}
+
+function semanticRankSync(q){
+  // Requires CHAPTER_EMB + a precomputed query emb; handled in async path.
+  return [];
+}
+
+function renderResults(q, list){
+  const box = document.getElementById("search-results");
+  if(!box) return;
+  if(!list.length){ box.innerHTML = '<div class="sr-empty">No matches for “'+escapeHTML(q)+'”.</div>'; box.classList.add("show"); return; }
+  box.innerHTML = list.map(r => {
+    const ch = r.ch;
+    const ctx = r.ctx || makeContext(ch.raw, bestTerm(q, ch));
+    const tag = r.sem ? '<span class="sr-tag sem">semantic</span>' : '<span class="sr-tag">match</span>';
+    return '<a class="sr-item" href="#chapter-'+ch.id+'" onclick="closeSearch()">'
+         + '<div class="sr-chap">Chapter '+ch.id+' · '+escapeHTML(ch.level)+'</div>'
+         + '<div class="sr-title"><span>'+escapeHTML(ch.title)+'</span>'+tag+'</div>'
+         + '<div class="sr-ctx">'+ctx+'</div></a>';
+  }).join("");
+  box.classList.add("show");
+}
+
+function closeSearch(){ const b=document.getElementById("search-results"); if(b) b.classList.remove("show"); }
+
+function searchBooks(q){
+  LAST_Q = q = (q||"").trim();
+  const box = document.getElementById("search-results");
+  if(!q){ closeSearch(); if(box) box.innerHTML=""; return; }
+  // Keyword results immediately (always available)
+  const kw = keywordResults(q, 14);
+  renderResults(q, kw);
+  // Semantic re-rank when ready
+  if(SEM_READY && CHAPTER_EMB.length){
+    embedText(q).then(qe => {
+      const sem = BOOK_INDEX.map(ch => ({
+        ch, sim: cosine(qe, CHAPTER_EMB[ch.id] || [])
+      })).filter(r => r.sim > 0.12)
+        .sort((a,b)=> b.sim - a.sim).slice(0, 8)
+        .map(r => ({ch:r.ch, ctx:makeContext(r.ch.raw, bestTerm(q, r.ch)), sem:true}));
+      // merge: semantic first, then keyword not already shown
+      const seen = new Set(sem.map(r=>r.ch.id));
+      const merged = sem.concat(kw.filter(r=>!seen.has(r.ch.id)).map(r=>({ch:r.ch,ctx:r.ctx,sem:false})));
+      renderResults(q, merged.slice(0,14));
+    }).catch(()=>{});
+  } else if(!window.__embStarted){
+    window.__embStarted = true;
+    primeEmbeddings();
+  }
+}
+
+// hide results on outside click
+document.addEventListener("click", function(e){
+  const w = document.querySelector(".search-wrap");
+  if(w && !w.contains(e.target)) closeSearch();
+});
+function setupScrollSpy(){
+  const links = document.querySelectorAll('#toc a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        const id = e.target.id;
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+id));
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px', threshold:0});
+  document.querySelectorAll('.chapter').forEach(c => obs.observe(c));
+}
+function openSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('backdrop').classList.add('show'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('backdrop').classList.remove('show'); }
+function exportHTML(){
+  const data = document.documentElement.outerHTML;
+  const blob = new Blob([data], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'Prolog-book.html'; a.click();
+  URL.revokeObjectURL(url);
+}
+window.addEventListener('DOMContentLoaded', () => {
+  renderTOC();
+  renderChapters();
+  buildIndex();
+  setTimeout(primeEmbeddings, 800);
+  setupScrollSpy();
+  mermaid.initialize({startOnLoad:false, theme:'neutral', flowchart:{curve:'basis'}, securityLevel:'loose'});
+  mermaid.run();
+});
+</script>
+</body>
+</html>

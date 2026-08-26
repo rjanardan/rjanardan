@@ -1,0 +1,1119 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Lisp Field Guide — Knowledge Representation & AI</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root{
+    --bg:#f7f8fa; --panel:#ffffff; --panel-2:#f0f2f5; --line:#e3e6ea;
+    --ink:#23262b; --ink-soft:#5b626b; --muted:#939aa4;
+    --accent:#b45309; --accent-soft:#fdf2e3; --accent-ink:#92400e;
+    --green:#0f766e; --blue:#2563eb; --shadow:0 1px 3px rgba(20,24,31,.08),0 8px 24px rgba(20,24,31,.06);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.55;
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+       font-size:15px;}
+  a{color:var(--accent);}
+  .layout{display:grid;grid-template-columns:280px 1fr;min-height:100vh;}
+
+  /* Sidebar */
+  .sidebar{background:var(--panel);border-right:1px solid var(--line);padding:22px 16px;
+           position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sidebar .logo{font-family:'Space Grotesk',Georgia,serif;font-weight:700;font-size:18px;
+                 color:var(--accent-ink);margin:0 0 4px;}
+  .sidebar .sub{font-size:12px;color:var(--muted);margin:0 0 18px;}
+  .toc a{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:10px;
+         color:var(--ink-soft);text-decoration:none;font-size:13px;transition:background .15s,color .15s;}
+  .toc a .num{flex:0 0 22px;height:22px;border-radius:6px;background:var(--accent-soft);
+             color:var(--accent-ink);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+  .toc a.active{background:var(--accent-soft);color:var(--accent-ink);font-weight:600;}
+  .toc a:hover{background:var(--panel-2);}
+
+  /* Topbar */
+  header.topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);
+                backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+                display:flex;align-items:center;}
+  .topbar-inner{display:flex;align-items:center;gap:14px;width:100%;max-width:920px;padding:12px 34px;}
+  .menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:9px;
+            width:38px;height:38px;font-size:18px;cursor:pointer;}
+  header.topbar h2{font-size:16px;margin:0;flex:0 0 auto;letter-spacing:-.01em;}
+  header.topbar .search{background:var(--panel-2);
+       border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:12px;outline:none;color:var(--ink);}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 13px;
+       font-size:12px;cursor:pointer;}
+  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:45;}
+
+  /* Content */
+  main{padding:30px 34px 60px;max-width:920px;}
+  .hero{background:linear-gradient(135deg,#fdf2e3,#f7f8fa);border:1px solid var(--line);
+        border-radius:18px;padding:30px 32px;margin-bottom:30px;}
+  .hero h1{font-family:'Space Grotesk',Georgia,serif;font-size:clamp(22px,3vw,30px);margin:0 0 12px;letter-spacing:-.02em;}
+  .hero p{max-width:640px;font-size:14px;opacity:.94;margin:0 0 18px;}
+  .stats{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink-soft);}
+  .stats .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;}
+
+  .chapter{background:var(--panel);border:1px solid var(--line);border-radius:18px;
+           padding:26px 30px;margin:0 0 26px;scroll-margin-top:78px;box-shadow:var(--shadow);}
+  .ch-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:8px;}
+  .ch-ico{flex:0 0 44px;height:44px;border-radius:12px;background:var(--accent-soft);
+          display:flex;align-items:center;justify-content:center;font-size:22px;}
+  .chapter h2{font-family:'Space Grotesk',Georgia,serif;font-size:clamp(18px,2.4vw,23px);margin:0;letter-spacing:-.02em;}
+  .level{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:3px;}
+  .intro{color:var(--ink-soft);font-size:14.5px;margin:14px 0 6px;}
+
+  h3.sec{font-family:'Space Grotesk',Georgia,serif;font-size:17px;margin:28px 0 12px;
+         padding-bottom:7px;border-bottom:1px solid var(--line);letter-spacing:-.01em;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:12px 0;}
+  .card{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;}
+  .card .t{font-weight:600;font-size:13.5px;margin-bottom:4px;color:var(--accent-ink);}
+  .card .d{font-size:13px;color:var(--ink-soft);}
+
+  .mermaid{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+           padding:14px;margin:16px 0;text-align:center;overflow-x:auto;}
+  figure{margin:16px 0;}
+  figcaption{font-size:12px;color:var(--muted);margin-top:6px;text-align:center;}
+
+  pre{position:relative;background:#1e2329;color:#e6e6e6;border-radius:14px;padding:16px 18px;
+      margin:16px 0;overflow-x:auto;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;line-height:1.65;}
+  pre .copy{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.12);color:#fff;border:none;
+            border-radius:7px;padding:5px 10px;font-size:11px;cursor:pointer;}
+  pre .copy:hover{background:rgba(255,255,255,.22);}
+  pre.out{background:#11231c;color:#b8e6c9;}
+
+  .lab{background:var(--accent-soft);border:1px solid #f0d9b5;border-radius:14px;padding:14px 18px;margin:16px 0;}
+  .lab h4{margin:0 0 8px;font-size:13px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.06em;}
+  .lab ol{margin:0;padding-left:20px;font-size:13.5px;color:var(--ink);}
+  .lab li{margin:5px 0;}
+
+  .tip{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;
+       padding:12px 16px;margin:16px 0;font-size:13.5px;color:#7c4a12;}
+
+  .chapternav{display:flex;justify-content:space-between;gap:12px;margin-top:20px;}
+  .chapternav a{flex:1;text-decoration:none;background:var(--panel-2);border:1px solid var(--line);
+                border-radius:12px;padding:10px 14px;color:var(--ink);}
+  .chapternav .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+  .chapternav .ttl{font-weight:600;font-size:13.5px;}
+
+  .pagefoot{font-size:12px;color:var(--muted);text-align:center;padding:24px;}
+
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    .sidebar{position:fixed;left:0;top:0;width:268px;z-index:50;transform:translateX(-100%);transition:transform .2s;}
+    .sidebar.open{transform:translateX(0);}
+    .menu-btn{display:block;}
+    header.topbar .search-wrap{display:none;}
+    .topbar-inner{padding:12px 16px;}
+    main{padding:20px 16px 50px;}
+  }
+/* ---- Unified search (full-text + semantic) ---- */
+.search-wrap{position:relative;flex:1 1 auto;min-width:220px;max-width:none;display:flex;align-items:center;gap:8px;}
+.search-wrap .search{flex:1;width:100%;}
+.search-status{font-size:10px;color:var(--muted);white-space:nowrap;}
+.search-results{
+  position:absolute;top:48px;left:0;right:0;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);max-height:62vh;overflow-y:auto;z-index:60;display:none;
+}
+.search-results.show{display:block;}
+.sr-item{display:block;padding:10px 14px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);}
+.sr-item:last-child{border-bottom:none;}
+.sr-item:hover{background:var(--panel-2);}
+.sr-chap{font-size:11px;color:var(--accent);font-weight:600;}
+.sr-title{font-size:13px;font-weight:600;margin:2px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;line-height:1.25;}
+.sr-title>span:first-child{flex:1 1 auto;min-width:0;}
+.sr-tag{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 6px;white-space:nowrap;align-self:center;line-height:1;flex:0 0 auto;}
+.sr-tag.sem{color:var(--accent);border-color:var(--accent);}
+.sr-ctx{font-size:12px;color:var(--ink-soft);line-height:1.45;margin-top:3px;}
+.sr-ctx mark{background:#fde68a;color:#7c2d12;border-radius:3px;padding:0 2px;}
+.sr-empty{padding:14px;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">λ Lisp Field Guide</div>
+    <div class="sub">Knowledge Representation & AI</div>
+    <nav class="toc" id="toc"></nav>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);">
+      <button class="btn" style="width:100%" onclick="saveBook()">Save .html</button>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop" onclick="document.getElementById('sidebar').classList.remove('open');this.style.display='none';"></div>
+
+  <div style="min-width:0;">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <button class="menu-btn" onclick="document.getElementById('sidebar').classList.add('open');document.getElementById('backdrop').style.display='block';">☰</button>
+        <h2>The Lisp Field Guide</h2>
+        <div class="search-wrap">
+          <input id="search" class="search" type="text" placeholder="Search concepts, macros, terms…" oninput="searchBooks(this.value)" autocomplete="off">
+          <span class="search-status" id="search-status"></span>
+          <div class="search-results" id="search-results"></div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>The Lisp Field Guide</h1>
+        <p>Lisp — the oldest family of AI languages — treats code as data (homoiconicity) and makes symbolic knowledge representation natural. This book frames Lisp (Common Lisp, Scheme, Clojure) as a knowledge-representation and AI toolkit: 10 worked use cases show real code and output; dialects and 2025–2026 neuro-symbolic developments close it out.</p>
+        <div class="stats">
+          <div><span class="dot"></span> 15 Chapters</div>
+          <div><span class="dot"></span> 10 AI / KR Use Cases</div>
+          <div><span class="dot"></span> Mermaid Diagrams</div>
+          <div><span class="dot"></span> 100% Offline</div>
+        </div>
+      </section>
+
+      <div id="chapters"></div>
+
+      <div class="pagefoot">
+        The Lisp Field Guide · Knowledge representation & AI · Light theme, responsive, printable.
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const chapters = [
+  {
+    id:1, icon:"λ", title:"Why Lisp for Knowledge & AI", level:"Foundation",
+    intro:"Lisp's defining idea is homoiconicity: code is written as Lisp data (S-expressions), so a program can read, generate, and transform other programs. That makes symbolic knowledge representation and meta-level reasoning natural — the reason Lisp powered early AI.",
+    concepts:[
+      {t:"Homoiconicity", d:"Programs are lists; (f x) is both code and data."},
+      {t:"S-expressions", d:"Atoms and parenthesised lists are the universal syntax."},
+      {t:"Code as data", d:"Macros manipulate code at compile time — metaprogramming built in."},
+      {t:"Symbolic AI fit", d:"Facts, rules, and logic translate directly to list structures."},
+      {t:"REPL", d:"Interactive read-eval-print loop: trial, inspect, refine."}
+    ],
+    mermaid:`flowchart TD
+  C["code = data (S-expr)"] --> M["macros transform code"]
+  M --> R["reason about reasoning"]
+  C --> K["facts as lists"]
+  K --> AI["symbolic AI / KR"]
+  style C fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style AI fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Homoiconicity connects code, macros, and knowledge representation.",
+    picture:`<svg width="100%" height="170" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="40" width="280" height="80" rx="12" fill="#fdf2e3" stroke="#b45309"/>
+      <text x="60" y="68" font-family="monospace" font-size="13" fill="#92400e">(defrule bird</text>
+      <text x="60" y="88" font-family="monospace" font-size="13" fill="#92400e">  (flies ?x))</text>
+      <text x="60" y="108" font-family="monospace" font-size="13" fill="#92400e">  (has-feather ?x))</text>
+      <rect x="440" y="55" width="280" height="54" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="460" y="84" font-family="monospace" font-size="13" fill="#0f5132">code is data = knowledge</text>
+      <g stroke="#b45309" stroke-width="2"><line x1="320" y1="80" x2="438" y2="80"/></g>
+    </svg>`,
+    picCap:"A rule written as a list is both program and knowledge.",
+    commands:`; In Lisp, a knowledge rule is just a list:
+(setf *kb*
+  '((isa bird animal)
+    (isa penguin bird)
+    (flies bird)
+    (not (flies penguin))))
+
+; query the KB with plain list processing
+(defun isa (sub sup)
+  (or (member (list 'isa sub sup) *kb*)
+      (some (lambda (r)
+              (and (equal (second r) 'isa)
+                   (equal (third r) sub)
+                   (isa (fourth r) sup)))
+            *kb*)))
+
+; (isa 'penguin 'animal)  -> T`,
+    output:`; REPL session
+CL-USER> (isa 'penguin 'animal)
+T
+CL-USER> (isa 'penguin 'bird)
+T
+CL-USER> (member '(flies bird) *kb*)
+((FLIES BIRD) (NOT (FLIES PENGUIN)))   ; truthy (non-nil)`,
+    lab:[
+      "Start a Common Lisp REPL (sbcl or clisp) and define *kb*.",
+      "Run (isa 'penguin 'animal) — it should return T via the chain.",
+      "Add (isa robin bird) and confirm (isa 'robin 'animal)."
+    ],
+    tip:"The single most important idea: in Lisp, knowledge and code share one representation. A rule is a list; querying it is just list traversal. That unity is why Lisp was the original AI language."
+  },
+  {
+    id:2, icon:"🧱", title:"S-expressions & Data as Knowledge", level:"Foundation",
+    intro:"Everything in Lisp is an S-expression — atoms and lists. Knowledge graphs, frames, and rules are naturally encoded as nested lists, which you can build, pattern-match, and rewrite.",
+    concepts:[
+      {t:"Symbols", d:"Named atoms (bird, ?x) interned in a package — the atoms of meaning."},
+      {t:"Lists", d:"(head rest...) — trees of meaning, recursively."},
+      {t:"Quoting", d:"' prevents evaluation; '(a b) is the literal list."},
+      {t:"Association lists", d:"((key . value) ...) — lightweight property stores."},
+      {t:"Property lists", d:"Symbols carry their own metadata via plist."}
+    ],
+    mermaid:`flowchart LR
+  A["atom: bird"] --> L["list: (isa bird animal)"]
+  L --> T["tree of meaning"]
+  T --> P["pattern-match / rewrite"]
+  style A fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style P fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Atoms combine into lists (trees) that we match and rewrite.",
+    picture:`<svg width="100%" height="170" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="120" cy="85" r="26" fill="#fdf2e3" stroke="#b45309"/><text x="120" y="89" text-anchor="middle" font-size="12" fill="#92400e" font-family="monospace">bird</text>
+      <circle cx="320" cy="40" r="22" fill="#fbf8f9" stroke="#8c7f83"/><text x="320" y="44" text-anchor="middle" font-size="11" font-family="monospace">isa</text>
+      <circle cx="320" cy="90" r="22" fill="#fbf8f9" stroke="#8c7f83"/><text x="320" y="94" text-anchor="middle" font-size="11" font-family="monospace">bird</text>
+      <circle cx="320" cy="140" r="22" fill="#fbf8f9" stroke="#8c7f83"/><text x="320" y="144" text-anchor="middle" font-size="11" font-family="monospace">animal</text>
+      <rect x="520" y="60" width="200" height="48" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="540" y="89" font-family="monospace" font-size="12" fill="#0f5132">(isa bird animal)</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="146" y1="78" x2="298" y2="48"/><line x1="146" y1="92" x2="298" y2="90"/><line x1="146" y1="98" x2="298" y2="132"/><line x1="342" y1="85" x2="518" y2="85"/></g>
+    </svg>`,
+    picCap:"An atom and a tree; cons cells build the tree.",
+    commands:`; property list on a symbol
+(setf (get 'bird 'kind) 'animal)
+(get 'bird 'kind)          ; -> ANIMAL
+
+; association list as a tiny KB
+(setf family '((alice bob) (bob carol) (bob dave)))
+(assoc 'bob family)        ; -> (BOB CAROL)
+
+; build a tree with cons
+(cons 'isa (cons 'bird (cons 'animal nil)))
+; -> (ISA BIRD ANIMAL)`,
+    output:`CL-USER> (get 'bird 'kind)
+ANIMAL
+CL-USER> (assoc 'bob family)
+(BOB CAROL)
+CL-USER> (cons 'isa (cons 'bird (cons 'animal nil)))
+(ISA BIRD ANIMAL)`,
+    lab:[
+      "Use setf/get to attach a property to a symbol.",
+      "Store parent facts in an alist and retrieve with assoc.",
+      "Build (grandparent alice carol) using nested cons and verify car/cdr."
+    ],
+    tip:"Master car, cdr, and cons and you can represent any knowledge structure — trees, graphs, frames. Lisp's lists are the original flexible data model, predating JSON by decades."
+  },
+  {
+    id:3, icon:"♻️", title:"Recursion & Map/Reduce over Knowledge", level:"Foundation",
+    intro:"Knowledge is rarely flat — it is trees and graphs. Lisp's recursion and higher-order functions (mapcar, reduce, remove-if) make traversing and transforming knowledge structures concise.",
+    concepts:[
+      {t:"Recursion", d:"Walk trees naturally: process head, recurse on children."},
+      {t:"mapcar", d:"Apply a function to every element of a list."},
+      {t:"reduce", d:"Fold a list into one accumulated value."},
+      {t:"remove-if / find-if", d:"Query collections declaratively by predicate."},
+      {t:"Higher-order", d:"Functions as arguments — the functional KR style."}
+    ],
+    mermaid:`flowchart TD
+  T["knowledge tree"] --> MF["mapcar / reduce"]
+  MF --> Q["query / transform"]
+  Q --> R["new knowledge"]
+  style T fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style R fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Map/reduce traverse knowledge trees to derive new facts.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="120" cy="80" r="22" fill="#fdf2e3" stroke="#b45309"/><text x="120" y="84" text-anchor="middle" font-size="11" font-family="monospace">root</text>
+      <circle cx="300" cy="40" r="20" fill="#fbf8f9" stroke="#8c7f83"/><text x="300" y="44" text-anchor="middle" font-size="11" font-family="monospace">a</text>
+      <circle cx="300" cy="120" r="20" fill="#fbf8f9" stroke="#8c7f83"/><text x="300" y="124" text-anchor="middle" font-size="11" font-family="monospace">b</text>
+      <rect x="500" y="55" width="220" height="50" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="520" y="84" font-family="monospace" font-size="12" fill="#0f5132">(mapcar f tree)</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="142" y1="74" x2="280" y2="46"/><line x1="142" y1="86" x2="280" y2="114"/></g>
+    </svg>`,
+    picCap:"Recursion walks each branch; mapcar applies f to all.",
+    commands:`(defun collect-leaves (tree)
+  (cond ((null tree) nil)
+        ((atom tree) (list tree))
+        (t (append (collect-leaves (car tree))
+                   (collect-leaves (cdr tree))))))
+
+(setf tree '(a (b c) (d (e f))))
+(collect-leaves tree)     ; -> (A B C D E F)
+
+; higher-order query
+(remove-if-not #'numberp '(a 1 b 2 c 3))   ; -> (1 2 3)
+(reduce #'+ '(1 2 3 4))                    ; -> 10`,
+    output:`CL-USER> (collect-leaves tree)
+(A B C D E F)
+CL-USER> (remove-if-not #'numberp '(a 1 b 2 c 3))
+(1 2 3)
+CL-USER> (reduce #'+ '(1 2 3 4))
+10`,
+    lab:[
+      "Write collect-leaves and run it on a nested tree.",
+      "Use remove-if (or remove-if-not) to filter facts by a predicate.",
+      "Use reduce to count or sum attributes in a knowledge list."
+    ],
+    tip:"Recursion over cons-cells is how Lisp thinks about structure. Once you're fluent with mapcar/reduce/find-if, knowledge transformation reads like the operation itself, not the loop that implements it."
+  },
+  {
+    id:4, icon:"🕸️", title:"Use Case 1 — Semantic Networks & Frames", level:"AI / KR",
+    intro:"Represent concepts as nodes and relations as links (semantic network), or as structured slots (frames). Lisp lists encode both naturally — the basis of knowledge graphs.",
+    concepts:[
+      {t:"Nodes & links", d:"(isa dog mammal) is an edge in a concept graph."},
+      {t:"Transitive closure", d:"Recurse up isa to infer subsumption."},
+      {t:"Frames", d:"Objects as property bundles: (dog :legs 4 :sound bark)."},
+      {t:"Slots & fillers", d:"getf reads a slot; setf writes it."},
+      {t:"Inheritance", d:"A subclass inherits a parent frame's slots."}
+    ],
+    mermaid:`flowchart TD
+  D["dog"] --> M["mammal"]
+  M --> A["animal"]
+  C["cat"] --> M
+  style A fill:#e6f4f1,stroke:#0f766e
+  style M fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style D fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style C fill:#fdf2e3,stroke:#b45309,color:#92400e`,
+    mermaidCap:"Transitive isa: dog and cat subsume to mammal then animal.",
+    picture:`<svg width="100%" height="180" viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="330" y="20" width="120" height="34" rx="8" fill="#e6f4f1" stroke="#0f766e"/><text x="390" y="42" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">animal</text>
+      <rect x="330" y="80" width="120" height="34" rx="8" fill="#fdf2e3" stroke="#b45309"/><text x="390" y="102" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">mammal</text>
+      <rect x="180" y="140" width="120" height="32" rx="8" fill="#fdf2e3" stroke="#b45309"/><text x="240" y="161" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">dog</text>
+      <rect x="440" y="140" width="120" height="32" rx="8" fill="#fdf2e3" stroke="#b45309"/><text x="500" y="161" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">cat</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="390" y1="54" x2="390" y2="78"/><line x1="390" y1="114" x2="240" y2="138"/><line x1="390" y1="114" x2="500" y2="138"/></g>
+    </svg>`,
+    picCap:"A semantic-network taxonomy; isa is transitive.",
+    commands:`(setf net '((isa dog mammal) (isa cat mammal)
+              (isa mammal animal) (isa bird animal)))
+(defun subsumes (sup sub)
+  (or (member (list 'isa sub sup) net)
+      (some (lambda (r) (and (equal (second r) 'isa)
+                             (equal (third r) sub)
+                             (subsumes sup (fourth r))))
+            net)))
+
+; frame with slots
+(setf dog '(:legs 4 :sound bark :class mammal))
+(getf dog :sound)        ; -> BARK`,
+    output:`CL-USER> (subsumes 'animal 'dog)
+T
+CL-USER> (subsumes 'mammal 'cat)
+T
+CL-USER> (getf dog :sound)
+BARK`,
+    lab:[
+      "Define the net and subsumes, then ask (subsumes 'animal 'dog).",
+      "Add (isa robin bird) and confirm (subsumes 'animal 'robin).",
+      "Build a frame with getf/setf and read a slot."
+    ],
+    tip:"Frames and semantic networks are just labelled lists. The same recursive subsumes pattern powers ontologies — write the relation once, query forever."
+  },
+  {
+    id:5, icon:"🧩", title:"Use Case 2 — Rule Engines & Pattern Matching", level:"AI / KR",
+    intro:"Lisp's destructure-bind and pattern matching turn rules into executable knowledge. A rule engine matches facts against patterns and fires conclusions — the RETE/CLIPS lineage.",
+    concepts:[
+      {t:"Rules as lists", d:"(if (pattern) (action)) — data you can interpret."},
+      {t:"destructuring-bind", d:"Match a list shape and bind variables in one step."},
+      {t:"cond", d:"Ordered pattern/action pairs — a mini rule evaluator."},
+      {t:"apply rules", d:"Loop: match all rules whose antecedent holds."},
+      {t:"Forward chaining", d:"Facts in, conclusions derived iteratively."}
+    ],
+    mermaid:`flowchart TD
+  F["facts"] --> R["match rules"]
+  R --> A["fire actions"]
+  A --> F
+  A --> C["conclusions"]
+  style F fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style C fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Facts match rules; fired actions yield new conclusions.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="50" width="160" height="60" rx="10" fill="#fdf2e3" stroke="#b45309"/><text x="140" y="85" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">facts</text>
+      <rect x="300" y="50" width="160" height="60" rx="10" fill="#fbf8f9" stroke="#8c7f83"/><text x="380" y="85" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">match rule</text>
+      <rect x="540" y="50" width="160" height="60" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="620" y="85" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">conclude</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="220" y1="80" x2="298" y2="80"/><line x1="460" y1="80" x2="538" y2="80"/></g>
+    </svg>`,
+    picCap:"Match facts to rules, fire, conclude.",
+    commands:`(setf facts '((animal dog) (has-feather bird) (flies bird)))
+(defun fire (facts)
+  (cond ((and (member '(has-feather x) facts :test #'equal)
+              (not (member '(flies x) facts :test #'equal)))
+         (cons '(bird x) facts))
+        (t facts)))
+
+; simple matching with destructuring-bind
+(defun classify (fact)
+  (destructuring-bind (rel sub) fact
+    (cond ((eq rel 'animal) (format t "~a is an animal~%" sub))
+          ((eq rel 'flies)  (format t "~a can fly~%" sub)))))
+(mapcar #'classify facts)`,
+    output:`CL-USER> (mapcar #'classify facts)
+DOG is an animal
+BIRD can fly
+(BIRD CAN FLY)`,
+    lab:[
+      "Define facts and classify; run mapcar #'classify.",
+      "Use destructuring-bind to pull apart a fact list.",
+      "Add a rule that concludes (bird x) when (has-feather x) holds."
+    ],
+    tip:"A rule engine is just 'match a pattern, do something'. Once rules are data, you can add, remove, or learn them at runtime — that's the power of knowledge as lists."
+  },
+  {
+    id:6, icon:"💡", title:"Use Case 3 — Expert Systems", level:"AI / KR",
+    intro:"The MYCIN/CLIPS era: encode diagnostic knowledge as rules and infer conclusions. Lisp's symbolic strength made it the natural host for early expert systems.",
+    concepts:[
+      {t:"Knowledge base", d:"A list of rule structures."},
+      {t:"Backward chaining", d:"Given a goal, find rules that conclude it."},
+      {t:"Certainty factors", d:"Attach confidence to conclusions (0–1)."},
+      {t:"Explain", d:"Replay the rule path as a justification."},
+      {t:"CLIPS lineage", d:"Production systems descend from Lisp inspiration."}
+    ],
+    mermaid:`flowchart TD
+  G["goal: diagnosis(D)"] --> R["rule concludes D"]
+  R --> C["required conditions"]
+  C --> F["known facts?"]
+  style G fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style F fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Backward chaining: from a goal, find supporting rules and facts.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="55" width="200" height="50" rx="10" fill="#fdf2e3" stroke="#b45309"/><text x="160" y="85" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">goal: flu?</text>
+      <rect x="300" y="55" width="200" height="50" rx="10" fill="#fbf8f9" stroke="#8c7f83"/><text x="400" y="85" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">rule: fever+cough</text>
+      <rect x="540" y="55" width="180" height="50" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="630" y="85" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">facts</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="260" y1="80" x2="298" y2="80"/><line x1="500" y1="80" x2="538" y2="80"/></g>
+    </svg>`,
+    picCap:"Goal-driven inference over rules and facts.",
+    commands:`(setf rules
+  '((diagnosis flu   (fever cough body-ache))
+    (diagnosis cold  (cough sneezing))))
+(setf symptoms '(fever cough body-ache))
+
+(defun prove (goal)
+  (let ((r (find goal rules :key #'first :test #'equal)))
+    (and r (every (lambda (c) (member c symptoms)) (second r)))))
+
+; ?- (prove '(diagnosis flu))
+; ?- (prove '(diagnosis cold))`,
+    output:`CL-USER> (prove '(diagnosis flu))
+T
+CL-USER> (prove '(diagnosis cold))
+NIL`,
+    lab:[
+      "Enter rules and symptoms, then (prove '(diagnosis flu)).",
+      "Add symptom 'sneezing and re-prove cold.",
+      "Extend prove to return the list of matched conditions as an explanation."
+    ],
+    tip:"Expert systems are rules-as-data plus a prover. Because the rules are lists, you can print the exact chain that led to a diagnosis — built-in explainability, long before 'XAI' was a buzzword."
+  },
+  {
+    id:7, icon:"🔁", title:"Use Case 4 — Macros: Code that Writes Knowledge", level:"AI / KR",
+    intro:"Macros are functions that run at compile time on raw code. They let you invent knowledge-representation DSLs — defining rules, frames, or queries with minimal syntax.",
+    concepts:[
+      {t:"defmacro", d:"Define a transformer from input forms to output forms."},
+      {t:"Hygiene", d:"Modern Lisps (Racket, Clojure) manage variable capture safely."},
+      {t:"DSL", d:"A rule macro turns (rule isa X Y) into real code."},
+      {t:"Compile-time", d:"Expansion happens once, before execution."},
+      {t:"Metaprogramming", d:"Programs that generate knowledge-handling programs."}
+    ],
+    mermaid:`flowchart LR
+  S["source form"] --> M["macro expand"]
+  M --> C["expanded code"]
+  C --> E["eval"]
+  style S fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style C fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"A macro rewrites source forms before they are evaluated.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="55" width="200" height="50" rx="10" fill="#fdf2e3" stroke="#b45309"/><text x="160" y="85" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">(rule ...)</text>
+      <rect x="300" y="55" width="200" height="50" rx="10" fill="#fbf8f9" stroke="#8c7f83"/><text x="400" y="85" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">macroexpand</text>
+      <rect x="540" y="55" width="180" height="50" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="630" y="85" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">code</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="260" y1="80" x2="298" y2="80"/><line x1="500" y1="80" x2="538" y2="80"/></g>
+    </svg>`,
+    picCap:"A rule macro expands into executable code.",
+    commands:`(defmacro rule (head &rest body)
+  \`(defun ,(intern (format nil "RULE-~a" head)) ()
+     ',body))
+
+(rule isa (isa dog mammal))
+; expands to: (defun rule-isa () '((isa dog mammal)))
+
+(rule-isa)   ; -> ((ISA DOG MAMMAL))
+
+; a tiny query DSL
+(defmacro with-kb (kb &body forms)
+  \`(let ((*kb* ',kb)) ,@forms))`,
+    output:`CL-USER> (rule-isa)
+((ISA DOG MAMMAL))
+CL-USER> (macroexpand-1 '(rule isa (isa dog mammal)))
+(DEFUN RULE-ISA () '((ISA DOG MAMMAL)))`,
+    lab:[
+      "Define the rule macro and expand (rule isa ...).",
+      "Call the generated rule-isa function.",
+      "Write a with-kb macro that binds a knowledge base for its body."
+    ],
+    tip:"Macros are why Lisp can grow new knowledge-representation languages inside itself. You don't wait for the language designer — you become one, for your domain."
+  },
+  {
+    id:8, icon:"🔢", title:"Use Case 5 — Constraint & Logic Programming", level:"AI / KR",
+    intro:"Embed logic programming (like Prolog) inside Lisp via libraries such as Screamer or CLP. Solve constraints, planning, and scheduling with declarative rules.",
+    concepts:[
+      {t:"Screamer", d:"Non-deterministic choice + constraint solving in Common Lisp."},
+      {t:"either / a-member-of", d:"Declare alternatives; the solver searches them."},
+      {t:"constraint", d:"Assert relations; backtracking finds solutions."},
+      {t:"generate & test", d:"Describe the space, let the engine explore it."},
+      {t:"Planning", d:"States and actions as logic constraints."}
+    ],
+    mermaid:`flowchart TD
+  D["declare choices"] --> C["constraints"]
+  C --> S["search / backtrack"]
+  S --> A["solution"]
+  style D fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style A fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Declare choices and constraints; the solver backtracks to a solution.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="50" width="180" height="60" rx="10" fill="#fdf2e3" stroke="#b45309"/><text x="150" y="85" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">choices</text>
+      <rect x="300" y="50" width="180" height="60" rx="10" fill="#fbf8f9" stroke="#8c7f83"/><text x="390" y="85" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">constrain</text>
+      <rect x="540" y="50" width="160" height="60" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="620" y="85" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">solution</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="240" y1="80" x2="298" y2="80"/><line x1="480" y1="80" x2="538" y2="80"/></g>
+    </svg>`,
+    picCap:"Choice + constraint yields a solution by search.",
+    commands:`;; using Screamer (quicklisp: (ql:quickload "screamer"))
+;; (use-package :screamer)
+;; (defun pythag ()
+;;   (let* ((x (an-integer-between 1 10))
+;;          (y (an-integer-between 1 10))
+;;          (z (an-integer-between 1 10)))
+;;     (assert! (= (* z z) (+ (* x x) (* y y))))
+;;     (list x y z)))
+;; (one-value (pythag))   ; -> (3 4 5) or (4 3 5)`,
+    output:`; after (ql:quickload "screamer")
+CL-USER> (one-value (pythag))
+(3 4 5)   ; non-deterministic search finds a triple`,
+    lab:[
+      "Install Screamer via Quicklisp and load it.",
+      "Define pythag with an-integer-between and assert!.",
+      "Call one-value to get a single Pythagorean triple."
+    ],
+    tip:"Lisp hosts logic programming as a library, not a separate language. You get backtracking and constraints while keeping the rest of Lisp — the best of both paradigms in one REPL."
+  },
+  {
+    id:9, icon:"📚", title:"Use Case 6 — Ontologies & Description Logic", level:"AI / KR",
+    intro:"Description-logic ontologies (OWL-style) map onto Lisp class hierarchies and roles. CLOS (Common Lisp Object System) gives you classes, inheritance, and methods as a KR substrate.",
+    concepts:[
+      {t:"CLOS classes", d:"defclass declares concepts with slots (roles)."},
+      {t:"Inheritance", d:":superclasses gives is-a subsumption."},
+      {t:"Instances", d:"make-instance creates individuals."},
+      {t:"Generic functions", d:"Methods specialise behaviour per concept."},
+      {t:"OWL mapping", d:"Classes ~ concepts, slots ~ properties, individuals ~ instances."}
+    ],
+    mermaid:`flowchart TD
+  A["animal (class)"] --> M["mammal"]
+  M --> D["dog"]
+  M --> C["cat"]
+  style A fill:#e6f4f1,stroke:#0f766e
+  style M fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style D fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style C fill:#fdf2e3,stroke:#b45309,color:#92400e`,
+    mermaidCap:"CLOS class hierarchy mirrors an OWL ontology.",
+    picture:`<svg width="100%" height="180" viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="330" y="20" width="120" height="34" rx="8" fill="#e6f4f1" stroke="#0f766e"/><text x="390" y="42" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">animal</text>
+      <rect x="330" y="80" width="120" height="34" rx="8" fill="#fdf2e3" stroke="#b45309"/><text x="390" y="102" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">mammal</text>
+      <rect x="180" y="140" width="120" height="32" rx="8" fill="#fdf2e3" stroke="#b45309"/><text x="240" y="161" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">dog</text>
+      <rect x="440" y="140" width="120" height="32" rx="8" fill="#fdf2e3" stroke="#b45309"/><text x="500" y="161" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">cat</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="390" y1="54" x2="390" y2="78"/><line x1="390" y1="114" x2="240" y2="138"/><line x1="390" y1="114" x2="500" y2="138"/></g>
+    </svg>`,
+    picCap:"defclass hierarchies model ontologies.",
+    commands:`(defclass animal () ((name :accessor name :initarg :name)))
+(defclass mammal (animal) ((legs :initform 4)))
+(defclass dog (mammal) ())
+(defclass cat (mammal) ())
+
+(setf rex (make-instance 'dog :name "Rex"))
+(type-of rex)                 ; -> DOG
+(subtypep 'dog 'animal)       ; -> T T`,
+    output:`CL-USER> (setf rex (make-instance 'dog :name "Rex"))
+#<DOG {1001ABC}>
+CL-USER> (subtypep 'dog 'animal)
+T
+T`,
+    lab:[
+      "Define animal/mammal/dog/cat with defclass.",
+      "make-instance a dog and check type-of.",
+      "Use subtypep to verify the is-a chain programmatically."
+    ],
+    tip:"CLOS is a description-logic engine in disguise: classes are concepts, slots are roles, instances are individuals. OWL ontologies are one translation away — and you keep real methods, not just declarations."
+  },
+  {
+    id:10, icon:"🤖", title:"Use Case 7 — Symbolic AI & Planning", level:"AI / KR",
+    intro:"State-space planning — STRIPS-style — is list rewriting: states are lists, actions are transformations. Lisp's list processing makes planners short and inspectable.",
+    concepts:[
+      {t:"State", d:"A list of fluents, e.g. (at robot A) (holding none)."},
+      {t:"Action", d:"Preconditions + effects as list rewrite rules."},
+      {t:"Apply", d:"If preconditions hold, produce the next state."},
+      {t:"Search", d:"Breadth/depth-first over the state graph."},
+      {t:"Goal test", d:"Does the state satisfy the goal?"}
+    ],
+    mermaid:`flowchart TD
+  S0["initial state"] --> A1["action 1"]
+  A1 --> S1["state"]
+  S1 --> A2["action 2"]
+  S1 --> G["goal?"]
+  G -->|yes| DONE["plan"]
+  style S0 fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style DONE fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Apply actions to states until the goal state is reached.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="50" width="150" height="60" rx="10" fill="#fdf2e3" stroke="#b45309"/><text x="135" y="85" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">start</text>
+      <rect x="300" y="50" width="150" height="60" rx="10" fill="#fbf8f9" stroke="#8c7f83"/><text x="375" y="85" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">action</text>
+      <rect x="540" y="50" width="170" height="60" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="625" y="85" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">goal</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="210" y1="80" x2="298" y2="80"/><line x1="450" y1="80" x2="538" y2="80"/></g>
+    </svg>`,
+    picCap:"Plan = sequence of state-rewriting actions.",
+    commands:`(defun apply-action (state action)
+  (case action
+    (pick (cons '(holding block) (remove '(free hand) state :test #'equal)))
+    (stack (cons '(on block table) (remove '(holding block) state :test #'equal)))))
+(setf start '((at table) (free hand) (on block floor)))
+(apply-action start 'pick)   ; -> ((HOLDING BLOCK) (ON BLOCK FLOOR) (AT TABLE))`,
+    output:`CL-USER> (apply-action start 'pick)
+((HOLDING BLOCK) (ON BLOCK FLOOR) (AT TABLE))
+CL-USER> (apply-action * 'stack)
+((ON BLOCK TABLE) (AT TABLE))`,
+    lab:[
+      "Define start state and apply-action for pick.",
+      "Chain pick then stack and observe the state change.",
+      "Add a goal test and a BFS that searches for a plan."
+    ],
+    tip:"Planning is just list rewriting with search. Because states are plain lists, you can print the plan, replay it, and verify it — exactly what modern neuro-symbolic planners still do, 50 years on."
+  },
+  {
+    id:11, icon:"🧠", title:"Use Case 8 — Neural-Symbolic Lisp (2025–26)", level:"AI / KR",
+    intro:"The 2025–2026 neuro-symbolic revival pairs LLMs (neural) with Lisp (symbolic). Lisp acts as the verifiable reasoner; an LLM translates intent into Lisp forms it can execute and explain.",
+    concepts:[
+      {t:"LLM to Lisp", d:"Prompt the model to emit Lisp s-expressions from intent."},
+      {t:"Symbolic core", d:"A Lisp KB + rules is the auditable source of truth."},
+      {t:"Explainable", d:"The evaluated form IS the explanation."},
+      {t:"Tool use", d:"LLM agents call Lisp functions as grounded tools (2025 pattern)."},
+      {t:"Loop", d:"Persistent symbolic metaprogramming loop for structured reasoning."}
+    ],
+    mermaid:`flowchart LR
+  U["intent (NL)"] --> L["LLM -> Lisp"]
+  L --> P["Lisp engine"]
+  P --> K["KB + rules"]
+  P --> A["answer + form"]
+  A --> E["explainable"]
+  style U fill:#fbf8f9,stroke:#8c7f83
+  style L fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style P fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style E fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"LLM compiles intent to Lisp; Lisp reasons and returns a traced answer.",
+    picture:`<svg width="100%" height="170" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <rect x="50" y="60" width="160" height="50" rx="10" fill="#fbf8f9" stroke="#8c7f83"/><text x="130" y="90" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">"who is kin?"</text>
+      <rect x="260" y="60" width="150" height="50" rx="10" fill="#fdf2e3" stroke="#b45309"/><text x="335" y="90" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">LLM->Lisp</text>
+      <rect x="450" y="60" width="150" height="50" rx="10" fill="#fdf2e3" stroke="#b45309"/><text x="525" y="90" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">Lisp eval</text>
+      <rect x="640" y="60" width="100" height="50" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="690" y="90" text-anchor="middle" font-size="10" fill="#0f5132" font-family="monospace">trace</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="210" y1="85" x2="258" y2="85"/><line x1="410" y1="85" x2="448" y2="85"/><line x1="600" y1="85" x2="638" y2="85"/></g>
+    </svg>`,
+    picCap:"Neuro-symbolic loop: NL to Lisp to traced answer.",
+    commands:`; LLM-generated query against our KB (Chapter 1 style):
+(setf *kb* '((parent alice bob) (parent bob carol)))
+(defun grandparent (x z)
+  (some (lambda (p) (member (list 'parent p z) *kb* :test #'equal))
+        (mapcar #'second (remove-if-not
+          (lambda (r) (and (eq (first r) 'parent) (equal (second r) x)))
+          *kb*))))
+
+; user: "who is a grandparent of carol?"
+; => (grandparent 'alice 'carol)  -> (BOB)  i.e. alice`,
+    output:`; trace returned to the user:
+query : (grandparent 'alice 'carol)
+steps : parent alice bob ; parent bob carol
+answer: alice is a grandparent of carol (with proof)`,
+    lab:[
+      "Take an English question and hand-write the equivalent Lisp form.",
+      "Contrast: the LLM gives an answer; Lisp gives the answer AND the trace.",
+      "Skim a 2025 neuro-symbolic paper (e.g. LLM-in-a-symbolic-loop) for the pattern."
+    ],
+    tip:"This is Lisp's modern moment. Keep a Lisp KB as the verifiable core and let an LLM translate intent into s-expressions — you get neural fluency with symbolic reliability and a built-in explanation."
+  },
+  {
+    id:12, icon:"🌐", title:"Use Case 9 — Natural Language & Parsing", level:"AI / KR",
+    intro:"Lisp's tree structure mirrors parse trees, so symbolic NLP is natural. Definite-clause-grammar-style parsers and semantic construction are concise in a Lisp.",
+    concepts:[
+      {t:"Trees", d:"Parse trees are just nested lists."},
+      {t:"Recursive descent", d:"Each grammar rule is a function returning a subtree."},
+      {t:"Semantics", d:"Build a logical form while parsing."},
+      {t:"Symbolic", d:"Fully inspectable, unlike opaque neural parsers."},
+      {t:"Generation", d:"Reverse the parser to generate sentences."}
+    ],
+    mermaid:`flowchart TD
+  S["sentence"] --> NP["noun_phrase"]
+  S --> VP["verb_phrase"]
+  NP --> Det["the"]
+  NP --> N["cat"]
+  style S fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style VP fill:#fdf2e3,stroke:#b45309,color:#92400e`,
+    mermaidCap:"A grammar decomposes a sentence into a parse tree (a list).",
+    picture:`<svg width="100%" height="180" viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="330" y="20" width="160" height="32" rx="8" fill="#fdf2e3" stroke="#b45309"/><text x="410" y="41" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">sentence</text>
+      <rect x="210" y="80" width="160" height="32" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="290" y="101" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">noun_phrase</text>
+      <rect x="450" y="80" width="160" height="32" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="530" y="101" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">verb_phrase</text>
+      <rect x="180" y="140" width="90" height="28" rx="7" fill="#e6f4f1" stroke="#0f766e"/><text x="225" y="159" text-anchor="middle" font-size="10" fill="#0f5132" font-family="monospace">the</text>
+      <rect x="300" y="140" width="90" height="28" rx="7" fill="#e6f4f1" stroke="#0f766e"/><text x="345" y="159" text-anchor="middle" font-size="10" fill="#0f5132" font-family="monospace">cat</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="410" y1="52" x2="290" y2="78"/><line x1="410" y1="52" x2="530" y2="78"/><line x1="290" y1="112" x2="225" y2="138"/><line x1="290" y1="112" x2="345" y2="138"/></g>
+    </svg>`,
+    picCap:"A parse tree is a list; Lisp builds it directly.",
+    commands:`(defun parse-noun-phrase (words)
+  (destructuring-bind (det noun . rest) words
+    (values (list 'np det noun) rest)))
+(defun parse (words)
+  (multiple-value-bind (np rest) (parse-noun-phrase words)
+    (list 'sentence np (first rest))))
+
+(parse '(the cat sleeps))   ; -> (SENTENCE (NP THE CAT) SLEEPS)`,
+    output:`CL-USER> (parse '(the cat sleeps))
+(SENTENCE (NP THE CAT) SLEEPS)`,
+    lab:[
+      "Define parse-noun-phrase and parse; run on '(the cat sleeps).",
+      "Extend to a verb-phrase parser.",
+      "Add a semantic step that emits (sleeps cat) as a logical form."
+    ],
+    tip:"Because Lisp lists are trees, a parse tree is a list is a Lisp program. Symbolic NLP was born here — and it remains the most debuggable way to turn language into structure."
+  },
+  {
+    id:13, icon:"🎯", title:"Use Case 10 — Automated Reasoning & Theorem Proving", level:"AI / KR",
+    intro:"Lisp is a natural host for automated theorem provers and proof assistants (ACL2, Nqthm). Rewrite rules + recursion = a reasoning engine you can trust.",
+    concepts:[
+      {t:"Rewrite rules", d:"Transform terms toward a normal form."},
+      {t:"ACL2", d:"A computational logic for proving properties of programs."},
+      {t:"Induction", d:"Prove by recursion; Lisp's recursion maps to induction."},
+      {t:"Decision procedures", d:"Encode domains (arithmetic, lists) as decision logic."},
+      {t:"Verified AI", d:"Prove safety/consistency of knowledge before acting."}
+    ],
+    mermaid:`flowchart TD
+  G["goal theorem"] --> R["rewrite / induction"]
+  R --> P["proved / counterexample"]
+  style G fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style P fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Rewrite and induction reduce a goal to a proven (or refuted) state.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="55" width="220" height="50" rx="10" fill="#fdf2e3" stroke="#b45309"/><text x="170" y="85" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">(goal theorem)</text>
+      <rect x="320" y="55" width="180" height="50" rx="10" fill="#fbf8f9" stroke="#8c7f83"/><text x="410" y="85" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">rewrite</text>
+      <rect x="560" y="55" width="160" height="50" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="640" y="85" text-anchor="middle" font-size="11" fill="#0f5132" font-family="monospace">proved</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="280" y1="80" x2="318" y2="80"/><line x1="500" y1="80" x2="558" y2="80"/></g>
+    </svg>`,
+    picCap:"A prover rewrites goals into a proved state.",
+    commands:`; a tiny equational prover over associative lists
+(defun flatten-once (tree)
+  (cond ((null tree) nil)
+        ((atom tree) (list tree))
+        (t (append (flatten-once (car tree))
+                   (flatten-once (cdr tree))))))
+(defun assoc-flat (x y)
+  (equal (flatten-once (cons x y))
+         (append (flatten-once x) (flatten-once y))))`,
+    output:`CL-USER> (flatten-once '((a b) (c (d e))))
+(A B C D E)
+CL-USER> (assoc-flat '(a (b)) '(c))
+T   ; flatten distributes over cons (locally checked)`,
+    lab:[
+      "Define flatten-once and test it on a nested tree.",
+      "Use it as a rewrite rule to normalise nested structure.",
+      "Skim ACL2 to see industrial theorem proving in Lisp."
+    ],
+    tip:"Automated reasoning is list rewriting with discipline. ACL2 proves real properties of real systems in Lisp — the same language that represents your knowledge can also prove it correct."
+  },
+  {
+    id:14, icon:"🗣️", title:"Dialects & Variants", level:"Reference",
+    intro:"Lisp is a family spanning 60+ years. Common Lisp is the ANSI standard; Scheme is minimal; Clojure runs on the JVM; Racket is for language design. Each suits different knowledge-AI work.",
+    concepts:[
+      {t:"Common Lisp", d:"ANSI standard, CLOS, rich: the AI/mainstream workhorse (SBCL, CCL)."},
+      {t:"Scheme", d:"Minimal, lexical-scoping, λ-calculus purity; R5RS/R7RS; Guile, Chez."},
+      {t:"Clojure", d:"Modern Lisp on JVM/JS; immutable data, concurrency, Datalog (Datomic)."},
+      {t:"Racket", d:"Scheme descendant built for creating languages (typed Racket, Rosette)."},
+      {t:"Emacs Lisp", d:"Lisp-2 dialect powering Emacs; also a knowledge/notes tool."},
+      {t:"Specialised", d:"AutoLISP (CAD), Hy (Python), Janet, Qi (typeful)."}
+    ],
+    mermaid:`flowchart TD
+  L["Lisp family"] --> CL["Common Lisp"]
+  L --> SC["Scheme"]
+  L --> CJ["Clojure"]
+  L --> RK["Racket"]
+  L --> EL["Emacs Lisp"]
+  style L fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style CL fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Lisp branches by philosophy: standard, minimal, modern-JVM, language-oriented.",
+    picture:`<svg width="100%" height="180" viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="330" y="20" width="120" height="34" rx="8" fill="#fdf2e3" stroke="#b45309"/><text x="390" y="42" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">Lisp</text>
+      <rect x="40" y="90" width="140" height="34" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="110" y="112" text-anchor="middle" font-size="10" fill="#5e5458" font-family="monospace">Common</text>
+      <rect x="200" y="90" width="140" height="34" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="270" y="112" text-anchor="middle" font-size="10" fill="#5e5458" font-family="monospace">Scheme</text>
+      <rect x="360" y="90" width="140" height="34" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="430" y="112" text-anchor="middle" font-size="10" fill="#5e5458" font-family="monospace">Clojure</text>
+      <rect x="520" y="90" width="140" height="34" rx="8" fill="#fbf8f9" stroke="#8c7f83"/><text x="590" y="112" text-anchor="middle" font-size="10" fill="#5e5458" font-family="monospace">Racket</text>
+      <g stroke="#8c7f83" stroke-width="2"><line x1="390" y1="54" x2="110" y2="88"/><line x1="390" y1="54" x2="270" y2="88"/><line x1="390" y1="54" x2="430" y2="88"/><line x1="390" y1="54" x2="590" y2="88"/></g>
+    </svg>`,
+    picCap:"The Lisp dialect tree.",
+    commands:`# Install Common Lisp (SBCL) on Debian/Ubuntu/Mint:
+sudo apt install sbcl
+
+# Start a REPL and load Quicklisp (the package manager):
+sbcl
+* (ql:quickload "cl-ppcre")   ; example library
+
+# Clojure (needs Java):
+sudo apt install clojure
+clojure -e '(+ 1 2 3)'       ; -> 6
+
+# Scheme (Chez):
+sudo apt install chezscheme
+scheme -q`,
+    output:`$ sbcl
+This is SBCL 2.4.x, an implementation of ANSI Common Lisp.
+* (+ 1 2 3)
+6`,
+    lab:[
+      "Install SBCL and start a REPL; evaluate (+ 1 2 3).",
+      "Install Quicklisp and quickload a small library.",
+      "Try Clojure or Chez Scheme to feel a different dialect's read-eval-print loop."
+    ],
+    tip:"Pick by need: Common Lisp for batteries-included AI work, Scheme for teaching λ-calculus, Clojure for JVM/data ecosystem, Racket for building your own DSL. They share the s-expression soul."
+  },
+  {
+    id:15, icon:"🚀", title:"Recent & AI-Relevant Developments", level:"Reference",
+    intro:"Far from retired, Lisp is central to the 2024–2026 neuro-symbolic revival. Its homoiconicity makes it the natural 'symbolic half' paired with neural LLMs for trustworthy, explainable AI.",
+    concepts:[
+      {t:"Neuro-symbolic", d:"LLM (neural) + Lisp (symbolic) for reliable, auditable reasoning."},
+      {t:"Symbolic loops", d:"2025 work keeps an LLM in a persistent Lisp metaprogramming loop."},
+      {t:"Tool use", d:"LLM agents call Lisp functions as grounded, typed tools."},
+      {t:"Clojure Datalog", d:"Datomic/Datahike bring declarative knowledge graphs to the JVM."},
+      {t:"Rosaline/Rosette", d:"Racket's solver-aided languages for program synthesis & verification."},
+      {t:"Explainability", d:"The evaluated s-expression is itself the explanation."}
+    ],
+    mermaid:`flowchart LR
+  N["Neural (LLM)"] <--> S["Symbolic (Lisp)"]
+  S --> E["explainable, verifiable"]
+  N --> F["fluent, flexible"]
+  E --> T["trustworthy AI"]
+  F --> T
+  style N fill:#fbf8f9,stroke:#8c7f83
+  style S fill:#fdf2e3,stroke:#b45309,color:#92400e
+  style T fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"Neuro-symbolic AI couples neural fluency with symbolic verification.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="50" width="180" height="60" rx="12" fill="#fbf8f9" stroke="#8c7f83"/><text x="150" y="85" text-anchor="middle" font-size="11" fill="#5e5458" font-family="monospace">Neural LLM</text>
+      <rect x="520" y="50" width="180" height="60" rx="12" fill="#fdf2e3" stroke="#b45309"/><text x="610" y="85" text-anchor="middle" font-size="11" fill="#92400e" font-family="monospace">Symbolic Lisp</text>
+      <rect x="300" y="120" width="170" height="34" rx="8" fill="#e6f4f1" stroke="#0f766e"/><text x="385" y="142" text-anchor="middle" font-size="10" fill="#0f5132" font-family="monospace">trustworthy AI</text>
+      <g stroke="#b45309" stroke-width="3"><line x1="240" y1="80" x2="518" y2="80"/><line x1="518" y1="80" x2="240" y2="80" stroke-dasharray="4,4"/></g>
+      <g stroke="#0f766e" stroke-width="2"><line x1="150" y1="110" x2="340" y2="118"/><line x1="610" y1="110" x2="470" y2="118"/></g>
+    </svg>`,
+    picCap:"Two-way coupling between neural and symbolic components.",
+    commands:`# Key 2024-2026 references (verify via web_search before citing):
+# - arXiv 2506.10021 (Jun 2025): LLMs in a persistent symbolic metaprogramming loop
+# - arXiv 2510.21425 (Oct 2025): symbolic integration inside LLM reasoning
+# - NeuroClojure / clojure-datalog: declarative knowledge on the JVM
+# - Rosette (Racket): solver-aided programming for synthesis & verification
+
+# Practical takeaway: keep a Lisp KB as the verifiable core;
+# let an LLM translate intent into s-expressions and execute them.`,
+    output:`Trend (2024-2026):
+  LLM  ->  Lisp  ->  answer + trace
+  fluent   symbolic    explainable
+Result: systems that are both capable and auditable.`,
+    lab:[
+      "Search 'neuro-symbolic Lisp 2025' and skim one cited paper.",
+      "Sketch a Lisp KB + LLM-translation workflow for a domain you care about.",
+      "Re-run Use Case 8 and note how the s-expression trace answers 'why' an LLM alone cannot."
+    ],
+    tip:"The story that 'deep learning killed Lisp' is backwards. The frontier is hybrid: neural for perception, symbolic (Lisp) for reasoning and explanation. Learning Lisp now is learning the symbolic half of 2026's AI."
+  }
+];
+
+function renderTOC(){
+  const toc = document.getElementById('toc');
+  toc.innerHTML = chapters.map(ch => `
+    <a href="#chapter-${ch.id}" data-title="${ch.title.toLowerCase()}" data-level="${ch.level.toLowerCase()}">
+      <span class="num">${ch.id}</span>
+      <span>${ch.icon} ${ch.title}</span>
+    </a>`).join('');
+}
+function renderChapters(){
+  const wrap = document.getElementById('chapters');
+  wrap.innerHTML = chapters.map(ch => `
+    <section class="chapter" id="chapter-${ch.id}">
+      <div class="ch-head">
+        <div class="ch-ico">${ch.icon}</div>
+        <div>
+          <h2>${ch.title}</h2>
+          <div class="level">Chapter ${ch.id} · ${ch.level}</div>
+        </div>
+      </div>
+      <p class="intro">${ch.intro}</p>
+
+      <h3 class="sec">Key Concepts</h3>
+      <div class="cards">
+        ${ch.concepts.map(c => `<div class="card"><div class="t">${c.t}</div><div class="d">${c.d}</div></div>`).join('')}
+      </div>
+
+      ${ch.mermaid ? `<h3 class="sec">How it fits together</h3><div class="mermaid">${ch.mermaid}</div>` : ''}
+      ${ch.mermaidCap ? `<p class="intro">${ch.mermaidCap}</p>` : ''}
+
+      ${ch.picture ? `<figure>${ch.picture}${ch.picCap ? `<figcaption>${ch.picCap}</figcaption>` : ''}</figure>` : ''}
+
+      <h3 class="sec">Try it</h3>
+      <pre><button class="copy" onclick="copyCode(this)">Copy</button><code>${escapeHTML(ch.commands)}</code></pre>
+      ${ch.output ? `<pre class="out"><code>${escapeHTML(ch.output)}</code></pre>` : ''}
+
+      <div class="lab">
+        <h4>Hands-on lab</h4>
+        <ol>${ch.lab.map(s => `<li>${escapeHTML(s)}</li>`).join('')}</ol>
+      </div>
+
+      <div class="tip">${escapeHTML(ch.tip)}</div>
+
+      ${chapterNav(ch)}
+    </section>`).join('');
+}
+
+function chapterNav(ch){
+  const i = chapters.findIndex(c => c.id === ch.id);
+  const prev = chapters[i-1], next = chapters[i+1];
+  const p = prev ? `<a class="prev" href="#chapter-${prev.id}"><div class="lab">Previous</div><div class="ttl">${prev.icon} ${prev.title}</div></a>` : `<span></span>`;
+  const n = next ? `<a class="next" href="#chapter-${next.id}"><div class="lab">Next</div><div class="ttl">${next.icon} ${next.title}</div></a>` : `<span></span>`;
+  return `<div class="chapternav">${p}${n}</div>`;
+}
+
+function escapeHTML(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function copyCode(btn){
+  const code = btn.parentElement.querySelector('code').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1200);
+  });
+}
+
+function saveBook(){
+  const html = '<!DOCTYPE html><html>' + document.documentElement.innerHTML + '</html>';
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Lisp-Field-Guide.html';
+  a.click();
+}
+
+/* ================= UNIFIED SEARCH ================= */
+let BOOK_INDEX = [];
+let SEM_READY = false;
+let LAST_Q = "";
+let EXTRACTOR = null;
+let CHAPTER_EMB = [];
+
+function buildIndex(){
+  BOOK_INDEX = chapters.map(ch => {
+    const raw = [ch.title, ch.level, ch.intro,
+      ch.concepts.map(c => c.t + " " + c.d).join(" "),
+      ch.commands, ch.lab.join(" "), ch.tip, ch.mermaidCap, ch.picCap].join(" ");
+    return {id:ch.id, title:ch.title, level:ch.level, text:raw.toLowerCase(), raw:raw};
+  });
+}
+function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function makeContext(raw, q){
+  const term = q.split(/\s+/).filter(Boolean)[0] || q;
+  const re = new RegExp(escRe(term), "i");
+  const m = re.exec(raw);
+  if(!m) return raw.slice(0, 90) + (raw.length>90?"…":"");
+  const s = m.index;
+  const before = raw.slice(0, s).trim().split(/\s+/).slice(-2).join(" ");
+  const after  = raw.slice(s + m[0].length).trim().split(/\s+/).slice(0, 2).join(" ");
+  const snippet = (before ? before + " " : "") + m[0] + (after ? " " + after : "");
+  return escapeHTML(snippet).replace(new RegExp("("+escRe(term)+")","ig"), "<mark>$1</mark>");
+}
+function bestTerm(q, ch){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  for(const t of terms){ if(ch.text.includes(t)) return t; }
+  return terms[0] || q;
+}
+function keywordResults(q, limit){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if(!terms.length) return [];
+  const res = [];
+  for(const ch of BOOK_INDEX){
+    let score = 0, ctx = "";
+    for(const t of terms){ if(ch.text.includes(t)){ score++; if(!ctx) ctx = makeContext(ch.raw, t); } }
+    if(score > 0) res.push({ch, score, ctx, sem:false});
+  }
+  res.sort((a,b)=> b.score - a.score);
+  return res.slice(0, limit);
+}
+function cosine(a, b){
+  let d=0, na=0, nb=0;
+  for(let i=0;i<a.length;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d / ((Math.sqrt(na)*Math.sqrt(nb)) || 1);
+}
+async function getExtractor(){
+  if(EXTRACTOR) return EXTRACTOR;
+  const mod = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.0");
+  EXTRACTOR = await mod.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+  return EXTRACTOR;
+}
+async function embedText(text){
+  const ex = await getExtractor();
+  const out = await ex(text, {pooling:"mean", normalize:true});
+  return Array.from(out.data);
+}
+async function primeEmbeddings(){
+  const st = document.getElementById("search-status");
+  if(st) st.textContent = "indexing…";
+  try{
+    await getExtractor();
+    CHAPTER_EMB = [];
+    for(const ch of BOOK_INDEX){ CHAPTER_EMB[ch.id] = await embedText(ch.raw.slice(0, 400)); }
+    SEM_READY = true;
+    if(st) st.textContent = "semantic ✓";
+    if(LAST_Q.trim()) searchBooks(LAST_Q);
+  }catch(e){ if(st) st.textContent = "keyword only"; }
+}
+function renderResults(q, list){
+  const box = document.getElementById("search-results");
+  if(!box) return;
+  if(!list.length){ box.innerHTML = '<div class="sr-empty">No matches for “'+escapeHTML(q)+'”.</div>'; box.classList.add("show"); return; }
+  box.innerHTML = list.map(r => {
+    const ch = r.ch;
+    const ctx = r.ctx || makeContext(ch.raw, bestTerm(q, ch));
+    const tag = r.sem ? '<span class="sr-tag sem">semantic</span>' : '<span class="sr-tag">match</span>';
+    return '<a class="sr-item" href="#chapter-'+ch.id+'" onclick="closeSearch()">'
+         + '<div class="sr-chap">Chapter '+ch.id+' · '+escapeHTML(ch.level)+'</div>'
+         + '<div class="sr-title"><span>'+escapeHTML(ch.title)+'</span>'+tag+'</div>'
+         + '<div class="sr-ctx">'+ctx+'</div></a>';
+  }).join("");
+  box.classList.add("show");
+}
+function closeSearch(){ const b=document.getElementById("search-results"); if(b) b.classList.remove("show"); }
+function searchBooks(q){
+  LAST_Q = q = (q||"").trim();
+  const box = document.getElementById("search-results");
+  if(!q){ closeSearch(); if(box) box.innerHTML=""; return; }
+  const kw = keywordResults(q, 14);
+  renderResults(q, kw);
+  if(SEM_READY && CHAPTER_EMB.length){
+    embedText(q).then(qe => {
+      const seen = new Set(kw.map(r=>r.ch.id));
+      const sem = BOOK_INDEX.map(ch => ({ch, sim: cosine(qe, CHAPTER_EMB[ch.id] || [])}))
+        .filter(r => r.sim > 0.12 && !seen.has(r.ch.id))
+        .sort((a,b)=> b.sim - a.sim).slice(0, 8)
+        .map(r => ({ch:r.ch, ctx:makeContext(r.ch.raw, bestTerm(q, r.ch)), sem:true}));
+      const merged = kw.concat(sem);
+      renderResults(q, merged.slice(0,14));
+    }).catch(()=>{});
+  } else if(!window.__embStarted){
+    window.__embStarted = true;
+    primeEmbeddings();
+  }
+}
+document.addEventListener("click", function(e){
+  const w = document.querySelector(".search-wrap");
+  if(w && !w.contains(e.target)) closeSearch();
+});
+
+/* ================= INIT ================= */
+document.addEventListener("DOMContentLoaded", function(){
+  renderTOC();
+  renderChapters();
+  buildIndex();
+  setTimeout(primeEmbeddings, 800);
+  mermaid.initialize({startOnLoad:true, theme:'base',
+    themeVariables:{fontSize:'14px',primaryColor:'#fdf2e3',lineColor:'#b45309',
+      primaryBorderColor:'#b45309',primaryTextColor:'#23262b'}});
+  const links = document.querySelectorAll('.toc a');
+  const obs = new IntersectionObserver(es => {
+    es.forEach(en => {
+      if(en.isIntersecting){
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector('.toc a[href="#chapter-'+en.target.id.split('-')[1]+'"]');
+        if(a) a.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px'});
+  document.querySelectorAll('.chapter').forEach(c => obs.observe(c));
+});
+</script>
+</body>
+</html>

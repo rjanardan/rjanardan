@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="ledger">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Field Guides — Janardan Revuru</title>
+<meta name="description" content="A shelf of hands-on Field Guide books by Janardan Revuru: Linux, Emacs, Lisp, and Prolog — knowledge-representation and AI toolkits you learn by doing.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
+    --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px;
+    --maxw: 960px;
+  }
+  [data-theme="blueprint"]{
+    --bg:#0a2540; --bg-elevated:#0e2f52; --grid-line: rgba(140,195,255,0.08);
+    --text:#eaf2ff; --text-muted:#93b3da; --accent:#5ec8f8; --accent-2:#ffcf6b;
+    --border: rgba(94,200,248,0.32); --border-strong: rgba(94,200,248,0.6);
+    --font-display:'Space Grotesk', sans-serif; --font-body:'IBM Plex Sans', sans-serif; --font-mono:'JetBrains Mono', monospace;
+    --radius:2px; --tracking-eyebrow: 0.14em;
+  }
+  [data-theme="studio"]{
+    --bg:#ffffff; --bg-elevated:#f6f6f4; --grid-line: transparent;
+    --text:#1a1a18; --text-muted:#68675f; --accent:#146b5c; --accent-2:#b5482a;
+    --border: rgba(0,0,0,0.14); --border-strong: rgba(0,0,0,0.3);
+    --font-display:'Space Grotesk', sans-serif; --font-body:'IBM Plex Sans', sans-serif; --font-mono:'JetBrains Mono', monospace;
+    --radius:4px; --tracking-eyebrow: 0.1em;
+  }
+  [data-theme="ledger"]{
+    --bg:#f7f4ec; --bg-elevated:#ffffff; --grid-line: rgba(43,58,103,0.07);
+    --text:#242938; --text-muted:#5d6274; --accent:#2b3a67; --accent-2:#8a6a34;
+    --border: rgba(43,58,103,0.22); --border-strong: rgba(43,58,103,0.45);
+    --font-display:'Source Serif 4', serif; --font-body:'Source Serif 4', serif; --font-mono:'JetBrains Mono', monospace;
+    --radius:2px; --tracking-eyebrow: 0.1em;
+  }
+
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; overflow-x:hidden; }
+  body{
+    margin:0; overflow-x:hidden; background:var(--bg); color:var(--text);
+    font-family:var(--font-body); line-height:1.6; font-size:16px;
+    transition:background .35s ease, color .35s ease;
+  }
+
+  a{ color:var(--accent); text-decoration:none; }
+  a:hover{ text-decoration:underline; }
+  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+
+  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 var(--space-5); }
+  h1,h2,h3{ font-family:var(--font-display); font-weight:600; margin:0; }
+  .eyebrow{
+    font-family:var(--font-mono); font-size:11px; letter-spacing:var(--tracking-eyebrow);
+    text-transform:uppercase; color:var(--accent); margin:0 0 var(--space-2);
+  }
+
+  /* ---------- Fixed bottom-right menu ---------- */
+  .site-menu{ position:fixed; right:max(var(--space-4), env(safe-area-inset-right)); bottom:max(var(--space-4), env(safe-area-inset-bottom)); z-index:60; }
+  .site-menu-toggle{
+    width:52px; height:52px; border-radius:50%; border:1px solid var(--border-strong);
+    background:var(--accent); color:var(--bg); cursor:pointer;
+    display:flex; align-items:center; justify-content:center;
+    box-shadow:0 6px 20px rgba(0,0,0,0.25); transition:transform .2s ease;
+  }
+  .site-menu-toggle:hover{ transform:scale(1.05); }
+  .site-menu-toggle svg{ width:20px; height:20px; }
+  .site-menu-toggle .icon-close{ display:none; }
+  .site-menu[data-open="true"] .icon-open{ display:none; }
+  .site-menu[data-open="true"] .icon-close{ display:block; }
+  .site-menu-panel{
+    position:absolute; right:0; bottom:64px; width:260px;
+    background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius);
+    box-shadow:0 12px 32px rgba(0,0,0,0.28); padding:var(--space-4);
+    opacity:0; transform:translateY(8px); pointer-events:none; transition:all .18s ease;
+    max-height:70vh; overflow-y:auto;
+  }
+  .site-menu[data-open="true"] .site-menu-panel{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .site-menu-group + .site-menu-group{ margin-top:var(--space-4); padding-top:var(--space-4); border-top:1px solid var(--border); }
+  .site-menu-heading{
+    font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
+    color:var(--text-muted); margin-bottom:var(--space-2);
+  }
+  .site-menu-links{ list-style:none; margin:0; padding:0; }
+  .site-menu-links li a{ display:block; padding:10px 6px; min-height:22px; border-radius:4px; font-size:13.5px; color:var(--text); text-decoration:none; }
+  .site-menu-links li a:hover{ background:var(--grid-line); color:var(--accent); text-decoration:none; }
+  .theme-options{ display:flex; gap:6px; }
+  .theme-options button{
+    flex:1; font-family:var(--font-mono); font-size:11px; letter-spacing:.02em; text-transform:uppercase;
+    background:transparent; border:1px solid var(--border); color:var(--text-muted); cursor:pointer;
+    padding:12px 4px; min-height:20px; border-radius:16px; transition:all .2s ease;
+  }
+  .theme-options button:hover{ color:var(--text); }
+  .theme-options button[aria-pressed="true"]{ background:var(--accent); color:var(--bg); font-weight:600; border-color:var(--accent); }
+
+  /* ---------- Header ---------- */
+  header{ padding:var(--space-8) 0 var(--space-5); border-bottom:1px solid var(--border); }
+  .name{ font-size:clamp(34px,6vw,58px); line-height:1.04; margin-bottom:var(--space-3); }
+  .tagline{ font-size:clamp(15px,2vw,18px); color:var(--text-muted); max-width:680px; margin-bottom:var(--space-4); }
+
+  .breadcrumb{ font-family:var(--font-mono); font-size:12px; color:var(--text-muted); margin-bottom:var(--space-4); }
+  .breadcrumb a{ color:var(--text-muted); }
+  .breadcrumb a:hover{ color:var(--accent); }
+
+  /* ---------- Books grid ---------- */
+  section{ padding:var(--space-7) 0; }
+  h2.section-title{ font-size:clamp(22px,3vw,28px); margin-bottom:var(--space-2); }
+  .section-sub{ color:var(--text-muted); font-size:14.5px; max-width:640px; margin-bottom:var(--space-5); }
+
+  .book-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(280px,1fr)); gap:var(--space-5); }
+
+  .book-card{
+    position:relative; display:flex; flex-direction:column;
+    border:1px solid var(--border); border-radius:var(--radius);
+    background:var(--bg-elevated); overflow:hidden;
+    transition:transform .25s ease, border-color .25s ease, box-shadow .25s ease;
+  }
+  .book-card:hover{
+    transform:translateY(-4px);
+    border-color:var(--border-strong);
+    box-shadow:0 14px 30px rgba(0,0,0,0.14);
+  }
+
+  .book-cover{
+    position:relative; aspect-ratio:3/2;
+    display:flex; align-items:center; justify-content:center;
+    border-bottom:1px solid var(--border);
+    background:var(--cover, var(--grid-line));
+    overflow:hidden;
+  }
+  .book-cover::before{
+    content:""; position:absolute; inset:0;
+    background-image:linear-gradient(135deg, rgba(255,255,255,0.10), rgba(0,0,0,0.04));
+  }
+  .book-cover .monogram{
+    font-family:var(--font-display); font-weight:700;
+    font-size:clamp(48px,9vw,76px); color:rgba(255,255,255,0.92);
+    line-height:1; text-shadow:0 2px 10px rgba(0,0,0,0.22); z-index:1;
+  }
+  .book-cover .kicker{
+    position:absolute; top:var(--space-3); left:var(--space-3); z-index:1;
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.08em; text-transform:uppercase;
+    color:rgba(255,255,255,0.9);
+    background:rgba(0,0,0,0.22); padding:4px 8px; border-radius:2px;
+  }
+
+  .book-body{ padding:var(--space-5); display:flex; flex-direction:column; gap:var(--space-3); flex:1; }
+  .book-title{ font-family:var(--font-display); font-weight:600; font-size:19px; line-height:1.2; }
+  .book-desc{ color:var(--text-muted); font-size:13.5px; flex:1; }
+  .book-foot{ display:flex; align-items:center; justify-content:space-between; gap:var(--space-3); margin-top:var(--space-1); }
+  .book-read{
+    font-family:var(--font-mono); font-size:12px; text-transform:uppercase; letter-spacing:.05em;
+    color:var(--accent); display:inline-flex; align-items:center; gap:6px;
+  }
+  .book-read svg{ width:14px; height:14px; transition:transform .2s ease; }
+  .book-card:hover .book-read svg{ transform:translateX(3px); }
+  .book-meta{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); white-space:nowrap; }
+
+  /* ---------- Back CTA ---------- */
+  .back-banner{
+    border:1px dashed var(--border-strong); border-radius:var(--radius); padding:var(--space-6);
+    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-4);
+  }
+  .back-banner .bb-text{ font-family:var(--font-display); font-weight:600; font-size:18px; }
+  .back-banner p{ color:var(--text-muted); font-size:13.5px; margin:4px 0 0; max-width:440px; }
+  .btn{
+    display:inline-block; font-family:var(--font-mono); font-size:13px; text-transform:uppercase; letter-spacing:.04em;
+    padding:12px 20px; border-radius:24px; border:1px solid var(--border-strong); color:var(--text);
+    white-space:nowrap;
+  }
+  .btn:hover{ text-decoration:none; background:var(--grid-line); }
+  .btn.primary{ background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:600; }
+  .btn.primary:hover{ opacity:.9; background:var(--accent); }
+
+  /* ---------- Footer ---------- */
+  footer{ padding:var(--space-6) 0 var(--space-8); }
+  .titleblock{ border:1px solid var(--border-strong); border-radius:var(--radius); font-family:var(--font-mono); font-size:12px; }
+  .titleblock-row{ display:grid; grid-template-columns:1fr 1fr 1fr; border-top:1px solid var(--border); }
+  .titleblock-row:first-child{ border-top:none; }
+  .titleblock-cell{ padding:var(--space-3) var(--space-4); border-left:1px solid var(--border); }
+  .titleblock-cell:first-child{ border-left:none; }
+  .titleblock-cell .k{ color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; font-size:10px; margin-bottom:3px; }
+  .titleblock-cell .v{ color:var(--text); }
+  .footer-links{ margin-top:var(--space-5); display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); font-family:var(--font-mono); font-size:13px; }
+
+  /* ---------- Entrance animation ---------- */
+  @keyframes rise{ from{ opacity:0; transform:translateY(14px);} to{ opacity:1; transform:translateY(0);} }
+  .book-card{ animation:rise .5s ease both; }
+  .book-card:nth-child(1){ animation-delay:.05s; }
+  .book-card:nth-child(2){ animation-delay:.12s; }
+  .book-card:nth-child(3){ animation-delay:.19s; }
+  .book-card:nth-child(4){ animation-delay:.26s; }
+  @media (prefers-reduced-motion:reduce){ .book-card{ animation:none; } .book-card:hover{ transform:none; } }
+
+  @media (max-width:640px){
+    .titleblock-row{ grid-template-columns:1fr; }
+    .titleblock-cell{ border-left:none; border-top:1px solid var(--border); }
+    .titleblock-cell:first-child{ border-top:none; }
+    .site-menu-panel{ width:220px; }
+    .back-banner{ flex-direction:column; align-items:flex-start; }
+    header{ padding:var(--space-7) 0 var(--space-5); }
+  }
+</style>
+</head>
+<body>
+
+<div class="site-menu" id="siteMenu" data-open="false">
+  <div class="site-menu-panel" role="menu" aria-label="Page menu">
+    <div class="site-menu-group">
+      <div class="site-menu-heading">Jump to section</div>
+      <ul class="site-menu-links">
+        <li><a href="#shelf">The Bookshelf</a></li>
+        <li><a href="#back">More from Janardan</a></li>
+      </ul>
+    </div>
+    <div class="site-menu-group">
+      <div class="site-menu-heading">Theme</div>
+      <div class="theme-options" role="group" aria-label="Choose visual theme">
+        <button type="button" data-theme-btn="ledger" aria-pressed="true">Ledger</button>
+        <button type="button" data-theme-btn="studio" aria-pressed="false">Studio</button>
+        <button type="button" data-theme-btn="blueprint" aria-pressed="false">Blueprint</button>
+      </div>
+    </div>
+  </div>
+  <button type="button" class="site-menu-toggle" id="siteMenuToggle" aria-expanded="false" aria-controls="siteMenu" aria-label="Open page menu">
+    <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
+    <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
+  </button>
+</div>
+
+<div class="wrap">
+
+  <header>
+    <p class="breadcrumb"><a href="../index.html">Home</a> &nbsp;/&nbsp; Field Guides</p>
+    <p class="eyebrow">Field Guides &middot; Knowledge Books</p>
+    <h1 class="name">The Bookshelf</h1>
+    <p class="tagline">Four hands-on, single-file books you learn by doing. Each one pairs plain explanation with diagrams, copy-paste commands, and labs you can run today &mdash; from the Linux terminal to symbolic AI.</p>
+  </header>
+
+  <section id="shelf">
+    <h2 class="section-title">The Field Guides</h2>
+    <p class="section-sub">Pick a shelf. Every book opens as a self-contained page &mdash; no install, no signup.</p>
+
+    <div class="book-grid">
+
+      <a class="book-card" href="Linux-book.html" style="--cover:#2f6b3a;">
+        <div class="book-cover">
+          <span class="kicker">OS &amp; Shell</span>
+          <span class="monogram">&#9112;</span>
+        </div>
+        <div class="book-body">
+          <div class="book-title">The Linux Field Guide</div>
+          <p class="book-desc">A hands-on, single-file book for learning Linux by doing. Mixes plain explanation, diagrams, and commands you can paste straight into your terminal &mdash; built for Mint, Ubuntu, Fedora, or any distribution.</p>
+          <div class="book-foot">
+            <span class="book-read">Read book
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+            <span class="book-meta">62 KB</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="book-card" href="Emacs-book.html" style="--cover:#7a2f4f;">
+        <div class="book-cover">
+          <span class="kicker">Editor &amp; Lisp</span>
+          <span class="monogram">E</span>
+        </div>
+        <div class="book-body">
+          <div class="book-title">The Emacs Field Guide</div>
+          <p class="book-desc">An extensible, customizable, self-documenting editor &mdash; and a lot more. Explains Emacs from philosophy to Lisp to the packages you will actually use, with diagrams, copy-paste config, and labs you can run today.</p>
+          <div class="book-foot">
+            <span class="book-read">Read book
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+            <span class="book-meta">450 KB</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="book-card" href="Lisp-book.html" style="--cover:#2b3a67;">
+        <div class="book-cover">
+          <span class="kicker">Symbolic AI</span>
+          <span class="monogram">&lambda;</span>
+        </div>
+        <div class="book-body">
+          <div class="book-title">The Lisp Field Guide</div>
+          <p class="book-desc">Lisp &mdash; the oldest family of AI languages &mdash; treats code as data (homoiconicity) and makes symbolic knowledge representation natural. Ten worked use cases across Common Lisp, Scheme, and Clojure, plus 2025&ndash;2026 neuro-symbolic developments.</p>
+          <div class="book-foot">
+            <span class="book-read">Read book
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+            <span class="book-meta">65 KB</span>
+          </div>
+        </div>
+      </a>
+
+      <a class="book-card" href="Prolog-book.html" style="--cover:#8a6a34;">
+        <div class="book-cover">
+          <span class="kicker">Logic &amp; AI</span>
+          <span class="monogram">&#928;</span>
+        </div>
+        <div class="book-body">
+          <div class="book-title">The Prolog Field Guide</div>
+          <p class="book-desc">Logic programming for knowledge representation and artificial intelligence. Frames Prolog as a declarative engine for encoding facts and rules, then querying them &mdash; the original knowledge-representation toolkit, and now a key piece of neuro-symbolic AI.</p>
+          <div class="book-foot">
+            <span class="book-read">Read book
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></svg>
+            </span>
+            <span class="book-meta">70 KB</span>
+          </div>
+        </div>
+      </a>
+
+    </div>
+  </section>
+
+  <section id="back">
+    <div class="back-banner">
+      <div class="bb-text">Looking for the rest of the site?</div>
+      <p>These field guides live alongside the main homepage &mdash; profile, communities, research, and speaking.</p>
+      <a class="btn primary" href="../index.html">Back to Homepage</a>
+    </div>
+  </section>
+
+  <footer>
+    <div class="titleblock">
+      <div class="titleblock-row">
+        <div class="titleblock-cell"><div class="k">Name</div><div class="v">Janardan Revuru</div></div>
+        <div class="titleblock-cell"><div class="k">Page</div><div class="v">Field Guides / Bookshelf</div></div>
+        <div class="titleblock-cell"><div class="k">Location</div><div class="v">Bengaluru, India</div></div>
+      </div>
+      <div class="titleblock-row">
+        <div class="titleblock-cell"><div class="k">Books</div><div class="v">Linux &middot; Emacs &middot; Lisp &middot; Prolog</div></div>
+        <div class="titleblock-cell"><div class="k">Profile</div><div class="v"><a href="../janardan-profile.html">janardan-profile.html</a></div></div>
+        <div class="titleblock-cell"><div class="k">Status</div><div class="v">Open to VP / Director / Head of AI Eng.</div></div>
+      </div>
+    </div>
+    <div class="footer-links">
+      <a href="../index.html">Homepage</a>
+      <a href="mailto:janardan.revuru@gmail.com">Email</a>
+      <a href="https://linkedin.com/in/rjanardan" target="_blank" rel="noopener">LinkedIn</a>
+      <a href="../janardan-profile.html">Full Profile</a>
+      <a href="https://publish.obsidian.md/janardan" target="_blank" rel="noopener">Research Blog</a>
+    </div>
+  </footer>
+
+</div>
+
+<script>
+  (function(){
+    var root = document.documentElement;
+    var buttons = document.querySelectorAll('[data-theme-btn]');
+    var saved = null;
+    try { saved = localStorage.getItem('jr-theme'); } catch(e) {}
+    var validThemes = ['ledger','studio','blueprint'];
+    if (saved && validThemes.indexOf(saved) !== -1) { setTheme(saved); }
+
+    function setTheme(name){
+      root.setAttribute('data-theme', name);
+      buttons.forEach(function(b){
+        b.setAttribute('aria-pressed', b.getAttribute('data-theme-btn') === name ? 'true' : 'false');
+      });
+      try { localStorage.setItem('jr-theme', name); } catch(e) {}
+    }
+
+    buttons.forEach(function(btn){
+      btn.addEventListener('click', function(){
+        setTheme(btn.getAttribute('data-theme-btn'));
+      });
+    });
+
+    var menu = document.getElementById('siteMenu');
+    var toggle = document.getElementById('siteMenuToggle');
+
+    function openMenu(){ menu.setAttribute('data-open','true'); toggle.setAttribute('aria-expanded','true'); }
+    function closeMenu(){ menu.setAttribute('data-open','false'); toggle.setAttribute('aria-expanded','false'); }
+    function isOpen(){ return menu.getAttribute('data-open') === 'true'; }
+
+    toggle.addEventListener('click', function(e){
+      e.stopPropagation();
+      isOpen() ? closeMenu() : openMenu();
+    });
+
+    menu.querySelectorAll('.site-menu-links a').forEach(function(link){
+      link.addEventListener('click', closeMenu);
+    });
+
+    document.addEventListener('click', function(e){
+      if (isOpen() && !menu.contains(e.target)) closeMenu();
+    });
+
+    document.addEventListener('keydown', function(e){
+      if (e.key === 'Escape' && isOpen()) closeMenu();
+    });
+  })();
+</script>
+
+</body>
+</html>
