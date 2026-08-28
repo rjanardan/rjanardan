@@ -266,6 +266,9 @@ pre.code .g{color:#86efac;}
     </div>
     <div class="tag">Table of Contents</div>
     <nav class="toc" id="toc"></nav>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);">
+      <button class="btn" style="width:100%" onclick="saveBook()">⬇ Save .html</button>
+    </div>
   </aside>
 
   <div class="backdrop" id="backdrop" onclick="closeSidebar()"></div>
@@ -280,7 +283,6 @@ pre.code .g{color:#86efac;}
         <span class="search-status" id="search-status"></span>
         <div class="search-results" id="search-results"></div>
       </div>
-      <button class="save" onclick="exportHTML()"><i class="fas fa-download"></i><span>Save .html</span></button>
     </header>
 
     <div class="content">
@@ -1070,6 +1072,15 @@ function copyCode(btn){
 }
 
 /* Search filter for TOC */
+function saveBook(){
+  const html = '<!DOCTYPE html><html>' + document.documentElement.outerHTML + '</html>';
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Linux-Field-Guide.html';
+  a.click();
+}
+
 /* ================= UNIFIED SEARCH ================= */
 let BOOK_INDEX = [];          // {id,title,level,text(lower),raw}
 let SEM_READY = false;
@@ -1244,14 +1255,6 @@ function openSidebar(){ document.getElementById('sidebar').classList.add('open')
 function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('backdrop').classList.remove('show'); }
 
 /* Export current page as standalone .html */
-function exportHTML(){
-  const data = document.documentElement.outerHTML;
-  const blob = new Blob([data], {type:'text/html'});
-  const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
-  a.href = url; a.download = 'Linux-book.html'; a.click();
-  URL.revokeObjectURL(url);
-}
 
 /* Init */
 window.addEventListener('DOMContentLoaded', () => {

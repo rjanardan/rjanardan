@@ -1,0 +1,1666 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The System Design Field Guide — Principal Architect Interviews</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root{
+    --bg:#f7f8fa; --panel:#ffffff; --panel-2:#f0f2f5; --line:#e3e6ea;
+    --ink:#23262b; --ink-soft:#5b626b; --muted:#939aa4;
+    --accent:#4f46e5; --accent-soft:#eef2ff; --accent-ink:#3730a3; --accent-soft:#eef2ff; --accent-ink:#3730a3;
+    --green:#0f766e; --blue:#2563eb; --shadow:0 1px 3px rgba(20,24,31,.08),0 8px 24px rgba(20,24,31,.06);
+  }
+  *{box-sizing:border-box;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.55;
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+       font-size:15px;}
+  a{color:var(--accent);}
+  .layout{display:grid;grid-template-columns:280px 1fr;min-height:100vh;}
+
+  /* Sidebar */
+  .sidebar{background:var(--panel);border-right:1px solid var(--line);padding:22px 16px;
+           position:sticky;top:0;height:100vh;overflow-y:auto;}
+  .sidebar .logo{font-family:'Space Grotesk',Georgia,serif;font-weight:700;font-size:18px;
+                 color:var(--accent-ink);margin:0 0 4px;}
+  .sidebar .sub{font-size:12px;color:var(--muted);margin:0 0 18px;}
+  .toc a{display:flex;align-items:center;gap:10px;padding:8px 11px;border-radius:10px;
+         color:var(--ink-soft);text-decoration:none;font-size:13px;transition:background .15s,color .15s;}
+  .toc a .num{flex:0 0 22px;height:22px;border-radius:6px;background:var(--accent-soft);
+             color:var(--accent-ink);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+  .toc a.active{background:var(--accent-soft);color:var(--accent-ink);font-weight:600;}
+  .toc a:hover{background:var(--panel-2);}
+
+  /* Topbar */
+  header.topbar{position:sticky;top:0;z-index:40;background:rgba(255,255,255,.92);
+                backdrop-filter:blur(8px);border-bottom:1px solid var(--line);
+                display:flex;align-items:center;}
+  .topbar-inner{display:flex;align-items:center;gap:14px;width:100%;max-width:920px;padding:12px 34px;}
+  .menu-btn{display:none;background:none;border:1px solid var(--line);border-radius:9px;
+            width:38px;height:38px;font-size:18px;cursor:pointer;}
+  header.topbar h2{font-size:16px;margin:0;flex:0 0 auto;letter-spacing:-.01em;}
+  header.topbar .search{background:var(--panel-2);
+       border:1px solid var(--line);border-radius:999px;padding:8px 14px;font-size:12px;outline:none;color:var(--ink);}
+  .btn{background:var(--accent);color:#fff;border:none;border-radius:9px;padding:8px 13px;
+       font-size:12px;cursor:pointer;}
+  .backdrop{display:none;position:fixed;inset:0;background:rgba(0,0,0,.35);z-index:45;}
+
+  /* Content */
+  main{padding:30px 34px 60px;max-width:920px;}
+  .hero{background:linear-gradient(135deg,#eef2ff,#f7f8fa);border:1px solid var(--line);
+        border-radius:18px;padding:30px 32px;margin-bottom:30px;}
+  .hero h1{font-family:'Space Grotesk',Georgia,serif;font-size:clamp(22px,3vw,30px);margin:0 0 12px;letter-spacing:-.02em;}
+  .hero p{max-width:640px;font-size:14px;opacity:.94;margin:0 0 18px;}
+  .stats{display:flex;flex-wrap:wrap;gap:14px;font-size:12px;color:var(--ink-soft);}
+  .stats .dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:var(--accent);margin-right:6px;}
+
+  .chapter{background:var(--panel);border:1px solid var(--line);border-radius:18px;
+           padding:26px 30px;margin:0 0 26px;scroll-margin-top:78px;box-shadow:var(--shadow);}
+  .ch-head{display:flex;gap:14px;align-items:flex-start;margin-bottom:8px;}
+  .ch-ico{flex:0 0 44px;height:44px;border-radius:12px;background:var(--accent-soft);
+          display:flex;align-items:center;justify-content:center;font-size:22px;}
+  .chapter h2{font-family:'Space Grotesk',Georgia,serif;font-size:clamp(18px,2.4vw,23px);margin:0;letter-spacing:-.02em;}
+  .level{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:3px;}
+  .intro{color:var(--ink-soft);font-size:14.5px;margin:14px 0 6px;}
+
+  h3.sec{font-family:'Space Grotesk',Georgia,serif;font-size:17px;margin:28px 0 12px;
+         padding-bottom:7px;border-bottom:1px solid var(--line);letter-spacing:-.01em;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:12px;margin:12px 0;}
+  .card{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;padding:12px 14px;}
+  .card .t{font-weight:600;font-size:13.5px;margin-bottom:4px;color:var(--accent-ink);}
+  .card .d{font-size:13px;color:var(--ink-soft);}
+
+  .mermaid{background:var(--panel-2);border:1px solid var(--line);border-radius:12px;
+           padding:14px;margin:16px 0;text-align:center;overflow-x:auto;}
+  figure{margin:16px 0;}
+  figcaption{font-size:12px;color:var(--muted);margin-top:6px;text-align:center;}
+
+  pre{position:relative;background:#1e2329;color:#e6e6e6;border-radius:14px;padding:16px 18px;
+      margin:16px 0;overflow-x:auto;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:12.5px;line-height:1.65;}
+  pre .copy{position:absolute;top:10px;right:10px;background:rgba(255,255,255,.12);color:#fff;border:none;
+            border-radius:7px;padding:5px 10px;font-size:11px;cursor:pointer;}
+  pre .copy:hover{background:rgba(255,255,255,.22);}
+  pre.out{background:#11231c;color:#b8e6c9;}
+
+  .lab{background:var(--accent-soft);border:1px solid #c7d2fe;border-radius:14px;padding:14px 18px;margin:16px 0;}
+  .lab h4{margin:0 0 8px;font-size:13px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.06em;}
+  .lab ol{margin:0;padding-left:20px;font-size:13.5px;color:var(--ink);}
+  .lab li{margin:5px 0;}
+
+  .tip{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 12px 12px 0;
+       padding:12px 16px;margin:16px 0;font-size:13.5px;color:#3730a3;}
+
+  .chapternav{display:flex;justify-content:space-between;gap:12px;margin-top:20px;}
+  .chapternav a{flex:1;text-decoration:none;background:var(--panel-2);border:1px solid var(--line);
+                border-radius:12px;padding:10px 14px;color:var(--ink);}
+  .chapternav .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;}
+  .chapternav .ttl{font-weight:600;font-size:13.5px;}
+
+  .pagefoot{font-size:12px;color:var(--muted);text-align:center;padding:24px;}
+
+  @media (max-width:900px){
+    .layout{grid-template-columns:1fr;}
+    .sidebar{position:fixed;left:0;top:0;width:268px;z-index:50;transform:translateX(-100%);transition:transform .2s;}
+    .sidebar.open{transform:translateX(0);}
+    .menu-btn{display:block;}
+    header.topbar .search-wrap{display:none;}
+    .topbar-inner{padding:12px 16px;}
+    main{padding:20px 16px 50px;}
+  }
+.tblwrap{overflow-x:auto;margin:14px 0;border:1px solid var(--line);border-radius:12px;}
+table.cmp{width:100%;border-collapse:collapse;font-size:13px;background:#fff;}
+table.cmp th{background:var(--accent-soft);color:var(--accent-ink);text-align:left;font-weight:600;
+  padding:9px 12px;border-bottom:1px solid var(--line);font-size:12px;text-transform:uppercase;letter-spacing:.05em;}
+table.cmp td{padding:8px 12px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:top;}
+table.cmp tr:last-child td{border-bottom:none;}
+table.cmp td:first-child{font-weight:600;color:var(--ink-soft);white-space:nowrap;}
+table.cmp tr:nth-child(even) td{background:#fafbfc;}
+/* ---- Unified search (full-text + semantic) ---- */
+.search-wrap{position:relative;flex:1 1 auto;min-width:220px;max-width:none;display:flex;align-items:center;gap:8px;}
+.search-wrap .search{flex:1;width:100%;}
+.search-status{font-size:10px;color:var(--muted);white-space:nowrap;}
+.search-results{
+  position:absolute;top:48px;left:0;right:0;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);max-height:62vh;overflow-y:auto;z-index:60;display:none;
+}
+.search-results.show{display:block;}
+.sr-item{display:block;padding:10px 14px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);}
+.sr-item:last-child{border-bottom:none;}
+.sr-item:hover{background:var(--panel-2);}
+.sr-chap{font-size:11px;color:var(--accent);font-weight:600;}
+.sr-title{font-size:13px;font-weight:600;margin:2px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;line-height:1.25;}
+.sr-title>span:first-child{flex:1 1 auto;min-width:0;}
+.sr-tag{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 6px;white-space:nowrap;align-self:center;line-height:1;flex:0 0 auto;}
+.sr-tag.sem{color:var(--accent);border-color:var(--accent);}
+.sr-ctx{font-size:12px;color:var(--ink-soft);line-height:1.45;margin-top:3px;}
+.sr-ctx mark{background:#e0e7ff;color:#3730a3;border-radius:3px;padding:0 2px;}
+.sr-empty{padding:14px;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+<div class="layout">
+  <aside class="sidebar" id="sidebar">
+    <div class="logo">⌬ System Design Field Guide</div>
+    <div class="sub">Knowledge Representation & AI</div>
+    <nav class="toc" id="toc"></nav>
+    <div style="margin-top:18px;padding-top:14px;border-top:1px solid var(--line);">
+      <button class="btn" style="width:100%" onclick="saveBook()">⬇ Save .html</button>
+    </div>
+  </aside>
+  <div class="backdrop" id="backdrop" onclick="document.getElementById('sidebar').classList.remove('open');this.style.display='none';"></div>
+
+  <div style="min-width:0;">
+    <header class="topbar">
+      <div class="topbar-inner">
+        <button class="menu-btn" onclick="document.getElementById('sidebar').classList.add('open');document.getElementById('backdrop').style.display='block';">☰</button>
+        <h2>The System Design Field Guide</h2>
+        <div class="search-wrap">
+          <input id="search" class="search" type="text" placeholder="Search concepts, services, decisions…" oninput="searchBooks(this.value)" autocomplete="off">
+          <span class="search-status" id="search-status"></span>
+          <div class="search-results" id="search-results"></div>
+        </div>
+      </div>
+    </header>
+
+    <main>
+      <section class="hero">
+        <h1>The System Design Field Guide</h1>
+        <p>A principal architect interview is a test of judgment: how you scope ambiguity, weigh trade-offs, and make decisions with long-term impact. This book prepares you both ways — the traditional method and the AI-age method — with a comparative view, a decision-rights model across senior engineer, principal architect, and chief architect, and a concrete preparation stack of open-source tools and cloud technologies (AWS, GCP, Azure).</p>
+        <div class="stats">
+          <div><span class="dot"></span> 18 Chapters</div>
+          <div><span class="dot"></span> Traditional + AI-Age Methods</div>
+          <div><span class="dot"></span> Decision-Rights Model</div>
+          <div><span class="dot"></span> AWS · GCP · Azure</div>
+        </div>
+      </section>
+
+      <div id="chapters"></div>
+
+      <div class="pagefoot">
+        The Lisp Field Guide · Knowledge representation & AI · Light theme, responsive, printable.
+      </div>
+    </main>
+  </div>
+</div>
+
+<script>
+const chapters = [
+{
+    id:1, icon:"🏛", title:"What a Principal Architect Interview Tests", level:"Foundation",
+    intro:"A principal architect interview is not a bigger version of a senior engineer interview. It tests judgment under ambiguity: how you scope a problem no one has fully defined, how you make decisions whose consequences outlive your tenure, and how you bring an organization along. The rubric rewards trade-off fluency and long-term thinking more than raw system trivia.",
+    concepts:[
+      {t:"Scope ambiguity", d:"You define the problem. Requirements are 20% given, 80% negotiated."},
+      {t:"Trade-off fluency", d:"Every choice is a pair: what you gain and what you give up, stated explicitly."},
+      {t:"Decision horizon", d:"Principal-level choices are measured in years: data model, boundaries, platform bets."},
+      {t:"Organizational reach", d:"You influence teams you do not manage — via ADRs, reviews, and leverage."},
+      {t:"Reversibility", d:"Two-way doors get quick decisions; one-way doors get ceremony and sign-off."}
+    ],
+    mermaid:`flowchart TD
+  A["interview problem"] --> B["scope & requirements"]
+  B --> C["constraints & scale"]
+  C --> D["candidate designs"]
+  D --> E["trade-off analysis"]
+  E --> F["decision + rationale"]
+  F --> G["communication & buy-in"]
+  style B fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style E fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style G fill:#e6f4f1,stroke:#0f766e,color:#0f5132`,
+    mermaidCap:"The interview is a decision pipeline: scope, constrain, design, compare, decide, persuade.",
+    picture:`<svg width="100%" height="180" viewBox="0 0 760 180" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="30" width="700" height="60" rx="12" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="50" y="58" font-family="monospace" font-size="14" fill="#3730a3">senior engineer: local, reversible, weeks</text>
+      <text x="50" y="78" font-family="monospace" font-size="14" fill="#3730a3">principal architect: system-wide, years</text>
+      <rect x="30" y="110" width="700" height="60" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="50" y="138" font-family="monospace" font-size="14" fill="#0f5132">chief architect: portfolio-wide, 3-10 years</text>
+      <text x="50" y="158" font-family="monospace" font-size="14" fill="#0f5132">owns the one-way doors, culture, platform strategy</text>
+    </svg>`,
+    picCap:"Decision horizon and blast radius grow with the level; the interview probes both.",
+    commands:`# A self-scoring rubric used by FAANG and enterprise loops
+# Rate yourself 1-5 on each; principal bar is 4+ across the board
+# score each dimension 1-5 in a plain file, then view it
+cat > rubric.txt <<'T'
+scoping:3         # turns vague prompt into concrete requirements
+estimation:3      # order-of-magnitude numbers, defended
+patterns:4        # knows when each pattern applies
+tradeoffs:3       # states gain/loss pairs without prompting
+data:4            # storage, consistency, access patterns
+scale:3           # identifies bottlenecks, proposes levers
+communication:4   # structure, clarity, buys time to think
+T
+column -t -s: rubric.txt`,
+    output:`scoping: 3
+estimation: 3
+patterns: 4
+tradeoffs: 3
+data: 4
+scale: 3
+communication: 4`,
+    lab:[
+      "Open the rubric above and score your last real design review honestly.",
+      "Pick your weakest dimension and write one paragraph on how you would improve it in 2 weeks.",
+      "Rehearse one 90-second answer to 'Tell me about the most consequential architecture decision you made.'",
+      "Time-box yourself: 60 seconds to restate the problem, 3 minutes to list constraints."
+    ],
+    tip:"Interviewers at principal level are not looking for the 'right' design — they are looking for how you handle the moment you realize there is no right answer."
+  },
+  {
+    id:2, icon:"📐", title:"The Traditional Method", level:"Classic Framework",
+    intro:"The traditional system design interview is a structured 45-60 minute conversation with a fixed rhythm: clarify, estimate, design, deep-dive, trade-off, scale. It rewards a rehearsed skeleton — interviewers can hear the framework in how you pace yourself. Master the skeleton first; improvisation comes later.",
+    concepts:[
+      {t:"Clarify (5 min)", d:"Users, traffic, reads/writes, latency, durability, non-goals."},
+      {t:"Estimate (5 min)", d:"QPS, storage, bandwidth — order of magnitude, round numbers."},
+      {t:"High-level design (15 min)", d:"Components and data flow on a whiteboard; name every box."},
+      {t:"Deep dive (15 min)", d:"Interviewer picks a slice: messaging, cache, data model, failure."},
+      {t:"Trade-offs & scale (10 min)", d:"Bottlenecks, levers, and what you would not do."}
+    ],
+    mermaid:`flowchart LR
+  A["clarify"] --> B["estimate"]
+  B --> C["high-level design"]
+  C --> D["deep dive"]
+  D --> E["trade-offs"]
+  E --> F["scale / next steps"]
+  style A fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style C fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style E fill:#eef2ff,stroke:#4f46e5,color:#3730a3`,
+    mermaidCap:"The five-act structure. Each act has a time budget; the interviewer steers the deep dive.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="40" width="110" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="55" y="72" font-family="monospace" font-size="13" fill="#3730a3">clarify</text>
+      <text x="55" y="92" font-family="monospace" font-size="12" fill="#3730a3">5 min</text>
+      <path d="M140 75 L170 75" stroke="#4f46e5" stroke-width="2" marker-end="url(#ar2)"/>
+      <rect x="175" y="40" width="110" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="200" y="72" font-family="monospace" font-size="13" fill="#3730a3">estimate</text>
+      <text x="200" y="92" font-family="monospace" font-size="12" fill="#3730a3">5 min</text>
+      <path d="M285 75 L315 75" stroke="#4f46e5" stroke-width="2"/>
+      <rect x="320" y="40" width="110" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="338" y="72" font-family="monospace" font-size="13" fill="#3730a3">design</text>
+      <text x="338" y="92" font-family="monospace" font-size="12" fill="#3730a3">15 min</text>
+      <path d="M430 75 L460 75" stroke="#4f46e5" stroke-width="2"/>
+      <rect x="465" y="40" width="110" height="70" rx="10" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="483" y="72" font-family="monospace" font-size="13" fill="#0f5132">deep dive</text>
+      <text x="483" y="92" font-family="monospace" font-size="12" fill="#0f5132">15 min</text>
+      <path d="M575 75 L605 75" stroke="#0f766e" stroke-width="2"/>
+      <rect x="610" y="40" width="120" height="70" rx="10" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="632" y="72" font-family="monospace" font-size="13" fill="#0f5132">trade-offs</text>
+      <text x="632" y="92" font-family="monospace" font-size="12" fill="#0f5132">10 min</text>
+      <defs><marker id="ar2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4f46e5"/></marker></defs>
+    </svg>`,
+    picCap:"Time-boxes keep the session moving; the deep dive is where level differences emerge.",
+    commands:`# Back-of-envelope template — memorize the shape, not the numbers
+# 1. Users and DAU
+users=100_000_000
+dau=$((users / 10))
+echo "DAU: $dau"
+
+# 2. Reads vs writes
+reads_per_user=20
+writes_per_user=1
+read_qps=$((dau * reads_per_user / 86400))
+write_qps=$((dau * writes_per_user / 86400))
+echo "read QPS: $read_qps  write QPS: $write_qps"
+
+# 3. Storage (5-year horizon)
+bytes_per_write=2048
+daily_bytes=$((write_qps * 86400 * bytes_per_write))
+echo "daily writes: $((daily_bytes / 1024 / 1024 / 1024)) GB"
+echo "5-year total: $((daily_bytes * 365 * 5 / 1024 / 1024 / 1024 / 1024)) TB"`,
+    output:`DAU: 10000000
+read QPS: 2315  write QPS: 116
+daily writes: 204 GB
+5-year total: 371 TB`,
+    lab:[
+      "Pick a classic problem: design Twitter, a URL shortener, or a rate limiter.",
+      "Run the five acts with a timer. Write down what you said at each boundary.",
+      "Afterwards, replay the recording and mark every moment you drifted off-framework.",
+      "Repeat the same problem 24 hours later; measure how much faster you hit the deep dive."
+    ],
+    tip:"The framework is a contract with the interviewer. Saying 'I will spend 5 minutes on requirements, then estimate' tells them you are in control — that alone scores points."
+  },
+  {
+    id:3, icon:"🤖", title:"The AI-Age Method", level:"Modern Framework",
+    intro:"Interviews changed when candidates started bringing LLMs to prep. The modern method keeps the traditional skeleton but supercharges it: AI mock interviewers drill you at your level, copilots generate design variants for comparison, and rubrics give instant feedback. The skill that emerged is curation — knowing which AI output to trust, adapt, or discard.",
+    concepts:[
+      {t:"AI mock interviewer", d:"Simulate the loop: prompt an LLM to run the five acts and push back."},
+      {t:"Design variants", d:"Ask for 3 designs, then interrogate each trade-off — breadth on demand."},
+      {t:"Instant rubric feedback", d:"Score every practice run; track deltas across sessions."},
+      {t:"Knowledge retrieval", d:"On-demand summaries of AWS/GCP/Azure services and patterns."},
+      {t:"Honesty boundary", d:"The interview is closed-book; prep with AI, but never present AI as your reasoning."}
+    ],
+    mermaid:`flowchart LR
+  A["you practice"] --> B["AI mock interviewer"]
+  B --> C["design attempt"]
+  C --> D["AI rubric + critique"]
+  D --> E["targeted drills"]
+  E --> A
+  style B fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style D fill:#e6f4f1,stroke:#0f766e,color:#0f5132`,
+    mermaidCap:"A closed prep loop: practice, critique, drill. The loop compresses months of interview reps.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="130" cy="75" r="45" fill="#eef2ff" stroke="#4f46e5" stroke-width="2"/>
+      <text x="118" y="79" font-family="monospace" font-size="13" fill="#3730a3">you</text>
+      <path d="M175 75 L300 75" stroke="#4f46e5" stroke-width="2" marker-end="url(#ai1)"/>
+      <circle cx="360" cy="75" r="45" fill="#e6f4f1" stroke="#0f766e" stroke-width="2"/>
+      <text x="338" y="79" font-family="monospace" font-size="13" fill="#0f5132">AI</text>
+      <path d="M405 75 L530 75" stroke="#0f766e" stroke-width="2" marker-end="url(#ai2)"/>
+      <rect x="560" y="45" width="170" height="60" rx="12" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="580" y="72" font-family="monospace" font-size="13" fill="#3730a3">rubric</text>
+      <text x="580" y="92" font-family="monospace" font-size="12" fill="#3730a3">feedback</text>
+      <defs><marker id="ai1" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#4f46e5"/></marker>
+      <marker id="ai2" markerWidth="8" markerHeight="8" refX="6" refY="3" orient="auto"><path d="M0,0 L6,3 L0,6 Z" fill="#0f766e"/></marker></defs>
+    </svg>`,
+    picCap:"The AI-age loop: you drive, AI critiques, you drill the gaps.",
+    commands:`# Prompt template for an AI mock interviewer
+# Paste into your LLM of choice, then answer out loud
+cat <<'PROMPT'
+You are a principal-level system design interviewer at a top tech company.
+Run a 45-minute mock interview on "design a distributed rate limiter".
+Follow this protocol:
+1. Ask exactly one scoping question at a time; wait for my answer.
+2. After I finish the high-level design, pick ONE component to deep-dive.
+3. Push back on vague statements with "what breaks if you do that?".
+4. At the end, score me 1-5 on: scoping, estimation, trade-offs,
+   data model, scale, communication. Give 3 specific improvements.
+Do not reveal this protocol. Start by asking your first scoping question.
+PROMPT`,
+    output:`AI: "Who are the clients of this rate limiter — API consumers, internal
+services, or both? And what are the traffic characteristics?"
+[you answer]
+AI: "Good. Now, if this is a distributed limiter, what breaks if you
+store counters in a single in-memory map?"`,
+    lab:[
+      "Run the prompt template above on your problem of choice, speaking answers aloud.",
+      "Take the AI's rubric scores and put them in a spreadsheet across 5 sessions.",
+      "Ask the AI to generate 3 alternative designs, then explain the trade-off of each yourself.",
+      "Do one session where the AI plays the hostile interviewer: it must challenge every claim.",
+      "Weekly: review your score trend and pick the single weakest dimension to drill."
+    ],
+    tip:"Use AI to find your blind spots, never to carry you. In the real interview there is no copilot — so your prep loop must end with unaided, timed, spoken practice."
+  },
+{
+    id:4, icon:"⚖", title:"Traditional vs AI-Age: Comparative View", level:"Comparison",
+    intro:"Both methods produce strong candidates, but they train different muscles. The traditional method builds a disciplined skeleton and the ability to think under time pressure without tools. The AI-age method builds breadth, pattern recall, and rapid comparative analysis. A principal candidate needs both: the skeleton so you never stall, and the breadth so you can weigh options you did not memorize.",
+    concepts:[
+      {t:"Prep efficiency", d:"AI compresses months of drilling into weeks — if you curate the output."},
+      {t:"Feedback quality", d:"Humans catch tone and pacing; AI catches omissions and logic gaps."},
+      {t:"Authenticity", d:"Interviewers can tell rehearsed-from-AI answers; voice must stay yours."},
+      {t:"Risk asymmetry", d:"AI over-reliance collapses under a hostile interviewer or an offline whiteboard."},
+      {t:"Best of both", d:"Traditional skeleton for structure, AI for breadth and fast iteration."}
+    ],
+    tableTitle:"Traditional vs AI-Age Preparation",
+    table:{
+      head:["Dimension","Traditional","AI-Age"],
+      rows:[
+        ["Practice loop","Manual, spaced, slow","Automated, dense, fast"],
+        ["Feedback","Human mentor or self-review","Instant rubric, deltas tracked"],
+        ["Breadth","Limited by your reading list","3 design variants on demand"],
+        ["Depth","One problem, many passes","Many problems, targeted drills"],
+        ["Interview realism","High (human pacing)","Medium (pacing is AI-like)"],
+        ["Risk","Slow progress, no blind-spot scan","Over-reliance, answer echo"],
+        ["Best for","Building the skeleton, live nerves","Pattern breadth, weak-spot discovery"]
+      ]
+    },
+    mermaid:`flowchart TD
+  A["you"] --> B["traditional: skeleton + reps"]
+  A --> C["AI-age: breadth + critique loop"]
+  B --> D["disciplined, unaided performance"]
+  C --> E["wide pattern recall, fast comparison"]
+  D --> F["principal-level result"]
+  E --> F
+  style B fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style C fill:#e6f4f1,stroke:#0f766e,color:#0f5132`,
+    mermaidCap:"The two paths converge; the strongest candidates train both.",
+    picture:`<svg width="100%" height="160" viewBox="0 0 760 160" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="30" width="330" height="100" rx="14" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="50" y="58" font-family="monospace" font-size="13" fill="#3730a3">traditional</text>
+      <text x="50" y="80" font-family="monospace" font-size="12" fill="#3730a3">+ skeleton under pressure</text>
+      <text x="50" y="98" font-family="monospace" font-size="12" fill="#3730a3">+ honest pacing, live nerves</text>
+      <text x="50" y="116" font-family="monospace" font-size="12" fill="#3730a3">- slow breadth, blind spots</text>
+      <rect x="400" y="30" width="330" height="100" rx="14" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="420" y="58" font-family="monospace" font-size="13" fill="#0f5132">AI-age</text>
+      <text x="420" y="80" font-family="monospace" font-size="12" fill="#0f5132">+ breadth, variants on demand</text>
+      <text x="420" y="98" font-family="monospace" font-size="12" fill="#0f5132">+ instant rubric feedback</text>
+      <text x="420" y="116" font-family="monospace" font-size="12" fill="#0f5132">- answer echo, pacing drift</text>
+    </svg>`,
+    picCap:"Same goal, different muscle groups; train both.",
+    commands:`# Hybrid 4-week prep plan (traditional skeleton + AI loop)
+WEEK1="framework reps: 3 classic problems, timed, unaided"
+WEEK2="AI mock interviews: 3 sessions, log rubric scores"
+WEEK3="deep dives: 2 problems with hostile AI interviewer"
+WEEK4="live simulation: 1 full timed interview, no tools, recorded"
+echo "$WEEK1"; echo "$WEEK2"; echo "$WEEK3"; echo "$WEEK4"
+
+# Track deltas between AI rubric scores
+cat > scores.tsv <<'T'
+session	scoping	tradeoffs	data	scale	comm
+1	3	2	3	2	4
+2	3	3	3	3	4
+3	4	3	4	3	4
+T
+column -t scores.tsv`,
+    output:`framework reps: 3 classic problems, timed, unaided
+AI mock interviews: 3 sessions, log rubric scores
+deep dives: 2 problems with hostile AI interviewer
+live simulation: 1 full timed interview, no tools, recorded
+session  scoping  tradeoffs  data  scale  comm
+1        3        2          3     2      4
+2        3        3          3     3      4
+3        4        3          4     3      4`,
+    lab:[
+      "Build your own hybrid plan with the shell template above; commit to 4 weeks.",
+      "Do the same problem once traditionally (unaided) and once with AI; diff the designs.",
+      "Write down which AI suggestion you rejected and why — that is your curation muscle.",
+      "Track rubric scores weekly; the dimension that does not move is your priority."
+    ],
+    tip:"Do not let AI replace your skeleton. In the interview, the skeleton is what saves you when the question is new and the clock is running."
+  },
+  {
+    id:5, icon:"🧭", title:"Decision Rights: Who Decides What", level:"Decision Model",
+    intro:"The question behind most principal interviews: who owns which decisions? A senior engineer optimizes within a defined system; a principal architect owns decisions that span systems and outlast releases; a chief architect owns portfolio-level bets and the culture of decision-making itself. The interview probes whether you know which seat you are in and can escalate correctly.",
+    concepts:[
+      {t:"Senior software engineer", d:"Decides within the service: implementation, schema details, local patterns."},
+      {t:"Principal architect", d:"Decides across services: boundaries, data contracts, consistency, platform choices."},
+      {t:"Chief architect", d:"Decides portfolio-wide: build vs buy, cloud strategy, capability investments."},
+      {t:"Escalation", d:"Knowing when a decision is above your seat is a decision in itself."},
+      {t:"Reversibility test", d:"Two-way door = you decide; one-way door = escalate, document, review."}
+    ],
+    tableTitle:"Who Decides: Decision Rights by Role",
+    table:{
+      head:["Decision","Senior SWE","Principal Architect","Chief Architect"],
+      rows:[
+        ["Schema/index within a service","Decides","Reviews","—"],
+        ["Service boundaries & APIs","Inputs","Decides","Vets if strategic"],
+        ["Data consistency model","Inputs","Decides","Vets"],
+        ["Message broker / event backbone","Inputs","Decides","Vets"],
+        ["Cloud provider & regions","Inputs","Recommends","Decides"],
+        ["Build vs buy (major platform)","Inputs","Analyzes","Decides"],
+        ["Multi-year platform roadmap","Inputs","Leads draft","Decides"],
+        ["Org-wide architecture standards","Inputs","Owns draft","Approves"],
+        ["Hiring for architect roles","Inputs","Participates","Decides"]
+      ]
+    },
+    mermaid:`flowchart TD
+  A["decision arises"] --> B{"reversible?"}
+  B -- "yes: two-way door" --> C["decide at lowest competent level"]
+  B -- "no: one-way door" --> D{"blast radius?"}
+  D -- "one system" --> E["senior engineer owns"]
+  D -- "many systems" --> F["principal architect owns"]
+  D -- "portfolio / vendor" --> G["chief architect owns"]
+  style C fill:#e6f4f1,stroke:#0f766e,color:#0f5132
+  style F fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style G fill:#fef3c7,stroke:#d97706,color:#92400e`,
+    mermaidCap:"The reversibility test routes the decision to the right seat.",
+    picture:`<svg width="100%" height="170" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="25" width="210" height="55" rx="12" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="48" font-family="monospace" font-size="13" fill="#3730a3">senior engineer</text>
+      <text x="48" y="66" font-family="monospace" font-size="12" fill="#3730a3">local, weeks</text>
+      <rect x="275" y="25" width="210" height="55" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="293" y="48" font-family="monospace" font-size="13" fill="#0f5132">principal architect</text>
+      <text x="293" y="66" font-family="monospace" font-size="12" fill="#0f5132">cross-system, years</text>
+      <rect x="520" y="25" width="210" height="55" rx="12" fill="#fef3c7" stroke="#d97706"/>
+      <text x="538" y="48" font-family="monospace" font-size="13" fill="#92400e">chief architect</text>
+      <text x="538" y="66" font-family="monospace" font-size="12" fill="#92400e">portfolio, 3-10 years</text>
+      <rect x="30" y="105" width="700" height="50" rx="12" fill="#f7f8fa" stroke="#e3e6ea"/>
+      <text x="50" y="127" font-family="monospace" font-size="13" fill="#5b626b">escalation path: senior -> principal -> chief</text>
+      <text x="50" y="145" font-family="monospace" font-size="12" fill="#939aa4">one-way door + big blast radius = escalate with an analysis, not a question</text>
+    </svg>`,
+    picCap:"Decision rights widen with blast radius; escalation is a skill, not a failure.",
+    commands:`# RACI template for an architecture decision
+# R = Responsible  A = Accountable  C = Consulted  I = Informed
+cat > raci.tsv <<'T'
+decision	R	A	C	I
+api-boundary	principal	principal	service-leads	all-eng
+schema-change	service-eng	principal	data-eng	qa
+cloud-region	principal	chief	finops	sre
+build-vs-buy	principal	chief	product	finance
+T
+column -t raci.tsv`,
+    output:`decision        R              A              C             I
+api-boundary    principal      principal      service-leads  all-eng
+schema-change   service-eng    principal      data-eng       qa
+cloud-region    principal      chief          finops         sre
+build-vs-buy    principal      chief          product        finance`,
+    lab:[
+      "Take three decisions from your current job and assign R/A/C/I for each.",
+      "For each, apply the reversibility test and say which seat should own it.",
+      "Write a one-paragraph escalation memo: decision, options, recommendation, owner.",
+      "Role-play: the interviewer says 'why not just decide this yourself?' — answer in 60 seconds."
+    ],
+    tip:"A principal who escalates a one-way door with an analysis is trusted; one who escalates with a question is not. The analysis is the deliverable."
+  },
+  {
+    id:6, icon:"🏗", title:"Decisions with Long-Term Impact", level:"Decision Catalog",
+    intro:"Some decisions compound: they shape what is easy and hard to do for years. Interviews test whether you can identify them, sequence them, and attach the right ceremony. This chapter catalogs the classic long-horizon decisions and the questions that unlock each one.",
+    concepts:[
+      {t:"Data model", d:"The schema is the contract; entities outlive every service that touches them."},
+      {t:"Service boundaries", d:"Wrong boundaries mean years of painful migration and distributed monoliths."},
+      {t:"Consistency model", d:"Strong vs eventual is a product promise; changing it later is a rewrite."},
+      {t:"Cloud provider & regions", d:"Lock-in, compliance, latency, and exit cost are portfolio bets."},
+      {t:"Build vs buy", d:"Build what differentiates you; buy everything else — and audit that annually."}
+    ],
+    mermaid:`flowchart TD
+  A["long-term decision"] --> B["data model"]
+  A --> C["service boundaries"]
+  A --> D["consistency model"]
+  A --> E["cloud provider"]
+  A --> F["build vs buy"]
+  B --> G["compounding impact"]
+  C --> G
+  D --> G
+  E --> G
+  F --> G
+  style B fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style C fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style G fill:#fef3c7,stroke:#d97706,color:#92400e`,
+    mermaidCap:"Five decision families, one compounding effect: the cost of being wrong grows every quarter.",
+    picture:`<svg width="100%" height="170" viewBox="0 0 760 170" xmlns="http://www.w3.org/2000/svg">
+      <text x="30" y="35" font-family="monospace" font-size="13" fill="#3730a3">decision value vs time</text>
+      <path d="M40 140 L40 40" stroke="#e3e6ea" stroke-width="2"/>
+      <path d="M40 140 L720 140" stroke="#e3e6ea" stroke-width="2"/>
+      <path d="M50 132 C 200 128, 350 118, 700 40" stroke="#4f46e5" stroke-width="3" fill="none"/>
+      <text x="560" y="60" font-family="monospace" font-size="12" fill="#4f46e5">schema / boundaries</text>
+      <path d="M50 138 C 250 134, 450 126, 700 90" stroke="#0f766e" stroke-width="3" fill="none"/>
+      <text x="560" y="105" font-family="monospace" font-size="12" fill="#0f766e">implementation detail</text>
+    </svg>`,
+    picCap:"Good architects distinguish compounding decisions from implementation details.",
+    commands:`# ADR (Architecture Decision Record) skeleton
+# One file per decision; the analysis is the deliverable
+mkdir -p docs/adr
+cat > docs/adr/0001-event-backbone.md <<'M'
+# ADR-0001: Event backbone choice
+
+## Status
+Accepted
+
+## Context
+17 services need async communication. Current point-to-point
+queues create implicit coupling and replay gaps.
+
+## Decision
+Adopt a log-based backbone (Kafka) with schema registry,
+owned by the platform team.
+
+## Consequences
++ Replay, audit, multiple consumers, decoupled producers
+- Operational complexity, ordering guarantees are partition-scoped
+- Migration cost for 6 existing integrations (estimate: 8 weeks)
+
+## Reversibility
+One-way door after adoption crosses 10 services.
+M
+cat docs/adr/0001-event-backbone.md`,
+    output:`# ADR-0001: Event backbone choice
+
+## Status
+Accepted
+
+## Context
+17 services need async communication. Current point-to-point
+queues create implicit coupling and replay gaps.
+
+## Decision
+Adopt a log-based backbone (Kafka) with schema registry,
+owned by the platform team.`,
+    lab:[
+      "Pick a real decision from your org and write a full ADR with the skeleton above.",
+      "For each of the five decision families, name one decision you would never let a junior make alone.",
+      "Estimate the reversal cost of each: how many person-weeks to undo it after 12 months?",
+      "Defend your ADR to the AI mock interviewer; let it attack the consequences section."
+    ],
+    tip:"Interviewers listen for the word 'reversible'. Say it early: 'this is a two-way door, so I will decide quickly' — it signals exactly the judgment they are hiring for."
+  },
+{
+    id:7, icon:"📏", title:"Estimation & Capacity Planning", level:"Core Skill",
+    intro:"Estimation is the interview's trust signal: it proves you can ground a design in numbers. Principals are expected to be order-of-magnitude fluent — 10x accuracy, round numbers, stated assumptions, and a sanity check at the end. The skill is not arithmetic; it is knowing which numbers matter and being unafraid to say 'roughly'.",
+    concepts:[
+      {t:"QPS & peaks", d:"Average is a trap; model the peak (traffic bursts, campaigns, paydays)."},
+      {t:"Storage horizon", d:"5-year growth with retention policy — and what you will not store."},
+      {t:"Bandwidth", d:"Throughput limits, cross-region costs, and payload size leverage."},
+      {t:"Caching ratio", d:"Cache hit rate changes the read-path numbers dramatically."},
+      {t:"Sanity check", d:"Compare against a known system: 'is this in the same ballpark as X?'"}
+    ],
+    mermaid:`flowchart LR
+  A["assumptions"] --> B["users / DAU"]
+  B --> C["traffic model"]
+  C --> D["storage"]
+  C --> E["bandwidth"]
+  C --> F["cache / db load"]
+  D --> G["sanity check"]
+  E --> G
+  F --> G
+  style B fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style G fill:#e6f4f1,stroke:#0f766e,color:#0f5132`,
+    mermaidCap:"Assumptions in, sanity-checked numbers out; round everything.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="35" width="150" height="80" rx="12" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="62" font-family="monospace" font-size="13" fill="#3730a3">DAU 10M</text>
+      <text x="48" y="82" font-family="monospace" font-size="12" fill="#3730a3">20 reads/user</text>
+      <text x="48" y="100" font-family="monospace" font-size="12" fill="#3730a3">1 write/user</text>
+      <path d="M180 75 L230 75" stroke="#4f46e5" stroke-width="2"/>
+      <rect x="235" y="35" width="150" height="80" rx="12" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="253" y="62" font-family="monospace" font-size="13" fill="#3730a3">read QPS 2315</text>
+      <text x="253" y="82" font-family="monospace" font-size="12" fill="#3730a3">write QPS 116</text>
+      <text x="253" y="100" font-family="monospace" font-size="12" fill="#3730a3">peak 3x</text>
+      <path d="M385 75 L435 75" stroke="#4f46e5" stroke-width="2"/>
+      <rect x="440" y="35" width="150" height="80" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="458" y="62" font-family="monospace" font-size="13" fill="#0f5132">371 TB / 5yr</text>
+      <text x="458" y="82" font-family="monospace" font-size="12" fill="#0f5132">2.4 GB/s peak</text>
+      <text x="458" y="100" font-family="monospace" font-size="12" fill="#0f5132">cache 90%</text>
+      <path d="M590 75 L625 75" stroke="#0f766e" stroke-width="2"/>
+      <rect x="630" y="35" width="100" height="80" rx="12" fill="#fef3c7" stroke="#d97706"/>
+      <text x="648" y="62" font-family="monospace" font-size="13" fill="#92400e">sanity:</text>
+      <text x="648" y="82" font-family="monospace" font-size="12" fill="#92400e">matches</text>
+      <text x="648" y="100" font-family="monospace" font-size="12" fill="#92400e">known sys</text>
+    </svg>`,
+    picCap:"Assumptions to numbers to sanity check, all rounded.",
+    commands:`# Estimation for a news feed (10M DAU, 20 reads/user/day)
+dau=10000000
+reads_per_day=20
+writes_per_day=1
+read_qps=$((dau * reads_per_day / 86400))
+write_qps=$((dau * writes_per_day / 86400))
+echo "read QPS:  $read_qps"
+echo "write QPS: $write_qps"
+echo "peak (3x): $((read_qps * 3))"
+
+# Storage: 500 bytes per feed item, 5-year horizon
+bytes=500
+daily_items=$((write_qps * 86400))
+daily_gb=$((daily_items * bytes / 1024 / 1024 / 1024))
+echo "daily storage: $daily_gb GB"
+echo "5-year total:  $((daily_gb * 365 * 5 / 1024)) TB"
+
+# Cache: 90% hit rate on reads
+cached=$((read_qps * 90 / 100))
+db_qps=$((read_qps - cached))
+echo "cache QPS: $cached  db QPS: $db_qps"`,
+    output:`read QPS:  2315
+write QPS: 116
+peak (3x): 6945
+daily storage: 5 GB
+5-year total: 8 TB
+cache QPS: 2084  db QPS: 231`,
+    lab:[
+      "Estimate Twitter's timeline: 300M MAU, 1 read/user/hour peak. Show all steps.",
+      "Now estimate a payment system: 10M users, 2 transactions/month — what changes?",
+      "For each, do the sanity check: name one real system with comparable numbers.",
+      "Do three estimates back-to-back with a timer; aim for under 4 minutes each."
+    ],
+    tip:"Round everything to one significant figure and say 'roughly'. Interviewers grade the reasoning chain, not the last decimal."
+  },
+  {
+    id:8, icon:"🧩", title:"Core Architectural Patterns", level:"Pattern Toolkit",
+    intro:"Principals are pattern-fluent: they recognize a problem shape and reach for the matching pattern without burning interview time. This chapter is the working set — not every pattern in the world, but the ones that appear constantly in principal interviews and in real systems.",
+    concepts:[
+      {t:"CQRS", d:"Separate read and write models; each optimized for its access pattern."},
+      {t:"Event sourcing", d:"Append-only log of facts; state is derived. Audit and replay for free."},
+      {t:"Transactional outbox", d:"Write DB row + event in one transaction; a relay publishes the event."},
+      {t:"Saga", d:"Distributed transaction as a sequence of local steps with compensating actions."},
+      {t:"Cache-aside & rate limiting", d:"The two patterns you should be able to draw blindfolded."}
+    ],
+    mermaid:`flowchart LR
+  subgraph write path
+    A1["API"] --> B1["command model"] --> C1["DB"]
+    C1 --> D1["outbox"] --> E1["event bus"]
+  end
+  subgraph read path
+    E1 --> F1["read model projector"]
+    F1 --> G1["read model / cache"]
+    A2["API"] --> G1
+  end
+  style C1 fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style D1 fill:#fef3c7,stroke:#d97706,color:#92400e
+  style G1 fill:#e6f4f1,stroke:#0f766e,color:#0f5132`,
+    mermaidCap:"CQRS + outbox + event bus: the workhorse combination for distributed writes.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="45" width="150" height="60" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="70" font-family="monospace" font-size="13" fill="#3730a3">write API</text>
+      <text x="48" y="88" font-family="monospace" font-size="12" fill="#3730a3">command</text>
+      <path d="M180 75 L220 75" stroke="#4f46e5" stroke-width="2"/>
+      <rect x="225" y="45" width="150" height="60" rx="10" fill="#fef3c7" stroke="#d97706"/>
+      <text x="243" y="70" font-family="monospace" font-size="13" fill="#92400e">outbox</text>
+      <text x="243" y="88" font-family="monospace" font-size="12" fill="#92400e">1 txn</text>
+      <path d="M375 75 L415 75" stroke="#d97706" stroke-width="2"/>
+      <rect x="420" y="45" width="150" height="60" rx="10" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="438" y="70" font-family="monospace" font-size="13" fill="#0f5132">event bus</text>
+      <text x="438" y="88" font-family="monospace" font-size="12" fill="#0f5132">publish</text>
+      <path d="M570 75 L610 75" stroke="#0f766e" stroke-width="2"/>
+      <rect x="615" y="45" width="115" height="60" rx="10" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="633" y="70" font-family="monospace" font-size="13" fill="#0f5132">read model</text>
+      <text x="633" y="88" font-family="monospace" font-size="12" fill="#0f5132">projected</text>
+    </svg>`,
+    picCap:"Outbox pattern: database and event bus stay consistent without distributed transactions.",
+    commands:`# Outbox relay in ~20 lines (Postgres + polling)
+# In your DB transaction:
+#   INSERT INTO orders (...) VALUES (...);
+#   INSERT INTO outbox (id, topic, payload, created_at)
+#     VALUES (gen_random_uuid(), 'order.created',
+#             jsonb_build_object('order_id', ...), now());
+cat > relay.py <<'PY'
+import json, time, psycopg2
+conn = psycopg2.connect("dbname=shop")
+while True:
+    cur = conn.cursor()
+    cur.execute("""
+      SELECT id, topic, payload FROM outbox
+      WHERE published_at IS NULL
+      ORDER BY created_at LIMIT 100 FOR UPDATE SKIP LOCKED""")
+    rows = cur.fetchall()
+    for oid, topic, payload in rows:
+        publish(topic, payload)   # idempotent producer
+        cur.execute("UPDATE outbox SET published_at = now() WHERE id = %s", (oid,))
+    conn.commit()
+    time.sleep(1)
+PY
+python3 -c "import ast; ast.parse(open('relay.py').read()); print('relay.py: syntax ok')"`,
+    output:`relay.py: syntax ok
+# In production: swap polling for a CDC stream (Debezium) or
+# transactional outbox in your message broker (e.g. Kafka Connect).`,
+    lab:[
+      "Draw cache-aside and rate-limiting from memory on paper; then compare to a reference.",
+      "Explain to the AI interviewer when you would use a saga instead of an outbox.",
+      "Design the outbox relay for exactly-once-ish delivery: what breaks on crash?",
+      "For each pattern, name the cost: CQRS adds projection lag, sagas add compensation complexity."
+    ],
+    tip:"Pattern fluency is about naming the trade-off, not the pattern. 'I would use an outbox here — it costs a relay but buys consistency without 2PC' is a principal-grade sentence."
+  },
+  {
+    id:9, icon:"🗄", title:"Data & Storage Decisions", level:"Data Layer",
+    intro:"Most long-term impact lives in the data layer. Principals decide the storage engine, the partitioning scheme, the consistency semantics, and the data's lifecycle. Interviews test whether you can map access patterns to storage choices and defend the mapping under pushback.",
+    concepts:[
+      {t:"SQL vs NoSQL", d:"Relationships, joins, transactions → SQL. Scale-out, flexible schema, KV → NoSQL."},
+      {t:"Partitioning", d:"Hash vs range; hotspot risk; partition key is the single most important choice."},
+      {t:"Replication", d:"Leader-based for writes; multi-leader for regions; read replicas for scale."},
+      {t:"Indexing", d:"Indexes serve access patterns; every index costs write throughput and storage."},
+      {t:"Data lifecycle", d:"Hot / warm / cold tiers; retention and archival are product decisions."}
+    ],
+    mermaid:`flowchart TD
+  A["access patterns"] --> B{"relations & joins?"}
+  B -- "yes" --> C["SQL / relational"]
+  B -- "no" --> D{"scale-out or flexible schema?"}
+  D -- "yes" --> E["NoSQL (KV / doc / wide)"]
+  D -- "no" --> F["SQL with replicas"]
+  C --> G["partition + index design"]
+  E --> G
+  F --> G
+  G --> H["lifecycle tiers"]
+  style C fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style E fill:#e6f4f1,stroke:#0f766e,color:#0f5132
+  style G fill:#fef3c7,stroke:#d97706,color:#92400e`,
+    mermaidCap:"Storage choice is a decision tree rooted in access patterns.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="30" width="210" height="90" rx="12" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="55" font-family="monospace" font-size="13" fill="#3730a3">relational</text>
+      <text x="48" y="75" font-family="monospace" font-size="12" fill="#3730a3">Postgres / MySQL / Aurora</text>
+      <text x="48" y="93" font-family="monospace" font-size="12" fill="#3730a3">joins, txn, constraints</text>
+      <text x="48" y="111" font-family="monospace" font-size="12" fill="#3730a3">scale via replicas + shards</text>
+      <rect x="275" y="30" width="210" height="90" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="293" y="55" font-family="monospace" font-size="13" fill="#0f5132">document / KV</text>
+      <text x="293" y="75" font-family="monospace" font-size="12" fill="#0f5132">DynamoDB / MongoDB</text>
+      <text x="293" y="93" font-family="monospace" font-size="12" fill="#0f5132">flexible schema</text>
+      <text x="293" y="111" font-family="monospace" font-size="12" fill="#0f5132">scale-out by design</text>
+      <rect x="520" y="30" width="210" height="90" rx="12" fill="#fef3c7" stroke="#d97706"/>
+      <text x="538" y="55" font-family="monospace" font-size="13" fill="#92400e">search / analytics</text>
+      <text x="538" y="75" font-family="monospace" font-size="12" fill="#92400e">Elasticsearch / BigQuery</text>
+      <text x="538" y="93" font-family="monospace" font-size="12" fill="#92400e">inverted index</text>
+      <text x="538" y="111" font-family="monospace" font-size="12" fill="#92400e">columnar analytics</text>
+    </svg>`,
+    picCap:"Three storage families; the principal maps the workload, not the fashion.",
+    commands:`# Choose storage by access pattern (shell decision aid)
+echo "1. relational (joins/transactions)"
+echo "2. document (flexible schema, scale-out)"
+echo "3. KV (point lookups at massive scale)"
+echo "4. search (text/vector queries)"
+echo "5. columnar analytics (aggregations)"
+read -p "dominant access pattern (1-5): " p
+case $p in
+  1) echo "→ Postgres/Aurora/Cloud SQL";;
+  2) echo "→ DynamoDB/MongoDB/Cosmos DB";;
+  3) echo "→ Redis/DynamoDB/Cassandra";;
+  4) echo "→ Elasticsearch/OpenSearch";;
+  5) echo "→ BigQuery/Redshift/Synapse";;
+esac`,
+    output:`1. relational (joins/transactions)
+2. document (flexible schema, scale-out)
+3. KV (point lookups at massive scale)
+4. search (text/vector queries)
+5. columnar analytics (aggregations)
+→ Postgres/Aurora/Cloud SQL`,
+    lab:[
+      "Take a system you know and list its five most important access patterns.",
+      "Map each pattern to a storage engine; justify with one trade-off per choice.",
+      "Design the partition key for a chat app's messages table; explain the hotspot risk.",
+      "Defend 'why not use Postgres for everything?' — the honest answer includes when you would."
+    ],
+    tip:"The partition key is the decision interviewers probe hardest. Show you know it is irreversible at scale: 'wrong key = re-sharding event, so I will spend the extra minute on it.'"
+  },
+{
+    id:10, icon:"🔄", title:"Consistency, Availability, Latency", level:"Trade-off Core",
+    intro:"The CAP/PACELC framing is table stakes; principals go further — they translate it into product promises (RPO, RTO, SLOs) and pick mechanisms (quorums, conflict resolution, idempotency) that honor those promises. Interviews test whether you can state the trade-off in user-visible terms, not just theorem names.",
+    concepts:[
+      {t:"CAP in practice", d:"Partitioned systems choose consistency or availability per operation; the choice is per-request."},
+      {t:"PACELC", d:"If not partitioned: latency vs consistency trade-off is always on."},
+      {t:"RPO / RTO", d:"Recovery point objective (data loss) and recovery time objective (downtime) are product decisions."},
+      {t:"Quorum", d:"W+R > N gives strong reads/writes; tune W and R to trade latency."},
+      {t:"Idempotency", d:"Retries are safe only with idempotent operations or dedupe keys."}
+    ],
+    mermaid:`flowchart LR
+  A["network partition?"] -- "yes" --> B{"which promise?"}
+  B -- "availability" --> C["eventual consistency"]
+  B -- "consistency" --> D["fail writes / 503"]
+  A -- "no" --> E{"latency vs consistency"}
+  E -- "low latency" --> F["async, replicas, cache"]
+  E -- "strong" --> G["sync quorum writes"]
+  style C fill:#e6f4f1,stroke:#0f766e,color:#0f5132
+  style D fill:#fef3c7,stroke:#d97706,color:#92400e
+  style G fill:#eef2ff,stroke:#4f46e5,color:#3730a3`,
+    mermaidCap:"The real decision is per-request: which promise do we keep when things break.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <text x="30" y="30" font-family="monospace" font-size="13" fill="#3730a3">trade-off triangle</text>
+      <polygon points="380,125 120,40 640,40" fill="#eef2ff" stroke="#4f46e5" stroke-width="2"/>
+      <text x="150" y="55" font-family="monospace" font-size="13" fill="#3730a3">consistency</text>
+      <text x="500" y="55" font-family="monospace" font-size="13" fill="#3730a3">availability</text>
+      <text x="350" y="118" font-family="monospace" font-size="13" fill="#3730a3">latency</text>
+      <circle cx="380" cy="70" r="6" fill="#d97706"/>
+      <text x="395" y="75" font-family="monospace" font-size="12" fill="#92400e">your system: pick 2 per request</text>
+    </svg>`,
+    picCap:"Every distributed system sits somewhere in the triangle — and moves per request.",
+    commands:`# SLO worksheet for a payment service
+cat > slo.tsv <<'T'
+metric	value	notes
+availability	99.95%	~4.4h downtime/year
+rpo	0	no accepted data loss
+rto	15 min	failover to secondary region
+p99 latency	250 ms	auth + ledger write
+consistency	strong	ledger; eventual for read models
+T
+column -t slo.tsv
+
+# Quorum math: N=3 replicas
+# strong read:   W=2, R=2  -> W+R=4 > N=3
+# fast read:     W=2, R=1  -> eventual, lower latency`,
+    output:`metric         value     notes
+availability   99.95%    ~4.4h downtime/year
+rpo            0         no accepted data loss
+rto            15 min    failover to secondary region
+p99 latency    250 ms    auth + ledger write
+consistency    strong    ledger; eventual for read models`,
+    lab:[
+      "Define SLOs for a chat app, a payments ledger, and a recommendation feed — same infra, different promises.",
+      "Explain to the interviewer why 'strong consistency everywhere' is not free; give the exact cost.",
+      "Design an idempotency key scheme for a retried payment API.",
+      "Role-play: the interviewer says 'just use eventual consistency' — push back with the user-visible failure."
+    ],
+    tip:"Name the failure mode out loud: 'if we lose this write, the customer sees a charge with no order'. Interviewers remember candidates who make trade-offs vivid."
+  },
+  {
+    id:11, icon:"📚", title:"Open-Source Prep Stack", level:"Prep Tooling",
+    intro:"A principal's preparation has a toolchain: canonical reading, structured problem sets, diagramming tools, and load-testing to verify assumptions. Everything here is open source or free. Build the stack once, and your prep runs on rails.",
+    concepts:[
+      {t:"system-design-primer", d:"The GitHub classic: 250K+ stars, structured sections, practice problems."},
+      {t:"DDIA", d:"Designing Data-Intensive Applications — the book every interviewer assumes you read."},
+      {t:"Diagramming", d:"Mermaid, PlantUML, draw.io, Excalidraw — draw fast, iterate, export to SVG."},
+      {t:"Load testing", d:"k6 or hey: verify that a '1000 QPS' claim is real on your laptop."},
+      {t:"Flashcards & notes", d:"Anki or a plain markdown vault for patterns, numbers, and ADR templates."}
+    ],
+    tableTitle:"Open-Source Prep Stack",
+    table:{
+      head:["Tool","Purpose","Notes"],
+      rows:[
+        ["system-design-primer","Structured learning + problems","GitHub, free, canonical"],
+        ["DDIA (book)","Distributed systems fundamentals","Read ch. 5-9 twice"],
+        ["Excalidraw / draw.io","Whiteboard practice","Free, export SVG"],
+        ["Mermaid / PlantUML","Diagram as code","Good for ADRs too"],
+        ["k6 / hey","Load-test your designs","Verify QPS claims"],
+        ["Anki / Obsidian","Spaced repetition of patterns","Build your own deck"]
+      ]
+    },
+    mermaid:`flowchart LR
+  A["read: DDIA + primer"] --> B["practice: Excalidraw + problems"]
+  B --> C["verify: k6 load tests"]
+  C --> D["internalize: Anki deck"]
+  D --> A
+  style A fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style B fill:#e6f4f1,stroke:#0f766e,color:#0f5132
+  style C fill:#fef3c7,stroke:#d97706,color:#92400e`,
+    mermaidCap:"Read → practice → verify → internalize; the loop is fully open source.",
+    picture:`<svg width="100%" height="140" viewBox="0 0 760 140" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="35" width="160" height="70" rx="12" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="62" font-family="monospace" font-size="13" fill="#3730a3">system-design</text>
+      <text x="48" y="80" font-family="monospace" font-size="12" fill="#3730a3">-primer</text>
+      <text x="48" y="96" font-family="monospace" font-size="11" fill="#3730a3">github.com</text>
+      <rect x="220" y="35" width="160" height="70" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="238" y="62" font-family="monospace" font-size="13" fill="#0f5132">DDIA</text>
+      <text x="238" y="80" font-family="monospace" font-size="12" fill="#0f5132">ch 5-9</text>
+      <rect x="410" y="35" width="160" height="70" rx="12" fill="#fef3c7" stroke="#d97706"/>
+      <text x="428" y="62" font-family="monospace" font-size="13" fill="#92400e">Excalidraw</text>
+      <text x="428" y="80" font-family="monospace" font-size="12" fill="#92400e">practice</text>
+      <rect x="600" y="35" width="130" height="70" rx="12" fill="#fef3c7" stroke="#d97706"/>
+      <text x="618" y="62" font-family="monospace" font-size="13" fill="#92400e">k6</text>
+      <text x="618" y="80" font-family="monospace" font-size="12" fill="#92400e">verify</text>
+    </svg>`,
+    picCap:"Four tools, one loop: learn, draw, test, remember.",
+    commands:`# Install the stack (Ubuntu / macOS)
+git clone https://github.com/donnemartin/system-design-primer.git
+brew install k6        # or: apt install k6 / download from grafana.com
+brew install --cask drawio excalidraw  # diagramming
+
+# Verify a QPS claim with hey (open-source load tool)
+hey -n 10000 -c 100 http://127.0.0.1:8123/Linux-book.html
+# Output includes: requests/sec, p50, p95, p99 latencies
+
+# Spaced repetition: build a deck from the primer's glossary
+pip install genanki 2>/dev/null || true
+echo "deck: pattern -> when to use -> cost -> failure mode"`,
+    output:`Summary:
+  Total:        10000 requests
+  Slowest:      412.3 ms
+  Fastest:      3.1 ms
+  Average:      41.7 ms
+  Requests/sec: 2381.6
+  p99 latency:  180.2 ms`,
+    lab:[
+      "Clone system-design-primer and work through its 'Design a system' problems list.",
+      "Read DDIA chapter 5 (replication) and 6 (partitioning); write a one-page summary.",
+      "Diagram a design you already know in Excalidraw with a 10-minute timer.",
+      "Load-test a local service with hey or k6; record its real p99 and compare to your estimate."
+    ],
+    tip:"The primer is a floor, not a ceiling. Interviewers at principal level expect you to go beyond it into failure modes and operations — that is where DDIA earns its keep."
+  },
+  {
+    id:12, icon:"☁️", title:"AWS: Services a Principal Must Know", level:"Cloud Prep",
+    intro:"Cloud fluency is now assumed at principal level. You are not expected to memorize every service, but you must know the canonical stack for the common problem shapes, the free-tier limits for practice, and the cost implications of each choice. AWS is the most common default; know its lexicon cold.",
+    concepts:[
+      {t:"Compute", d:"EC2 (control), EKS (containers), Lambda (event-driven), Fargate (serverless-ish)."},
+      {t:"Data", d:"RDS/Aurora (SQL), DynamoDB (KV/doc scale-out), ElastiCache (Redis), S3 (object)."},
+      {t:"Messaging", d:"SQS (queue), SNS (pub/sub), Kinesis (stream), EventBridge (routing)."},
+      {t:"Edge & network", d:"Route 53 (DNS), CloudFront (CDN), API Gateway, ALB/NLB."},
+      {t:"Ops & cost", d:"CloudWatch, IAM, Cost Explorer, Terraform for everything."}
+    ],
+    mermaid:`flowchart LR
+  A["Route 53 + CloudFront"] --> B["API Gateway"]
+  B --> C["Lambda / EKS / EC2"]
+  C --> D["RDS / DynamoDB"]
+  C --> E["SQS / Kinesis"]
+  C --> F["S3"]
+  E --> G["workers (Lambda)"]
+  G --> F
+  style A fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style D fill:#e6f4f1,stroke:#0f766e,color:#0f5132
+  style F fill:#fef3c7,stroke:#d97706,color:#92400e`,
+    mermaidCap:"The canonical AWS web stack: edge → API → compute → data, with async lanes.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="40" width="130" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="66" font-family="monospace" font-size="12" fill="#3730a3">Route 53</text>
+      <text x="48" y="84" font-family="monospace" font-size="12" fill="#3730a3">CloudFront</text>
+      <text x="48" y="100" font-family="monospace" font-size="11" fill="#3730a3">edge</text>
+      <rect x="200" y="40" width="130" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="218" y="66" font-family="monospace" font-size="12" fill="#3730a3">API Gateway</text>
+      <text x="218" y="84" font-family="monospace" font-size="12" fill="#3730a3">auth / throttle</text>
+      <rect x="370" y="40" width="130" height="70" rx="10" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="388" y="66" font-family="monospace" font-size="12" fill="#0f5132">Lambda / EKS</text>
+      <text x="388" y="84" font-family="monospace" font-size="12" fill="#0f5132">compute</text>
+      <rect x="540" y="40" width="190" height="70" rx="10" fill="#fef3c7" stroke="#d97706"/>
+      <text x="558" y="66" font-family="monospace" font-size="12" fill="#92400e">RDS / DynamoDB / S3</text>
+      <text x="558" y="84" font-family="monospace" font-size="12" fill="#92400e">SQS / Kinesis</text>
+      <text x="558" y="100" font-family="monospace" font-size="11" fill="#92400e">data + async</text>
+    </svg>`,
+    picCap:"The canonical AWS web stack at a glance.",
+    commands:`# Free-tier practice: spin up a real stack (aws cli)
+aws configure   # set keys (never commit them)
+
+# Launch an EC2 t2.micro (free tier) and tag it
+aws ec2 run-instances --image-id ami-0abcdef1234567890 \
+  --instance-type t2.micro --key-name mykey \
+  --tag-specifications 'ResourceType=instance,Tags=[{Key=Name,Value=prep}]'
+
+# DynamoDB: on-demand table (no capacity planning)
+aws dynamodb create-table \
+  --table-name prep-sessions \
+  --attribute-definitions AttributeName=id,AttributeType=S \
+  --key-schema AttributeName=id,KeyType=HASH \
+  --billing-mode PAY_PER_REQUEST
+
+# Cost guard: never leave a stack running
+aws ec2 stop-instances --instance-ids i-1234567890abcdef0`,
+    output:`{
+    "TableDescription": {
+        "TableName": "prep-sessions",
+        "TableStatus": "ACTIVE",
+        "BillingModeSummary": {"BillingMode": "PAY_PER_REQUEST"}
+    }
+}`,
+    lab:[
+      "Create a DynamoDB table on the free tier and insert 100 items; note the access-pattern mapping.",
+      "Design a fan-out: SNS → SQS queues per consumer; draw it and explain delivery semantics.",
+      "Compare Aurora vs DynamoDB for a leaderboard: joins? write spikes? hot keys?",
+      "Estimate the monthly cost of a 100 QPS service on Lambda vs EKS (use the AWS pricing calculator)."
+    ],
+    tip:"Interviewers like hearing the failure first: 'SQS gives at-least-once, so my consumer must be idempotent.' That sentence shows you know the service's real contract, not its marketing page."
+  },
+{
+    id:13, icon:"🔵", title:"GCP: Services a Principal Must Know", level:"Cloud Prep",
+    intro:"Google Cloud wins on data and Kubernetes: BigQuery for analytics, Spanner for global consistency, and GKE for containers. Many enterprise and AI-heavy companies run GCP precisely for these strengths. Know the mapping — the same problem shapes, different service names and different trade-offs.",
+    concepts:[
+      {t:"Compute", d:"GKE (containers), Cloud Run (serverless containers), Compute Engine (VMs)."},
+      {t:"Data", d:"Cloud SQL (managed Postgres/MySQL), Spanner (global strong consistency), BigQuery (analytics)."},
+      {t:"Storage & messaging", d:"Cloud Storage (objects), Pub/Sub (pub/sub), Dataflow (stream processing)."},
+      {t:"Networking", d:"Cloud Load Balancing, Cloud CDN, Cloud DNS, VPC-native services."},
+      {t:"AI-native edge", d:"Vertex AI, TPUs — the reason GCP appears in AI-heavy architectures."}
+    ],
+    mermaid:`flowchart LR
+  A["Global LB + Cloud CDN"] --> B["Cloud Run / GKE"]
+  B --> C["Cloud SQL / Spanner"]
+  B --> D["Pub/Sub"]
+  B --> E["Cloud Storage"]
+  D --> F["Dataflow / Cloud Run workers"]
+  F --> E
+  style A fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style C fill:#e6f4f1,stroke:#0f766e,color:#0f5132
+  style D fill:#fef3c7,stroke:#d97706,color:#92400e`,
+    mermaidCap:"The canonical GCP stack: global LB, serverless compute, Pub/Sub lanes, BigQuery for analytics.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="40" width="150" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="66" font-family="monospace" font-size="12" fill="#3730a3">Cloud LB</text>
+      <text x="48" y="84" font-family="monospace" font-size="12" fill="#3730a3">Cloud CDN</text>
+      <rect x="215" y="40" width="150" height="70" rx="10" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="233" y="66" font-family="monospace" font-size="12" fill="#0f5132">Cloud Run</text>
+      <text x="233" y="84" font-family="monospace" font-size="12" fill="#0f5132">GKE</text>
+      <rect x="400" y="40" width="150" height="70" rx="10" fill="#fef3c7" stroke="#d97706"/>
+      <text x="418" y="66" font-family="monospace" font-size="12" fill="#92400e">Cloud SQL</text>
+      <text x="418" y="84" font-family="monospace" font-size="12" fill="#92400e">Spanner</text>
+      <rect x="585" y="40" width="145" height="70" rx="10" fill="#fef3c7" stroke="#d97706"/>
+      <text x="603" y="66" font-family="monospace" font-size="12" fill="#92400e">Pub/Sub</text>
+      <text x="603" y="84" font-family="monospace" font-size="12" fill="#92400e">BigQuery</text>
+    </svg>`,
+    picCap:"GCP's strengths: global load balancing, serverless containers, managed analytics.",
+    commands:`# Free-tier practice with gcloud (no card required for trial)
+gcloud auth login
+gcloud config set project prep-project
+
+# Cloud Run: deploy a container (auto-scales to zero)
+gcloud run deploy prep-api \
+  --image gcr.io/cloudrun/hello \
+  --platform managed --region us-central1 --allow-unauthenticated
+
+# Pub/Sub: create a topic and subscription
+gcloud pubsub topics create prep-events
+gcloud pubsub subscriptions create prep-sub \
+  --topic prep-events --ack-deadline 60
+
+# BigQuery: query public dataset (no infrastructure to manage)
+bq query --use_legacy_sql=false \
+  'SELECT COUNT(*) AS n FROM \`bigquery-public-data.samples.gsod\`'`,
+    output:`Created service [prep-api].
+Service URL: https://prep-api-xxxx-uc.a.run.app
+Created topic [projects/prep-project/topics/prep-events].
+Created subscription [projects/prep-project/subscriptions/prep-sub].`,
+    lab:[
+      "Deploy a Cloud Run service on the free tier; verify it scales to zero when idle.",
+      "Create a Pub/Sub topic and write a 20-line subscriber in your language of choice.",
+      "Compare Spanner vs Cloud SQL for a global multi-region app: what does Spanner's consistency cost?",
+      "Run one BigQuery query on a public dataset; note that 'analytics scale' needs no servers."
+    ],
+    tip:"GCP interviewers love Spanner: know exactly when it beats Cloud SQL (global reads/writes with strong consistency) and when it is overkill (single-region, modest scale)."
+  },
+  {
+    id:14, icon:"🟦", title:"Azure: Services a Principal Must Know", level:"Cloud Prep",
+    intro:"Azure is the enterprise default: deep Active Directory integration, hybrid on-prem story, and strong compliance posture for regulated industries (banking, health). Principal interviews at large enterprises frequently assume Azure. The mapping differs in naming and in one important fact: Azure's PaaS story is unusually strong.",
+    concepts:[
+      {t:"Compute", d:"AKS (containers), App Service (PaaS), Azure Functions (serverless), VMs."},
+      {t:"Data", d:"Azure SQL (managed SQL Server/Postgres), Cosmos DB (multi-model, global), Blob Storage."},
+      {t:"Messaging", d:"Service Bus (enterprise queue/topics), Event Hubs (stream), Event Grid (routing)."},
+      {t:"Networking", d:"Front Door (global LB/WAF), Traffic Manager (DNS), Application Gateway."},
+      {t:"Enterprise", d:"Entra ID (identity), Azure Policy, Purview (governance) — the enterprise levers."}
+    ],
+    mermaid:`flowchart LR
+  A["Front Door + WAF"] --> B["App Service / AKS"]
+  B --> C["Azure SQL / Cosmos DB"]
+  B --> D["Service Bus / Event Hubs"]
+  B --> E["Blob Storage"]
+  D --> F["Functions workers"]
+  F --> E
+  style A fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style C fill:#e6f4f1,stroke:#0f766e,color:#0f5132
+  style D fill:#fef3c7,stroke:#d97706,color:#92400e`,
+    mermaidCap:"The canonical Azure stack: Front Door at the edge, PaaS compute, Service Bus lanes.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="40" width="150" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="66" font-family="monospace" font-size="12" fill="#3730a3">Front Door</text>
+      <text x="48" y="84" font-family="monospace" font-size="12" fill="#3730a3">WAF</text>
+      <rect x="215" y="40" width="150" height="70" rx="10" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="233" y="66" font-family="monospace" font-size="12" fill="#0f5132">App Service</text>
+      <text x="233" y="84" font-family="monospace" font-size="12" fill="#0f5132">AKS</text>
+      <rect x="400" y="40" width="150" height="70" rx="10" fill="#fef3c7" stroke="#d97706"/>
+      <text x="418" y="66" font-family="monospace" font-size="12" fill="#92400e">Azure SQL</text>
+      <text x="418" y="84" font-family="monospace" font-size="12" fill="#92400e">Cosmos DB</text>
+      <rect x="585" y="40" width="145" height="70" rx="10" fill="#fef3c7" stroke="#d97706"/>
+      <text x="603" y="66" font-family="monospace" font-size="12" fill="#92400e">Service Bus</text>
+      <text x="603" y="84" font-family="monospace" font-size="12" fill="#92400e">Event Hubs</text>
+    </svg>`,
+    picCap:"Azure's edge-to-data stack; PaaS-first is the default posture.",
+    commands:`# Free-tier practice with az cli
+az login
+az group create --name prep-rg --location eastus
+
+# App Service: deploy a web app (PaaS, free tier F1)
+az appservice plan create --name prep-plan --resource-group prep-rg --sku F1
+az webapp create --name prep-app-$RANDOM \
+  --resource-group prep-rg --plan prep-plan
+
+# Cosmos DB: global multi-model database (free tier 1000 RU/s)
+az cosmosdb create --name prep-cosmos-$RANDOM \
+  --resource-group prep-rg --locations regionName=eastus
+
+# Service Bus: queue + check depth
+az servicebus namespace create --name prep-sb-$RANDOM \
+  --resource-group prep-rg --sku Basic`,
+    output:`{
+  "appServicePlanName": "prep-plan",
+  "name": "prep-app-48213",
+  "state": "Running",
+  "hostNames": ["prep-app-48213.azurewebsites.net"]
+}`,
+    lab:[
+      "Create an App Service app on the free tier and note the default HTTPS + auto-scaling posture.",
+      "Compare Cosmos DB vs Azure SQL for a global app: consistency levels, RU pricing, multi-region writes.",
+      "Design a fan-out with Service Bus topics; explain the at-least-once delivery implication.",
+      "Role-play: the interviewer asks 'why Azure over AWS for a bank?' — lead with identity + compliance."
+    ],
+    tip:"For Azure interviews, know Entra ID and Azure Policy by name — enterprise interviewers listen for governance vocabulary, not just services."
+  },
+  {
+    id:15, icon:"🌐", title:"Choosing a Provider: AWS vs GCP vs Azure", level:"Decision",
+    intro:"Provider choice is a one-way door with a decade-long blast radius — exactly the decision a principal analyzes and a chief approves. The interview rarely asks you to pick a winner; it asks whether you can structure the decision: requirements first, then evaluation, then a defensible recommendation with exit cost acknowledged.",
+    concepts:[
+      {t:"Parity is the default", d:"For 80% of workloads any provider works; the decision lives in the 20%."},
+      {t:"Differentiators", d:"AWS: breadth + maturity. GCP: data/analytics/AI. Azure: enterprise + compliance."},
+      {t:"Lock-in reality", d:"Managed services lock you in; Kubernetes is the escape hatch, not the exit."},
+      {t:"Cost structure", d:"Compute pricing is close; data egress and managed-service markups differ wildly."},
+      {t:"Team leverage", d:"Your org's existing skills and certifications often outweigh technical deltas."}
+    ],
+    tableTitle:"AWS vs GCP vs Azure: Principal's Comparison",
+    table:{
+      head:["Dimension","AWS","GCP","Azure"],
+      rows:[
+        ["Strength","Breadth & maturity","Data, analytics, AI","Enterprise & compliance"],
+        ["Compute default","EC2 / EKS / Lambda","GKE / Cloud Run","App Service / AKS"],
+        ["SQL","RDS / Aurora","Cloud SQL / Spanner","Azure SQL"],
+        ["NoSQL / scale-out","DynamoDB","Bigtable / Firestore","Cosmos DB"],
+        ["Analytics","Redshift","BigQuery (best-in-class)","Synapse"],
+        ["Streaming","Kinesis","Dataflow / Pub-Sub","Event Hubs"],
+        ["Serverless","Lambda","Cloud Run / Functions","Functions"],
+        ["Identity","IAM + Cognito","IAM / Workforce","Entra ID (deepest)"],
+        ["Free tier","Generous, complex","Simple, includes BigQuery","12 months + $200 credit"],
+        ["Exit cost","High on managed","High on managed","High on managed"]
+      ]
+    },
+    mermaid:`flowchart TD
+  A{"primary workload?"} --> B["analytics / AI / data"]
+  B --> C["GCP: BigQuery, Vertex AI, TPUs"]
+  A --> D["regulated enterprise / hybrid"]
+  D --> E["Azure: Entra ID, compliance, hybrid"]
+  A --> F["broad product surface / startup default"]
+  F --> G["AWS: deepest service catalog"]
+  style C fill:#e6f4f1,stroke:#0f766e,color:#0f5132
+  style E fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style G fill:#fef3c7,stroke:#d97706,color:#92400e`,
+    mermaidCap:"Workload type, not fashion, picks the provider.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <text x="30" y="30" font-family="monospace" font-size="13" fill="#3730a3">provider decision matrix</text>
+      <rect x="30" y="45" width="220" height="90" rx="12" fill="#fef3c7" stroke="#d97706"/>
+      <text x="48" y="70" font-family="monospace" font-size="13" fill="#92400e">AWS</text>
+      <text x="48" y="90" font-family="monospace" font-size="12" fill="#92400e">breadth, maturity,</text>
+      <text x="48" y="108" font-family="monospace" font-size="12" fill="#92400e">deep catalog</text>
+      <rect x="270" y="45" width="220" height="90" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="288" y="70" font-family="monospace" font-size="13" fill="#0f5132">GCP</text>
+      <text x="288" y="90" font-family="monospace" font-size="12" fill="#0f5132">BigQuery, Spanner,</text>
+      <text x="288" y="108" font-family="monospace" font-size="12" fill="#0f5132">Vertex AI, TPUs</text>
+      <rect x="510" y="45" width="220" height="90" rx="12" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="528" y="70" font-family="monospace" font-size="13" fill="#3730a3">Azure</text>
+      <text x="528" y="90" font-family="monospace" font-size="12" fill="#3730a3">Entra ID, compliance,</text>
+      <text x="528" y="108" font-family="monospace" font-size="12" fill="#3730a3">hybrid, enterprise</text>
+    </svg>`,
+    picCap:"Each provider wins a different workload; the principal maps the workload first.",
+    commands:`# Provider decision worksheet
+echo "1. What is the primary workload? (web/analytics/AI/enterprise)"
+echo "2. What compliance regimes apply? (SOC2, HIPAA, PCI, GDPR)"
+echo "3. Where is the data? (regions, residency laws)"
+echo "4. What does the team already run? (existing skills = leverage)"
+echo "5. What is the realistic egress + exit cost?"
+
+# Compare compute pricing (approx, 2026, us-east):
+cat <<'T'
+service             vCPU  RAM   $/mo (approx)
+AWS t3.medium       2     4     30
+GCP e2-standard-2   2     8     49
+Azure D2s v3        2     8     70
+T
+echo "note: reserved/committed use discounts change all of these"`,
+    output:`1. What is the primary workload? (web/analytics/AI/enterprise)
+2. What compliance regimes apply? (SOC2, HIPAA, PCI, GDPR)
+3. Where is the data? (regions, residency laws)
+4. What does the team already do? (existing skills = leverage)
+5. What is the realistic egress + exit cost?`,
+    lab:[
+      "Structure a provider recommendation for a healthcare analytics platform; state the decisive factors.",
+      "Argue the counter-case: why would the same company choose a different provider next year?",
+      "Compute the exit cost of one managed service you use (data volume x egress price).",
+      "Write the one-paragraph recommendation you would put in front of a chief architect."
+    ],
+    tip:"The principal answer to 'which cloud?' is never a name — it is the decision structure: requirements, differentiators, lock-in, cost, and team leverage, ending with a reversible migration plan."
+  },
+{
+    id:16, icon:"🤝", title:"AI-Assisted Prep Workflow", level:"Prep System",
+    intro:"This chapter is the operating manual for the AI-age method: a weekly system that uses LLMs as interviewer, critic, and librarian — without letting them become a crutch. The discipline is curation: everything AI produces is a draft to be challenged, especially its confident wrong answers about services and numbers.",
+    concepts:[
+      {t:"Weekly rhythm", d:"2 AI mock interviews + 1 unaided timed session + 1 ADR defense."},
+      {t:"Prompt library", d:"Save your interviewer, critic, and hostile-question prompts; version them."},
+      {t:"Rubric log", d:"Every AI session ends with scored dimensions; chart the trend."},
+      {t:"Fact-check reflex", d:"AI will hallucinate service limits and prices — verify against docs."},
+      {t:"The unaided rule", d:"Never enter the real interview having only practiced with AI pacing."}
+    ],
+    mermaid:`flowchart TD
+  A["week start"] --> B["AI mock interview"]
+  B --> C["rubric log + trend"]
+  C --> D{"weakest dim?"}
+  D --> E["targeted drill (AI critic)"]
+  E --> F["unaided timed session"]
+  F --> G["ADR defense"]
+  G --> A
+  style B fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style F fill:#e6f4f1,stroke:#0f766e,color:#0f5132
+  style G fill:#fef3c7,stroke:#d97706,color:#92400e`,
+    mermaidCap:"The weekly loop: AI for volume, you for the live reps, log everything.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="40" width="160" height="70" rx="12" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="66" font-family="monospace" font-size="12" fill="#3730a3">Mon: AI mock</text>
+      <text x="48" y="84" font-family="monospace" font-size="12" fill="#3730a3">2 sessions</text>
+      <rect x="215" y="40" width="160" height="70" rx="12" fill="#fef3c7" stroke="#d97706"/>
+      <text x="233" y="66" font-family="monospace" font-size="12" fill="#92400e">Wed: drills</text>
+      <text x="233" y="84" font-family="monospace" font-size="12" fill="#92400e">weakest dim</text>
+      <rect x="400" y="40" width="160" height="70" rx="12" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="418" y="66" font-family="monospace" font-size="12" fill="#0f5132">Fri: unaided</text>
+      <text x="418" y="84" font-family="monospace" font-size="12" fill="#0f5132">timed, no tools</text>
+      <rect x="585" y="40" width="145" height="70" rx="12" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="603" y="66" font-family="monospace" font-size="12" fill="#3730a3">log + trend</text>
+      <text x="603" y="84" font-family="monospace" font-size="12" fill="#3730a3">rubric chart</text>
+    </svg>`,
+    picCap:"A sustainable weekly cadence beats a frantic two-week cram.",
+    commands:`# The critic prompt — run after any design you produce
+cat <<'PROMPT'
+You are a skeptical principal architect reviewing my design.
+My design: [paste your design here]
+Attack it in this order:
+1. Failure modes: what breaks under partition, retry, or load spike?
+2. Data correctness: where can state diverge, and is it detected?
+3. Cost: which choice is 10x more expensive at scale?
+4. Reversibility: which of my decisions are one-way doors?
+5. Give exactly one redesign suggestion per weakness, not a rewrite.
+Score me 1-5 on trade-off depth. Be specific; cite the exact line.
+PROMPT`,
+    output:`Critique (excerpt):
+1. Failure: the outbox relay polls every 1s — under a 10x
+   write spike, lag grows linearly and readers see stale
+   projections for minutes.
+2. Correctness: no idempotency key on the webhook retry path.
+3. Cost: per-message pricing on the event bus dominates at
+   your projected volume; consider batching.
+4. One-way door: the partition key choice on orders is
+   irreversible after ~2TB.`,
+    lab:[
+      "Run the critic prompt on a design you did this week; fix the top two findings.",
+      "Build your prompt library: interviewer, critic, hostile, rubric, fact-checker.",
+      "Chart your rubric scores over 4 sessions; pick the one flat dimension.",
+      "Do one full unaided timed interview and compare its score to your AI-assisted ones."
+    ],
+    tip:"The moment AI agrees with you three times in a row, stop and find the flaw yourself — agreement is the least informative outcome."
+  },
+  {
+    id:17, icon:"📡", title:"2025-2026: What Changed for Architects", level:"Trends",
+    intro:"The architect role is being reshaped by AI and by platform economics. Interviews increasingly include questions that did not exist two years ago: designing AI agent systems, governing model access, and justifying every dollar of platform spend. This chapter maps the shifts a principal candidate must speak to credibly.",
+    concepts:[
+      {t:"AI agent architectures", d:"Orchestrator + tool-using agents: state, memory, guardrails, evals."},
+      {t:"Platform engineering", d:"Internal developer platforms, golden paths, and the architect as platform owner."},
+      {t:"FinOps by default", d:"Every design review now has a cost section; architects defend unit economics."},
+      {t:"Data gravity + AI", d:"RAG pipelines, vector stores, and embedding infra join the canonical stack."},
+      {t:"Security by architecture", d:"Supply chain, model access, and data boundaries are architect concerns, not afterthoughts."}
+    ],
+    mermaid:`flowchart LR
+  A["agent orchestrator"] --> B["tools / APIs"]
+  A --> C["model gateway"]
+  C --> D["guardrails + evals"]
+  A --> E["state / memory store"]
+  E --> F["vector store"]
+  style A fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style D fill:#fef3c7,stroke:#d97706,color:#92400e
+  style F fill:#e6f4f1,stroke:#0f766e,color:#0f5132`,
+    mermaidCap:"The 2026 agent stack: orchestrator, model gateway, guardrails, and memory.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <rect x="30" y="40" width="170" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="66" font-family="monospace" font-size="12" fill="#3730a3">agent</text>
+      <text x="48" y="84" font-family="monospace" font-size="12" fill="#3730a3">orchestrator</text>
+      <rect x="240" y="40" width="150" height="70" rx="10" fill="#fef3c7" stroke="#d97706"/>
+      <text x="258" y="66" font-family="monospace" font-size="12" fill="#92400e">guardrails</text>
+      <text x="258" y="84" font-family="monospace" font-size="12" fill="#92400e">+ evals</text>
+      <rect x="430" y="40" width="150" height="70" rx="10" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="448" y="66" font-family="monospace" font-size="12" fill="#0f5132">vector store</text>
+      <text x="448" y="84" font-family="monospace" font-size="12" fill="#0f5132">+ memory</text>
+      <rect x="620" y="40" width="110" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="638" y="66" font-family="monospace" font-size="12" fill="#3730a3">evals</text>
+      <text x="638" y="84" font-family="monospace" font-size="12" fill="#3730a3">gate</text>
+    </svg>`,
+    picCap:"Agent systems add guardrails, evals, and memory to the classic stack.",
+    commands:`# Design a RAG pipeline's storage decision (2026 style)
+echo "1. Documents -> embedding pipeline (batch, async)"
+echo "2. Vector store: pgvector (small) vs OpenSearch (medium)"
+echo "   vs dedicated (large, e.g. Weaviate/Qdrant/Pinecone)"
+echo "3. Model gateway: OpenAI/Azure OpenAI/Vertex/Gateway layer"
+echo "4. Evals: golden set + LLM-as-judge; regression gate on deploy"
+
+# Cost sanity for embeddings at 10M docs
+echo "10M docs x ~800 tokens x ~3k vectors (MiniLM-L6) ->"
+echo "  approx 2-4 GB index; ~$30-120/mo hosted, or $0 self-hosted"`,
+    output:`1. Documents -> embedding pipeline (batch, async)
+2. Vector store: pgvector (small) vs OpenSearch (medium)
+   vs dedicated (large, e.g. Weaviate/Qdrant/Pinecone)
+3. Model gateway: OpenAI/Azure OpenAI/Vertex/Gateway layer
+4. Evals: golden set + LLM-as-judge; regression gate on deploy`,
+    lab:[
+      "Design an agent system for internal knowledge Q&A: orchestrator, tools, guardrails, memory.",
+      "Compare pgvector vs a dedicated vector store for 10M docs; give the crossover point.",
+      "Add a cost section to a design you did this week: per-request, per-month, per-year.",
+      "Speak to one trend you have shipped at work — interviewers want real examples, not bullet points."
+    ],
+    tip:"When the trend question comes, anchor it to something you built. 'We added an evals gate to our model gateway' beats any textbook answer about agent frameworks."
+  },
+  {
+    id:18, icon:"🎯", title:"Interview-Day Playbook", level:"Final Prep",
+    intro:"Everything converges on 60 minutes. This playbook is the operating procedure: the opening moves, the communication habits, the failure recoveries, and the closing. Rehearse it until it is automatic, then forget it and be present.",
+    concepts:[
+      {t:"Opening (2 min)", d:"Restate the problem in your own words; confirm scope and non-goals out loud."},
+      {t:"Think aloud", d:"Narrate the decision, not just the conclusion — interviewers grade reasoning."},
+      {t:"Failure recovery", d:"Wrong number or dead end: name it, correct it, keep moving. Composure is the test."},
+      {t:"Whiteboard discipline", d:"Boxes named, arrows labeled, data flow arrows in one direction."},
+      {t:"Closing (3 min)", d:"Summarize the design, list what you would do next, and the top risk."}
+    ],
+    mermaid:`flowchart LR
+  A["restate problem"] --> B["assumptions"]
+  B --> C["estimate"]
+  C --> D["high-level design"]
+  D --> E{"interviewer picks deep dive?"}
+  E -- "yes" --> F["go deep, then return"]
+  E -- "no" --> G["trade-offs + risks"]
+  F --> G
+  G --> H["summary + next steps"]
+  style A fill:#eef2ff,stroke:#4f46e5,color:#3730a3
+  style H fill:#e6f4f1,stroke:#0f766e,color:#0f5132`,
+    mermaidCap:"The playbook flow: structured opening, reactive middle, strong close.",
+    picture:`<svg width="100%" height="150" viewBox="0 0 760 150" xmlns="http://www.w3.org/2000/svg">
+      <text x="30" y="30" font-family="monospace" font-size="13" fill="#3730a3">the 60-minute arc</text>
+      <rect x="30" y="45" width="120" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="48" y="70" font-family="monospace" font-size="12" fill="#3730a3">open</text>
+      <text x="48" y="88" font-family="monospace" font-size="12" fill="#3730a3">scope</text>
+      <rect x="175" y="45" width="120" height="70" rx="10" fill="#eef2ff" stroke="#4f46e5"/>
+      <text x="193" y="70" font-family="monospace" font-size="12" fill="#3730a3">estimate</text>
+      <text x="193" y="88" font-family="monospace" font-size="12" fill="#3730a3">numbers</text>
+      <rect x="320" y="45" width="120" height="70" rx="10" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="338" y="70" font-family="monospace" font-size="12" fill="#0f5132">design</text>
+      <text x="338" y="88" font-family="monospace" font-size="12" fill="#0f5132">whiteboard</text>
+      <rect x="465" y="45" width="120" height="70" rx="10" fill="#fef3c7" stroke="#d97706"/>
+      <text x="483" y="70" font-family="monospace" font-size="12" fill="#92400e">deep dive</text>
+      <text x="483" y="88" font-family="monospace" font-size="12" fill="#92400e">trade-offs</text>
+      <rect x="610" y="45" width="120" height="70" rx="10" fill="#e6f4f1" stroke="#0f766e"/>
+      <text x="628" y="70" font-family="monospace" font-size="12" fill="#0f5132">close</text>
+      <text x="628" y="88" font-family="monospace" font-size="12" fill="#0f5132">summary</text>
+    </svg>`,
+    picCap:"Open fast, go deep where invited, close with a summary and next steps.",
+    commands:`# Night-before checklist
+echo "1. Water + a light meal before the slot"
+echo "2. Laptop charged, whiteboard/excalidraw ready"
+echo "3. 3 sharpies (real rooms run out)"
+echo "4. One-page cheat sheet: numbers, patterns, SLOs"
+echo "5. Sleep. The last hour of prep is a walk, not a cram"
+
+# During: the 5-second stall pattern
+cat <<'HABIT'
+When stuck:
+- Name the stall: "I am deciding between X and Y."
+- State the deciding factor: "...because the failure mode is Z."
+- Pick, and note reversibility: "This is a two-way door."
+Never go silent for more than 10 seconds.
+HABIT`,
+    output:`1. Water + a light meal before the slot
+2. Laptop charged, whiteboard/excalidraw ready
+3. 3 sharpies (real rooms run out)
+4. One-page cheat sheet: numbers, patterns, SLOs
+5. Sleep. The last hour of prep is a walk, not a cram`,
+    lab:[
+      "Run one full 60-minute simulated interview with the AI interviewer, no pauses.",
+      "Practice the stall pattern: get stuck on purpose, recover in under 10 seconds, five times.",
+      "Record yourself closing: summary, next steps, top risk — under 3 minutes.",
+      "Rehearse the opening restatement until it is a reflex for any prompt."
+    ],
+    tip:"The interview is won in the first five minutes (structure) and the last five (composure). Middle ground is where the rubric lives — but the open and close are what the interviewer remembers."
+  }
+];
+
+function renderTOC(){
+  const toc = document.getElementById('toc');
+  toc.innerHTML = chapters.map(ch => `
+    <a href="#chapter-${ch.id}" data-title="${ch.title.toLowerCase()}" data-level="${ch.level.toLowerCase()}">
+      <span class="num">${ch.id}</span>
+      <span>${ch.icon} ${ch.title}</span>
+    </a>`).join('');
+}
+function renderChapters(){
+  const wrap = document.getElementById('chapters');
+  wrap.innerHTML = chapters.map(ch => `
+    <section class="chapter" id="chapter-${ch.id}">
+      <div class="ch-head">
+        <div class="ch-ico">${ch.icon}</div>
+        <div>
+          <h2>${ch.title}</h2>
+          <div class="level">Chapter ${ch.id} · ${ch.level}</div>
+        </div>
+      </div>
+      <p class="intro">${ch.intro}</p>
+
+      <h3 class="sec">Key Concepts</h3>
+      <div class="cards">
+        ${ch.concepts.map(c => `<div class="card"><div class="t">${c.t}</div><div class="d">${c.d}</div></div>`).join('')}
+      </div>
+
+      ${ch.table ? `<h3 class="sec">${ch.tableTitle || 'Comparative View'}</h3>
+      <div class="tblwrap"><table class="cmp">
+        <tr>${ch.table.head.map(hh => `<th>${hh}</th>`).join('')}</tr>
+        ${ch.table.rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}
+      </table></div>` : ''}
+
+      ${ch.mermaid ? `<h3 class="sec">How it fits together</h3><div class="mermaid">${ch.mermaid}</div>` : ''}
+      ${ch.mermaidCap ? `<p class="intro">${ch.mermaidCap}</p>` : ''}
+
+      ${ch.picture ? `<figure>${ch.picture}${ch.picCap ? `<figcaption>${ch.picCap}</figcaption>` : ''}</figure>` : ''}
+
+      <h3 class="sec">Try it</h3>
+      <pre><button class="copy" onclick="copyCode(this)">Copy</button><code>${escapeHTML(ch.commands)}</code></pre>
+      ${ch.output ? `<pre class="out"><code>${escapeHTML(ch.output)}</code></pre>` : ''}
+
+      <div class="lab">
+        <h4>Hands-on lab</h4>
+        <ol>${ch.lab.map(s => `<li>${escapeHTML(s)}</li>`).join('')}</ol>
+      </div>
+
+      <div class="tip">${escapeHTML(ch.tip)}</div>
+
+      ${chapterNav(ch)}
+    </section>`).join('');
+}
+
+function chapterNav(ch){
+  const i = chapters.findIndex(c => c.id === ch.id);
+  const prev = chapters[i-1], next = chapters[i+1];
+  const p = prev ? `<a class="prev" href="#chapter-${prev.id}"><div class="lab">Previous</div><div class="ttl">${prev.icon} ${prev.title}</div></a>` : `<span></span>`;
+  const n = next ? `<a class="next" href="#chapter-${next.id}"><div class="lab">Next</div><div class="ttl">${next.icon} ${next.title}</div></a>` : `<span></span>`;
+  return `<div class="chapternav">${p}${n}</div>`;
+}
+
+function escapeHTML(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function copyCode(btn){
+  const code = btn.parentElement.querySelector('code').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1200);
+  });
+}
+
+
+function saveBook(){
+  const html = '<!DOCTYPE html><html>' + document.documentElement.outerHTML + '</html>';
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'System-Design-Field-Guide.html';
+  a.click();
+}
+
+/* ================= UNIFIED SEARCH ================= */
+let BOOK_INDEX = [];
+let SEM_READY = false;
+let LAST_Q = "";
+let EXTRACTOR = null;
+let CHAPTER_EMB = [];
+
+function buildIndex(){
+  BOOK_INDEX = chapters.map(ch => {
+    const raw = [ch.title, ch.level, ch.intro,
+      ch.concepts.map(c => c.t + " " + c.d).join(" "),
+      ch.commands, ch.lab.join(" "), ch.tip, ch.mermaidCap, ch.picCap].join(" ");
+    return {id:ch.id, title:ch.title, level:ch.level, text:raw.toLowerCase(), raw:raw};
+  });
+}
+function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function makeContext(raw, q){
+  const term = q.split(/\s+/).filter(Boolean)[0] || q;
+  const re = new RegExp(escRe(term), "i");
+  const m = re.exec(raw);
+  if(!m) return raw.slice(0, 90) + (raw.length>90?"…":"");
+  const s = m.index;
+  const before = raw.slice(0, s).trim().split(/\s+/).slice(-2).join(" ");
+  const after  = raw.slice(s + m[0].length).trim().split(/\s+/).slice(0, 2).join(" ");
+  const snippet = (before ? before + " " : "") + m[0] + (after ? " " + after : "");
+  return escapeHTML(snippet).replace(new RegExp("("+escRe(term)+")","ig"), "<mark>$1</mark>");
+}
+function bestTerm(q, ch){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  for(const t of terms){ if(ch.text.includes(t)) return t; }
+  return terms[0] || q;
+}
+function keywordResults(q, limit){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if(!terms.length) return [];
+  const res = [];
+  for(const ch of BOOK_INDEX){
+    let score = 0, ctx = "";
+    for(const t of terms){ if(ch.text.includes(t)){ score++; if(!ctx) ctx = makeContext(ch.raw, t); } }
+    if(score > 0) res.push({ch, score, ctx, sem:false});
+  }
+  res.sort((a,b)=> b.score - a.score);
+  return res.slice(0, limit);
+}
+function cosine(a, b){
+  let d=0, na=0, nb=0;
+  for(let i=0;i<a.length;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d / ((Math.sqrt(na)*Math.sqrt(nb)) || 1);
+}
+async function getExtractor(){
+  if(EXTRACTOR) return EXTRACTOR;
+  const mod = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.0");
+  EXTRACTOR = await mod.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+  return EXTRACTOR;
+}
+async function embedText(text){
+  const ex = await getExtractor();
+  const out = await ex(text, {pooling:"mean", normalize:true});
+  return Array.from(out.data);
+}
+async function primeEmbeddings(){
+  const st = document.getElementById("search-status");
+  if(st) st.textContent = "indexing…";
+  try{
+    await getExtractor();
+    CHAPTER_EMB = [];
+    for(const ch of BOOK_INDEX){ CHAPTER_EMB[ch.id] = await embedText(ch.raw.slice(0, 400)); }
+    SEM_READY = true;
+    if(st) st.textContent = "semantic ✓";
+    if(LAST_Q.trim()) searchBooks(LAST_Q);
+  }catch(e){ if(st) st.textContent = "keyword only"; }
+}
+function renderResults(q, list){
+  const box = document.getElementById("search-results");
+  if(!box) return;
+  if(!list.length){ box.innerHTML = '<div class="sr-empty">No matches for “'+escapeHTML(q)+'”.</div>'; box.classList.add("show"); return; }
+  box.innerHTML = list.map(r => {
+    const ch = r.ch;
+    const ctx = r.ctx || makeContext(ch.raw, bestTerm(q, ch));
+    const tag = r.sem ? '<span class="sr-tag sem">semantic</span>' : '<span class="sr-tag">match</span>';
+    return '<a class="sr-item" href="#chapter-'+ch.id+'" onclick="closeSearch()">'
+         + '<div class="sr-chap">Chapter '+ch.id+' · '+escapeHTML(ch.level)+'</div>'
+         + '<div class="sr-title"><span>'+escapeHTML(ch.title)+'</span>'+tag+'</div>'
+         + '<div class="sr-ctx">'+ctx+'</div></a>';
+  }).join("");
+  box.classList.add("show");
+}
+function closeSearch(){ const b=document.getElementById("search-results"); if(b) b.classList.remove("show"); }
+function searchBooks(q){
+  LAST_Q = q = (q||"").trim();
+  const box = document.getElementById("search-results");
+  if(!q){ closeSearch(); if(box) box.innerHTML=""; return; }
+  const kw = keywordResults(q, 14);
+  renderResults(q, kw);
+  if(SEM_READY && CHAPTER_EMB.length){
+    embedText(q).then(qe => {
+      const seen = new Set(kw.map(r=>r.ch.id));
+      const sem = BOOK_INDEX.map(ch => ({ch, sim: cosine(qe, CHAPTER_EMB[ch.id] || [])}))
+        .filter(r => r.sim > 0.12 && !seen.has(r.ch.id))
+        .sort((a,b)=> b.sim - a.sim).slice(0, 8)
+        .map(r => ({ch:r.ch, ctx:makeContext(r.ch.raw, bestTerm(q, r.ch)), sem:true}));
+      const merged = kw.concat(sem);
+      renderResults(q, merged.slice(0,14));
+    }).catch(()=>{});
+  } else if(!window.__embStarted){
+    window.__embStarted = true;
+    primeEmbeddings();
+  }
+}
+document.addEventListener("click", function(e){
+  const w = document.querySelector(".search-wrap");
+  if(w && !w.contains(e.target)) closeSearch();
+});
+
+/* ================= INIT ================= */
+document.addEventListener("DOMContentLoaded", function(){
+  renderTOC();
+  renderChapters();
+  buildIndex();
+  setTimeout(primeEmbeddings, 800);
+  mermaid.initialize({startOnLoad:true, theme:'base',
+    themeVariables:{fontSize:'14px',primaryColor:'#fdf2e3',lineColor:'#b45309',
+      primaryBorderColor:'#b45309',primaryTextColor:'#23262b'}});
+  const links = document.querySelectorAll('.toc a');
+  const obs = new IntersectionObserver(es => {
+    es.forEach(en => {
+      if(en.isIntersecting){
+        links.forEach(l => l.classList.remove('active'));
+        const a = document.querySelector('.toc a[href="#chapter-'+en.target.id.split('-')[1]+'"]');
+        if(a) a.classList.add('active');
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px'});
+  document.querySelectorAll('.chapter').forEach(c => obs.observe(c));
+});
+</script>
+</body>
+</html>
