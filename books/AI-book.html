@@ -1,0 +1,1584 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The AI Interview Field Guide - ML, Agentic AI & Cloud</title>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#f5f7f9;
+  --panel:#ffffff;
+  --panel-2:#f8fafb;
+  --ink:#1a2433;
+  --ink-soft:#4a5568;
+  --muted:#8a94a6;
+  --line:#e4e9ef;
+  --accent:#0891b2;
+  --accent-soft:#e0f4f8;
+  --blue:#2563eb;
+  --blue-soft:#e8f0fe;
+  --amber:#b45309;
+  --amber-soft:#fdf3e7;
+  --purple:#7c3aed;
+  --purple-soft:#f1ebfe;
+  --green:#0f766e;
+  --green-soft:#e6f4f1;
+  --code-bg:#0d1526;
+  --code-ink:#c7d5e8;
+  --shadow:0 1px 2px rgba(26,36,51,.06),0 8px 24px rgba(26,36,51,.06);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.title-font{font-family:'Space Grotesk',sans-serif;}
+code,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+
+.shell{max-width:1400px;margin:0 auto;display:flex;align-items:flex-start;}
+
+.sidebar{
+  width:290px;flex:0 0 290px;
+  position:sticky;top:0;
+  height:100vh;overflow-y:auto;
+  background:var(--panel);
+  border-right:1px solid var(--line);
+  padding:26px 18px;
+}
+.sidebar .brand{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.sidebar .brand .logo{
+  width:42px;height:42px;border-radius:12px;
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.sidebar h1{font-size:17px;margin:0;letter-spacing:-.02em;}
+.sidebar .tag{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin:14px 6px 10px;}
+.toc a{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 11px;border-radius:10px;
+  color:var(--ink-soft);text-decoration:none;font-size:13px;
+  transition:background .15s,color .15s;
+}
+.toc a .num{
+  width:22px;height:22px;flex:0 0 22px;border-radius:6px;
+  background:var(--panel-2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);
+}
+.toc a:hover{background:var(--panel-2);color:var(--ink);}
+.toc a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+.toc a.active .num{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+.main{flex:1;min-width:0;}
+header.topbar{
+  position:sticky;top:0;z-index:40;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;
+  padding:14px 26px;
+}
+header.topbar .menu-btn{display:none;font-size:20px;background:none;border:none;color:var(--ink);cursor:pointer;}
+header.topbar h2{font-size:16px;margin:0;flex:1;letter-spacing:-.01em;}
+header.topbar .search{
+  flex:0 0 300px;max-width:40vw;
+  background:var(--panel-2);border:1px solid var(--line);
+  border-radius:999px;padding:8px 14px;font-size:12px;outline:none;color:var(--ink);
+}
+header.topbar .search:focus{border-color:var(--accent);background:#fff;}
+header.topbar .save{
+  display:flex;align-items:center;gap:7px;font-size:12px;
+  background:var(--accent);color:#fff;border:none;cursor:pointer;
+  padding:9px 15px;border-radius:999px;white-space:nowrap;
+}
+header.topbar .save:hover{background:#0e7490;}
+
+.content{padding:38px clamp(20px,4vw,56px) 120px;max-width:920px;}
+
+.hero{
+  background:linear-gradient(135deg,#0891b2 0%,#155e75 100%);
+  color:#fff;border-radius:22px;padding:46px 40px;margin-bottom:46px;
+  box-shadow:var(--shadow);
+}
+.hero h1{font-family:'Space Grotesk';font-size:clamp(22px,3vw,30px);margin:0 0 12px;letter-spacing:-.02em;line-height:1.15;}
+.hero p{max-width:660px;font-size:14px;opacity:.95;margin:0 0 18px;}
+.hero .stats{display:flex;flex-wrap:wrap;gap:18px;font-size:13px;}
+.hero .stats div{display:flex;align-items:center;gap:8px;}
+.hero .stats .dot{width:8px;height:8px;border-radius:50%;background:#a5f3fc;}
+
+.chapter{
+  background:var(--panel);border:1px solid var(--line);border-radius:20px;
+  padding:34px clamp(20px,3.5vw,44px);margin-bottom:40px;box-shadow:var(--shadow);
+  scroll-margin-top:84px;
+}
+.chapter .ch-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:8px;}
+.chapter .ch-ico{
+  width:54px;height:54px;flex:0 0 54px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  background:var(--accent-soft);
+}
+.chapter h2{font-family:'Space Grotesk';font-size:clamp(18px,2.4vw,23px);margin:0;letter-spacing:-.02em;}
+.chapter .level{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:4px;}
+.chapter .intro{font-size:15px;color:var(--ink-soft);margin:16px 0 22px;}
+
+.chapter h3.sec{
+  font-family:'Space Grotesk';font-size:17px;margin:28px 0 12px;
+  padding-bottom:7px;border-bottom:1px solid var(--line);letter-spacing:-.01em;
+}
+.chapter p{color:var(--ink-soft);}
+.chapter ul.clean{margin:14px 0;padding-left:0;list-style:none;}
+.chapter ul.clean li{position:relative;padding:6px 0 6px 26px;color:var(--ink-soft);}
+.chapter ul.clean li::before{content:"▹";position:absolute;left:4px;color:var(--accent);font-weight:700;}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0;}
+.card{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+.card .t{font-weight:600;color:var(--accent);margin-bottom:4px;}
+.card .d{font-size:13px;color:var(--ink-soft);}
+
+.diagram{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+  padding:18px;margin:18px 0;overflow-x:auto;
+}
+.diagram .cap{font-size:12px;color:var(--muted);text-align:center;margin-top:8px;font-style:italic;}
+
+.picture{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+  padding:18px;margin:18px 0;text-align:center;
+}
+.picture svg{max-width:100%;height:auto;}
+.picture .cap{font-size:12px;color:var(--muted);margin-top:8px;}
+
+.codewrap{position:relative;margin:16px 0;}
+pre.code{
+  background:var(--code-bg);color:var(--code-ink);
+  border-radius:14px;padding:18px 20px;overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.65;margin:0;
+}
+pre.code .c{color:#7dd3fc;}
+pre.code .p{color:#fca5a5;}
+pre.code .g{color:#86efac;}
+.copy-btn{
+  position:absolute;top:10px;right:10px;
+  background:rgba(255,255,255,.12);color:#e2e8f0;border:1px solid rgba(255,255,255,.18);
+  border-radius:8px;padding:5px 11px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;
+}
+.copy-btn:hover{background:rgba(255,255,255,.22);}
+.copy-btn.done{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+.lab{background:var(--blue-soft);border:1px solid #cdddfb;border-radius:14px;padding:18px 22px;margin:22px 0;}
+.lab .lh{display:flex;align-items:center;gap:10px;color:var(--blue);font-weight:600;margin-bottom:10px;}
+.lab ol{margin:0;padding-left:22px;color:var(--ink-soft);}
+.lab ol li{margin:7px 0;}
+
+.tip{background:var(--amber-soft);border:1px solid #f0d9b5;border-radius:14px;padding:16px 20px;margin:22px 0;display:flex;gap:12px;}
+.tip .ic{color:var(--amber);font-size:20px;margin-top:2px;}
+.tip .tx{color:#7c4a12;font-size:13.5px;}
+
+.note{background:var(--accent-soft);border:1px solid #c7eef6;border-radius:14px;padding:13px 17px;margin:16px 0;font-size:13.5px;color:#155e75;}
+
+/* ---- End-of-chapter questions ---- */
+.qa{margin:20px 0 6px;}
+.qa details{border:1px solid var(--line);border-radius:12px;margin:10px 0;background:var(--panel-2);overflow:hidden;}
+.qa summary{cursor:pointer;padding:13px 16px;font-weight:600;color:var(--ink);list-style:none;display:flex;gap:10px;align-items:flex-start;font-size:14px;}
+.qa summary::-webkit-details-marker{display:none;}
+.qa summary .qn{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;flex:0 0 auto;line-height:1.6;}
+.qa summary::after{content:"+";margin-left:auto;color:var(--muted);font-weight:700;font-size:16px;line-height:1.4;}
+.qa details[open] summary::after{content:"−";}
+.qa .ans{padding:0 16px 14px 40px;color:var(--ink-soft);font-size:13.5px;line-height:1.6;}
+.qa .ans p{margin:8px 0 0;color:var(--ink-soft);}
+
+.chapternav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:10px;}
+.chapternav a{
+  flex:1;min-width:200px;text-decoration:none;color:var(--ink-soft);
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;box-shadow:var(--shadow);
+}
+.chapternav a:hover{border-color:var(--accent);}
+.chapternav a .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.chapternav a .ttl{font-weight:600;color:var(--ink);}
+.chapternav a.next{text-align:right;}
+
+.pagefoot{max-width:920px;margin:0 auto;padding:30px 20px 60px;text-align:center;color:var(--muted);font-size:13px;}
+
+.backdrop{display:none;position:fixed;inset:0;background:rgba(26,36,51,.45);z-index:49;}
+
+@media (max-width:900px){
+  .sidebar{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%);transition:transform .25s ease;box-shadow:var(--shadow);}
+  .sidebar.open{transform:translateX(0);}
+  .backdrop.show{display:block;}
+  header.topbar .menu-btn{display:block;}
+  header.topbar .search{flex:1;max-width:none;}
+  header.topbar .save span{display:none;}
+}
+@media (max-width:560px){
+  .content{padding:24px 16px 90px;}
+  .hero{padding:32px 24px;}
+  .chapter{padding:26px 20px;}
+  header.topbar .search-wrap{display:none;}
+}
+
+/* ---- Unified search (full-text + semantic) ---- */
+.search-wrap{position:relative;flex:0 0 330px;max-width:42vw;display:flex;align-items:center;gap:8px;}
+.search-wrap .search{flex:1;width:100%;}
+.search-status{font-size:10px;color:var(--muted);white-space:nowrap;}
+.search-results{
+  position:absolute;top:48px;left:0;right:0;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);max-height:62vh;overflow-y:auto;z-index:60;display:none;
+}
+.search-results.show{display:block;}
+.sr-item{display:block;padding:10px 14px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);}
+.sr-item:last-child{border-bottom:none;}
+.sr-item:hover{background:var(--panel-2);}
+.sr-chap{font-size:11px;color:var(--accent);font-weight:600;}
+.sr-title{font-size:13px;font-weight:600;margin:2px 0;display:flex;justify-content:space-between;gap:8px;}
+.sr-tag{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px;}
+.sr-tag.sem{color:var(--accent);border-color:var(--accent);}
+.sr-ctx{font-size:12px;color:var(--ink-soft);line-height:1.45;margin-top:3px;}
+.sr-ctx mark{background:#fde68a;color:#7c2d12;border-radius:3px;padding:0 2px;}
+.sr-empty{padding:14px;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">AI</div>
+      <h1>AI Interview Field Guide</h1>
+    </div>
+    <div class="tag">Table of Contents</div>
+    <nav class="toc" id="toc"></nav>
+  </aside>
+
+  <div class="backdrop" id="backdrop" onclick="closeSidebar()"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" onclick="openSidebar()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+      <h2>The AI Interview Field Guide</h2>
+      <div class="search-wrap">
+        <input id="search" class="search" type="text" placeholder="Search concepts, models, questions…" oninput="searchBooks(this.value)" autocomplete="off">
+        <span class="search-status" id="search-status"></span>
+        <div class="search-results" id="search-results"></div>
+      </div>
+      <button class="save" onclick="exportHTML()"><i class="fas fa-download"></i><span>Save .html</span></button>
+    </header>
+
+    <div class="content">
+      <section class="hero">
+        <h1>The AI Interview Field Guide</h1>
+        <p>Machine learning, Agentic AI, cloud ML, and the interview answers that carry you from engineering leadership into a hands-on Director or VP seat at a large MNC. Eighteen chapters you work through, with diagrams, copy-paste code, labs, and a question bank that tests you as you go.</p>
+        <div class="stats">
+          <div><span class="dot"></span> 18 Chapters</div>
+          <div><span class="dot"></span> 60+ Interview Q&amp;A</div>
+          <div><span class="dot"></span> Mermaid + SVG Diagrams</div>
+          <div><span class="dot"></span> Full-text + Semantic Search</div>
+        </div>
+      </section>
+
+      <div id="chapters"></div>
+
+      <div class="pagefoot">
+        The AI Interview Field Guide · A personal, offline reference book · Light theme, responsive, printable.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const chapters = [
+  {
+    id:1, icon:"🧭", title:"The Mindset Shift", level:"Foundation",
+    intro:"You have led teams of a hundred plus engineers, shipped enterprise platforms, and run a community of 22K. Moving into a hands-on AI role is not a step down. It is a bet that the Director who can still build is rarer, and more valuable, than the Director who only directs. This chapter frames the move so the next seventeen chapters build on a solid base.",
+    concepts:[
+      {t:"Leadership to IC", d:"You are not abandoning leadership. You are re-earning the technical depth that makes your leadership credible."},
+      {t:"Three tracks", d:"ML depth, platform engineering, and leadership narrative. All three are on the interview panel; all three matter."},
+      {t:"Learn by building", d:"A portfolio project beats a wall of certificates. Build the GenAI Gateway and talk about it with confidence."},
+      {t:"Portfolio over badges", d:"One working system with guardrails, eval, and audit says more than five online courses."},
+      {t:"The 18-week map", d:"Weeks 1 to 6 platform, 7 to 12 Agentic AI, 13 to 18 narrative and interview sprint."}
+    ],
+    mermaid:`flowchart LR
+  A["Leadership today"] --> B["ML depth"]
+  A --> C["Platform engineering"]
+  A --> D["Leadership narrative"]
+  B --> E["Director / VP seat"]
+  C --> E
+  D --> E
+  style A fill:#e0f4f8,stroke:#0891b2
+  style E fill:#e8f0fe,stroke:#2563eb`,
+    mermaidCap:"Three tracks converge on the target seat. The candidate who can speak all three wins the panel.",
+    picture:`<svg width="100%" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="70" width="140" height="60" rx="14" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/>
+      <text x="110" y="105" text-anchor="middle" font-size="14" fill="#155e75" font-family="monospace">You today</text>
+      <rect x="300" y="30" width="160" height="44" rx="10" fill="#e8f0fe" stroke="#2563eb"/><text x="380" y="57" text-anchor="middle" font-size="12" fill="#1e40af" font-family="monospace">ML depth</text>
+      <rect x="300" y="88" width="160" height="44" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="380" y="115" text-anchor="middle" font-size="12" fill="#0c6b48" font-family="monospace">Platform</text>
+      <rect x="300" y="146" width="160" height="44" rx="10" fill="#f1ebfe" stroke="#7c3aed"/><text x="380" y="173" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">Narrative</text>
+      <rect x="560" y="70" width="160" height="60" rx="14" fill="#fdf3e7" stroke="#b45309" stroke-width="2"/>
+      <text x="640" y="105" text-anchor="middle" font-size="14" fill="#7c4a12" font-family="monospace">The seat</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="180" y1="100" x2="298" y2="52"/><line x1="180" y1="100" x2="298" y2="110"/><line x1="180" y1="100" x2="298" y2="168"/><line x1="460" y1="52" x2="558" y2="88"/><line x1="460" y1="110" x2="558" y2="100"/><line x1="460" y1="168" x2="558" y2="112"/></g>
+    </svg>`,
+    picCap:"Three paths, one destination: the Director or VP who still builds.",
+    commands:`# Your first-week checklist, in order
+1. Pick ONE cloud: AWS SageMaker (GCC default), GCP Vertex AI as backup
+2. Open Colab on your regular Gmail account (T4 GPU is free)
+3. Clone a starter repo and run the Router class from Chapter 17
+4. Schedule 90 minutes daily: 45 learning, 45 building
+5. Book the AWS MLS-C01 exam for 12 to 16 weeks out
+6. Write your leadership narrative in one page (Chapter 1 end)`,
+    lab:[
+      "Write a one-page 'why I am going hands-on' statement. Keep it factual, no slogans.",
+      "List the three tracks from the diagram and mark which one is your weakest today.",
+      "Open Colab, verify the GPU with nvidia-smi, and confirm PyTorch sees the T4."
+    ],
+    tip:"Do not wait for permission to start. The strongest answer to 'why are you doing this' is a working project you can open on screen and walk the interviewer through line by line.",
+    questions:[
+      {q:"Why does a Director or VP moving into hands-on AI help or hurt an interview?", a:"It helps when framed as re-earning technical depth, not as a demotion. You bring scale, hiring, and platform judgment that most ICs lack, plus you can still build. It hurts only if you describe it apologetically. Own the move as a strength."},
+      {q:"Which of the three tracks matters most for a large MNC panel?", a:"It depends on the seat, but for a balanced ML plus platform plus leadership role, the narrative track is the differentiator. ML depth and platform get you past the screen; the narrative decides the offer."},
+      {q:"Is one portfolio project enough, or do I need several?", a:"One deep, working project you can defend beats five half-finished ones. The GenAI Gateway covers router, guardrails, evaluation, audit, and cost in a single system, which is exactly the breadth a panel probes."}
+    ]
+  },
+  {
+    id:2, icon:"🗺️", title:"The ML Landscape", level:"Foundation",
+    intro:"Before you write a line of code, you need the map. Machine learning splits into a few families of problem, and every interview question about 'which approach' hangs on knowing which family you are in. This chapter is the terrain you will reference for the rest of the book.",
+    concepts:[
+      {t:"Supervised", d:"Learn a mapping from inputs to labeled outputs. Regression for numbers, classification for categories."},
+      {t:"Unsupervised", d:"Find structure without labels: clustering, dimensionality reduction, anomaly detection."},
+      {t:"Reinforcement", d:"An agent learns by acting in an environment and receiving reward signals."},
+      {t:"Generative", d:"Learn the data distribution and sample from it: text, image, and audio models."},
+      {t:"The lifecycle", d:"Problem framing, data, training, evaluation, deployment, monitoring, and iteration."}
+    ],
+    mermaid:`flowchart TD
+  A["ML"] --> B["Supervised"]
+  A --> C["Unsupervised"]
+  A --> D["Reinforcement"]
+  A --> E["Generative"]
+  B --> B1["Regression"]
+  B --> B2["Classification"]
+  C --> C1["Clustering"]
+  C --> C2["Dimensionality"]
+  E --> E1["LLMs"]
+  E --> E2["Diffusion"]
+  style A fill:#e0f4f8,stroke:#0891b2
+  style B fill:#e8f0fe,stroke:#2563eb
+  style C fill:#e6f4f1,stroke:#0f766e
+  style D fill:#fdf3e7,stroke:#b45309
+  style E fill:#f1ebfe,stroke:#7c3aed`,
+    mermaidCap:"Four families of ML problem, with the sub-problems each family answers.",
+    picture:`<svg width="100%" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="50" y="70" width="120" height="60" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/>
+      <text x="110" y="105" text-anchor="middle" font-size="13" fill="#155e75" font-family="monospace">Data</text>
+      <rect x="280" y="50" width="140" height="44" rx="10" fill="#e8f0fe" stroke="#2563eb"/><text x="350" y="77" text-anchor="middle" font-size="12" fill="#1e40af" font-family="monospace">Train model</text>
+      <rect x="280" y="116" width="140" height="44" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="350" y="143" text-anchor="middle" font-size="12" fill="#0c6b48" font-family="monospace">Evaluate</text>
+      <rect x="520" y="50" width="150" height="44" rx="10" fill="#f1ebfe" stroke="#7c3aed"/><text x="595" y="77" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">Deploy</text>
+      <rect x="520" y="116" width="150" height="44" rx="10" fill="#fdf3e7" stroke="#b45309"/><text x="595" y="143" text-anchor="middle" font-size="12" fill="#7c4a12" font-family="monospace">Monitor</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="170" y1="100" x2="278" y2="72"/><line x1="420" y1="72" x2="518" y2="72"/><line x1="420" y1="138" x2="518" y2="138"/><line x1="170" y1="100" x2="278" y2="138"/></g>
+    </svg>`,
+    picCap:"The ML lifecycle is a loop, not a line. Monitoring feeds back into data and training.",
+    commands:`# Classify a problem in two minutes
+# Ask: is there a label to predict?
+#   yes -> supervised (numeric -> regression, category -> classification)
+#   no  -> unsupervised (grouping -> clustering, reduce dims -> PCA / t-SNE)
+
+# Example labels and their family
+#   house price (numeric)          -> regression
+#   spam / not spam (category)     -> classification
+#   customer segments (no label)   -> clustering
+#   next token in a sentence       -> generative (self-supervised)
+
+# Python check of family by output type
+def family(target):
+    if target is None: return "unsupervised"
+    if isinstance(target, (int, float)): return "regression"
+    return "classification"`,
+    lab:[
+      "Take three problems from your own work and label each with its family and sub-problem.",
+      "Sketch the lifecycle loop on paper, marking where a deployed model sends signal back.",
+      "Explain in one sentence why an LLM is 'generative' even though it is trained to predict the next token."
+    ],
+    tip:"Interviewers rarely ask for a definition. They ask 'what kind of problem is this, and how would you solve it'. Naming the family first is the single highest-leverage habit you can build.",
+    questions:[
+      {q:"What is the difference between classification and regression?", a:"Both are supervised. Regression predicts a continuous numeric target, like price or temperature. Classification predicts a discrete category, like spam or churn. The metric and the loss function change accordingly."},
+      {q:"Where does self-supervised learning fit in the four families?", a:"It is a training technique, not a problem family. You derive labels from the data itself, for example masking a token and predicting it. LLMs are usually described as generative models trained with a self-supervised objective."},
+      {q:"Why does the lifecycle matter more in production than in a notebook?", a:"In a notebook the model is the deliverable. In production the loop is the deliverable: data drifts, the world changes, and the model must be retrained and redeployed. A panel tests whether you think about the loop, not just the artifact."}
+    ]
+  },
+  {
+    id:3, icon:"🧹", title:"Data & Feature Engineering", level:"Foundation",
+    intro:"Most models fail not because of the algorithm but because of the data. Feature engineering is the quiet craft that separates a model that works in a notebook from one that works on real traffic. The AWS MLS-C01 exam weights data engineering at about 20 percent, and interviews weight it higher.",
+    concepts:[
+      {t:"Train / val / test", d:"Three splits with three jobs: fit, tune, and give an honest final estimate."},
+      {t:"Data leakage", d:"When information from the future or the target leaks into training, scores look great and fail in production."},
+      {t:"Feature scaling", d:"Standardization and normalization keep gradient descent stable and distances meaningful."},
+      {t:"Encoding", d:"Turn categories into numbers with one-hot or target encoding, chosen to match the model."},
+      {t:"Class imbalance", d:"When one label dominates, accuracy lies. Resample, reweight, or change the metric."}
+    ],
+    mermaid:`flowchart LR
+  A["Raw data"] --> B["Split"]
+  B --> C["Train"]
+  B --> D["Validation"]
+  B --> E["Test"]
+  C --> F["Scale + encode"]
+  D --> F
+  F --> G["Fit model"]
+  G --> H["Tune on validation"]
+  H --> I["Report on test"]
+  style B fill:#fdf3e7,stroke:#b45309
+  style F fill:#e0f4f8,stroke:#0891b2
+  style I fill:#e8f0fe,stroke:#2563eb`,
+    mermaidCap:"Split first, transform inside the train split, and hold the test set untouched until the end.",
+    picture:`<svg width="100%" height="190" viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="60" y="20" width="180" height="60" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/><text x="150" y="55" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">Train 70%</text>
+      <rect x="290" y="20" width="160" height="60" rx="12" fill="#e6f4f1" stroke="#0f766e" stroke-width="2"/><text x="370" y="55" text-anchor="middle" font-size="12" fill="#0c6b48" font-family="monospace">Validation 15%</text>
+      <rect x="500" y="20" width="180" height="60" rx="12" fill="#f1ebfe" stroke="#7c3aed" stroke-width="2"/><text x="590" y="55" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">Test 15%</text>
+      <rect x="60" y="120" width="620" height="44" rx="10" fill="#fdf3e7" stroke="#b45309"/><text x="370" y="147" text-anchor="middle" font-size="12" fill="#7c4a12" font-family="monospace">Leakage: if any of these touch the test set, your score is fiction</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="370" y1="80" x2="370" y2="118"/></g>
+    </svg>`,
+    picCap:"Three splits, one rule: the test set is for the final report only.",
+    commands:`# Correct split-then-transform order with scikit-learn
+from sklearn.model_selection import train_test_split
+from sklearn.preprocessing import StandardScaler
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+
+scaler = StandardScaler()
+scaler.fit(X_train)             # fit ONLY on train
+X_train_s = scaler.transform(X_train)
+X_test_s  = scaler.transform(X_test)   # transform test, never refit
+
+# Detect class imbalance
+from collections import Counter
+print(Counter(y_train))`,
+    lab:[
+      "Load a small dataset and print the class distribution with Counter to spot imbalance.",
+      "Fit a scaler on train only, then transform test. Note what happens if you fit on the full set instead.",
+      "Invent a leakage example: a feature computed from the future, or an ID that encodes the label."
+    ],
+    tip:"The fastest way to sound senior is to ask about leakage and imbalance before anyone else does. 'How would you split and scale this' is the single most common data question in ML interviews.",
+    questions:[
+      {q:"What is data leakage, and give a concrete example.", a:"Leakage is when training data contains information that would not be available at prediction time. A classic example is including a customer's future purchases to predict churn, or standardizing with statistics computed on the whole dataset including the test set."},
+      {q:"When would you use one-hot encoding versus target encoding?", a:"One-hot for low-cardinality categories and for linear and tree models that need no ordering. Target encoding for high-cardinality features, applied with cross-validation or smoothing to avoid overfitting. For tree models, ordinal or label encoding is often enough."},
+      {q:"Accuracy is 99 percent. Why might the model still be bad?", a:"With severe class imbalance, a model that always predicts the majority class can score 99 percent accuracy while being useless. Report precision, recall, F1, or AUC for the minority class, and consider resampling or reweighting."}
+    ]
+  },
+  {
+    id:4, icon:"🎯", title:"Model Training & Evaluation", level:"Core",
+    intro:"Training is where the math becomes a model, and evaluation is where you decide whether to ship it. The two ideas every panel probes are the bias-variance tradeoff and the right metric for the problem. Get these crisp and you sound senior immediately.",
+    concepts:[
+      {t:"Bias vs variance", d:"Bias is systematic error from underfitting; variance is instability from overfitting. Tune the sweet spot."},
+      {t:"Overfitting", d:"The model memorizes training noise. Signatures: low train error, high validation error."},
+      {t:"Cross-validation", d:"K-fold reuses data for training and validation, giving a more stable score."},
+      {t:"Metrics", d:"Precision, recall, F1, AUC, and log-loss each answer a different question."},
+      {t:"Regularization", d:"L1 and L2 penalties, dropout, and early stopping push a model away from overfitting."}
+    ],
+    mermaid:`flowchart TD
+  A["Model complexity"] --> B{"Bias / variance"}
+  B -->|too simple| C["Underfit: high bias"]
+  B -->|too complex| D["Overfit: high variance"]
+  B -->|sweet spot| E["Generalizes"]
+  style C fill:#fdf3e7,stroke:#b45309
+  style D fill:#f1ebfe,stroke:#7c3aed
+  style E fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"The bias-variance tradeoff: complexity too low underfits, too high overfits.",
+    picture:`<svg width="100%" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="140" width="680" height="40" rx="10" fill="#f8fafb" stroke="#e4e9ef"/>
+      <text x="380" y="165" text-anchor="middle" font-size="12" fill="#4a5568" font-family="monospace">x-axis: model complexity  -></text>
+      <path d="M50 130 C 200 120 300 60 400 55 C 520 50 620 70 710 80" fill="none" stroke="#2563eb" stroke-width="3"/>
+      <path d="M50 40 C 180 60 300 100 420 120 C 560 140 640 150 710 155" fill="none" stroke="#b45309" stroke-width="3" stroke-dasharray="6 4"/>
+      <text x="120" y="48" font-size="11" fill="#2563eb" font-family="monospace">train error (falls)</text>
+      <text x="460" y="150" font-size="11" fill="#b45309" font-family="monospace">val error (U-shape)</text>
+    </svg>`,
+    picCap:"Training error falls with complexity; validation error is U-shaped. The valley is the sweet spot.",
+    commands:`# A compact evaluation harness
+from sklearn.model_selection import cross_val_score, train_test_split
+from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, roc_auc_score
+
+X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=42)
+model.fit(X_train, y_train)
+pred = model.predict(X_test)
+
+print("precision", round(precision_score(y_test, pred), 3))
+print("recall",    round(recall_score(y_test, pred), 3))
+print("f1",        round(f1_score(y_test, pred), 3))
+print("auc",       round(roc_auc_score(y_test, model.predict_proba(X_test)[:,1]), 3))`,
+    lab:[
+      "Fit a decision tree with depth 1, then depth 20. Watch train error fall and validation error rise.",
+      "Run 5-fold cross-validation and compare its spread to a single holdout split.",
+      "For an imbalanced task, compare accuracy against F1 and explain which one you would report and why."
+    ],
+    tip:"Name the metric before you name the model. 'For churn, I optimize recall because a missed churn costs more than a false alarm' is the sentence that separates a leader from a junior.",
+    questions:[
+      {q:"Explain the bias-variance tradeoff in plain words.", a:"Bias is error from a model that is too simple to capture the pattern, so it underfits. Variance is error from a model that fits the noise, so it overfits and changes a lot with small data changes. You trade one for the other and pick the complexity that minimizes total error on unseen data."},
+      {q:"Why use cross-validation instead of a single train-test split?", a:"A single split can be lucky or unlucky. K-fold cross-validation averages over K splits so the estimate is more stable and less dependent on how the data happened to divide. It also makes better use of a small dataset for both training and validation."},
+      {q:"When is accuracy the wrong metric?", a:"When classes are imbalanced or when errors have unequal costs. Accuracy rewards predicting the majority class. Use precision, recall, F1, or AUC instead, and choose based on the business cost of false positives versus false negatives."}
+    ]
+  },
+  {
+    id:5, icon:"🌳", title:"Classic ML Algorithms", level:"Core",
+    intro:"Before neural networks, and still today for tabular data, a handful of classic algorithms do most of the work. You need to know what each one assumes, when it shines, and when to reach for something else. Tabular problems at a bank or insurer are often won by a gradient-boosted tree, not a transformer.",
+    concepts:[
+      {t:"Linear & logistic", d:"Simple, interpretable, fast. Linear for regression, logistic for classification with a sigmoid."},
+      {t:"Decision trees", d:"Recursive splits that are easy to read but prone to overfitting."},
+      {t:"Random forest", d:"An ensemble of trees trained on bootstrapped samples that averages out variance."},
+      {t:"Gradient boosting", d:"XGBoost and LightGBM add trees that fix prior errors; the default winner on tabular data."},
+      {t:"k-means", d:"Unsupervised clustering that assigns points to the nearest of k centroids."}
+    ],
+    mermaid:`flowchart TD
+  A["Tabular problem"] --> B{"Linear in features?"}
+  B -->|yes, interpretable| C["Linear / logistic"]
+  B -->|no, complex| D{"Need ranking power?"}
+  D -->|yes| E["XGBoost / LightGBM"]
+  D -->|many trees, less tuning| F["Random forest"]
+  A --> G["No labels"] --> H["k-means"]
+  style C fill:#e8f0fe,stroke:#2563eb
+  style E fill:#e6f4f1,stroke:#0f766e
+  style F fill:#e0f4f8,stroke:#0891b2
+  style H fill:#f1ebfe,stroke:#7c3aed`,
+    mermaidCap:"A decision guide for classic algorithms on tabular data.",
+    picture:`<svg width="100%" height="210" viewBox="0 0 760 210" xmlns="http://www.w3.org/2000/svg">
+      <rect x="330" y="20" width="100" height="46" rx="10" fill="#e8f0fe" stroke="#2563eb"/><text x="380" y="48" text-anchor="middle" font-size="12" fill="#1e40af" font-family="monospace">age &gt; 40?</text>
+      <rect x="140" y="110" width="120" height="46" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="200" y="138" text-anchor="middle" font-size="11" fill="#0c6b48" font-family="monospace">income &gt; 5L?</text>
+      <rect x="500" y="110" width="120" height="46" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="560" y="138" text-anchor="middle" font-size="11" fill="#0c6b48" font-family="monospace">tenure &gt; 2y?</text>
+      <rect x="80" y="180" width="100" height="30" rx="8" fill="#fdf3e7" stroke="#b45309"/><text x="130" y="199" text-anchor="middle" font-size="10" fill="#7c4a12" font-family="monospace">churn</text>
+      <rect x="230" y="180" width="100" height="30" rx="8" fill="#f1ebfe" stroke="#7c3aed"/><text x="280" y="199" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="monospace">stay</text>
+      <rect x="480" y="180" width="100" height="30" rx="8" fill="#fdf3e7" stroke="#b45309"/><text x="530" y="199" text-anchor="middle" font-size="10" fill="#7c4a12" font-family="monospace">churn</text>
+      <rect x="600" y="180" width="100" height="30" rx="8" fill="#f1ebfe" stroke="#7c3aed"/><text x="650" y="199" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="monospace">stay</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="380" y1="66" x2="200" y2="108"/><line x1="380" y1="66" x2="560" y2="108"/><line x1="200" y1="156" x2="130" y2="178"/><line x1="200" y1="156" x2="280" y2="178"/><line x1="560" y1="156" x2="530" y2="178"/><line x1="560" y1="156" x2="650" y2="178"/></g>
+    </svg>`,
+    picCap:"A decision tree is readable, which is why banks and auditors still like it.",
+    commands:`# A full tabular baseline in ten lines
+from xgboost import XGBClassifier
+from sklearn.linear_model import LogisticRegression
+from sklearn.ensemble import RandomForestClassifier
+from sklearn.cluster import KMeans
+
+# Interpretable baseline
+log = LogisticRegression(max_iter=1000)
+
+# The default tabular winner
+xgb = XGBClassifier(n_estimators=300, max_depth=6, learning_rate=0.1)
+
+# Clustering with no labels
+km = KMeans(n_clusters=3, n_init=10, random_state=42)
+
+# Always try logistic first, then XGBoost; report both`,
+    lab:[
+      "On a tabular dataset, fit logistic regression and XGBoost and compare their F1 scores.",
+      "Print the feature importances from the XGBoost model and name the top three drivers.",
+      "Run k-means with k from 2 to 6 and watch the within-cluster inertia fall; find the elbow."
+    ],
+    tip:"For tabular data, start with logistic regression for a baseline, then XGBoost or LightGBM for accuracy. Neural networks are usually overkill, and an interviewer will respect you for saying so.",
+    questions:[
+      {q:"How does gradient boosting differ from a random forest?", a:"A random forest trains many trees independently on bootstrapped samples and averages them, which reduces variance. Gradient boosting trains trees sequentially, each one fitting the residual errors of the ensemble so far, which reduces bias and usually wins on accuracy at the cost of more tuning and overfitting risk."},
+      {q:"When would you choose logistic regression over XGBoost?", a:"When interpretability, speed, or simplicity matter more than a small accuracy gain, for example a regulated credit model where you must explain coefficients, or a high-volume scoring endpoint where latency is tight. Logistic regression also generalizes better on very small datasets."},
+      {q:"What does the k in k-means control, and how do you pick it?", a:"k is the number of clusters. Pick it with the elbow method on inertia, or silhouette score, or domain knowledge. k-means also assumes spherical, similarly sized clusters and is sensitive to feature scale, so standardize first."}
+    ]
+  },
+  {
+    id:6, icon:"🧠", title:"Deep Learning", level:"Core",
+    intro:"Neural networks stack simple units into powerful function approximators. Once you understand one neuron, backpropagation, and the activation and optimizer that train it, the whole of modern deep learning becomes readable. This chapter is the foundation every LLM question quietly assumes.",
+    concepts:[
+      {t:"The neuron", d:"A weighted sum of inputs passed through a nonlinear activation."},
+      {t:"Backpropagation", d:"The chain rule applied backward through the network to compute gradients for every weight."},
+      {t:"Activations", d:"ReLU for hidden layers, sigmoid or softmax for outputs. They bring the nonlinearity."},
+      {t:"Optimizers", d:"SGD, Adam, and friends move weights downhill. Adam is the safe default."},
+      {t:"Regularization", d:"Dropout, batch norm, and weight decay stop a deep network from memorizing."}
+    ],
+    mermaid:`flowchart LR
+  A["Input x"] --> B["Linear: Wx + b"]
+  B --> C["Activation: ReLU"]
+  C --> D["Hidden layer"]
+  D --> E["Output: softmax"]
+  E --> F["Loss"]
+  F -->|backprop| B
+  style C fill:#f1ebfe,stroke:#7c3aed
+  style F fill:#fdf3e7,stroke:#b45309`,
+    mermaidCap:"Forward pass computes a prediction; backward pass sends gradients back to every weight.",
+    picture:`<svg width="100%" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="120" cy="100" r="22" fill="#e0f4f8" stroke="#0891b2"/><text x="120" y="105" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">x1</text>
+      <circle cx="120" cy="160" r="22" fill="#e0f4f8" stroke="#0891b2"/><text x="120" y="165" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">x2</text>
+      <circle cx="340" cy="60" r="22" fill="#f1ebfe" stroke="#7c3aed"/><text x="340" y="65" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">h1</text>
+      <circle cx="340" cy="130" r="22" fill="#f1ebfe" stroke="#7c3aed"/><text x="340" y="135" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">h2</text>
+      <circle cx="340" cy="200" r="22" fill="#f1ebfe" stroke="#7c3aed"/><text x="340" y="205" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">h3</text>
+      <circle cx="560" cy="130" r="22" fill="#fdf3e7" stroke="#b45309"/><text x="560" y="135" text-anchor="middle" font-size="12" fill="#7c4a12" font-family="monospace">y</text>
+      <g stroke="#8a94a6" stroke-width="1.5"><line x1="142" y1="100" x2="318" y2="60"/><line x1="142" y1="100" x2="318" y2="130"/><line x1="142" y1="100" x2="318" y2="200"/><line x1="142" y1="160" x2="318" y2="60"/><line x1="142" y1="160" x2="318" y2="130"/><line x1="142" y1="160" x2="318" y2="200"/><line x1="362" y1="60" x2="538" y2="130"/><line x1="362" y1="130" x2="538" y2="130"/><line x1="362" y1="200" x2="538" y2="130"/></g>
+    </svg>`,
+    picCap:"A tiny feedforward network: inputs, a hidden layer, and one output.",
+    commands:`# A dense network in PyTorch
+import torch, torch.nn as nn
+
+net = nn.Sequential(
+    nn.Linear(10, 64),
+    nn.ReLU(),
+    nn.Dropout(0.2),
+    nn.Linear(64, 2),
+)
+
+opt = torch.optim.Adam(net.parameters(), lr=1e-3)
+loss_fn = nn.CrossEntropyLoss()
+
+# One training step
+x, y = torch.randn(32, 10), torch.randint(0, 2, (32,))
+opt.zero_grad()
+logits = net(x)
+loss = loss_fn(logits, y)
+loss.backward()
+opt.step()`,
+    lab:[
+      "Run the snippet and print loss.item() before and after one step.",
+      "Swap ReLU for sigmoid in a deep stack and observe the vanishing-gradient slowdown.",
+      "Add a third hidden layer and note how the parameter count grows."
+    ],
+    tip:"In an interview, do not recite the chain rule. Say it in one line: backprop is just the chain rule applied layer by layer, so every weight learns how much it contributed to the error.",
+    questions:[
+      {q:"Why do we need activation functions at all?", a:"Without a nonlinear activation, stacking linear layers just gives another linear map, so the network could not learn nonlinear patterns. The activation is what gives a network its representational power."},
+      {q:"What is the vanishing gradient problem?", a:"With sigmoid or tanh activations in a deep network, gradients shrink as they propagate backward because the derivatives are small, so early layers learn very slowly. ReLU and residual connections largely fix this by letting gradients flow."},
+      {q:"What does dropout do and why does it help?", a:"Dropout randomly zeroes a fraction of units during training, forcing the network not to rely on any single neuron. It acts as a form of regularization that reduces overfitting. At test time, all units are used."}
+    ]
+  },
+  {
+    id:7, icon:"⚡", title:"Transformers & Attention", level:"Core",
+    intro:"The transformer is the architecture behind every modern large language model. Attention is its one big idea: instead of reading a sequence left to right, every token looks at every other token and decides how much it matters. Master this chapter and the rest of the LLM material has a place to hang.",
+    concepts:[
+      {t:"Self-attention", d:"Each token produces query, key, and value vectors, then weights every other token by relevance."},
+      {t:"Q, K, V", d:"Queries look, keys match, values carry content. Attention scores are query-key dot products."},
+      {t:"Positional encoding", d:"Attention is order-blind, so position is injected to keep sequence order."},
+      {t:"Multi-head", d:"Several attention heads in parallel each learn a different relationship."},
+      {t:"The block", d:"Attention plus a feedforward network, wrapped in residual connections and layer norm, stacked many times."}
+    ],
+    mermaid:`flowchart TD
+  A["Tokens"] --> B["Embeddings"]
+  B --> C["Positional encoding"]
+  C --> D["Multi-head self-attention"]
+  D --> E["Add & norm"]
+  E --> F["Feedforward"]
+  F --> G["Add & norm"]
+  G --> H["Next layer"]
+  style D fill:#f1ebfe,stroke:#7c3aed
+  style F fill:#e0f4f8,stroke:#0891b2`,
+    mermaidCap:"One transformer block, repeated many times to build a full model.",
+    picture:`<svg width="100%" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="40" width="120" height="50" rx="10" fill="#e0f4f8" stroke="#0891b2"/><text x="100" y="70" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">Query q</text>
+      <rect x="320" y="40" width="120" height="50" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="380" y="70" text-anchor="middle" font-size="12" fill="#0c6b48" font-family="monospace">Keys k</text>
+      <rect x="600" y="40" width="120" height="50" rx="10" fill="#f1ebfe" stroke="#7c3aed"/><text x="660" y="70" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">Values v</text>
+      <rect x="260" y="130" width="240" height="50" rx="10" fill="#fdf3e7" stroke="#b45309"/><text x="380" y="160" text-anchor="middle" font-size="12" fill="#7c4a12" font-family="monospace">softmax(q·k) · v</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="160" y1="65" x2="258" y2="145"/><line x1="440" y1="65" x2="380" y2="128"/><line x1="660" y1="90" x2="500" y2="145"/></g>
+    </svg>`,
+    picCap:"Attention: score query against keys, then take a weighted sum of values.",
+    commands:`# Attention in a few lines (simplified, for intuition)
+import torch, torch.nn.functional as F
+
+def attention(q, k, v):
+    d = q.size(-1)
+    scores = q @ k.transpose(-2, -1) / (d ** 0.5)   # scaled dot product
+    weights = F.softmax(scores, dim=-1)
+    return weights @ v
+
+q = torch.randn(1, 5, 64)   # batch, seq, dim
+k = torch.randn(1, 5, 64)
+v = torch.randn(1, 5, 64)
+out = attention(q, k, v)
+print(out.shape)            # torch.Size([1, 5, 64])`,
+    lab:[
+      "Run the snippet and confirm the output shape matches the input sequence shape.",
+      "Change the temperature by scaling the divisor and watch the softmax sharpen or flatten.",
+      "Explain in your own words why masking is needed for autoregressive generation."
+    ],
+    tip:"The phrase to memorize is 'attention is a weighted sum of values, where the weights come from query-key similarity'. That one sentence answers half the transformer questions you will hear.",
+    questions:[
+      {q:"What problem does attention solve that RNNs had?", a:"RNNs process sequences one step at a time, which is slow to parallelize and forgets long-range context. Attention lets every token attend to every other token in parallel, capturing long-range dependencies directly."},
+      {q:"Why divide by the square root of the dimension in scaled dot-product attention?", a:"The dot product grows with the dimension, pushing the softmax into regions with tiny gradients. Dividing by the square root of the key dimension keeps the variance stable and the softmax trainable."},
+      {q:"Why is positional encoding needed?", a:"Attention has no notion of order, so without positional information the model cannot tell 'the dog bit the man' from 'the man bit the dog'. Positional encoding injects sequence position into the token representations."}
+    ]
+  },
+  {
+    id:8, icon:"🤖", title:"LLMs & Foundation Models", level:"Core",
+    intro:"Large language models are transformers trained on enormous text corpora to predict the next token, then aligned to follow instructions. From that one objective comes a surprising amount of capability. This chapter covers how they are trained, how they are adapted, and the knobs you turn at inference time.",
+    concepts:[
+      {t:"Pretraining", d:"Self-supervised next-token prediction on trillions of tokens. The expensive part."},
+      {t:"SFT and RLHF", d:"Instruction fine-tuning then reinforcement from human preference to align behavior."},
+      {t:"LoRA / PEFT", d:"Adapt a big model cheaply by training small low-rank matrices instead of the full weights."},
+      {t:"Tokens and context", d:"Text is split into tokens; the context window is how many the model can attend to at once."},
+      {t:"Temperature", d:"Controls randomness of sampling. Lower is more deterministic, higher is more creative."}
+    ],
+    mermaid:`flowchart LR
+  A["Raw text corpus"] --> B["Pretrain: next token"]
+  B --> C["Base model"]
+  C --> D["SFT: instruction pairs"]
+  D --> E["RLHF: preference"]
+  E --> F["Aligned assistant"]
+  style B fill:#e0f4f8,stroke:#0891b2
+  style F fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"From raw text to an aligned assistant in three stages.",
+    picture:`<svg width="100%" height="190" viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="60" width="200" height="60" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/><text x="140" y="90" text-anchor="middle" font-size="13" fill="#155e75" font-family="monospace">Frozen base model</text>
+      <rect x="300" y="50" width="150" height="40" rx="10" fill="#f1ebfe" stroke="#7c3aed"/><text x="375" y="75" text-anchor="middle" font-size="11" fill="#5b21b6" font-family="monospace">LoRA adapter A</text>
+      <rect x="300" y="100" width="150" height="40" rx="10" fill="#f1ebfe" stroke="#7c3aed"/><text x="375" y="125" text-anchor="middle" font-size="11" fill="#5b21b6" font-family="monospace">LoRA adapter B</text>
+      <rect x="520" y="60" width="180" height="60" rx="12" fill="#e6f4f1" stroke="#0f766e" stroke-width="2"/><text x="610" y="90" text-anchor="middle" font-size="13" fill="#0c6b48" font-family="monospace">Task model</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="240" y1="90" x2="298" y2="70"/><line x1="240" y1="90" x2="298" y2="120"/><line x1="450" y1="70" x2="518" y2="82"/><line x1="450" y1="120" x2="518" y2="98"/></g>
+    </svg>`,
+    picCap:"LoRA trains tiny adapters while the base model stays frozen, one adapter per task.",
+    commands:`# Tokenization and sampling knobs
+from transformers import AutoTokenizer, AutoModelForCausalLM
+
+tok = AutoTokenizer.from_pretrained("HuggingFaceTB/SmolLM2-135M")
+ids = tok.encode("Interview prep for ML", return_tensors="pt")
+print("tokens:", ids.shape[1])     # token count
+
+# Sampling: temperature and top_p
+gen = tok.decode(model.generate(ids, max_new_tokens=20, temperature=0.2, top_p=0.9)[0])`,
+    lab:[
+      "Tokenize a sentence and count how many tokens it becomes; find where words split.",
+      "Generate with temperature 0.1 versus 1.5 and note the difference in output.",
+      "Look up a LoRA adapter on Hugging Face and list what base model it was trained against."
+    ],
+    tip:"When asked how a big model is adapted cheaply, the answer is PEFT, with LoRA the most common. You freeze the base model and train small low-rank matrices, so a full fine-tune's cost drops to a fraction.",
+    questions:[
+      {q:"What is the difference between pretraining, SFT, and RLHF?", a:"Pretraining teaches next-token prediction on raw text. SFT fine-tunes on instruction-response pairs so the model follows instructions. RLHF then uses human preference data to align outputs with what people actually want, rewarding helpful and harmless responses."},
+      {q:"Why use LoRA instead of full fine-tuning?", a:"Full fine-tuning updates every parameter and needs a copy of the whole model for each task. LoRA freezes the base model and trains only small low-rank adapters, cutting memory and cost by orders of magnitude while often matching full fine-tune quality."},
+      {q:"What does temperature control, and when would you lower it?", a:"Temperature scales the logits before softmax. Lower values make sampling more deterministic and less random, which suits factual or code tasks. Higher values increase diversity, which suits creative writing. For extraction and classification you want low temperature."}
+    ]
+  },
+  {
+    id:9, icon:"🔎", title:"Retrieval-Augmented Generation", level:"Core",
+    intro:"An LLM trained long ago cannot know your private documents or this week's facts. Retrieval-augmented generation, RAG for short, fixes that by fetching relevant text and handing it to the model as context. It is the most common production GenAI pattern, and it is on nearly every panel.",
+    concepts:[
+      {t:"The pipeline", d:"Chunk documents, embed them, store vectors, retrieve the closest at query time, and generate with context."},
+      {t:"Embeddings", d:"Turn text into vectors so similar meaning sits close in vector space."},
+      {t:"Chunking", d:"Split documents into pieces sized to the context window, with overlap to avoid cutting meaning."},
+      {t:"Vector store", d:"An index that finds nearest neighbors fast: FAISS, Pinecone, pgvector, and others."},
+      {t:"Re-ranking", d:"A second, stronger model reorders the retrieved chunks so the best ones reach the generator."}
+    ],
+    mermaid:`flowchart LR
+  A["Documents"] --> B["Chunk"]
+  B --> C["Embed"]
+  C --> D[("Vector store")]
+  Q["User query"] --> E["Embed query"]
+  E --> D
+  D --> F["Retrieve top-k"]
+  F --> G["Re-rank"]
+  G --> H["Prompt + context"]
+  H --> I["Generate answer"]
+  style D fill:#e6f4f1,stroke:#0f766e
+  style G fill:#fdf3e7,stroke:#b45309
+  style I fill:#f1ebfe,stroke:#7c3aed`,
+    mermaidCap:"The RAG pipeline: index once, then retrieve and generate on every query.",
+    picture:`<svg width="100%" height="190" viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+      <circle cx="160" cy="95" r="10" fill="#0891b2"/><text x="160" y="130" text-anchor="middle" font-size="10" fill="#155e75" font-family="monospace">query</text>
+      <circle cx="260" cy="70" r="12" fill="#e0f4f8" stroke="#0891b2"/><text x="260" y="40" text-anchor="middle" font-size="9" fill="#155e75" font-family="monospace">doc A</text>
+      <circle cx="300" cy="120" r="8" fill="#e0f4f8" stroke="#0891b2"/><text x="330" y="120" text-anchor="middle" font-size="9" fill="#155e75" font-family="monospace">doc B</text>
+      <circle cx="420" cy="150" r="6" fill="#e0f4f8" stroke="#0891b2"/><text x="420" y="178" text-anchor="middle" font-size="9" fill="#155e75" font-family="monospace">doc C</text>
+      <g stroke="#8a94a6" stroke-width="1.5" stroke-dasharray="4 3"><line x1="170" y1="92" x2="252" y2="78"/><line x1="170" y1="98" x2="294" y2="118"/><line x1="170" y1="102" x2="414" y2="146"/></g>
+    </svg>`,
+    picCap:"Embeddings place similar meaning close together, so nearest neighbors are the relevant docs.",
+    commands:`# A minimal RAG index with sentence-transformers
+from sentence_transformers import SentenceTransformer
+import numpy as np
+
+model = SentenceTransformer("all-MiniLM-L6-v2")
+docs = ["Churn model uses XGBoost.", "RAG fetches context.", "Gateway routes by task."]
+emb = model.encode(docs)
+q = model.encode("which model predicts churn")
+
+scores = q @ emb.T / (np.linalg.norm(q) * np.linalg.norm(emb, axis=1))
+top = int(np.argmax(scores))
+print(docs[top])`,
+    lab:[
+      "Run the snippet and confirm it retrieves the churn document for the churn query.",
+      "Split a long document into 300-character chunks with 50 characters of overlap.",
+      "Compare cosine similarity against a keyword match and note where they disagree."
+    ],
+    tip:"The quality of a RAG system is decided by retrieval, not by the generator. If the wrong chunks are retrieved, no prompt can save it. Spend your tuning time on chunking, embeddings, and re-ranking.",
+    questions:[
+      {q:"Why use RAG instead of fine-tuning the model on the documents?", a:"RAG keeps the model's knowledge current and lets you swap documents without retraining. It also reduces hallucination by grounding answers in retrieved text with citations. Fine-tuning bakes knowledge in, which is expensive and goes stale."},
+      {q:"What is the role of chunking in RAG?", a:"Chunking splits documents into pieces small enough to fit the context window and precise enough that retrieval returns the right passage. Overlap between chunks prevents meaning from being cut at the boundary."},
+      {q:"How do you know if retrieval is failing?", a:"Evaluate the retriever directly with hit rate or recall at k, and evaluate the end result with RAG metrics like faithfulness and answer relevance. If faithfulness is high but relevance is low, retrieval is usually the culprit."}
+    ]
+  },
+  {
+    id:10, icon:"✍️", title:"Prompt Engineering", level:"Core",
+    intro:"Prompting is the interface to a language model. A well-structured prompt can double the quality of an answer with zero code. This chapter covers the patterns that work, from few-shot examples to chain-of-thought to the structured outputs and function calling you will use in a real system.",
+    concepts:[
+      {t:"Role and task", d:"State who the model is, what to do, and the exact output format."},
+      {t:"Few-shot", d:"Give examples of the desired input-output pairs; the model generalizes from them."},
+      {t:"Chain-of-thought", d:"Ask the model to reason step by step before answering, which improves complex tasks."},
+      {t:"Structured output", d:"Request JSON or a schema so the result is parseable by code, not prose."},
+      {t:"Function calling", d:"Give the model a list of tools and let it emit structured calls your code executes."}
+    ],
+    mermaid:`flowchart LR
+  A["System prompt"] --> B["Model"]
+  C["Few-shot examples"] --> B
+  D["User query"] --> B
+  B --> E["Reasoned output"]
+  E --> F["Structured / function call"]
+  style A fill:#e0f4f8,stroke:#0891b2
+  style C fill:#e6f4f1,stroke:#0f766e
+  style F fill:#f1ebfe,stroke:#7c3aed`,
+    mermaidCap:"The parts of a strong prompt: role, examples, query, and a defined output shape.",
+    picture:`<svg width="100%" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="20" width="680" height="160" rx="12" fill="#0d1526"/>
+      <text x="60" y="50" font-family="monospace" font-size="12" fill="#7dd3fc">You are a router. Classify intent.</text>
+      <text x="60" y="76" font-family="monospace" font-size="12" fill="#c7d5e8">Q: "fix this code"  A: {&quot;task&quot;:&quot;coding&quot;}</text>
+      <text x="60" y="102" font-family="monospace" font-size="12" fill="#c7d5e8">Q: "why did sales drop"  A: {&quot;task&quot;:&quot;analytics&quot;}</text>
+      <text x="60" y="128" font-family="monospace" font-size="12" fill="#86efac">Q: "{{user}}"?</text>
+      <text x="60" y="154" font-family="monospace" font-size="12" fill="#fca5a5">Return JSON only.</text>
+    </svg>`,
+    picCap:"A few-shot prompt with a clear output schema, ready to parse.",
+    commands:`# A prompt template with few-shot and schema
+SYSTEM = """You classify support requests into tasks.
+Return JSON only: {"task": "coding" | "analytics" | "other"}
+
+Examples:
+Q: fix this bug      -> {"task": "coding"}
+Q: why did churn rise -> {"task": "analytics"}
+"""
+
+def classify(model, user):
+    return model(f"{SYSTEM}\\nQ: {user} ->")
+
+# Chain-of-thought for reasoning
+def answer(model, q):
+    return model(f"{q}\\nThink step by step, then give the final answer.")`,
+    lab:[
+      "Write a few-shot prompt that classifies five of your own support tickets.",
+      "Add 'think step by step' to a math prompt and compare the accuracy with and without it.",
+      "Ask a model for JSON output and confirm you can json.loads() the result directly."
+    ],
+    tip:"For any prompt you ship, define the output format explicitly and request JSON. Parsing structured output is what separates a demo from a system, and it is the first thing a panel will ask about your gateway.",
+    questions:[
+      {q:"When does few-shot prompting beat zero-shot?", a:"When the task needs a specific format, tone, or edge-case behavior that a description alone is ambiguous about. A handful of examples teach the exact pattern faster than a paragraph of instructions, especially for classification and structured extraction."},
+      {q:"What is chain-of-thought prompting, and why does it help?", a:"It asks the model to produce intermediate reasoning steps before the final answer. This improves performance on arithmetic, logic, and multi-step tasks because the model spends more computation on the reasoning path instead of committing to an answer immediately."},
+      {q:"What is function calling and how does it fit a system?", a:"The model is given a schema of available functions and returns a structured request for the one it wants to call, with arguments. Your code executes it and returns the result. It is how an agent takes real actions, like querying a database or booking a meeting, instead of only writing text."}
+    ]
+  },
+  {
+    id:11, icon:"🕸️", title:"Agents & Agentic AI", level:"Advanced",
+    intro:"An agent is a language model with tools, memory, and the ability to decide its own next step in a loop. This is where your PhD in multi-agent systems becomes a differentiator. Most candidates can call an LLM once; far fewer can design a system where several agents coordinate to finish a task.",
+    concepts:[
+      {t:"The agent loop", d:"Think, act, observe, repeat, until a goal is met. The model chooses the next tool call."},
+      {t:"Tools", d:"Functions the agent can invoke: search, query a database, run code, call another API."},
+      {t:"ReAct", d:"Interleave reasoning and action so each step is grounded in the previous observation."},
+      {t:"LangGraph", d:"Model an agent as a graph of nodes and edges, giving control and checkpointing."},
+      {t:"Multi-agent", d:"Specialist agents with distinct roles coordinate through a shared protocol."}
+    ],
+    mermaid:`flowchart TD
+  A["Task"] --> B["Think"]
+  B --> C["Choose tool"]
+  C --> D["Act: call tool"]
+  D --> E["Observe result"]
+  E --> F{"Done?"}
+  F -->|no| B
+  F -->|yes| G["Final answer"]
+  style B fill:#e0f4f8,stroke:#0891b2
+  style D fill:#f1ebfe,stroke:#7c3aed
+  style G fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"The agent loop: the model reasons, acts through tools, observes, and repeats until done.",
+    picture:`<svg width="100%" height="200" viewBox="0 0 760 200" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="70" width="130" height="60" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/><text x="105" y="105" text-anchor="middle" font-size="13" fill="#155e75" font-family="monospace">Orchestrator</text>
+      <rect x="290" y="20" width="150" height="46" rx="10" fill="#f1ebfe" stroke="#7c3aed"/><text x="365" y="48" text-anchor="middle" font-size="11" fill="#5b21b6" font-family="monospace">Researcher agent</text>
+      <rect x="290" y="82" width="150" height="46" rx="10" fill="#e6f4f1" stroke="#0f766e"/><text x="365" y="110" text-anchor="middle" font-size="11" fill="#0c6b48" font-family="monospace">Coder agent</text>
+      <rect x="290" y="144" width="150" height="46" rx="10" fill="#fdf3e7" stroke="#b45309"/><text x="365" y="172" text-anchor="middle" font-size="11" fill="#7c4a12" font-family="monospace">Reviewer agent</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="170" y1="100" x2="288" y2="43"/><line x1="170" y1="100" x2="288" y2="105"/><line x1="170" y1="100" x2="288" y2="167"/></g>
+    </svg>`,
+    picCap:"A multi-agent design: an orchestrator delegates to specialist agents.",
+    commands:`# A minimal ReAct-style loop in pseudo-Python
+def agent_loop(task, model, tools, max_steps=10):
+    history = [task]
+    for _ in range(max_steps):
+        decision = model.reason(history, tools)   # think + choose
+        if decision.done:
+            return decision.answer
+        result = tools[decision.tool](decision.args)   # act
+        history.append(f"tool {decision.tool} -> {result}")   # observe
+    return "gave up after max steps"`,
+    lab:[
+      "Sketch an agent loop on paper for a task like 'research a competitor and summarize'.",
+      "List three tools such an agent would need and the schema of each tool's arguments.",
+      "Design a two-agent split: one to draft, one to critique, and describe the handoff."
+    ],
+    tip:"Frame multi-agent systems as your PhD home turf. Say what most candidates cannot: how agents share state, how you bound their loops, and how you verify one agent's output before the next consumes it.",
+    questions:[
+      {q:"What distinguishes an agent from a plain LLM call?", a:"A plain call is one shot: prompt in, answer out. An agent runs a loop, choosing tools, acting on the world, and observing results until it reaches a goal. The model decides the sequence of actions instead of a fixed pipeline deciding it."},
+      {q:"What is the ReAct pattern?", a:"ReAct interleaves reasoning and acting. The model writes a thought, chooses an action, observes the result, then reasons again. Grounding each step in observations makes the agent more reliable than reasoning or acting alone."},
+      {q:"Why would you split work across multiple agents?", a:"Specialist agents with narrow prompts and distinct tools outperform one generalist on complex work, and you can verify each stage independently. The tradeoffs are more latency, more cost, and a harder debugging surface, so use multiple agents only when the task genuinely decomposes."}
+    ]
+  },
+  {
+    id:12, icon:"🛡️", title:"Guardrails & AI Safety", level:"Advanced",
+    intro:"An enterprise will not ship a model without guardrails. Guardrails validate inputs and outputs, redact personal data, and block prompt injection before it reaches a user. For a Director building a GenAI platform, this chapter is table stakes, and it is exactly what your GenAI Gateway must demonstrate.",
+    concepts:[
+      {t:"Input validation", d:"Check prompts for forbidden content, injection attempts, and malformed requests before the model runs."},
+      {t:"Output validation", d:"Check responses for policy violations, leakage, and hallucinated claims before they reach the user."},
+      {t:"PII redaction", d:"Detect and mask names, emails, and IDs with tools like Presidio, then restore or strip them."},
+      {t:"Prompt injection", d:"Malicious instructions embedded in data that override the system prompt. Mitigate with allowlists and sandboxing."},
+      {t:"Defense in depth", d:"No single guard catches everything; stack several cheap checks at different layers."}
+    ],
+    mermaid:`flowchart LR
+  A["User input"] --> B["Input guard"]
+  B -->|pass| C["LLM"]
+  B -->|block| X["Reject"]
+  C --> D["Output guard"]
+  D -->|pass| E["PII redact"]
+  E --> F["User"]
+  D -->|block| X
+  style B fill:#e0f4f8,stroke:#0891b2
+  style D fill:#fdf3e7,stroke:#b45309
+  style X fill:#f1ebfe,stroke:#7c3aed`,
+    mermaidCap:"Guardrails wrap the model on both sides, with PII redaction before the response leaves.",
+    picture:`<svg width="100%" height="190" viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="55" width="200" height="70" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/><text x="140" y="80" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">Input guard</text><text x="140" y="100" text-anchor="middle" font-size="10" fill="#155e75" font-family="monospace">injection, policy</text>
+      <rect x="280" y="55" width="200" height="70" rx="12" fill="#fafafa" stroke="#e4e9ef" stroke-width="2"/><text x="380" y="95" text-anchor="middle" font-size="13" fill="#1a2433" font-family="monospace">LLM</text>
+      <rect x="520" y="55" width="200" height="70" rx="12" fill="#fdf3e7" stroke="#b45309" stroke-width="2"/><text x="620" y="80" text-anchor="middle" font-size="12" fill="#7c4a12" font-family="monospace">Output guard</text><text x="620" y="100" text-anchor="middle" font-size="10" fill="#7c4a12" font-family="monospace">redact PII</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="240" y1="90" x2="278" y2="90"/><line x1="480" y1="90" x2="518" y2="90"/></g>
+    </svg>`,
+    picCap:"Two guard layers: one before the model, one after.",
+    commands:`# PII detection with Presidio (conceptual)
+from presidio_analyzer import AnalyzerEngine
+from presidio_anonymizer import AnonymizerEngine
+
+analyzer = AnalyzerEngine()
+anonymizer = AnonymizerEngine()
+
+text = "John called from +91-98765-43210 with card 4111-1111-1111-1111"
+results = analyzer.analyze(text=text, language="en")
+masked = anonymizer.anonymize(text=text, analyzer_results=results)
+print(masked.text)   # PII replaced with placeholders`,
+    lab:[
+      "Run the Presidio snippet on a sample and list which entity types it caught.",
+      "Write three prompt-injection strings and test whether your input guard rejects them.",
+      "Define an output guard rule: block responses that contain a credit card pattern or an API key."
+    ],
+    tip:"The strongest guardrail story is not 'we added a library'. It is 'we put input validation before the model, output validation after, and PII redaction at the boundary, and here is a case each one caught'.",
+    questions:[
+      {q:"What is prompt injection, and why is it hard to prevent?", a:"Prompt injection is when an attacker embeds instructions in data the model reads, so the data overrides the system prompt. It is hard because the model cannot reliably distinguish trusted instructions from untrusted content. Defense is layered: input filters, output validation, allowlists, and not giving the model powerful tools."},
+      {q:"Where does PII redaction belong in a GenAI pipeline?", a:"At the boundary. Redact on input before it reaches the model or any log, and re-check output before it returns to the user. Redacting at both ends prevents personal data from leaking into logs, model context, or responses."},
+      {q:"Why is defense in depth necessary for guardrails?", a:"No single check catches everything. An input filter misses novel injection, and an output filter misses a cleverly worded leak. Stacking independent, cheap checks across layers makes the system robust even when any one guard fails."}
+    ]
+  },
+  {
+    id:13, icon:"📊", title:"LLM Evaluation", level:"Advanced",
+    intro:"A language model has no tidy accuracy number, so evaluation is a whole discipline. You test retrieval with RAG metrics, measure hallucination with faithfulness, and use an LLM as a judge where human labels are too slow. For your gateway, evaluation is what turns a demo into something you can regression-test.",
+    concepts:[
+      {t:"LLM-as-judge", d:"Use a stronger model to score outputs against criteria, calibrated against human labels."},
+      {t:"Faithfulness", d:"Does the answer stay grounded in the retrieved context, or does it invent facts?"},
+      {t:"Answer relevance", d:"Does the response actually address the question asked?"},
+      {t:"Hallucination", d:"Fabricated facts stated confidently. Measure it, then reduce it with grounding and citations."},
+      {t:"Regression sets", d:"A fixed set of prompt-expected-output pairs run on every change to catch regressions."}
+    ],
+    mermaid:`flowchart LR
+  A["Golden set"] --> B["Run pipeline"]
+  B --> C["RAG metrics"]
+  B --> D["LLM-as-judge"]
+  C --> E["Scorecard"]
+  D --> E
+  E --> F{"Regressed?"}
+  F -->|yes| G["Block release"]
+  F -->|no| H["Ship"]
+  style E fill:#e0f4f8,stroke:#0891b2
+  style G fill:#fdf3e7,stroke:#b45309
+  style H fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"A regression set plus metrics gates every release.",
+    picture:`<svg width="100%" height="190" viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="30" width="160" height="130" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/><text x="120" y="60" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">Reference answer</text><text x="120" y="82" text-anchor="middle" font-size="10" fill="#155e75" font-family="monospace">(human-written)</text>
+      <rect x="300" y="30" width="160" height="130" rx="12" fill="#f1ebfe" stroke="#7c3aed" stroke-width="2"/><text x="380" y="60" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">Model answer</text><text x="380" y="82" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="monospace">(to score)</text>
+      <rect x="560" y="30" width="160" height="130" rx="12" fill="#fdf3e7" stroke="#b45309" stroke-width="2"/><text x="640" y="60" text-anchor="middle" font-size="12" fill="#7c4a12" font-family="monospace">Judge score</text><text x="640" y="82" text-anchor="middle" font-size="10" fill="#7c4a12" font-family="monospace">1 to 5 + rubric</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="200" y1="95" x2="298" y2="95"/><line x1="460" y1="95" x2="558" y2="95"/></g>
+    </svg>`,
+    picCap:"LLM-as-judge compares a model answer against a rubric or reference.",
+    commands:`# Evaluation metrics with ragas (conceptual)
+from ragas import evaluate
+from ragas.metrics import faithfulness, answer_relevancy
+
+dataset = {
+    "question": ["What drives churn?"],
+    "answer":   ["Customers churn when support is slow."],
+    "contexts": [["Support response time is the top churn driver."]],
+}
+result = evaluate(dataset, metrics=[faithfulness, answer_relevancy])
+print(result)`,
+    lab:[
+      "Write five prompt-expected-output pairs for a task you care about. That is your regression set.",
+      "Pick a metric: define faithfulness in one sentence and how you would score it.",
+      "Design a rubric for an LLM judge with three criteria and a 1 to 5 scale each."
+    ],
+    tip:"The sentence that wins interviews is 'we run a fixed regression set on every change, and a drop below threshold blocks the release'. It proves you think about quality as a system, not a one-off demo.",
+    questions:[
+      {q:"What is LLM-as-judge, and when is it appropriate?", a:"You use a strong model to score another model's output against a rubric or reference. It is appropriate for high-volume evaluation where human labeling is too slow, but you must calibrate the judge against human labels and watch for judge bias before trusting it."},
+      {q:"What is the difference between faithfulness and answer relevance?", a:"Faithfulness measures whether the answer is supported by the retrieved context, catching hallucination. Answer relevance measures whether the response actually addresses the question. An answer can be faithful but irrelevant, and vice versa."},
+      {q:"How do you reduce hallucination in a RAG system?", a:"Ground the answer in retrieved context, require citations, lower temperature, and add an output guard that flags unsupported claims. If retrieval returns no confident match, have the system say it does not know rather than guess."}
+    ]
+  },
+  {
+    id:14, icon:"🚀", title:"MLOps & Deployment", level:"Platform",
+    intro:"A model in a notebook is worth nothing to a business. MLOps is the discipline of getting models into production and keeping them there: registry, CI/CD, serving, monitoring, and the retraining loop. This is the platform track, and it is where your twenty years of infrastructure leadership give you a real edge.",
+    concepts:[
+      {t:"Model registry", d:"A versioned store of trained models with metadata, so any artifact can be reproduced."},
+      {t:"CI/CD for ML", d:"Automate training, validation, and deployment, with gates that stop a bad model from shipping."},
+      {t:"Serving", d:"Expose a model as an endpoint with FastAPI, SageMaker, vLLM, or a managed platform."},
+      {t:"Monitoring", d:"Track latency, throughput, and prediction distribution over time."},
+      {t:"Drift", d:"When input data or the target distribution shifts, accuracy decays. Detect and retrain."}
+    ],
+    mermaid:`flowchart LR
+  A["Train"] --> B["Registry"]
+  B --> C["Validate"]
+  C -->|pass| D["Deploy"]
+  C -->|fail| A
+  D --> E["Serve"]
+  E --> F["Monitor"]
+  F -->|drift| A
+  style B fill:#e0f4f8,stroke:#0891b2
+  style F fill:#fdf3e7,stroke:#b45309
+  style D fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"The MLOps loop: train, register, validate, deploy, monitor, and retrain on drift.",
+    picture:`<svg width="100%" height="190" viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="60" width="140" height="60" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/><text x="110" y="95" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">FastAPI app</text>
+      <rect x="260" y="60" width="140" height="60" rx="12" fill="#f1ebfe" stroke="#7c3aed" stroke-width="2"/><text x="330" y="95" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">Model v3</text>
+      <rect x="480" y="60" width="140" height="60" rx="12" fill="#e6f4f1" stroke="#0f766e" stroke-width="2"/><text x="550" y="95" text-anchor="middle" font-size="12" fill="#0c6b48" font-family="monospace">Monitoring</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="180" y1="90" x2="258" y2="90"/><line x1="400" y1="90" x2="478" y2="90"/></g>
+      <text x="380" y="150" text-anchor="middle" font-size="11" fill="#8a94a6" font-family="monospace">request -> response, with metrics logged at each hop</text>
+    </svg>`,
+    picCap:"A serving endpoint wraps the model, and monitoring watches every request.",
+    commands:`# A minimal FastAPI model endpoint
+from fastapi import FastAPI
+from pydantic import BaseModel
+
+app = FastAPI()
+
+class Item(BaseModel):
+    text: str
+
+@app.post("/predict")
+def predict(item: Item):
+    score = model.predict([item.text])[0]
+    log_metric("latency_ms", elapsed)
+    return {"label": score}
+
+# uvicorn main:app --reload`,
+    lab:[
+      "Write the FastAPI endpoint above and hit it with a curl POST request.",
+      "List three metrics you would monitor and the threshold for each.",
+      "Describe a drift scenario and what triggers a retrain in your design."
+    ],
+    tip:"Do not describe deployment as 'we saved the model'. Describe the loop: registry with versions, an automated validation gate, a monitored endpoint, and drift-triggered retraining. That vocabulary is the platform signal.",
+    questions:[
+      {q:"What is model drift, and how do you detect it?", a:"Drift is the decay in accuracy as the world changes. Data drift is when input distributions shift; concept drift is when the input-output relationship changes. Detect it by monitoring prediction distributions, feature statistics, and ground-truth feedback over time."},
+      {q:"Why do you need a model registry?", a:"A registry version-controls trained models with their metadata, metrics, and lineage, so you can reproduce any model, roll back to a previous version, and audit what changed. Without it, 'which model is in production' becomes unanswerable."},
+      {q:"How does CI/CD differ for ML versus traditional software?", a:"ML adds data and model validation stages. Tests include data quality checks, model performance gates against a regression set, and drift checks, not just unit tests. Deployment also moves artifacts through a registry, not just code through a repo."}
+    ]
+  },
+  {
+    id:15, icon:"🏗️", title:"ML System Design", level:"Platform",
+    intro:"ML system design is the interview round that decides seniority. It is not 'build me a model'; it is 'design me a system that ships predictions at scale'. You reason about requirements, data, training, serving, and cost, and you trade them off out loud. This chapter gives you a repeatable framework.",
+    concepts:[
+      {t:"Requirements first", d:"Latency, throughput, cost, and accuracy targets, plus what happens when you miss them."},
+      {t:"Batch vs realtime", d:"Batch for periodic scoring and reports; realtime for interactive, latency-sensitive predictions."},
+      {t:"Feature store", d:"A shared, consistent source of features for both training and serving, preventing skew."},
+      {t:"Training-serving skew", d:"When features differ between training and production, the model silently underperforms."},
+      {t:"Cost as a feature", d:"Tokens, GPU hours, and storage are design constraints, not afterthoughts."}
+    ],
+    mermaid:`flowchart LR
+  A["Requirement"] --> B["Data"]
+  B --> C["Feature store"]
+  C --> D["Train"]
+  C --> E["Serve"]
+  D --> F["Model"]
+  F --> E
+  E --> G["Predictions"]
+  G --> H["Feedback"]
+  H --> B
+  style C fill:#e0f4f8,stroke:#0891b2
+  style E fill:#e6f4f1,stroke:#0f766e
+  style H fill:#fdf3e7,stroke:#b45309`,
+    mermaidCap:"A shared feature store keeps training and serving consistent, with feedback closing the loop.",
+    picture:`<svg width="100%" height="190" viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="70" width="160" height="60" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/><text x="120" y="100" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">latency &lt; 100ms</text><text x="120" y="118" text-anchor="middle" font-size="10" fill="#155e75" font-family="monospace">10k req/s</text>
+      <rect x="300" y="70" width="160" height="60" rx="12" fill="#e6f4f1" stroke="#0f766e" stroke-width="2"/><text x="380" y="100" text-anchor="middle" font-size="12" fill="#0c6b48" font-family="monospace">realtime</text><text x="380" y="118" text-anchor="middle" font-size="10" fill="#0c6b48" font-family="monospace">or batch</text>
+      <rect x="560" y="70" width="160" height="60" rx="12" fill="#fdf3e7" stroke="#b45309" stroke-width="2"/><text x="640" y="100" text-anchor="middle" font-size="12" fill="#7c4a12" font-family="monospace">cost cap</text><text x="640" y="118" text-anchor="middle" font-size="10" fill="#7c4a12" font-family="monospace">per request</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="200" y1="100" x2="298" y2="100"/><line x1="460" y1="100" x2="558" y2="100"/></g>
+      <text x="380" y="160" text-anchor="middle" font-size="11" fill="#8a94a6" font-family="monospace">state the tradeoffs before you pick an architecture</text>
+    </svg>`,
+    picCap:"System design starts with numbers: latency, throughput, and cost.",
+    commands:`# The 10-minute ML system design framework
+# 1. Requirements: latency, throughput, accuracy, cost
+# 2. Data: sources, volume, labels, freshness
+# 3. Features: store, compute, skew risk
+# 4. Training: offline, frequency, evaluation set
+# 5. Serving: batch vs realtime, infra, scaling
+# 6. Monitoring + iteration: drift, feedback, retrain
+
+# Example answer skeleton
+#   "This is a <realtime|batch> problem because <latency reason>.
+#    I would use a shared feature store to avoid training-serving skew,
+#    serve with <FastAPI|SageMaker|vLLM>, and monitor <metrics>."`,
+    lab:[
+      "Take a recommendation task and write its latency, throughput, and cost requirements.",
+      "Decide batch versus realtime for that task and justify it in one paragraph.",
+      "Draw the feature-store loop on paper and mark where skew could sneak in."
+    ],
+    tip:"Interviewers reward candidates who state requirements and tradeoffs before jumping to a solution. Opening with the numbers, not the model, is the single biggest signal of seniority in a system design round.",
+    questions:[
+      {q:"When do you choose batch versus realtime serving?", a:"Realtime when the prediction must be available immediately and latency is tight, like fraud detection at checkout. Batch when you can score a large population on a schedule, like nightly churn scoring. Realtime costs more to operate; batch is simpler and cheaper."},
+      {q:"What is training-serving skew, and how do you prevent it?", a:"Skew is when the features used in production differ from those used in training, so the model sees different data than it learned from. A shared feature store and versioned feature transforms keep both paths computing features the same way."},
+      {q:"How do you handle a model that must run on 10,000 requests per second?", a:"Start with the requirements, then optimize the pipeline: distill or quantize the model, batch requests on the GPU, cache common results, add horizontal scaling behind a load balancer, and consider an efficient server like vLLM for LLMs. Measure before optimizing."}
+    ]
+  },
+  {
+    id:16, icon:"☁️", title:"Cloud ML: AWS & GCP", level:"Platform",
+    intro:"Large MNCs run their ML on a cloud platform, and GCCs overwhelmingly use AWS. Knowing SageMaker end to end, with Vertex AI as your multi-cloud card, is the platform depth a Director must have. The AWS MLS-C01 exam certifies exactly this, which is why it is your first certification.",
+    concepts:[
+      {t:"SageMaker pipeline", d:"Author, version, and automate the train to deploy workflow as a DAG of steps."},
+      {t:"SageMaker endpoints", d:"Managed, auto-scaling serving with the model hosted and monitored for you."},
+      {t:"Feature Store", d:"A centralized, shareable store for training and serving features."},
+      {t:"Vertex AI Workbench", d:"GCP's managed notebook and training surface, your multi-cloud alternative."},
+      {t:"When to use which", d:"AWS for GCC roles and breadth; GCP for Vertex teams and your existing credits."}
+    ],
+    mermaid:`flowchart LR
+  A["Data"] --> B["SageMaker Pipeline"]
+  B --> C["Train job"]
+  C --> D["Model registry"]
+  D --> E["Endpoint"]
+  E --> F["Monitor"]
+  F -->|drift| B
+  style B fill:#e0f4f8,stroke:#0891b2
+  style E fill:#e6f4f1,stroke:#0f766e
+  style F fill:#fdf3e7,stroke:#b45309`,
+    mermaidCap:"SageMaker covers the whole lifecycle: pipeline, registry, endpoint, and monitoring.",
+    picture:`<svg width="100%" height="190" viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="50" width="200" height="80" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/><text x="140" y="80" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">AWS SageMaker</text><text x="140" y="100" text-anchor="middle" font-size="10" fill="#155e75" font-family="monospace">GCC default</text>
+      <rect x="300" y="50" width="200" height="80" rx="12" fill="#e6f4f1" stroke="#0f766e" stroke-width="2"/><text x="400" y="80" text-anchor="middle" font-size="12" fill="#0c6b48" font-family="monospace">GCP Vertex AI</text><text x="400" y="100" text-anchor="middle" font-size="10" fill="#0c6b48" font-family="monospace">multi-cloud</text>
+      <rect x="560" y="50" width="160" height="80" rx="12" fill="#f1ebfe" stroke="#7c3aed" stroke-width="2"/><text x="640" y="80" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">Colab</text><text x="640" y="100" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="monospace">daily driver</text>
+      <text x="380" y="165" text-anchor="middle" font-size="11" fill="#8a94a6" font-family="monospace">three tools, three jobs: cert, portfolio, daily learning</text>
+    </svg>`,
+    picCap:"Your cloud stack: SageMaker for the cert and GCC story, Vertex for multi-cloud, Colab for learning.",
+    commands:`# SageMaker pipeline (conceptual outline)
+# 1. Preprocess step: clean and feature-engineer
+# 2. Train step: launch a training job with a chosen instance
+# 3. Evaluate step: score against a validation set, gate the model
+# 4. Register step: store the approved model with metadata
+# 5. Deploy step: create or update an endpoint
+
+# Colab to Vertex: upload your notebook
+# gcloud notebooks instances create genai-workbench --machine-type n1-standard-4`,
+    lab:[
+      "List the five SageMaker pipeline steps and what each one gates.",
+      "Map the AWS MLS-C01 domains to the chapters of this book (data, modeling, MLOps).",
+      "Open the Vertex AI Workbench console with your credits and start a small instance."
+    ],
+    tip:"The AWS ML Specialty is worth more as a story than as a badge. Pair it with the sentence 'I built and served a model through a SageMaker pipeline', and the certification stops being paper and becomes proof.",
+    questions:[
+      {q:"What does a SageMaker pipeline give you over ad-hoc scripts?", a:"It turns training into a versioned, reproducible, automated workflow. Steps are orchestrated as a DAG, results are tracked, models are registered with lineage, and the whole thing can gate deployment. It removes the manual, error-prone glue between notebook and production."},
+      {q:"Why use a feature store instead of computing features in the serving app?", a:"A feature store centralizes feature definitions and values so training and serving use identical features, preventing skew, and so features are reused across models instead of recomputed in every pipeline. It also keeps a consistent, historical view for backfills."},
+      {q:"When would you pick Vertex AI over SageMaker?", a:"When the team or company is on GCP, when you need tight integration with BigQuery and Vertex tooling, or when you have GCP credits. For a GCC targeting AWS-heavy employers, SageMaker is the higher-leverage platform to learn first, but knowing both reads as multi-cloud credibility."}
+    ]
+  },
+  {
+    id:17, icon:"🏛️", title:"The GenAI Gateway Project", level:"Advanced",
+    intro:"This is the portfolio centerpiece. The GenAI Gateway is an enterprise LLM platform with a router, guardrails, evaluation, audit, and a cost dashboard behind a FastAPI. One working system demonstrates the entire book, and it is the artifact you will open on screen in the interview.",
+    concepts:[
+      {t:"Router", d:"Choose the model per request by task, cost, and risk. Cheap model for coding, frontier for reasoning."},
+      {t:"Guardrails", d:"Input and output validation plus PII redaction, as in Chapter 12."},
+      {t:"Evaluation", d:"A regression set and LLM-as-judge scoring, as in Chapter 13."},
+      {t:"Audit log", d:"Record every request and response for compliance and debugging."},
+      {t:"Cost dashboard", d:"Track tokens and spend per model and per team, so cost is visible, not hidden."}
+    ],
+    mermaid:`flowchart LR
+  A["Client"] --> B["FastAPI"]
+  B --> C["Router"]
+  C --> D["Guardrails"]
+  D --> E["LLM (routed)"]
+  E --> F["Output guard"]
+  F --> G["Audit log"]
+  G --> H["Cost dashboard"]
+  F --> I["Client response"]
+  style C fill:#e0f4f8,stroke:#0891b2
+  style D fill:#fdf3e7,stroke:#b45309
+  style G fill:#f1ebfe,stroke:#7c3aed`,
+    mermaidCap:"The gateway pipeline: route, guard, generate, re-guard, and log everything.",
+    picture:`<svg width="100%" height="190" viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="60" width="150" height="70" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/><text x="115" y="90" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">Router</text><text x="115" y="108" text-anchor="middle" font-size="10" fill="#155e75" font-family="monospace">task + cost</text>
+      <rect x="230" y="60" width="150" height="70" rx="12" fill="#fdf3e7" stroke="#b45309" stroke-width="2"/><text x="305" y="90" text-anchor="middle" font-size="12" fill="#7c4a12" font-family="monospace">Guardrails</text><text x="305" y="108" text-anchor="middle" font-size="10" fill="#7c4a12" font-family="monospace">in + out</text>
+      <rect x="420" y="60" width="150" height="70" rx="12" fill="#f1ebfe" stroke="#7c3aed" stroke-width="2"/><text x="495" y="90" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">Eval + Audit</text><text x="495" y="108" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="monospace">score + log</text>
+      <rect x="610" y="60" width="120" height="70" rx="12" fill="#e6f4f1" stroke="#0f766e" stroke-width="2"/><text x="670" y="90" text-anchor="middle" font-size="12" fill="#0c6b48" font-family="monospace">Cost</text><text x="670" y="108" text-anchor="middle" font-size="10" fill="#0c6b48" font-family="monospace">dashboard</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="190" y1="95" x2="228" y2="95"/><line x1="380" y1="95" x2="418" y2="95"/><line x1="570" y1="95" x2="608" y2="95"/></g>
+    </svg>`,
+    picCap:"Four components, one pipeline, all behind a single API.",
+    commands:`# The Router class from the project
+from pydantic import BaseModel
+
+class RouteRule(BaseModel):
+    name: str
+    condition: str
+    model: str
+    max_tokens: int = 4096
+    temperature: float = 0.1
+
+class Router:
+    def __init__(self, rules): self.rules = rules
+    def route(self, request: dict) -> RouteRule:
+        for rule in self.rules:
+            if self._matches(rule, request):
+                return rule
+        return self.rules[-1]   # default
+    def _matches(self, rule, request) -> bool:
+        if rule.condition == "*": return True
+        for part in rule.condition.split(" and "):
+            if "==" in part:
+                k, v = part.split("==")
+                if request.get(k.strip()) != v.strip(): return False
+        return True
+
+rules = [
+    RouteRule(name="coding", condition="task==coding", model="gpt-4o-mini"),
+    RouteRule(name="reasoning", condition="task==reasoning", model="claude-sonnet"),
+    RouteRule(name="default", condition="*", model="gpt-4o-mini"),
+]
+print(Router(rules).route({"task": "reasoning"}).model)`,
+    lab:[
+      "Run the Router and confirm it sends reasoning to the right model.",
+      "Add a guardrail check before the router and an audit line after the response.",
+      "Extend the router with a cost rule: route to the cheaper model when the request is low risk."
+    ],
+    tip:"When you present this project, lead with the diagram, then walk one request through the pipeline, then open the code. A candidate who can trace a request end to end owns the room.",
+    questions:[
+      {q:"Why build a gateway instead of calling an LLM API directly?", a:"A gateway centralizes routing, guardrails, evaluation, audit, and cost control so every team gets safety and visibility by default instead of each reinventing it. It is the difference between a pile of API calls and a governed platform, which is what an enterprise actually needs."},
+      {q:"How does the router decide which model to use?", a:"Rules map request attributes like task type, sensitivity, and budget to a model. Simple tasks route to a cheap fast model, hard reasoning routes to a frontier model, and a default rule catches everything else. The decision is explicit and auditable, not hidden inside prompts."},
+      {q:"What is the strongest interview talking point in this project?", a:"That you built the full governance loop, not just generation: routing, guardrails on both sides, a regression evaluation set, an audit log, and a cost dashboard. Each maps to a real enterprise concern, which proves you think like an owner, not a demo author."}
+    ]
+  },
+  {
+    id:18, icon:"🎓", title:"Certs, GPU & Interview Bank", level:"System",
+    intro:"The last chapter ties the threads together: which certification to take first, how to get GPU time without burning money, and a compact bank of the questions you are most likely to hear, with the answer shape that lands. Use this chapter to close gaps and rehearse out loud.",
+    concepts:[
+      {t:"AWS MLS-C01 first", d:"Data engineering, EDA, modeling, and MLOps domains map one-to-one onto this book."},
+      {t:"NVIDIA DLI", d:"Short, hands-on courses in deep learning and RAG that read as applied, not academic."},
+      {t:"GPU ladder", d:"Colab free T4, then Colab Pro, then RunPod spot. Pay only when the free tier runs out."},
+      {t:"Rehearse out loud", d:"Answers you can only write are not ready. Say them; time yourself; cut the filler."},
+      {t:"The narrative", d:"PhD in multi-agent systems, three patents, a 22K community, and a platform you built: that is the story."}
+    ],
+    mermaid:`flowchart LR
+  A["Week 1"] --> B["ML fundamentals"]
+  B --> C["GenAI + agents"]
+  C --> D["Platform + project"]
+  D --> E["Cert + interview"]
+  style A fill:#e0f4f8,stroke:#0891b2
+  style E fill:#e6f4f1,stroke:#0f766e`,
+    mermaidCap:"The arc of the whole book in one line, from fundamentals to the offer.",
+    picture:`<svg width="100%" height="190" viewBox="0 0 760 190" xmlns="http://www.w3.org/2000/svg">
+      <rect x="40" y="70" width="150" height="60" rx="12" fill="#e0f4f8" stroke="#0891b2" stroke-width="2"/><text x="115" y="95" text-anchor="middle" font-size="12" fill="#155e75" font-family="monospace">Colab T4</text><text x="115" y="113" text-anchor="middle" font-size="10" fill="#155e75" font-family="monospace">free</text>
+      <rect x="230" y="70" width="150" height="60" rx="12" fill="#e6f4f1" stroke="#0f766e" stroke-width="2"/><text x="305" y="95" text-anchor="middle" font-size="12" fill="#0c6b48" font-family="monospace">Colab Pro</text><text x="305" y="113" text-anchor="middle" font-size="10" fill="#0c6b48" font-family="monospace">$10/mo</text>
+      <rect x="420" y="70" width="150" height="60" rx="12" fill="#fdf3e7" stroke="#b45309" stroke-width="2"/><text x="495" y="95" text-anchor="middle" font-size="12" fill="#7c4a12" font-family="monospace">RunPod A100</text><text x="495" y="113" text-anchor="middle" font-size="10" fill="#7c4a12" font-family="monospace">about $0.50/hr</text>
+      <rect x="610" y="70" width="120" height="60" rx="12" fill="#f1ebfe" stroke="#7c3aed" stroke-width="2"/><text x="670" y="95" text-anchor="middle" font-size="12" fill="#5b21b6" font-family="monospace">Vertex</text><text x="670" y="113" text-anchor="middle" font-size="10" fill="#5b21b6" font-family="monospace">credits</text>
+      <g stroke="#8a94a6" stroke-width="2"><line x1="190" y1="100" x2="228" y2="100"/><line x1="380" y1="100" x2="418" y2="100"/><line x1="570" y1="100" x2="608" y2="100"/></g>
+    </svg>`,
+    picCap:"Your GPU ladder, cheapest first. Move up only when the free tier runs out.",
+    commands:`# Interview bank: the top questions and the shape of a strong answer
+# 1. Explain bias-variance -> plain words, then the U-shaped curve
+# 2. How does attention work -> weighted sum of values, query-key weights
+# 3. RAG vs fine-tune    -> currency, cost, hallucination, citations
+# 4. Design a realtime system -> requirements first, then feature store, serving, monitoring
+# 5. Guardrails story    -> input, output, PII, one case each caught
+
+# Rehearse rule: answer in 90 seconds, no filler, end with a tradeoff`,
+    lab:[
+      "Time yourself on each of the five questions in the command block. Ninety seconds each.",
+      "Record one answer on your phone and listen for filler words to cut.",
+      "Write your one-page leadership narrative: PhD, patents, community, and the gateway in four paragraphs."
+    ],
+    tip:"The interview is a performance of what you already know, not a test of what you can recall under pressure. Rehearsing out loud turns this book from reading into fluency, and fluency is what gets the offer.",
+    questions:[
+      {q:"Why is AWS ML Specialty the right first certification?", a:"Its four domains, data engineering, EDA, modeling, and MLOps, map directly onto the platform work GCCs do, and AWS is the dominant cloud for those employers. It certifies breadth exactly where the role needs it, and it pairs with a working SageMaker project to become proof, not paper."},
+      {q:"What is your GPU strategy for learning on a budget?", a:"Start on Colab's free T4 for all prototyping. Move to Colab Pro only when I need a faster or larger GPU for real training, and to RunPod spot A100 for occasional heavy jobs at about fifty cents an hour. Vertex AI credits cover multi-cloud practice. I pay only for what the free tier cannot handle."},
+      {q:"What single sentence sums up your candidacy?", a:"An engineering leader with a PhD in multi-agent systems, three patents, and a 22K community, who built an enterprise LLM gateway end to end and can still open the code and explain every line. That one sentence carries the ML depth, the platform work, and the leadership all at once."}
+    ]
+  }
+];
+
+/* =====================================================================
+   RENDERING
+   ===================================================================== */
+const colorVar = {
+  Foundation:'--accent', Core:'--blue', Advanced:'--purple', Platform:'--green', System:'--amber'
+};
+function renderTOC(){
+  const toc = document.getElementById('toc');
+  toc.innerHTML = chapters.map(ch => `
+    <a href="#chapter-${ch.id}" data-title="${ch.title.toLowerCase()}" data-level="${ch.level.toLowerCase()}">
+      <span class="num">${ch.id}</span>
+      <span>${ch.icon} ${ch.title}</span>
+    </a>`).join('');
+}
+function renderQuestions(qs){
+  if(!qs || !qs.length) return '';
+  return `<h3 class="sec">Check Yourself</h3>
+  <div class="qa">
+    ${qs.map((q,i)=>`<details class="qa-item">
+      <summary><span class="qn">Q${i+1}</span><span>${q.q}</span></summary>
+      <div class="ans">${q.a}</div>
+    </details>`).join('')}
+  </div>`;
+}
+function renderChapters(){
+  const wrap = document.getElementById('chapters');
+  wrap.innerHTML = chapters.map(ch => `
+    <section class="chapter" id="chapter-${ch.id}">
+      <div class="ch-head">
+        <div class="ch-ico">${ch.icon}</div>
+        <div>
+          <h2>${ch.title}</h2>
+          <div class="level">Chapter ${ch.id} · ${ch.level}</div>
+        </div>
+      </div>
+      <p class="intro">${ch.intro}</p>
+
+      <h3 class="sec">Key Concepts</h3>
+      <div class="cards">
+        ${ch.concepts.map(c => `<div class="card"><div class="t">${c.t}</div><div class="d">${c.d}</div></div>`).join('')}
+      </div>
+
+      <h3 class="sec">How It Works</h3>
+      <div class="diagram">
+        <div class="mermaid">${ch.mermaid}</div>
+        <div class="cap">${ch.mermaidCap}</div>
+      </div>
+
+      <h3 class="sec">Illustration</h3>
+      <div class="picture">
+        ${ch.picture}
+        <div class="cap">${ch.picCap}</div>
+      </div>
+
+      <h3 class="sec">Try It Yourself</h3>
+      <div class="codewrap">
+        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+        <pre class="code">${escapeHTML(ch.commands)}</pre>
+      </div>
+
+      <div class="lab">
+        <div class="lh"><i class="fas fa-flask"></i> Hands-on Lab</div>
+        <ol>${ch.lab.map(s => `<li>${s}</li>`).join('')}</ol>
+      </div>
+
+      <div class="tip">
+        <div class="ic"><i class="fas fa-lightbulb"></i></div>
+        <div class="tx"><strong>Expert tip:</strong> ${ch.tip}</div>
+      </div>
+
+      ${renderQuestions(ch.questions)}
+
+      ${chapterNav(ch.id)}
+    </section>
+  `).join('');
+}
+function chapterNav(id){
+  const prev = chapters.find(c => c.id === id-1);
+  const next = chapters.find(c => c.id === id+1);
+  const p = prev ? `<a class="prev" href="#chapter-${prev.id}"><div class="lab">Previous</div><div class="ttl">${prev.icon} ${prev.title}</div></a>` : `<span></span>`;
+  const n = next ? `<a class="next" href="#chapter-${next.id}"><div class="lab">Next</div><div class="ttl">${next.icon} ${next.title}</div></a>` : `<span></span>`;
+  return `<div class="chapternav">${p}${n}</div>`;
+}
+function escapeHTML(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Copy button */
+function copyCode(btn){
+  const code = btn.parentElement.querySelector('pre').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.classList.add('done');
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+    setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = '<i class="fas fa-copy"></i> Copy'; }, 1600);
+  });
+}
+
+/* ================= UNIFIED SEARCH ================= */
+let BOOK_INDEX = [];
+let SEM_READY = false;
+let LAST_Q = "";
+let EXTRACTOR = null;
+let CHAPTER_EMB = [];
+
+function buildIndex(){
+  BOOK_INDEX = chapters.map(ch => {
+    const qa = ch.questions ? ch.questions.map(q => q.q + " " + q.a).join(" ") : "";
+    const raw = [
+      ch.title, ch.level, ch.intro,
+      ch.concepts.map(c => c.t + " " + c.d).join(" "),
+      ch.commands, ch.lab.join(" "), ch.tip,
+      ch.mermaidCap, ch.picCap, qa
+    ].join(" ");
+    return {id:ch.id, title:ch.title, level:ch.level, text:raw.toLowerCase(), raw:raw};
+  });
+}
+
+function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+function makeContext(raw, q){
+  const term = q.split(/\s+/).filter(Boolean)[0] || q;
+  const re = new RegExp(escRe(term), "i");
+  const m = re.exec(raw);
+  if(!m) return raw.slice(0, 90) + (raw.length>90?"…":"");
+  const s = m.index;
+  const before = raw.slice(0, s).trim().split(/\s+/).slice(-2).join(" ");
+  const after  = raw.slice(s + m[0].length).trim().split(/\s+/).slice(0, 2).join(" ");
+  const snippet = (before ? before + " " : "") + m[0] + (after ? " " + after : "");
+  return escapeHTML(snippet).replace(new RegExp("("+escRe(term)+")","ig"), "<mark>$1</mark>");
+}
+
+function bestTerm(q, ch){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  for(const t of terms){ if(ch.text.includes(t)) return t; }
+  return terms[0] || q;
+}
+
+function keywordResults(q, limit){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if(!terms.length) return [];
+  const res = [];
+  for(const ch of BOOK_INDEX){
+    let score = 0, ctx = "";
+    for(const t of terms){
+      if(ch.text.includes(t)){ score++; if(!ctx) ctx = makeContext(ch.raw, t); }
+    }
+    if(score > 0) res.push({ch, score, ctx, sem:false});
+  }
+  res.sort((a,b)=> b.score - a.score);
+  return res.slice(0, limit);
+}
+
+function cosine(a, b){
+  let d=0, na=0, nb=0;
+  for(let i=0;i<a.length;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d / ((Math.sqrt(na)*Math.sqrt(nb)) || 1);
+}
+
+async function getExtractor(){
+  if(EXTRACTOR) return EXTRACTOR;
+  const mod = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.0");
+  EXTRACTOR = await mod.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+  return EXTRACTOR;
+}
+
+async function embedText(text){
+  const ex = await getExtractor();
+  const out = await ex(text, {pooling:"mean", normalize:true});
+  return Array.from(out.data);
+}
+
+async function primeEmbeddings(){
+  const st = document.getElementById("search-status");
+  if(st) st.textContent = "indexing…";
+  try{
+    await getExtractor();
+    CHAPTER_EMB = [];
+    for(const ch of BOOK_INDEX){
+      CHAPTER_EMB[ch.id] = await embedText(ch.raw.slice(0, 400));
+    }
+    SEM_READY = true;
+    if(st) st.textContent = "semantic ✓";
+    if(LAST_Q.trim()) renderResults(LAST_Q, searchBlend(LAST_Q, 14));
+  }catch(e){
+    if(st) st.textContent = "keyword only";
+  }
+}
+
+function searchBlend(q, limit){
+  return keywordResults(q, limit);
+}
+
+function renderResults(q, list){
+  const box = document.getElementById("search-results");
+  if(!box) return;
+  if(!list.length){ box.innerHTML = '<div class="sr-empty">No matches for "'+escapeHTML(q)+'".</div>'; box.classList.add("show"); return; }
+  box.innerHTML = list.map(r => {
+    const ch = r.ch;
+    const ctx = r.ctx || makeContext(ch.raw, bestTerm(q, ch));
+    const tag = r.sem ? '<span class="sr-tag sem">semantic</span>' : '<span class="sr-tag">match</span>';
+    return '<a class="sr-item" href="#chapter-'+ch.id+'" onclick="closeSearch()">'
+         + '<div class="sr-chap">Chapter '+ch.id+' · '+escapeHTML(ch.level)+'</div>'
+         + '<div class="sr-title"><span>'+escapeHTML(ch.title)+'</span>'+tag+'</div>'
+         + '<div class="sr-ctx">'+ctx+'</div></a>';
+  }).join("");
+  box.classList.add("show");
+}
+
+function closeSearch(){ const b=document.getElementById("search-results"); if(b) b.classList.remove("show"); }
+
+function searchBooks(q){
+  LAST_Q = q = (q||"").trim();
+  const box = document.getElementById("search-results");
+  if(!q){ closeSearch(); if(box) box.innerHTML=""; return; }
+  const kw = keywordResults(q, 14);
+  renderResults(q, kw);
+  if(SEM_READY && CHAPTER_EMB.length){
+    embedText(q).then(qe => {
+      const sem = BOOK_INDEX.map(ch => ({
+        ch, sim: cosine(qe, CHAPTER_EMB[ch.id] || [])
+      })).filter(r => r.sim > 0.12)
+        .sort((a,b)=> b.sim - a.sim).slice(0, 8)
+        .map(r => ({ch:r.ch, ctx:makeContext(r.ch.raw, bestTerm(q, r.ch)), sem:true}));
+      const seen = new Set(sem.map(r=>r.ch.id));
+      const merged = sem.concat(kw.filter(r=>!seen.has(r.ch.id)).map(r=>({ch:r.ch,ctx:r.ctx,sem:false})));
+      renderResults(q, merged.slice(0,14));
+    }).catch(()=>{});
+  } else if(!window.__embStarted){
+    window.__embStarted = true;
+    primeEmbeddings();
+  }
+}
+
+// hide results on outside click
+document.addEventListener("click", function(e){
+  const w = document.querySelector(".search-wrap");
+  if(w && !w.contains(e.target)) closeSearch();
+});
+
+/* Active section highlight on scroll */
+function setupScrollSpy(){
+  const links = document.querySelectorAll('#toc a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        const id = e.target.id;
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+id));
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px', threshold:0});
+  document.querySelectorAll('.chapter').forEach(c => obs.observe(c));
+}
+
+/* Mobile sidebar */
+function openSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('backdrop').classList.add('show'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('backdrop').classList.remove('show'); }
+
+/* Export current page as standalone .html */
+function exportHTML(){
+  const data = document.documentElement.outerHTML;
+  const blob = new Blob([data], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'AI-book.html'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* Init */
+window.addEventListener('DOMContentLoaded', () => {
+  renderTOC();
+  renderChapters();
+  buildIndex();
+  setTimeout(primeEmbeddings, 800);
+  setupScrollSpy();
+  mermaid.initialize({startOnLoad:false, theme:'neutral', flowchart:{curve:'basis'}, securityLevel:'loose'});
+  mermaid.run();
+});
+</script>
+</body>
+</html>
