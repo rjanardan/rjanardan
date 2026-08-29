@@ -520,6 +520,15 @@ function gotoPage(n){
 }
 function gotoChapter(n){ if(n >= 1 && n <= chapters.length) flipTo(n, true); }
 
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    const el = document.documentElement;
+    (el.requestFullscreen || el.webkitRequestFullscreen || function(){}).call(el);
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || function(){}).call(document);
+  }
+}
+
 let numBuffer = '';
 let numTimer = null;
 function numDigit(d, shifted){
