@@ -68,7 +68,8 @@
   .book-area{flex:1;min-height:0;display:flex;flex-direction:column;}
   .stage-hint{font-size:11px;color:var(--muted);padding:6px 18px 2px;}
   #stage{flex:1;min-height:0;display:flex;gap:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
-         padding:10px 0 14px;perspective:2400px;align-items:center;}
+          padding:10px 0 14px;perspective:2400px;align-items:center;}
+  .pages{display:flex;}
   #stage::-webkit-scrollbar{height:11px;}
   #stage::-webkit-scrollbar-thumb{background:#cfd4db;border-radius:6px;}
 
@@ -77,7 +78,15 @@
   .leaf.flipping{animation:pageTurn .55s cubic-bezier(.2,.7,.3,1);}
   @keyframes pageTurn{0%{transform:rotateY(0deg);}55%{transform:rotateY(-8deg);box-shadow:-30px 0 50px rgba(20,24,31,.16);}100%{transform:rotateY(0deg);}}
 
-  /* Slim top bar (toggled with t) */
+  /* Centre number-entry readout (multi-digit page/chapter jump) */
+  .numentry{display:none;position:fixed;inset:0;z-index:95;pointer-events:none;
+            align-items:center;justify-content:center;font-family:'Space Grotesk',Georgia,serif;}
+  .numentry.show{display:flex;animation:numIn .12s ease;}
+  @keyframes numIn{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
+  .numentry{font-size:64px;font-weight:700;color:var(--accent-ink);
+            background:rgba(255,255,255,.86);border:1px solid var(--line);
+            padding:26px 44px;border-radius:18px;box-shadow:0 18px 50px rgba(20,24,31,.18);}
+
   .topbar{display:flex;align-items:center;gap:12px;padding:6px 18px;background:var(--panel);
           border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-soft);}
   .topbar.hidden{display:none;}
@@ -195,7 +204,7 @@
   <div class="topbar" id="topbar">
     <span class="now" id="nowchap">Ch 1</span>
     <span class="track" id="track"></span>
-    <span class="hint">t bar · T contents</span>
+    <span class="hint">zoom <b id="zoomval">100%</b> · t contents · T top bar</span>
   </div>
 
   <div class="book-area">
@@ -211,6 +220,8 @@
     </div>
     <div class="tocgrid" id="tocgrid"></div>
   </div>
+
+  <div class="numentry" id="numentry"></div>
 
   <div class="jumplist" id="jumplist" onclick="if(event.target===this)this.classList.remove('show')">
     <div class="panel">
@@ -408,7 +419,7 @@ function backHTML(ch){
 
 function renderBook(){
   const stage = document.getElementById('stage');
-  stage.innerHTML = chapters.map(ch => `
+  stage.innerHTML = `<div class="pages" id="pages">` + chapters.map(ch => `
     <div class="leaf" id="leaf-${ch.id}" data-id="${ch.id}">
       <div class="page left" id="chapter-${ch.id}">
         <div class="pagelabel">Page 1 · Concepts</div>
@@ -491,22 +502,61 @@ function openJump(){ const j=document.getElementById('jumplist'); if(j) j.classL
 function openSearch(){ const o=document.getElementById('searchoverlay'); const s=document.getElementById('search'); if(o){o.classList.add('show');} if(s){ s.focus(); s.select(); } }
 function closeSearch(){ const o=document.getElementById('searchoverlay'); const b=document.getElementById('search-results'); if(o) o.classList.remove('show'); if(b){ b.classList.remove('show'); b.innerHTML=''; } const s=document.getElementById('search'); if(s) s.value=''; }
 
-function toggleFullscreen(){
-  if(!document.fullscreenElement){ if(document.documentElement.requestFullscreen) document.documentElement.requestFullscreen(); }
-  else { if(document.exitFullscreen) document.exitFullscreen(); }
+function setZoom(z){
+  zoom = Math.max(0.6, Math.min(2.2, z));
+  const p = document.getElementById('pages');
+  if(p) p.style.zoom = zoom;
+  const zv = document.getElementById('zoomval');
+  if(zv) zv.textContent = Math.round(zoom * 100) + '%';
 }
+let zoom = 1;
+function zoomBy(d){ setZoom(zoom + d); }
+function gotoPage(n){
+  const total = chapters.length * 2;
+  n = Math.max(1, Math.min(total, n));
+  const idx = Math.ceil(n / 2) - 1;
+  const leaf = chapters[idx];
+  if(leaf) flipTo(leaf.id, true);
+}
+function gotoChapter(n){ if(n >= 1 && n <= chapters.length) flipTo(n, true); }
+
+let numBuffer = '';
+let numTimer = null;
+function numDigit(d, shifted){
+  numBuffer += d;
+  if(numBuffer.length > 3) numBuffer = numBuffer.slice(-3);
+  showNum(numBuffer, shifted ? 'chapter' : 'page');
+  clearTimeout(numTimer);
+  numTimer = setTimeout(() => {
+    const n = parseInt(numBuffer, 10);
+    numBuffer = '';
+    hideNum();
+    if(shifted) gotoChapter(n); else gotoPage(n);
+  }, 500);
+}
+function showNum(txt, kind){
+  const el = document.getElementById('numentry');
+  if(!el) return;
+  el.textContent = txt + (kind === 'chapter' ? '  · chapter' : '  · page');
+  el.classList.add('show');
+}
+function hideNum(){ const el = document.getElementById('numentry'); if(el) el.classList.remove('show'); }
 
 document.addEventListener('keydown', function(e){
   if(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
-  if(e.key === 'ArrowRight' || e.key === 'n' || e.key === 'N'){ e.preventDefault(); step(1); }
+  if(e.key === '+' || e.key === '='){ e.preventDefault(); zoomBy(0.1); }
+  else if(e.key === '-' || e.key === '_'){ e.preventDefault(); zoomBy(-0.1); }
+  else if(e.key === 'ArrowRight' || e.key === 'n' || e.key === 'N'){ e.preventDefault(); step(1); }
   else if(e.key === 'ArrowLeft' || e.key === 'p' || e.key === 'P'){ e.preventDefault(); step(-1); }
-  else if(e.key === '0'){ e.preventDefault(); flipTo(chapters[0].id, true); }
+  else if(e.key === '0'){ e.preventDefault(); numDigit('0', e.shiftKey); }
   else if(e.key === 'z' || e.key === 'Z'){ e.preventDefault(); flipTo(chapters[chapters.length-1].id, true); }
   else if(e.key === 'g' || e.key === 'G'){ e.preventDefault(); openJump(); }
   else if(e.key === 't'){ e.preventDefault(); toggleTOC(); }
   else if(e.key === 'T'){ e.preventDefault(); toggleTabbar(); }
   else if(e.key === 's' || e.key === 'S'){ e.preventDefault(); openSearch(); }
   else if(e.key === 'f' || e.key === 'F'){ e.preventDefault(); toggleFullscreen(); }
+  else if(/^Digit[0-9]$/.test(e.code)){ e.preventDefault(); numDigit(e.code.slice(5), e.shiftKey); }
+  else if(/^Numpad[0-9]$/.test(e.code)){ e.preventDefault(); numDigit(e.code.slice(6), e.shiftKey); }
   else if(e.key === 'Escape'){ const j=document.getElementById('jumplist'); if(j) j.classList.remove('show'); closeSearch(); }
 });
 
