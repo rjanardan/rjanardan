@@ -445,16 +445,34 @@ function flipTo(id, scroll){
   updateBar();
   if(scroll !== false){
     const stage = document.getElementById('stage');
-    stage.scrollTo({left: Math.max(0, leaf.offsetLeft - stage.offsetLeft - 14), behavior:'smooth'});
+    const lr = leaf.getBoundingClientRect();
+    const sr = stage.getBoundingClientRect();
+    const left = stage.scrollLeft + (lr.left - sr.left) - 14;
+    stage.scrollTo({left: Math.max(0, left), behavior:'smooth'});
   }
 }
 let scrolling = false;
+function currentLeafId(){
+  const stage = document.getElementById('stage');
+  if(!stage) return CURRENT;
+  const sr = stage.getBoundingClientRect();
+  const mid = sr.left + sr.width/2;
+  let best = null, bestDist = Infinity;
+  document.querySelectorAll('.leaf').forEach(l => {
+    const r = l.getBoundingClientRect();
+    const c = r.left + r.width/2;
+    const d = Math.abs(c - mid);
+    if(d < bestDist){ bestDist = d; best = l; }
+  });
+  return best ? parseInt(best.dataset.id, 10) : CURRENT;
+}
 function toggleFlip(id){
   const leaf = document.getElementById('leaf-' + id);
   if(leaf) leaf.classList.toggle('flipped');
 }
 function step(dir){
-  let idx = chapters.findIndex(c => c.id === CURRENT);
+  const id = currentLeafId();
+  let idx = chapters.findIndex(c => c.id === id);
   idx = Math.min(chapters.length - 1, Math.max(0, idx + dir));
   flipTo(chapters[idx].id, true);
 }
