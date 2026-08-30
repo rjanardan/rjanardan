@@ -1,0 +1,902 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Mermaid Field Guide</title>
+
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.6.0/css/all.min.css">
+
+<style>
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap');
+
+:root{
+  --bg:#f5f7f9;
+  --panel:#ffffff;
+  --panel-2:#f8fafb;
+  --ink:#1a2433;
+  --ink-soft:#4a5568;
+  --muted:#8a94a6;
+  --line:#e4e9ef;
+  --accent:#4338ca;
+  --accent-soft:#e9e8fd;
+  --blue:#2563eb;
+  --blue-soft:#e8f0fe;
+  --amber:#b45309;
+  --amber-soft:#fdf3e7;
+  --purple:#7c3aed;
+  --purple-soft:#f1ebfe;
+  --green:#0f766e;
+  --green-soft:#e6f4f1;
+  --code-bg:#0d1526;
+  --code-ink:#c7d5e8;
+  --shadow:0 1px 2px rgba(26,36,51,.06),0 8px 24px rgba(26,36,51,.06);
+}
+*{box-sizing:border-box;}
+html{scroll-behavior:smooth;}
+body{
+  margin:0;
+  font-family:'Inter',system-ui,-apple-system,sans-serif;
+  background:var(--bg);
+  color:var(--ink);
+  font-size:15px;
+  line-height:1.55;
+  -webkit-font-smoothing:antialiased;
+}
+.title-font{font-family:'Space Grotesk',sans-serif;}
+code,.mono{font-family:'JetBrains Mono',ui-monospace,monospace;}
+
+.shell{max-width:1400px;margin:0 auto;display:flex;align-items:flex-start;}
+
+.sidebar{
+  width:290px;flex:0 0 290px;
+  position:sticky;top:0;
+  height:100vh;overflow-y:auto;
+  background:var(--panel);
+  border-right:1px solid var(--line);
+  padding:26px 18px;
+}
+.sidebar .brand{display:flex;align-items:center;gap:12px;margin-bottom:6px;}
+.sidebar .brand .logo{
+  width:42px;height:42px;border-radius:12px;
+  background:var(--accent);color:#fff;
+  display:flex;align-items:center;justify-content:center;font-size:22px;
+}
+.sidebar h1{font-size:17px;margin:0;letter-spacing:-.02em;}
+.sidebar .tag{font-size:11px;text-transform:uppercase;letter-spacing:.14em;color:var(--muted);margin:14px 6px 10px;}
+.toc a{
+  display:flex;align-items:center;gap:10px;
+  padding:8px 11px;border-radius:10px;
+  color:var(--ink-soft);text-decoration:none;font-size:13px;
+  transition:background .15s,color .15s;
+}
+.toc a .num{
+  width:22px;height:22px;flex:0 0 22px;border-radius:6px;
+  background:var(--panel-2);border:1px solid var(--line);
+  display:flex;align-items:center;justify-content:center;font-size:11px;color:var(--muted);
+}
+.toc a:hover{background:var(--panel-2);color:var(--ink);}
+.toc a.active{background:var(--accent-soft);color:var(--accent);font-weight:600;}
+.toc a.active .num{background:var(--accent);color:#fff;border-color:var(--accent);}
+
+.main{flex:1;min-width:0;}
+header.topbar{
+  position:sticky;top:0;z-index:40;
+  background:rgba(255,255,255,.85);backdrop-filter:blur(10px);
+  border-bottom:1px solid var(--line);
+  display:flex;align-items:center;gap:14px;
+  padding:14px 26px;
+}
+header.topbar .menu-btn{display:none;font-size:20px;background:none;border:none;color:var(--ink);cursor:pointer;}
+header.topbar h2{font-size:16px;margin:0;flex:1;letter-spacing:-.01em;}
+header.topbar .search{
+  flex:0 0 300px;max-width:40vw;
+  background:var(--panel-2);border:1px solid var(--line);
+  border-radius:999px;padding:8px 14px;font-size:12px;outline:none;color:var(--ink);
+}
+header.topbar .search:focus{border-color:var(--accent);background:#fff;}
+header.topbar .save{
+  display:flex;align-items:center;gap:7px;font-size:12px;
+  background:var(--accent);color:#fff;border:none;cursor:pointer;
+  padding:9px 15px;border-radius:999px;white-space:nowrap;
+}
+header.topbar .save:hover{background:#3730a3;}
+
+.content{padding:38px clamp(20px,4vw,56px) 120px;max-width:920px;}
+
+.hero{
+  background:linear-gradient(135deg,#4338ca 0%,#312e81 100%);
+  color:#fff;border-radius:22px;padding:46px 40px;margin-bottom:46px;
+  box-shadow:var(--shadow);
+}
+.hero h1{font-family:'Space Grotesk';font-size:clamp(22px,3vw,30px);margin:0 0 12px;letter-spacing:-.02em;line-height:1.15;}
+.hero p{max-width:660px;font-size:14px;opacity:.95;margin:0 0 18px;}
+.hero .stats{display:flex;flex-wrap:wrap;gap:18px;font-size:13px;}
+.hero .stats div{display:flex;align-items:center;gap:8px;}
+.hero .stats .dot{width:8px;height:8px;border-radius:50%;background:#c7d2fe;}
+
+.chapter{
+  background:var(--panel);border:1px solid var(--line);border-radius:20px;
+  padding:34px clamp(20px,3.5vw,44px);margin-bottom:40px;box-shadow:var(--shadow);
+  scroll-margin-top:84px;
+}
+.chapter .ch-head{display:flex;align-items:flex-start;gap:16px;margin-bottom:8px;}
+.chapter .ch-ico{
+  width:54px;height:54px;flex:0 0 54px;border-radius:14px;
+  display:flex;align-items:center;justify-content:center;font-size:28px;
+  background:var(--accent-soft);
+}
+.chapter h2{font-family:'Space Grotesk';font-size:clamp(18px,2.4vw,23px);margin:0;letter-spacing:-.02em;}
+.chapter .level{font-size:11px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:4px;}
+.chapter .intro{font-size:15px;color:var(--ink-soft);margin:16px 0 22px;}
+
+.chapter h3.sec{
+  font-family:'Space Grotesk';font-size:17px;margin:28px 0 12px;
+  padding-bottom:7px;border-bottom:1px solid var(--line);letter-spacing:-.01em;
+}
+.chapter p{color:var(--ink-soft);}
+.chapter ul.clean{margin:14px 0;padding-left:0;list-style:none;}
+.chapter ul.clean li{position:relative;padding:6px 0 6px 26px;color:var(--ink-soft);}
+.chapter ul.clean li::before{content:"▹";position:absolute;left:4px;color:var(--accent);font-weight:700;}
+
+.cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:14px;margin:18px 0;}
+.card{background:var(--panel-2);border:1px solid var(--line);border-radius:14px;padding:16px 18px;}
+.card .t{font-weight:600;color:var(--accent);margin-bottom:4px;}
+.card .d{font-size:13px;color:var(--ink-soft);}
+
+.diagram{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+  padding:18px;margin:18px 0;overflow-x:auto;
+}
+.diagram .cap{font-size:12px;color:var(--muted);text-align:center;margin-top:8px;font-style:italic;}
+
+.picture{
+  background:var(--panel-2);border:1px solid var(--line);border-radius:14px;
+  padding:18px;margin:18px 0;text-align:center;
+}
+.picture svg{max-width:100%;height:auto;}
+.picture .cap{font-size:12px;color:var(--muted);margin-top:8px;}
+
+.codewrap{position:relative;margin:16px 0;}
+pre.code{
+  background:var(--code-bg);color:var(--code-ink);
+  border-radius:14px;padding:18px 20px;overflow-x:auto;
+  font-family:'JetBrains Mono',monospace;font-size:12.5px;line-height:1.65;margin:0;
+}
+pre.code .c{color:#7dd3fc;}
+pre.code .p{color:#fca5a5;}
+pre.code .g{color:#86efac;}
+.copy-btn{
+  position:absolute;top:10px;right:10px;
+  background:rgba(255,255,255,.12);color:#e2e8f0;border:1px solid rgba(255,255,255,.18);
+  border-radius:8px;padding:5px 11px;font-size:12px;cursor:pointer;display:flex;align-items:center;gap:6px;
+}
+.copy-btn:hover{background:rgba(255,255,255,.22);}
+.copy-btn.done{background:var(--accent);border-color:var(--accent);color:#fff;}
+
+.lab{background:var(--blue-soft);border:1px solid #cdddfb;border-radius:14px;padding:18px 22px;margin:22px 0;}
+.lab .lh{display:flex;align-items:center;gap:10px;color:var(--blue);font-weight:600;margin-bottom:10px;}
+.lab ol{margin:0;padding-left:22px;color:var(--ink-soft);}
+.lab ol li{margin:7px 0;}
+
+.tip{background:var(--amber-soft);border:1px solid #f0d9b5;border-radius:14px;padding:16px 20px;margin:22px 0;display:flex;gap:12px;}
+.tip .ic{color:var(--amber);font-size:20px;margin-top:2px;}
+.tip .tx{color:#7c4a12;font-size:13.5px;}
+
+.note{background:var(--accent-soft);border:1px solid #c7eef6;border-radius:14px;padding:13px 17px;margin:16px 0;font-size:13.5px;color:#155e75;}
+
+/* ---- End-of-chapter questions ---- */
+.qa{margin:20px 0 6px;}
+.qa details{border:1px solid var(--line);border-radius:12px;margin:10px 0;background:var(--panel-2);overflow:hidden;}
+.qa summary{cursor:pointer;padding:13px 16px;font-weight:600;color:var(--ink);list-style:none;display:flex;gap:10px;align-items:flex-start;font-size:14px;}
+.qa summary::-webkit-details-marker{display:none;}
+.qa summary .qn{color:var(--accent);font-family:'JetBrains Mono',monospace;font-size:12px;font-weight:700;flex:0 0 auto;line-height:1.6;}
+.qa summary::after{content:"+";margin-left:auto;color:var(--muted);font-weight:700;font-size:16px;line-height:1.4;}
+.qa details[open] summary::after{content:"−";}
+.qa .ans{padding:0 16px 14px 40px;color:var(--ink-soft);font-size:13.5px;line-height:1.6;}
+.qa .ans p{margin:8px 0 0;color:var(--ink-soft);}
+
+.chapternav{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;margin-top:10px;}
+.chapternav a{
+  flex:1;min-width:200px;text-decoration:none;color:var(--ink-soft);
+  background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:14px 18px;box-shadow:var(--shadow);
+}
+.chapternav a:hover{border-color:var(--accent);}
+.chapternav a .lab{font-size:11px;color:var(--muted);text-transform:uppercase;letter-spacing:.1em;}
+.chapternav a .ttl{font-weight:600;color:var(--ink);}
+.chapternav a.next{text-align:right;}
+
+.pagefoot{max-width:920px;margin:0 auto;padding:30px 20px 60px;text-align:center;color:var(--muted);font-size:13px;}
+
+.backdrop{display:none;position:fixed;inset:0;background:rgba(26,36,51,.45);z-index:49;}
+
+@media (max-width:900px){
+  .sidebar{position:fixed;left:0;top:0;z-index:50;transform:translateX(-100%);transition:transform .25s ease;box-shadow:var(--shadow);}
+  .sidebar.open{transform:translateX(0);}
+  .backdrop.show{display:block;}
+  header.topbar .menu-btn{display:block;}
+  header.topbar .search{flex:1;max-width:none;}
+  header.topbar .save span{display:none;}
+}
+@media (max-width:560px){
+  .content{padding:24px 16px 90px;}
+  .hero{padding:32px 24px;}
+  .chapter{padding:26px 20px;}
+  header.topbar .search-wrap{display:none;}
+}
+
+/* ---- Unified search (full-text + semantic) ---- */
+.search-wrap{position:relative;flex:0 0 330px;max-width:42vw;display:flex;align-items:center;gap:8px;}
+.search-wrap .search{flex:1;width:100%;}
+.search-status{font-size:10px;color:var(--muted);white-space:nowrap;}
+.search-results{
+  position:absolute;top:48px;left:0;right:0;
+  background:#fff;border:1px solid var(--line);border-radius:14px;
+  box-shadow:var(--shadow);max-height:62vh;overflow-y:auto;z-index:60;display:none;
+}
+.search-results.show{display:block;}
+.sr-item{display:block;padding:10px 14px;border-bottom:1px solid var(--line);text-decoration:none;color:var(--ink);}
+.sr-item:last-child{border-bottom:none;}
+.sr-item:hover{background:var(--panel-2);}
+.sr-chap{font-size:11px;color:var(--accent);font-weight:600;}
+.sr-title{font-size:13px;font-weight:600;margin:2px 0;display:flex;justify-content:space-between;gap:8px;}
+.sr-tag{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:1px 6px;}
+.sr-tag.sem{color:var(--accent);border-color:var(--accent);}
+.sr-ctx{font-size:12px;color:var(--ink-soft);line-height:1.45;margin-top:3px;}
+.sr-ctx mark{background:#fde68a;color:#7c2d12;border-radius:3px;padding:0 2px;}
+.sr-empty{padding:14px;color:var(--muted);font-size:13px;}
+</style>
+</head>
+<body>
+
+<div class="shell">
+  <aside class="sidebar" id="sidebar">
+    <div class="brand">
+      <div class="logo">🧜</div>
+      <h1>The Mermaid Field Guide</h1>
+    </div>
+    <div class="tag">Table of Contents</div>
+    <nav class="toc" id="toc"></nav>
+  </aside>
+
+  <div class="backdrop" id="backdrop" onclick="closeSidebar()"></div>
+
+  <div class="main">
+    <header class="topbar">
+      <button class="menu-btn" onclick="openSidebar()" aria-label="Open menu"><i class="fas fa-bars"></i></button>
+      <h2>The Mermaid Field Guide</h2>
+      <div class="search-wrap">
+        <input id="search" class="search" type="text" placeholder="Search…" oninput="searchBooks(this.value)" autocomplete="off">
+        <span class="search-status" id="search-status"></span>
+        <div class="search-results" id="search-results"></div>
+      </div>
+      <button class="save" onclick="exportHTML()"><i class="fas fa-download"></i><span>Save .html</span></button>
+    </header>
+
+    <div class="content">
+      <section class="hero">
+        <h1>The Mermaid Field Guide</h1>
+        <p>One text block, many diagrams. Mermaid turns plain sentences into flowcharts, sequence diagrams, class models, state machines, Gantt charts, mindmaps, and a dozen more kinds of picture. This guide walks each diagram type: the syntax, a live example, the shapes and edges available, and a lab to make your own.</p>
+        <div class="stats">
+          <div><span class="dot"></span> 16 Chapters</div>
+          <div><span class="dot"></span> 48 Q&amp;A</div>
+          <div><span class="dot"></span> Mermaid + SVG Diagrams</div>
+          <div><span class="dot"></span> Full-text + Semantic Search</div>
+        </div>
+      </section>
+
+      <div id="chapters"></div>
+
+      <div class="pagefoot">
+        The Mermaid Field Guide · A personal, offline reference book · Light theme, responsive, printable.
+      </div>
+    </div>
+  </div>
+</div>
+
+<script>
+const chapters = [
+
+  {id:1, icon:"🧭", title:"Flowchart", level:"Foundation",
+   intro:"Flowchart is the diagram people reach for first, and it earns that place. A few lines of text become boxes, arrows, and decisions that explain a process to a colleague or to a future you.",
+   concepts:[
+     {t:"Node", d:"One box holding one idea, written as plain text in the source"},
+     {t:"Edge", d:"An arrow between nodes, made with two dashes and a greater-than sign"},
+     {t:"Direction", d:"TD, LR, BT, and RL set which way the whole chart flows"},
+     {t:"Shape", d:"Square, rounded, diamond, cylinder, chosen by the bracket type"},
+     {t:"Subgraph", d:"A named box that groups nodes visually without changing the flow"}],
+   mermaid:"flowchart TD\n  A[\"Idea\"] --> B[\"Design\"]\n  B --> C[\"Review\"]\n  C -->|pass| D[\"Ship\"]\n  C -->|fail| B",
+   mermaidCap:"A small review loop: the fail edge feeds the design back, which one line of text describes.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><rect x='30' y='80' width='120' height='44' rx='8' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='90' y='106' font-size='15' text-anchor='middle' fill='#312e81'>Idea</text><line x1='150' y1='102' x2='200' y2='102' stroke='#94a3b8' stroke-width='2'/><rect x='200' y='80' width='120' height='44' rx='8' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='260' y='106' font-size='15' text-anchor='middle' fill='#312e81'>Design</text><line x1='320' y1='102' x2='370' y2='102' stroke='#94a3b8' stroke-width='2'/><path d='M370 102 l40 0 l-12 -10 M410 102 l-12 10' fill='none' stroke='#4338ca' stroke-width='2'/><path d='M370 82 h55 v40 h-35' fill='none' stroke='#4338ca' stroke-width='2'/><polygon points='425,102 415,96 415,108' fill='#4338ca'/><text x='455' y='80' font-size='14' fill='#5d6274'>Review</text><text x='420' y='76' font-size='11' fill='#8a94a6'>pass</text><path d='M420 102 h120' stroke='#94a3b8' stroke-width='2' stroke-dasharray='4 3'/><polygon points='544,102 534,96 534,108' fill='#94a3b8'/><text x='420' y='126' font-size='11' fill='#8a94a6'>fail</text><rect x='548' y='80' width='120' height='44' rx='8' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='608' y='106' font-size='15' text-anchor='middle' fill='#312e81'>Ship</text><text x='370' y='176' font-size='12' fill='#8a94a6' text-anchor='middle'>One decision, two outcomes, drawn as a sentence</text></svg>",
+   picCap:"A decision diamond splits the flow into pass and fail.",
+   commands:"flowchart LR\n  subgraph Front\n    A[\"Browser\"]\n  end\n  subgraph Back\n    B[\"API\"]\n    C[\"Database\"]\n  end\n  A --> B --> C\n  C -.->|read| A",
+   lab:["Write a four-node flow for your morning routine","Change TD to LR and watch the whole layout rotate","Wrap two nodes in a subgraph and label it"],
+   tip:"Quote every label. A bare label that contains a comma or a colon breaks the parser.",
+   questions:[
+     {q:"What does the arrow A --> B tell a reader about A and B?", a:"Control or data moves from A to B; the flow direction is explicit."},
+     {q:"Name three node shapes and the brackets that make them.", a:"Rectangle with square brackets, rounded with parentheses, diamond with curly brackets."},
+     {q:"Why would you reach for a subgraph?", a:"To group related nodes visually so a wide flow stays readable."}]},
+
+  {id:2, icon:"🔁", title:"Sequence Diagram", level:"Foundation",
+   intro:"Sequence diagrams put actors and services in lanes and draw the messages between them in time order. They answer the question: who calls whom, and in what order?",
+   concepts:[
+     {t:"Participant", d:"A lane for a person or service, declared with participant"},
+     {t:"Message", d:"A solid arrow for a call, a dashed arrow for a reply"},
+     {t:"Order", d:"Messages read top to bottom as time passes"},
+     {t:"Activation", d:"A bar on the lane showing how long a call stays active"},
+     {t:"Note", d:"A comment pinned to one lane or stretched between two"}],
+   mermaid:"sequenceDiagram\n  participant U as User\n  participant S as Server\n  participant D as Database\n  U->>S: Login request\n  S->>D: Check credentials\n  D-->>S: OK\n  S-->>U: Token",
+   mermaidCap:"A login in four messages: two calls and two dashed replies.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><line x1='150' y1='40' x2='150' y2='180' stroke='#cbd5e1' stroke-width='2'/><line x1='400' y1='40' x2='400' y2='180' stroke='#cbd5e1' stroke-width='2'/><line x1='630' y1='40' x2='630' y2='180' stroke='#cbd5e1' stroke-width='2'/><rect x='95' y='30' width='110' height='26' rx='6' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='150' y='47' font-size='13' text-anchor='middle' fill='#312e81'>User</text><rect x='345' y='30' width='110' height='26' rx='6' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='400' y='47' font-size='13' text-anchor='middle' fill='#312e81'>Server</text><rect x='575' y='30' width='110' height='26' rx='6' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='630' y='47' font-size='13' text-anchor='middle' fill='#312e81'>Database</text><line x1='150' y1='75' x2='400' y2='75' stroke='#4338ca' stroke-width='2'/><polygon points='404,75 394,69 394,81' fill='#4338ca'/><text x='275' y='68' font-size='12' text-anchor='middle' fill='#5d6274'>Login request</text><line x1='400' y1='110' x2='630' y2='110' stroke='#4338ca' stroke-width='2'/><polygon points='634,110 624,104 624,116' fill='#4338ca'/><text x='515' y='103' font-size='12' text-anchor='middle' fill='#5d6274'>Check credentials</text><line x1='630' y1='140' x2='400' y2='140' stroke='#94a3b8' stroke-width='2' stroke-dasharray='5 3'/><polygon points='396,140 406,134 406,146' fill='#94a3b8'/><text x='515' y='157' font-size='12' text-anchor='middle' fill='#8a94a6'>OK</text></svg>",
+   picCap:"Lanes and arrows: time runs down the page.",
+   commands:"sequenceDiagram\n  actor U as User\n  participant S as Checkout\n  participant P as Payments\n  U->>S: Place order\n  S->>P: Charge card\n  P-->>S: Approved\n  S-->>U: Order confirmed\n  Note over S,P: retry twice on decline",
+   lab:["Draw a login flow with three participants","Change one message from solid to dashed and say why it changed","Add a Note stretched over two participants"],
+   tip:"Declare people with actor so the lane draws a stick figure instead of a box.",
+   questions:[
+     {q:"What is the difference between --> and -->> in a message?", a:"The first is a plain dashed line, the second a dashed line with an arrowhead, used for replies."},
+     {q:"Why do messages read top to bottom?", a:"The vertical order is time order; the diagram is a story told downward."},
+     {q:"When is an activation bar useful?", a:"When a call takes visible time, the bar shows how long the participant stays busy."}]},
+
+  {id:3, icon:"🏛", title:"Class Diagram", level:"Core",
+   intro:"Class diagrams model the types in a codebase: their fields, methods, and how they relate. They are the floor plan of an object-oriented design.",
+   concepts:[
+     {t:"Class", d:"A type drawn as a box with name, fields, and methods"},
+     {t:"Attribute", d:"A field with a name and type, listed in the class box"},
+     {t:"Method", d:"A function with a signature, listed below the fields"},
+     {t:"Relation", d:"Inheritance, composition, and association drawn as different arrows"},
+     {t:"Visibility", d:"Plus for public, minus for private, shown beside each member"}],
+   mermaid:"classDiagram\n  class Animal {\n    +name: string\n    +speak() void\n  }\n  class Dog\n  class Cat\n  Animal <|-- Dog\n  Animal <|-- Cat",
+   mermaidCap:"Two subclasses inherit from one base class, drawn with hollow-triangle arrows.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><rect x='300' y='18' width='160' height='120' rx='8' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='380' y='44' font-size='15' text-anchor='middle' fill='#312e81' font-weight='600'>Animal</text><line x1='300' y1='56' x2='460' y2='56' stroke='#4338ca' stroke-width='1'/><text x='314' y='76' font-size='12' fill='#5d6274'>+ name: string</text><text x='314' y='96' font-size='12' fill='#5d6274'>+ speak(): void</text><rect x='70' y='120' width='150' height='58' rx='8' fill='#fff' stroke='#94a3b8' stroke-width='2'/><text x='145' y='154' font-size='14' text-anchor='middle' fill='#312e81'>Dog</text><rect x='540' y='120' width='150' height='58' rx='8' fill='#fff' stroke='#94a3b8' stroke-width='2'/><text x='615' y='154' font-size='14' text-anchor='middle' fill='#312e81'>Cat</text><line x1='220' y1='140' x2='300' y2='90' stroke='#4338ca' stroke-width='2'/><polygon points='300,90 288,84 288,96' fill='none' stroke='#4338ca' stroke-width='2'/><line x1='460' y1='90' x2='540' y2='140' stroke='#4338ca' stroke-width='2'/><polygon points='460,90 448,84 448,96' fill='none' stroke='#4338ca' stroke-width='2'/><text x='380' y='188' font-size='12' fill='#8a94a6' text-anchor='middle'>Inheritance: the hollow triangle points at the base class</text></svg>",
+   picCap:"The hollow triangle always points at the parent.",
+   commands:"classDiagram\n  class Order {\n    +id: string\n    +total: number\n    +pay() bool\n  }\n  class Customer\n  class OrderItem\n  Customer \"1\" --> \"*\" Order : places\n  Order \"1\" *-- \"*\" OrderItem : contains",
+   lab:["Model a User and an Admin where Admin inherits from User","Add two fields and one method to the User class","Change one relation to composition and describe the difference"],
+   tip:"Show visibility with + and -; the contract of the class becomes readable at a glance.",
+   questions:[
+     {q:"Which arrow points at the base class in inheritance?", a:"The hollow triangle. It points from the subclass to the class it inherits from."},
+     {q:"What do the plus and minus signs before members mean?", a:"Plus is public, minus is private; they state who may call or read the member."},
+     {q:"How does composition differ from inheritance?", a:"Composition is a has-a relation drawn with a filled diamond; inheritance is an is-a relation drawn with a triangle."}]},
+
+  {id:4, icon:"🚦", title:"State Diagram", level:"Core",
+   intro:"State diagrams show the moods of a system: what states it can be in, what events move it, and where it starts and ends. They are the simplest honest picture of a state machine.",
+   concepts:[
+     {t:"State", d:"A named condition the system can hold"},
+     {t:"Transition", d:"An arrow from one state to another, labeled with the event"},
+     {t:"Start", d:"The entry point, drawn as a filled circle"},
+     {t:"End", d:"The terminal point, drawn as a filled circle with a ring"},
+     {t:"Composite state", d:"A state that contains states of its own"}],
+   mermaid:"stateDiagram-v2\n  [*] --> Idle\n  Idle --> Running : start\n  Running --> Idle : stop\n  Running --> Failed : crash\n  Failed --> Idle : restart\n  Idle --> [*]",
+   mermaidCap:"Four states, five transitions, one start, one end. The colon holds the event.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><circle cx='60' cy='100' r='10' fill='#4338ca'/><rect x='140' y='78' width='120' height='44' rx='22' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='200' y='105' font-size='14' text-anchor='middle' fill='#312e81'>Idle</text><rect x='340' y='78' width='130' height='44' rx='22' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='405' y='105' font-size='14' text-anchor='middle' fill='#312e81'>Running</text><rect x='550' y='140' width='130' height='44' rx='22' fill='#f3e8ff' stroke='#7c3aed' stroke-width='2'/><text x='615' y='165' font-size='14' text-anchor='middle' fill='#4c1d95'>Failed</text><line x1='70' y1='100' x2='140' y2='100' stroke='#4338ca' stroke-width='2'/><polygon points='144,100 134,94 134,106' fill='#4338ca'/><line x1='260' y1='100' x2='340' y2='100' stroke='#4338ca' stroke-width='2'/><polygon points='344,100 334,94 334,106' fill='#4338ca'/><text x='300' y='92' font-size='12' text-anchor='middle' fill='#5d6274'>start</text><line x1='470' y1='110' x2='560' y2='140' stroke='#94a3b8' stroke-width='2'/><polygon points='564,140 552,136 556,146' fill='#94a3b8'/><text x='520' y='128' font-size='12' text-anchor='middle' fill='#8a94a6'>crash</text><path d='M550 150 q-160 60 -260 -8' fill='none' stroke='#94a3b8' stroke-width='2' stroke-dasharray='5 3'/><polygon points='294,140 300,126 306,140' fill='#94a3b8'/><text x='390' y='182' font-size='12' fill='#8a94a6' text-anchor='middle'>restart carries the system back to Idle</text></svg>",
+   picCap:"The event name rides the arrow, the state name sits in the bubble.",
+   commands:"stateDiagram-v2\n  [*] --> Draft\n  Draft --> Review : submit\n  Review --> Draft : request changes\n  Review --> Published : approve\n  Published --> [*]",
+   lab:["Draw a three-state machine for a door: open, closed, locked","Label each transition with the event that triggers it","Add a start and end marker and describe both"],
+   tip:"Put the event after the colon on the arrow; the transition then reads as a sentence.",
+   questions:[
+     {q:"What do the filled circle and the ringed circle mean?", a:"The filled circle is the start state, the ringed circle is the end state."},
+     {q:"Where does the event name belong in a transition?", a:"After the colon on the arrow, so the arrow reads from-state, event, to-state."},
+     {q:"Why model a failed state instead of stopping at error handling?", a:"A named failed state makes recovery explicit: you can draw the path back to normal."}]},
+
+  {id:5, icon:"🗄", title:"Entity-Relationship Diagram", level:"Core",
+   intro:"Entity-relationship diagrams map the data: the tables or entities, their cardinalities, and the relationships that hold the model together.",
+   concepts:[
+     {t:"Entity", d:"A thing worth storing, like a customer or an order"},
+     {t:"Attribute", d:"A property of an entity, listed under its name"},
+     {t:"Relationship", d:"A named connection between two entities"},
+     {t:"Cardinality", d:"How many of each side take part, read from the shapes at the ends"},
+     {t:"Crow's foot", d:"The three-pronged mark that means many at that end"}],
+   mermaid:"erDiagram\n  CUSTOMER ||--o{ ORDER : places\n  ORDER ||--|{ LINE_ITEM : contains\n  PRODUCT ||--o{ LINE_ITEM : appears_in",
+   mermaidCap:"Two bars mean exactly one, a foot with a ring means zero or many.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><rect x='40' y='70' width='170' height='60' rx='8' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='125' y='105' font-size='14' text-anchor='middle' fill='#312e81'>CUSTOMER</text><line x1='210' y1='100' x2='330' y2='100' stroke='#94a3b8' stroke-width='2'/><text x='270' y='90' font-size='12' fill='#8a94a6' text-anchor='middle'>places</text><rect x='380' y='70' width='160' height='60' rx='8' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='460' y='105' font-size='14' text-anchor='middle' fill='#312e81'>ORDER</text><line x1='380' y1='70' x2='360' y2='90' stroke='#94a3b8' stroke-width='2'/><line x1='380' y1='110' x2='360' y2='130' stroke='#94a3b8' stroke-width='2'/><line x1='370' y1='80' x2='340' y2='90' stroke='#94a3b8' stroke-width='2'/><line x1='370' y1='120' x2='340' y2='130' stroke='#94a3b8' stroke-width='2'/><text x='330' y='135' font-size='10' fill='#8a94a6'>o{</text><text x='605' y='105' font-size='13' fill='#5d6274'>a customer places</text><text x='605' y='125' font-size='13' fill='#5d6274'>zero to many orders</text><circle cx='608' cy='78' r='4' fill='none' stroke='#94a3b8' stroke-width='2'/><text x='608' y='92' font-size='10' fill='#8a94a6'>o{</text></svg>",
+   picCap:"Read the cardinality from the glyph at each end of the line.",
+   commands:"erDiagram\n  USER ||--o{ ORDER : places\n  ORDER ||--|{ ITEM : contains\n  PRODUCT ||--o{ ITEM : appears_in",
+   lab:["Model a book and its authors with a many-to-many relation","Change one cardinality and describe what the model now allows","Add a third entity and connect it to the pair"],
+   tip:"Read the cardinality from the shape at each end: two bars for exactly one, a crow's foot for many.",
+   questions:[
+     {q:"What does ||--o{ mean when read from left to right?", a:"Exactly one of the left entity relates to zero or many of the right entity."},
+     {q:"What is a crow's foot?", a:"The three-pronged mark at an end of a relationship line meaning many."},
+     {q:"Why name the relationship on the line?", a:"The name turns the line into a sentence: a customer places orders."}]},
+
+  {id:6, icon:"📅", title:"Gantt Chart", level:"Core",
+   intro:"Gantt charts lay tasks on a calendar. They show what depends on what and where the slack lives. Mermaid draws them from a sectioned task list with dates or offsets.",
+   concepts:[
+     {t:"Task", d:"A row on the chart with a name, a start, and a duration"},
+     {t:"Section", d:"A band that groups related tasks under a heading"},
+     {t:"Dependency", d:"after TASKID starts a task when its predecessor finishes"},
+     {t:"Milestone", d:"A zero-duration marker for a moment, not a stretch of work"},
+     {t:"dateFormat", d:"The shape dates take in the source, set once near the top"}],
+   mermaid:"gantt\n  title Release Plan\n  dateFormat YYYY-MM-DD\n  section Build\n    Design :a1, 2026-09-01, 5d\n    Code   :a2, after a1, 10d\n  section Ship\n    Test   :a3, after a2, 4d\n    Launch :milestone, after a3, 0d",
+   mermaidCap:"Two sections, four tasks, one milestone, and every task after its predecessor.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><text x='20' y='30' font-size='13' fill='#5d6274'>Build</text><text x='20' y='70' font-size='13' fill='#5d6274'>Ship</text><line x1='90' y1='14' x2='90' y2='180' stroke='#cbd5e1' stroke-width='1'/><line x1='290' y1='14' x2='290' y2='180' stroke='#cbd5e1' stroke-width='1'/><line x1='490' y1='14' x2='490' y2='180' stroke='#cbd5e1' stroke-width='1'/><line x1='690' y1='14' x2='690' y2='180' stroke='#cbd5e1' stroke-width='1'/><rect x='90' y='18' width='200' height='26' rx='5' fill='#e9e8fd' stroke='#4338ca' stroke-width='1.5'/><text x='190' y='35' font-size='12' fill='#312e81'>Design</text><rect x='290' y='50' width='280' height='26' rx='5' fill='#e9e8fd' stroke='#4338ca' stroke-width='1.5'/><text x='430' y='67' font-size='12' fill='#312e81'>Code</text><rect x='570' y='58' width='120' height='26' rx='5' fill='#e9e8fd' stroke='#4338ca' stroke-width='1.5'/><text x='630' y='75' font-size='12' fill='#312e81'>Test</text><path d='M600 84 l0 12 M615 84 l0 12 M630 84 l0 12' stroke='#4338ca' stroke-width='2'/><text x='610' y='110' font-size='12' fill='#312e81'>Launch</text><text x='180' y='150' font-size='12' fill='#8a94a6' text-anchor='middle'>Design</text><text x='430' y='150' font-size='12' fill='#8a94a6' text-anchor='middle'>Code</text><text x='610' y='150' font-size='12' fill='#8a94a6' text-anchor='middle'>Test</text><line x1='90' y1='140' x2='690' y2='140' stroke='#e4e9ef' stroke-width='2'/><text x='700' y='184' font-size='11' fill='#8a94a6'>after a1, after a2, after a3: the chain</text></svg>",
+   picCap:"Dependencies chain the bars: after a1, after a2, after a3.",
+   commands:"gantt\n  title Launch Plan\n  dateFormat YYYY-MM-DD\n  section Research\n    Interviews :r1, 2026-09-01, 7d\n  section Build\n    Prototype  :b1, after r1, 10d\n    Test       :b2, after b1, 5d\n  section Launch\n    Announce   :milestone, after b2, 0d",
+   lab:["Plan three tasks with absolute dates","Switch one task to after the previous task id","Add a milestone at the end and set its duration to 0d"],
+   tip:"Use after TASKID instead of absolute dates so the chart reflows when one task slips.",
+   questions:[
+     {q:"What does after a1 mean on a task?", a:"The task starts when task a1 finishes, whatever day that turns out to be."},
+     {q:"How is a milestone different from a task?", a:"A milestone has zero duration; it marks a moment, not a stretch of work."},
+     {q:"Why set dateFormat near the top of the chart?", a:"Every date in the file is parsed with it; changing it later reinterprets all rows."}]},
+
+  {id:7, icon:"🥧", title:"Pie Chart", level:"Foundation",
+   intro:"A pie chart is one sentence: this much of the whole is that. Mermaid needs a title, labels, and numbers, nothing else.",
+   concepts:[
+     {t:"Title", d:"The chart heading, written on the title line"},
+     {t:"Slice label", d:"A quoted name for one part of the whole"},
+     {t:"Value", d:"A number that sizes the slice"},
+     {t:"Sum", d:"The total the slices divide; the renderer works it out"},
+     {t:"Ratio", d:"Each slice shows its share of the total as a percentage"}],
+   mermaid:"pie title Cloud Spend by Service\n  \"Compute\" : 45\n  \"Storage\" : 25\n  \"Network\" : 15\n  \"Other\" : 15",
+   mermaidCap:"Four slices, four numbers, one total the renderer computes.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><circle cx='240' cy='105' r='70' fill='#e9e8fd'/><path d='M240 105 L240 35 A70 70 0 0 1 300 55 Z' fill='#4338ca'/><path d='M240 105 L300 55 A70 70 0 0 1 240 175 Z' fill='#7c9cf5'/><path d='M240 105 L240 175 A70 70 0 0 1 190 160 Z' fill='#c7d2fe'/><path d='M240 105 L190 160 A70 70 0 0 1 170 105 Z' fill='#e9e8fd' stroke='#94a3b8' stroke-width='1'/><text x='330' y='55' font-size='14' fill='#312e81'>Compute 45</text><text x='330' y='85' font-size='14' fill='#312e81'>Storage 25</text><text x='330' y='115' font-size='14' fill='#312e81'>Network 15</text><text x='330' y='145' font-size='14' fill='#312e81'>Other 15</text><text x='240' y='105' font-size='11' fill='#5d6274' text-anchor='middle'>whole</text><text x='420' y='180' font-size='12' fill='#8a94a6'>The pie shows shares, so the total is implied</text></svg>",
+   picCap:"Slices are sized by their share of the sum.",
+   commands:"pie title Where the Day Goes\n  \"Sleep\" : 8\n  \"Work\" : 8\n  \"Everything else\" : 8",
+   lab:["Draw a pie of how you spent last weekend, three slices","Change one value and describe what shifts","Add a fourth slice and watch the angles rebalance"],
+   tip:"Keep slices to six or fewer; beyond that a bar chart reads better.",
+   questions:[
+     {q:"What does the renderer do with the numbers on the right?", a:"It sums them and sizes each slice as its share of that total."},
+     {q:"Why are slice labels quoted in the source?", a:"A label with spaces or punctuation would otherwise confuse the parser."},
+     {q:"When is a pie chart the wrong choice?", a:"When you have many small slices or need to compare exact values; bars handle both better."}]},
+
+  {id:8, icon:"🧗", title:"User Journey", level:"Advanced",
+   intro:"Journey diagrams score how pleasant each step of an experience is. The task, a score from zero to five, and the person experiencing it is all the syntax needs.",
+   concepts:[
+     {t:"Section", d:"A stage of the journey, like Check-in or Security"},
+     {t:"Task", d:"One step, written as text before the colon"},
+     {t:"Score", d:"A number from zero to five for how pleasant the step feels"},
+     {t:"Actor", d:"The person living the step, after the score"},
+     {t:"Title", d:"The journey name at the top of the chart"}],
+   mermaid:"journey\n  title Morning at the Airport\n  section Check-in\n    Queue: 2: Me\n    Kiosk: 5: Me\n  section Security\n    Scan: 4: Me\n    Shoes: 3: Me",
+   mermaidCap:"The curve dips at Queue and Shoes, which is exactly what the chart is for.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><line x1='40' y1='30' x2='720' y2='30' stroke='#cbd5e1' stroke-width='1'/><line x1='40' y1='180' x2='720' y2='180' stroke='#cbd5e1' stroke-width='1'/><text x='40' y='20' font-size='11' fill='#8a94a6'>5</text><text x='40' y='105' font-size='11' fill='#8a94a6'>3</text><text x='40' y='190' font-size='11' fill='#8a94a6'>0</text><polyline points='80,45 210,45 330,95 460,60 590,110 680,110' fill='none' stroke='#4338ca' stroke-width='3' stroke-linejoin='round'/><circle cx='80' cy='45' r='6' fill='#4338ca'/><text x='80' y='40' font-size='12' fill='#312e81' text-anchor='middle'>Queue</text><circle cx='210' cy='45' r='6' fill='#4338ca'/><text x='210' y='40' font-size='12' fill='#312e81' text-anchor='middle'>Kiosk</text><circle cx='330' cy='95' r='6' fill='#4338ca'/><text x='330' y='130' font-size='12' fill='#312e81' text-anchor='middle'>Scan</text><circle cx='460' cy='60' r='6' fill='#4338ca'/><text x='460' y='55' font-size='12' fill='#312e81' text-anchor='middle'>Shoes</text><text x='590' y='125' font-size='12' fill='#312e81'>lower scores</text><text x='590' y='143' font-size='12' fill='#312e81'>are redesign targets</text></svg>",
+   picCap:"The line is the experience; the valleys are the work.",
+   commands:"journey\n  title First Coffee of the Day\n  section Kitchen\n    Grind beans: 5: Me\n    Boil water: 4: Me\n    Pour: 5: Me\n  section Desk\n    First sip: 5: Me",
+   lab:["Score three steps of your morning routine","Move one step into a new section","Change one score and describe what the line does"],
+   tip:"Score every step before you start, then read the valleys: the low scores are the redesign targets.",
+   questions:[
+     {q:"What does the number after the colon mean?", a:"It is the score from zero to five for how pleasant that step feels."},
+     {q:"Who is the actor in a journey diagram?", a:"The person experiencing the journey, named after the score on each task."},
+     {q:"How should you use the finished chart?", a:"Look at the dips; each low-scored task is a candidate for redesign."}]},
+
+  {id:9, icon:"🌳", title:"Mindmap", level:"Foundation",
+   intro:"A mindmap is a tree drawn from a root. It suits notes, feature lists, and the first pass of any plan, and the syntax is the closest Mermaid gets to plain indentation.",
+   concepts:[
+     {t:"Root", d:"The center node from which every branch grows"},
+     {t:"Branch", d:"A first-level node, one indent from the root"},
+     {t:"Leaf", d:"A node deeper in the tree, two indents or more"},
+     {t:"Indent", d:"Two spaces per level decide parent and child"},
+     {t:"Shape", d:"Brackets around the root text change its look, like ((round))"}],
+   mermaid:"mindmap\n  root((Roadmap))\n    Research\n      Papers\n      Interviews\n    Build\n      Prototype\n      Launch",
+   mermaidCap:"A root, two branches, and four leaves, decided purely by indentation.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><ellipse cx='380' cy='100' rx='70' ry='34' fill='#4338ca'/><text x='380' y='106' font-size='14' text-anchor='middle' fill='#fff'>Roadmap</text><line x1='318' y1='88' x2='210' y2='60' stroke='#94a3b8' stroke-width='2'/><line x1='318' y1='112' x2='210' y2='140' stroke='#94a3b8' stroke-width='2'/><line x1='442' y1='88' x2='550' y2='60' stroke='#94a3b8' stroke-width='2'/><line x1='442' y1='112' x2='550' y2='140' stroke='#94a3b8' stroke-width='2'/><rect x='70' y='40' width='120' height='40' rx='20' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='130' y='65' font-size='13' text-anchor='middle' fill='#312e81'>Research</text><rect x='70' y='120' width='120' height='40' rx='20' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='130' y='145' font-size='13' text-anchor='middle' fill='#312e81'>Build</text><rect x='570' y='40' width='130' height='40' rx='20' fill='#fff' stroke='#94a3b8' stroke-width='2'/><text x='635' y='65' font-size='13' text-anchor='middle' fill='#5d6274'>Papers</text><rect x='570' y='120' width='130' height='40' rx='20' fill='#fff' stroke='#94a3b8' stroke-width='2'/><text x='635' y='145' font-size='13' text-anchor='middle' fill='#5d6274'>Launch</text><line x1='190' y1='60' x2='570' y2='60' stroke='#cbd5e1' stroke-width='1'/><line x1='190' y1='140' x2='570' y2='140' stroke='#cbd5e1' stroke-width='1'/><text x='380' y='188' font-size='12' fill='#8a94a6' text-anchor='middle'>Depth is indentation: two spaces per level</text></svg>",
+   picCap:"Every level of depth is two more spaces of indent.",
+   commands:"mindmap\n  root((Quarter))\n    Ship\n      Feature A\n      Feature B\n    Learn\n      User interviews\n    Grow\n      Docs",
+   lab:["Map your current week from a root","Move a leaf one level deeper and watch it reattach","Give the root the round (( )) shape"],
+   tip:"Indent with two spaces and keep branch text short; a mindmap is a map, not an essay.",
+   questions:[
+     {q:"What decides the parent of a node?", a:"Indentation: a node two spaces deeper than another hangs under it."},
+     {q:"Why keep branch text short?", a:"Long labels turn the tree into a paragraph; short labels keep it a map."},
+     {q:"What does root((Roadmap)) do?", a:"It draws the root as a rounded double circle instead of a plain branch shape."}]},
+
+  {id:10, icon:"🕰", title:"Timeline", level:"Advanced",
+   intro:"Timelines place events in a straight line of time. They are the diagram for history: a product's releases, a team's milestones, a project's arc.",
+   concepts:[
+     {t:"Title", d:"The timeline name on the first line"},
+     {t:"Period", d:"A date or label on its own line that anchors an event"},
+     {t:"Event", d:"A description after the colon, attached to its period"},
+     {t:"Order", d:"Rows run top to bottom and left to right"},
+     {t:"Markdown", d:"Event text may include bold and links for emphasis"}],
+   mermaid:"timeline\n  title History of the API\n  2019 : First version\n  2021 : v2 rewrite\n  2023 : GraphQL added\n  2025 : Public launch",
+   mermaidCap:"Four events, four periods, one straight line of time.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><line x1='60' y1='110' x2='700' y2='110' stroke='#4338ca' stroke-width='3'/><circle cx='140' cy='110' r='8' fill='#4338ca'/><circle cx='330' cy='110' r='8' fill='#4338ca'/><circle cx='520' cy='110' r='8' fill='#4338ca'/><circle cx='680' cy='110' r='8' fill='#4338ca'/><text x='140' y='90' font-size='13' text-anchor='middle' fill='#312e81' font-weight='600'>2019</text><text x='140' y='140' font-size='12' text-anchor='middle' fill='#5d6274'>First version</text><text x='330' y='90' font-size='13' text-anchor='middle' fill='#312e81' font-weight='600'>2021</text><text x='330' y='140' font-size='12' text-anchor='middle' fill='#5d6274'>v2 rewrite</text><text x='520' y='90' font-size='13' text-anchor='middle' fill='#312e81' font-weight='600'>2023</text><text x='520' y='140' font-size='12' text-anchor='middle' fill='#5d6274'>GraphQL</text><text x='680' y='90' font-size='13' text-anchor='middle' fill='#312e81' font-weight='600'>2025</text><text x='680' y='140' font-size='12' text-anchor='middle' fill='#5d6274'>Public launch</text><text x='400' y='180' font-size='12' fill='#8a94a6' text-anchor='middle'>The line carries the order; the labels carry the story</text></svg>",
+   picCap:"Period above the line, event below it.",
+   commands:"timeline\n  title The Service So Far\n  2022 : First deploy\n  2023 : v2 with queues\n  2024 : Multi-region\n  2025 : Public API",
+   lab:["List five events from your own project history","Give one event two sentences of description","Swap two events and see the order change"],
+   tip:"Write the period on its own line and the description after a colon; the renderer lines them up.",
+   questions:[
+     {q:"Where does the period go relative to the event?", a:"The period is its own line, the event follows after a colon."},
+     {q:"What does the timeline assume about its events?", a:"That they happened in the order written, top to bottom."},
+     {q:"When would you not use a timeline?", a:"When the story is about causation rather than chronology; a flowchart shows that better."}]},
+
+  {id:11, icon:"🌿", title:"Git Graph", level:"Advanced",
+   intro:"Git graphs draw branches and merges the way git thinks about them. They are the diagram a team actually looks at during a release.",
+   concepts:[
+     {t:"Commit", d:"A dot on a line, one per snapshot of history"},
+     {t:"Branch", d:"A line that splits off from main and grows its own commits"},
+     {t:"Checkout", d:"The command that moves the pointer to another branch"},
+     {t:"Merge", d:"A join that brings a branch back into the line it left"},
+     {t:"Commit id", d:"An optional label that names a commit in the graph"}],
+   mermaid:"gitGraph\n  commit id: \"init\"\n  branch feature\n  checkout feature\n  commit id: \"add-search\"\n  checkout main\n  commit id: \"fix-login\"\n  merge feature",
+   mermaidCap:"A feature branch, two main commits, and a merge back into main.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><line x1='60' y1='120' x2='700' y2='120' stroke='#4338ca' stroke-width='3'/><line x1='240' y1='120' x2='240' y2='55' stroke='#7c9cf5' stroke-width='3'/><line x1='240' y1='55' x2='560' y2='55' stroke='#7c9cf5' stroke-width='3'/><line x1='560' y1='55' x2='560' y2='120' stroke='#7c9cf5' stroke-width='3'/><circle cx='110' cy='120' r='9' fill='#4338ca'/><circle cx='240' cy='120' r='9' fill='#4338ca'/><circle cx='240' cy='55' r='9' fill='#7c9cf5'/><circle cx='400' cy='55' r='9' fill='#7c9cf5'/><circle cx='560' cy='55' r='9' fill='#7c9cf5'/><circle cx='560' cy='120' r='9' fill='#4338ca'/><circle cx='660' cy='120' r='9' fill='#4338ca'/><text x='110' y='142' font-size='11' text-anchor='middle' fill='#5d6274'>init</text><text x='240' y='142' font-size='11' text-anchor='middle' fill='#5d6274'>main</text><text x='400' y='45' font-size='11' text-anchor='middle' fill='#5d6274'>feature</text><text x='560' y='95' font-size='11' fill='#5d6274'>merge</text><text x='660' y='142' font-size='11' text-anchor='middle' fill='#5d6274'>fix-login</text><text x='380' y='180' font-size='12' fill='#8a94a6' text-anchor='middle'>The branch splits, grows, and rejoins; main never forks</text></svg>",
+   picCap:"Branches split and rejoin; the graph keeps the order.",
+   commands:"gitGraph\n  commit\n  branch feature\n  checkout feature\n  commit\n  commit\n  checkout main\n  commit\n  merge feature",
+   lab:["Draw main with three commits","Create a branch after the second commit","Add two commits to the branch and merge it back"],
+   tip:"Give commits id labels only when the story needs them; unlabeled commits keep the graph clean.",
+   questions:[
+     {q:"What does checkout do in the graph source?", a:"It moves the working pointer onto another branch so the next commits land there."},
+     {q:"What does the merge line do to the branch?", a:"It joins the branch back into the line it left, with the arrowhead on the receiving line."},
+     {q:"Why keep commits unlabeled?", a:"Labels add noise; the shape of the graph carries the story for simple histories."}]},
+
+  {id:12, icon:"🎯", title:"Quadrant Chart", level:"Advanced",
+   intro:"A quadrant chart pins items on a two-axis plane. The classic use is effort versus impact: four named regions and a list of points.",
+   concepts:[
+     {t:"x-axis", d:"The horizontal scale, written low to high"},
+     {t:"y-axis", d:"The vertical scale, written low to high"},
+     {t:"Quadrant", d:"One of four named regions of the plane"},
+     {t:"Point", d:"An item placed by two coordinates from zero to one"},
+     {t:"Title", d:"The chart name on the first line"}],
+   mermaid:"quadrantChart\n  title Effort vs Impact\n  x-axis Low Effort --> High Effort\n  y-axis Low Impact --> High Impact\n  quadrant-1 Quick wins\n  quadrant-2 Big bets\n  quadrant-3 Fill-ins\n  quadrant-4 Time sinks\n  \"Fix search\": [0.2, 0.8]\n  \"New API\": [0.7, 0.7]",
+   mermaidCap:"Four named regions, two points, one story about where work lands.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><rect x='120' y='30' width='300' height='130' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><rect x='420' y='30' width='280' height='130' fill='#f3e8ff' stroke='#7c3aed' stroke-width='2'/><line x1='420' y1='30' x2='420' y2='160' stroke='#4338ca' stroke-width='3'/><line x1='120' y1='95' x2='700' y2='95' stroke='#4338ca' stroke-width='3'/><text x='270' y='65' font-size='13' text-anchor='middle' fill='#312e81'>Quick wins</text><text x='560' y='65' font-size='13' text-anchor='middle' fill='#4c1d95'>Big bets</text><text x='270' y='130' font-size='13' text-anchor='middle' fill='#312e81'>Fill-ins</text><text x='560' y='130' font-size='13' text-anchor='middle' fill='#4c1d95'>Time sinks</text><circle cx='240' cy='45' r='8' fill='#4338ca'/><text x='258' y='42' font-size='11' fill='#312e81'>Fix search</text><circle cx='560' cy='58' r='8' fill='#7c3aed'/><text x='578' y='55' font-size='11' fill='#4c1d95'>New API</text><text x='120' y='185' font-size='11' fill='#8a94a6'>Low Effort</text><text x='700' y='185' font-size='11' fill='#8a94a6' text-anchor='end'>High Effort</text><text x='112' y='60' font-size='11' fill='#8a94a6' transform='rotate(-90 112 60)'>Low Impact</text><text x='112' y='160' font-size='11' fill='#8a94a6' transform='rotate(-90 112 160)'>High Impact</text></svg>",
+   picCap:"One axis pair, four regions, and points that choose a region.",
+   commands:"quadrantChart\n  title Backlog Triage\n  x-axis Low Effort --> High Effort\n  y-axis Low Impact --> High Impact\n  quadrant-1 Quick wins\n  quadrant-2 Big bets\n  quadrant-3 Fill-ins\n  quadrant-4 Time sinks\n  \"Fix auth\": [0.25, 0.8]\n  \"Rewrite search\": [0.7, 0.65]\n  \"Rename vars\": [0.2, 0.25]",
+   lab:["Place three backlog items on an effort-impact plane","Rename the four quadrants for your own question","Move one point and describe what the answer changes"],
+   tip:"Coordinates are fractions from 0 to 1 on each axis; place points where they belong, not where they look nice.",
+   questions:[
+     {q:"What range do the point coordinates use?", a:"Zero to one on each axis, as fractions of the scale."},
+     {q:"What is the usual story of quadrant-1?", a:"The items there are quick and impactful, so they are the first candidates for action."},
+     {q:"How are the quadrants labeled?", a:"In the source, quadrant-1 through quadrant-4 each get a name after the number."}]},
+
+  {id:13, icon:"🌊", title:"Sankey Diagram", level:"Advanced",
+   intro:"Sankey diagrams show quantity flowing between stages. The width of each ribbon carries the number, so a glance shows where the volume goes.",
+   concepts:[
+     {t:"Node", d:"A stage the flow passes through, named in quotes"},
+     {t:"Link", d:"A quoted arrow from one node to another"},
+     {t:"Value", d:"The number on a link, which sets its ribbon width"},
+     {t:"Direction", d:"Flow runs left to right along the arrows"},
+     {t:"Conservation", d:"What enters a node should leave it, or the chart says otherwise"}],
+   mermaid:"sankey-beta\n  'Solar' --> 'Grid': 40, 'Wind' --> 'Grid': 25, 'Grid' --> 'Homes': 65",
+   mermaidCap:"Two sources into the grid, one load out; in mermaid 10.x the links sit on one line, comma-separated.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><rect x='30' y='20' width='110' height='34' rx='6' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='85' y='41' font-size='13' text-anchor='middle' fill='#312e81'>Solar</text><rect x='30' y='80' width='110' height='34' rx='6' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='85' y='101' font-size='13' text-anchor='middle' fill='#312e81'>Wind</text><rect x='30' y='140' width='110' height='34' rx='6' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='85' y='161' font-size='13' text-anchor='middle' fill='#312e81'>Coal</text><path d='M140 37 Q300 30 420 45 L420 95 Q300 100 140 87 Z' fill='#7c9cf5' opacity='.7'/><path d='M140 97 Q300 95 420 90 L420 140 Q300 145 140 147 Z' fill='#94a3b8' opacity='.6'/><rect x='420' y='40' width='110' height='105' rx='6' fill='#4338ca'/><text x='475' y='98' font-size='13' text-anchor='middle' fill='#fff'>Grid</text><path d='M530 55 Q630 60 660 70 L660 110 Q630 120 530 115 Z' fill='#c7d2fe'/><path d='M530 120 Q630 130 660 135 L660 175 Q630 165 530 155 Z' fill='#e9e8fd' stroke='#94a3b8' stroke-width='1'/><rect x='660' y='66' width='80' height='48' rx='6' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='700' y='95' font-size='12' text-anchor='middle' fill='#312e81'>Homes</text><rect x='660' y='130' width='80' height='48' rx='6' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='700' y='159' font-size='12' text-anchor='middle' fill='#312e81'>Industry</text><text x='380' y='190' font-size='12' fill='#8a94a6' text-anchor='middle'>Ribbon width is the value; the numbers stay in the source</text></svg>",
+   picCap:"Width is the message; the numbers stay in the source.",
+   commands:"sankey-beta\n  \"Visits\" --> \"Signups\": 12\n  \"Visits\" --> \"Bounce\": 88\n  \"Signups\" --> \"Paid\": 3\n  \"Signups\" --> \"Free\": 9",
+   lab:["Trace a funnel with three stages and four links","Change one value and watch the ribbon resize","Check that what enters a node equals what leaves it"],
+   tip:"Keep the numbers integers and the node names short; the ribbon widths do the talking.",
+   questions:[
+     {q:"What does the number on a link control?", a:"The width of the ribbon, so big flows are visually loud."},
+     {q:"Why should what enters a node equal what leaves it?", a:"Sankey implies conservation; an imbalance is either a real loss or a mistake in the data."},
+     {q:"What kind of question is a Sankey good for?", a:"Where volume goes: funnels, budgets, energy, and anything measured in quantities."}]},
+
+  {id:14, icon:"📋", title:"Requirement Diagram", level:"Advanced",
+   intro:"Requirement diagrams turn a specification into a picture: each requirement, its risk, its verification method, and which element satisfies it. Traceability becomes visible.",
+   concepts:[
+     {t:"Requirement", d:"A named statement the system must meet, with an id"},
+     {t:"Element", d:"A component of the system that fulfills a requirement"},
+     {t:"Satisfies", d:"The relation that ties an element to a requirement"},
+     {t:"Risk", d:"A level from low to very high set on the requirement"},
+     {t:"Verification", d:"The method, like test or inspection, written on the requirement"}],
+   mermaid:"flowchart LR\n  R[\"Req: Login (id 1)\" ] -->|satisfies| E[\"App\"]\n  R -.->|verifymethod: test| E",
+   mermaidCap:"The requirement, the element that satisfies it, and the verification method, drawn as a flow.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><rect x='430' y='40' width='290' height='120' rx='10' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='448' y='66' font-size='14' fill='#312e81' font-weight='600'>Requirement: Login</text><text x='448' y='90' font-size='12' fill='#5d6274'>id: 1</text><text x='448' y='110' font-size='12' fill='#5d6274'>risk: medium</text><text x='448' y='130' font-size='12' fill='#5d6274'>verifymethod: test</text><rect x='60' y='70' width='150' height='60' rx='8' fill='#fff' stroke='#94a3b8' stroke-width='2'/><text x='135' y='105' font-size='14' text-anchor='middle' fill='#312e81'>App</text><line x1='210' y1='100' x2='430' y2='100' stroke='#4338ca' stroke-width='2'/><text x='320' y='90' font-size='12' text-anchor='middle' fill='#5d6274'>satisfies</text><polygon points='434,100 422,93 422,107' fill='#4338ca'/><text x='380' y='180' font-size='12' fill='#8a94a6' text-anchor='middle'>The arrow says the element satisfies the requirement</text></svg>",
+   picCap:"The satisfies arrow runs from element to requirement.",
+   commands:"requirementDiagram\n  requirement Fast Login {\n    id: R1\n    text: Login completes in under two seconds.\n    risk: medium\n    verifymethod: test\n  }\n  element LoginScreen\n  LoginScreen - satisfies -> Fast Login",
+   lab:["Write one requirement for a feature you know","Add the element that satisfies it","Change the risk level and the verification method"],
+   tip:"Give every requirement an id and a verifymethod; a requirement you cannot verify is a wish.",
+   questions:[
+     {q:"What fields does a requirement carry?", a:"An id, the text, a risk level, and a verification method."},
+     {q:"Which direction does satisfies point?", a:"From the element to the requirement it fulfills."},
+     {q:"Why is traceability the point of this diagram?", a:"You can see which component answers which requirement, and what is left unanswered."}]},
+
+  {id:15, icon:"🏗", title:"Architecture and C4", level:"Platform",
+   intro:"Architecture diagrams show services and the groups they live in, with icons and flows. The beta syntax reads like a sentence: a service, its group, and an arrow.",
+   concepts:[
+     {t:"Group", d:"A container that holds related services, named with square brackets"},
+     {t:"Service", d:"One component, placed inside a group with in"},
+     {t:"Flow", d:"An arrow between two services, labeled with sides like R and L"},
+     {t:"Icon", d:"A symbol for a service, chosen by name or by icon keyword"},
+     {t:"Junction", d:"A point where several flows meet or split"}],
+   mermaid:"flowchart LR\n  subgraph web[Web Tier]\n    E[\"Edge\"]\n    A[\"App\"]\n  end\n  subgraph data[Data Tier]\n    D[\"Database\"]\n  end\n  E --> A --> D",
+   mermaidCap:"Two tiers, three services, and the flows between them. The architecture-beta syntax for this picture is in the copy block.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><rect x='40' y='30' width='330' height='140' rx='12' fill='#e9e8fd' stroke='#4338ca' stroke-width='2' stroke-dasharray='6 4'/><text x='60' y='55' font-size='13' fill='#312e81' font-weight='600'>Web Tier</text><rect x='70' y='70' width='120' height='46' rx='8' fill='#fff' stroke='#4338ca' stroke-width='2'/><text x='130' y='97' font-size='13' text-anchor='middle' fill='#312e81'>Edge</text><rect x='220' y='70' width='120' height='46' rx='8' fill='#fff' stroke='#4338ca' stroke-width='2'/><text x='280' y='97' font-size='13' text-anchor='middle' fill='#312e81'>App</text><rect x='440' y='70' width='280' height='100' rx='12' fill='#f3e8ff' stroke='#7c3aed' stroke-width='2' stroke-dasharray='6 4'/><text x='460' y='95' font-size='13' fill='#4c1d95' font-weight='600'>Data Tier</text><rect x='470' y='105' width='130' height='46' rx='8' fill='#fff' stroke='#7c3aed' stroke-width='2'/><text x='535' y='132' font-size='13' text-anchor='middle' fill='#4c1d95'>Database</text><line x1='190' y1='93' x2='220' y2='93' stroke='#4338ca' stroke-width='2'/><polygon points='224,93 214,87 214,99' fill='#4338ca'/><line x1='340' y1='93' x2='470' y2='128' stroke='#4338ca' stroke-width='2'/><polygon points='474,128 462,124 466,134' fill='#4338ca'/><text x='370' y='180' font-size='12' fill='#8a94a6' text-anchor='middle'>Groups hold services; arrows show the flows between them</text></svg>",
+   picCap:"Dashed boxes are groups; the arrows are flows.",
+   commands:"architecture-beta\n  group web[Web Tier]\n  group data[Data Tier]\n  service edge[Edge] in web\n  service app[App] in web\n  service db[Database] in data\n  edge:R --> L app:L\n  app:R --> L db:L",
+   lab:["Draw two groups with one service each","Add a flow between them with explicit sides","Move a service into another group and describe the change"],
+   tip:"Declare the group before the services inside it, and connect with the letter of the side you mean.",
+   questions:[
+     {q:"What does in do in the service line?", a:"It places the service inside a declared group."},
+     {q:"What do the letters on a flow mean?", a:"They name the side of each service the arrow attaches to, like R for right and L for left."},
+     {q:"Why are the groups drawn dashed?", a:"Groups are logical containers, not runtime boundaries, so the renderer keeps them visually lighter."}]},
+
+  {id:16, icon:"🧰", title:"The Beta Toolbox", level:"Advanced",
+   intro:"Beyond the stable types, Mermaid keeps a toolbox of younger diagrams: block layouts, packets, xycharts, radar, kanban. They change faster, and they are worth knowing because they are free.",
+   concepts:[
+     {t:"block-beta", d:"A grid of blocks you place and connect with arrows"},
+     {t:"packet-beta", d:"A bit-field drawn as labeled segments across a row"},
+     {t:"xychart-beta", d:"Bar and line charts with axes declared in text"},
+     {t:"radar-beta", d:"A polygon profile across several named axes"},
+     {t:"kanban", d:"A board of columns and cards for workflow"}],
+   mermaid:"block-beta\n  columns 3\n  A[\"Client\"] B[\"Gateway\"] C[\"Service\"]\n  D[\"Cache\"] E[\"Queue\"] F[\"Worker\"]\n  A --> B\n  B --> C\n  C --> E\n  E --> F",
+   mermaidCap:"A six-block grid with four arrows, all from plain text.",
+   picture:"<svg viewBox='0 0 760 200' xmlns='http://www.w3.org/2000/svg' font-family='Inter,sans-serif'><rect x='40' y='40' width='140' height='46' rx='8' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='110' y='67' font-size='13' text-anchor='middle' fill='#312e81'>Client</text><rect x='310' y='40' width='140' height='46' rx='8' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='380' y='67' font-size='13' text-anchor='middle' fill='#312e81'>Gateway</text><rect x='580' y='40' width='140' height='46' rx='8' fill='#e9e8fd' stroke='#4338ca' stroke-width='2'/><text x='650' y='67' font-size='13' text-anchor='middle' fill='#312e81'>Service</text><rect x='40' y='120' width='140' height='46' rx='8' fill='#fff' stroke='#94a3b8' stroke-width='2'/><text x='110' y='147' font-size='13' text-anchor='middle' fill='#5d6274'>Cache</text><rect x='310' y='120' width='140' height='46' rx='8' fill='#fff' stroke='#94a3b8' stroke-width='2'/><text x='380' y='147' font-size='13' text-anchor='middle' fill='#5d6274'>Queue</text><rect x='580' y='120' width='140' height='46' rx='8' fill='#fff' stroke='#94a3b8' stroke-width='2'/><text x='650' y='147' font-size='13' text-anchor='middle' fill='#5d6274'>Worker</text><line x1='180' y1='63' x2='310' y2='63' stroke='#4338ca' stroke-width='2'/><polygon points='314,63 304,57 304,69' fill='#4338ca'/><line x1='450' y1='63' x2='580' y2='63' stroke='#4338ca' stroke-width='2'/><polygon points='584,63 574,57 574,69' fill='#4338ca'/><line x1='650' y1='86' x2='650' y2='120' stroke='#4338ca' stroke-width='2'/><polygon points='650,124 644,114 656,114' fill='#4338ca'/><line x1='380' y1='86' x2='380' y2='120' stroke='#4338ca' stroke-width='2'/><polygon points='380,124 374,114 386,114' fill='#4338ca'/><text x='380' y='188' font-size='12' fill='#8a94a6' text-anchor='middle'>columns 3 lays the grid; the arrows wire the blocks</text></svg>",
+   picCap:"columns 3 lays the grid; the arrows wire the blocks.",
+   commands:"packet-beta\n  title TCP Segment\n  0-15: \"Source Port\"\n  16-31: \"Dest Port\"\n  32-63: \"Sequence\"\n\nxychart-beta\n  title Quarterly Sales\n  x-axis [Q1, Q2, Q3, Q4]\n  y-axis \"Units\" 0 --> 100\n  bar [20, 45, 60, 85]\n\nradar-beta\n  title Skill Profile\n  x-axis [Speed, Scale, Cost, Time]\n  y-axis 0 --> 5\n  series \"Score\" [4, 3, 2, 4]",
+   lab:["Build a block grid with three columns and two rows","Draw a packet with four labeled segments","Plot one bar series and one radar series"],
+   tip:"Beta diagrams are the ones most likely to change between releases; pin the mermaid version when you depend on them.",
+   questions:[
+     {q:"What does columns 3 do in block-beta?", a:"It fixes the number of blocks per row, so the grid takes shape before the arrows."},
+     {q:"How does packet-beta describe a bit field?", a:"Each line gives a bit range and a label, and the segments are drawn in order."},
+     {q:"Why pin the mermaid version for beta diagrams?", a:"Beta syntax changes between releases; a pinned version keeps your diagrams rendering the same."}]},
+
+];
+
+/* =====================================================================
+   RENDERING
+   ===================================================================== */
+const colorVar = {
+  Foundation:'--accent', Core:'--blue', Advanced:'--purple', Platform:'--green', System:'--amber'
+};
+function renderTOC(){
+  const toc = document.getElementById('toc');
+  toc.innerHTML = chapters.map(ch => `
+    <a href="#chapter-${ch.id}" data-title="${ch.title.toLowerCase()}" data-level="${ch.level.toLowerCase()}">
+      <span class="num">${ch.id}</span>
+      <span>${ch.icon} ${ch.title}</span>
+    </a>`).join('');
+}
+function renderQuestions(qs){
+  if(!qs || !qs.length) return '';
+  return `<h3 class="sec">Check Yourself</h3>
+  <div class="qa">
+    ${qs.map((q,i)=>`<details class="qa-item">
+      <summary><span class="qn">Q${i+1}</span><span>${q.q}</span></summary>
+      <div class="ans">${q.a}</div>
+    </details>`).join('')}
+  </div>`;
+}
+function renderChapters(){
+  const wrap = document.getElementById('chapters');
+  wrap.innerHTML = chapters.map(ch => `
+    <section class="chapter" id="chapter-${ch.id}">
+      <div class="ch-head">
+        <div class="ch-ico">${ch.icon}</div>
+        <div>
+          <h2>${ch.title}</h2>
+          <div class="level">Chapter ${ch.id} · ${ch.level}</div>
+        </div>
+      </div>
+      <p class="intro">${ch.intro}</p>
+
+      <h3 class="sec">Key Concepts</h3>
+      <div class="cards">
+        ${ch.concepts.map(c => `<div class="card"><div class="t">${c.t}</div><div class="d">${c.d}</div></div>`).join('')}
+      </div>
+
+      <h3 class="sec">How It Works</h3>
+      <div class="diagram">
+        <div class="mermaid">${ch.mermaid}</div>
+        <div class="cap">${ch.mermaidCap}</div>
+      </div>
+
+      <h3 class="sec">Illustration</h3>
+      <div class="picture">
+        ${ch.picture}
+        <div class="cap">${ch.picCap}</div>
+      </div>
+
+      <h3 class="sec">Try It Yourself</h3>
+      <div class="codewrap">
+        <button class="copy-btn" onclick="copyCode(this)"><i class="fas fa-copy"></i> Copy</button>
+        <pre class="code">${escapeHTML(ch.commands)}</pre>
+      </div>
+
+      <div class="lab">
+        <div class="lh"><i class="fas fa-flask"></i> Hands-on Lab</div>
+        <ol>${ch.lab.map(s => `<li>${s}</li>`).join('')}</ol>
+      </div>
+
+      <div class="tip">
+        <div class="ic"><i class="fas fa-lightbulb"></i></div>
+        <div class="tx"><strong>Expert tip:</strong> ${ch.tip}</div>
+      </div>
+
+      ${renderQuestions(ch.questions)}
+
+      ${chapterNav(ch.id)}
+    </section>
+  `).join('');
+}
+function chapterNav(id){
+  const prev = chapters.find(c => c.id === id-1);
+  const next = chapters.find(c => c.id === id+1);
+  const p = prev ? `<a class="prev" href="#chapter-${prev.id}"><div class="lab">Previous</div><div class="ttl">${prev.icon} ${prev.title}</div></a>` : `<span></span>`;
+  const n = next ? `<a class="next" href="#chapter-${next.id}"><div class="lab">Next</div><div class="ttl">${next.icon} ${next.title}</div></a>` : `<span></span>`;
+  return `<div class="chapternav">${p}${n}</div>`;
+}
+function escapeHTML(s){
+  return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+}
+
+/* Copy button */
+function copyCode(btn){
+  const code = btn.parentElement.querySelector('pre').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    btn.classList.add('done');
+    btn.innerHTML = '<i class="fas fa-check"></i> Copied';
+    setTimeout(() => { btn.classList.remove('done'); btn.innerHTML = '<i class="fas fa-copy"></i> Copy'; }, 1600);
+  });
+}
+
+/* ================= UNIFIED SEARCH ================= */
+let BOOK_INDEX = [];
+let SEM_READY = false;
+let LAST_Q = "";
+let EXTRACTOR = null;
+let CHAPTER_EMB = [];
+
+function buildIndex(){
+  BOOK_INDEX = chapters.map(ch => {
+    const qa = ch.questions ? ch.questions.map(q => q.q + " " + q.a).join(" ") : "";
+    const raw = [
+      ch.title, ch.level, ch.intro,
+      ch.concepts.map(c => c.t + " " + c.d).join(" "),
+      ch.commands, ch.lab.join(" "), ch.tip,
+      ch.mermaidCap, ch.picCap, qa
+    ].join(" ");
+    return {id:ch.id, title:ch.title, level:ch.level, text:raw.toLowerCase(), raw:raw};
+  });
+}
+
+function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+
+function makeContext(raw, q){
+  const term = q.split(/\s+/).filter(Boolean)[0] || q;
+  const re = new RegExp(escRe(term), "i");
+  const m = re.exec(raw);
+  if(!m) return raw.slice(0, 90) + (raw.length>90?"…":"");
+  const s = m.index;
+  const before = raw.slice(0, s).trim().split(/\s+/).slice(-2).join(" ");
+  const after  = raw.slice(s + m[0].length).trim().split(/\s+/).slice(0, 2).join(" ");
+  const snippet = (before ? before + " " : "") + m[0] + (after ? " " + after : "");
+  return escapeHTML(snippet).replace(new RegExp("("+escRe(term)+")","ig"), "<mark>$1</mark>");
+}
+
+function bestTerm(q, ch){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  for(const t of terms){ if(ch.text.includes(t)) return t; }
+  return terms[0] || q;
+}
+
+function keywordResults(q, limit){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if(!terms.length) return [];
+  const res = [];
+  for(const ch of BOOK_INDEX){
+    let score = 0, ctx = "";
+    for(const t of terms){
+      if(ch.text.includes(t)){ score++; if(!ctx) ctx = makeContext(ch.raw, t); }
+    }
+    if(score > 0) res.push({ch, score, ctx, sem:false});
+  }
+  res.sort((a,b)=> b.score - a.score);
+  return res.slice(0, limit);
+}
+
+function cosine(a, b){
+  let d=0, na=0, nb=0;
+  for(let i=0;i<a.length;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d / ((Math.sqrt(na)*Math.sqrt(nb)) || 1);
+}
+
+async function getExtractor(){
+  if(EXTRACTOR) return EXTRACTOR;
+  const mod = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.0");
+  EXTRACTOR = await mod.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+  return EXTRACTOR;
+}
+
+async function embedText(text){
+  const ex = await getExtractor();
+  const out = await ex(text, {pooling:"mean", normalize:true});
+  return Array.from(out.data);
+}
+
+async function primeEmbeddings(){
+  const st = document.getElementById("search-status");
+  if(st) st.textContent = "indexing…";
+  try{
+    await getExtractor();
+    CHAPTER_EMB = [];
+    for(const ch of BOOK_INDEX){
+      CHAPTER_EMB[ch.id] = await embedText(ch.raw.slice(0, 400));
+    }
+    SEM_READY = true;
+    if(st) st.textContent = "semantic ✓";
+    if(LAST_Q.trim()) renderResults(LAST_Q, searchBlend(LAST_Q, 14));
+  }catch(e){
+    if(st) st.textContent = "keyword only";
+  }
+}
+
+function searchBlend(q, limit){
+  return keywordResults(q, limit);
+}
+
+function renderResults(q, list){
+  const box = document.getElementById("search-results");
+  if(!box) return;
+  if(!list.length){ box.innerHTML = '<div class="sr-empty">No matches for "'+escapeHTML(q)+'".</div>'; box.classList.add("show"); return; }
+  box.innerHTML = list.map(r => {
+    const ch = r.ch;
+    const ctx = r.ctx || makeContext(ch.raw, bestTerm(q, ch));
+    const tag = r.sem ? '<span class="sr-tag sem">semantic</span>' : '<span class="sr-tag">match</span>';
+    return '<a class="sr-item" href="#chapter-'+ch.id+'" onclick="closeSearch()">'
+         + '<div class="sr-chap">Chapter '+ch.id+' · '+escapeHTML(ch.level)+'</div>'
+         + '<div class="sr-title"><span>'+escapeHTML(ch.title)+'</span>'+tag+'</div>'
+         + '<div class="sr-ctx">'+ctx+'</div></a>';
+  }).join("");
+  box.classList.add("show");
+}
+
+function closeSearch(){ const b=document.getElementById("search-results"); if(b) b.classList.remove("show"); }
+
+function searchBooks(q){
+  LAST_Q = q = (q||"").trim();
+  const box = document.getElementById("search-results");
+  if(!q){ closeSearch(); if(box) box.innerHTML=""; return; }
+  const kw = keywordResults(q, 14);
+  renderResults(q, kw);
+  if(SEM_READY && CHAPTER_EMB.length){
+    embedText(q).then(qe => {
+      const sem = BOOK_INDEX.map(ch => ({
+        ch, sim: cosine(qe, CHAPTER_EMB[ch.id] || [])
+      })).filter(r => r.sim > 0.12)
+        .sort((a,b)=> b.sim - a.sim).slice(0, 8)
+        .map(r => ({ch:r.ch, ctx:makeContext(r.ch.raw, bestTerm(q, r.ch)), sem:true}));
+      const seen = new Set(sem.map(r=>r.ch.id));
+      const merged = sem.concat(kw.filter(r=>!seen.has(r.ch.id)).map(r=>({ch:r.ch,ctx:r.ctx,sem:false})));
+      renderResults(q, merged.slice(0,14));
+    }).catch(()=>{});
+  } else if(!window.__embStarted){
+    window.__embStarted = true;
+    primeEmbeddings();
+  }
+}
+
+// hide results on outside click
+document.addEventListener("click", function(e){
+  const w = document.querySelector(".search-wrap");
+  if(w && !w.contains(e.target)) closeSearch();
+});
+
+/* Active section highlight on scroll */
+function setupScrollSpy(){
+  const links = document.querySelectorAll('#toc a');
+  const obs = new IntersectionObserver(entries => {
+    entries.forEach(e => {
+      if(e.isIntersecting){
+        const id = e.target.id;
+        links.forEach(l => l.classList.toggle('active', l.getAttribute('href') === '#'+id));
+      }
+    });
+  }, {rootMargin:'-40% 0px -55% 0px', threshold:0});
+  document.querySelectorAll('.chapter').forEach(c => obs.observe(c));
+}
+
+/* Mobile sidebar */
+function openSidebar(){ document.getElementById('sidebar').classList.add('open'); document.getElementById('backdrop').classList.add('show'); }
+function closeSidebar(){ document.getElementById('sidebar').classList.remove('open'); document.getElementById('backdrop').classList.remove('show'); }
+
+/* Export current page as standalone .html */
+function exportHTML(){
+  const data = document.documentElement.outerHTML;
+  const blob = new Blob([data], {type:'text/html'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url; a.download = 'Mermaid-Field-Guide.html'; a.click();
+  URL.revokeObjectURL(url);
+}
+
+/* Init */
+window.addEventListener('DOMContentLoaded', () => {
+  renderTOC();
+  renderChapters();
+  buildIndex();
+  setTimeout(primeEmbeddings, 800);
+  setupScrollSpy();
+  mermaid.initialize({startOnLoad:false, theme:'neutral', flowchart:{curve:'basis'}, securityLevel:'loose'});
+  mermaid.run();
+});
+</script>
+</body>
+</html>
