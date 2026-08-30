@@ -1,0 +1,1625 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>The Org Mode and Diary Field Guide — Planning and Achieving More</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+<style>
+  :root{
+    --bg:#e9ebef; --panel:#ffffff; --panel-2:#f0f2f5; --line:#d8dce2;
+    --ink:#23262b; --ink-soft:#5b626b; --muted:#939aa4;
+    --accent:#4f46e5; --accent-soft:#eef2ff; --accent-ink:#3730a3;
+    --green:#0f766e; --blue:#2563eb; --shadow:0 1px 3px rgba(20,24,31,.10),0 10px 30px rgba(20,24,31,.08);
+  }
+  *{box-sizing:border-box;}
+  html,body{height:100%;}
+  html{scroll-behavior:smooth;}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.55;
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+       font-size:15px;overflow:hidden;}
+  a{color:var(--accent);}
+
+  /* Tab strip (notebook subjects) */
+  .tabbar{position:sticky;top:0;z-index:42;background:rgba(255,255,255,.94);
+          backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .tabbar.hidden{display:none;}
+  .tabbar-inner{display:flex;align-items:center;gap:8px;overflow-x:auto;padding:10px 16px;scrollbar-width:thin;}
+  .tabbar-inner::-webkit-scrollbar{height:8px;}
+  .tabbar-inner::-webkit-scrollbar-thumb{background:var(--line);border-radius:6px;}
+  .tabbar .brand{font-weight:700;font-size:14px;color:var(--accent-ink);white-space:nowrap;margin-right:6px;flex:0 0 auto;}
+  .tabbar .tabs{display:flex;gap:6px;flex:0 0 auto;}
+  .tab{flex:0 0 auto;display:flex;flex-direction:column;align-items:flex-start;line-height:1.15;
+       padding:6px 12px;border-radius:11px;border:1px solid var(--line);background:var(--panel-2);
+       color:var(--ink-soft);font-size:12.5px;cursor:pointer;white-space:nowrap;transition:all .15s;}
+  .tab .ti{font-size:14px;margin-right:5px;}
+  .tab .tl{font-size:9px;text-transform:uppercase;letter-spacing:.07em;opacity:.65;}
+  .tab:hover{background:#e7e9ee;}
+  .tab.active{background:var(--accent);color:#fff;border-color:var(--accent);}
+  .tab.active .tl{opacity:.85;}
+  .tab .row{display:flex;align-items:center;gap:4px;}
+
+  /* Search (centered Google-style overlay, opened with s) */
+  .searchoverlay{display:none;position:fixed;inset:0;background:rgba(20,24,31,.40);z-index:90;
+                align-items:flex-start;justify-content:center;padding-top:9vh;}
+  .searchoverlay.show{display:flex;}
+  .searchpanel{width:min(680px,92vw);display:flex;flex-direction:column;gap:12px;}
+  .searchbar{display:flex;align-items:center;gap:10px;background:#fff;border:1px solid var(--line);
+             border-radius:999px;padding:0 18px;box-shadow:0 12px 40px rgba(20,24,31,.18);}
+  .searchbar .mag{font-size:20px;color:var(--muted);}
+  .searchbar .search{flex:1;width:100%;background:transparent;border:none;outline:none;padding:16px 0;font-size:16px;color:var(--ink);}
+  .search-status{font-size:11px;color:var(--muted);white-space:nowrap;}
+  .search-results{background:#fff;border:1px solid var(--line);border-radius:18px;box-shadow:0 12px 40px rgba(20,24,31,.18);
+                   max-height:64vh;overflow-y:auto;padding:8px;}
+  .search-results.show{display:block;}
+  .sr-item{display:block;padding:12px 16px;border-radius:12px;text-decoration:none;color:var(--ink);}
+  .sr-item:last-child{border-bottom:none;}
+  .sr-item:hover{background:var(--accent-soft);}
+  .sr-chap{font-size:11px;color:var(--accent);font-weight:600;}
+  .sr-title{font-size:15px;font-weight:600;margin:3px 0;display:flex;align-items:center;justify-content:space-between;gap:8px;line-height:1.25;}
+  .sr-title>span:first-child{flex:1 1 auto;min-width:0;}
+  .sr-tag{font-size:9px;text-transform:uppercase;letter-spacing:.08em;color:var(--muted);border:1px solid var(--line);border-radius:6px;padding:2px 6px;white-space:nowrap;align-self:center;line-height:1;flex:0 0 auto;}
+  .sr-tag.sem{color:var(--accent);border-color:var(--accent);}
+  .sr-ctx{font-size:13px;color:var(--ink-soft);line-height:1.45;margin-top:4px;}
+  .sr-ctx mark{background:#e0e7ff;color:#3730a3;border-radius:3px;padding:0 2px;}
+  .sr-empty{padding:16px;color:var(--muted);font-size:14px;}
+
+  /* Book stage */
+  .book-area{flex:1;min-height:0;display:flex;flex-direction:column;}
+  .stage-hint{font-size:11px;color:var(--muted);padding:6px 18px 2px;}
+  #stage{flex:1;min-height:0;display:flex;gap:0;overflow-x:auto;overflow-y:hidden;scroll-snap-type:x mandatory;
+          padding:10px 0 14px;perspective:2400px;align-items:center;}
+  .pages{display:flex;}
+  #stage::-webkit-scrollbar{height:11px;}
+  #stage::-webkit-scrollbar-thumb{background:#cfd4db;border-radius:6px;}
+
+  .leaf{flex:0 0 auto;display:flex;scroll-snap-align:center;margin:0 14px;position:relative;
+        transition:transform .55s cubic-bezier(.2,.7,.3,1);transform-style:preserve-3d;}
+  .leaf.flipping{animation:pageTurn .55s cubic-bezier(.2,.7,.3,1);}
+  @keyframes pageTurn{0%{transform:rotateY(0deg);}55%{transform:rotateY(-8deg);box-shadow:-30px 0 50px rgba(20,24,31,.16);}100%{transform:rotateY(0deg);}}
+
+  /* Centre number-entry readout (multi-digit page/chapter jump) */
+  .numentry{display:none;position:fixed;inset:0;z-index:95;pointer-events:none;
+            align-items:center;justify-content:center;font-family:'Space Grotesk',Georgia,serif;}
+  .numentry.show{display:flex;animation:numIn .12s ease;}
+  @keyframes numIn{from{opacity:0;transform:scale(.85);}to{opacity:1;transform:scale(1);}}
+  .numentry{font-size:64px;font-weight:700;color:var(--accent-ink);
+            background:rgba(255,255,255,.86);border:1px solid var(--line);
+            padding:26px 44px;border-radius:18px;box-shadow:0 18px 50px rgba(20,24,31,.18);}
+
+  .topbar{display:flex;align-items:center;gap:12px;padding:6px 18px;background:var(--panel);
+          border-bottom:1px solid var(--line);font-size:12px;color:var(--ink-soft);}
+  .topbar.hidden{display:none;}
+  .topbar .now{font-weight:700;color:var(--accent-ink);white-space:nowrap;}
+  .topbar .track{flex:1;height:6px;background:var(--panel-2);border-radius:999px;overflow:hidden;}
+  .topbar .track i{display:block;height:100%;background:var(--accent);border-radius:999px;transition:width .35s;}
+  .topbar .hint{opacity:.6;white-space:nowrap;}
+
+  /* Table of contents overlay (top, toggled with T) */
+  .tocoverlay{display:none;position:fixed;left:0;right:0;top:0;z-index:85;background:rgba(255,255,255,.98);
+              border-bottom:1px solid var(--line);box-shadow:0 10px 30px rgba(20,24,31,.10);
+              max-height:70vh;overflow-y:auto;padding:14px 18px 18px;}
+  .tocoverlay.show{display:block;}
+  .tochead{display:flex;align-items:center;justify-content:space-between;font-weight:700;
+           font-size:14px;color:var(--accent-ink);font-family:'Space Grotesk',Georgia,serif;margin-bottom:10px;}
+  .tocclose{background:var(--panel-2);border:1px solid var(--line);border-radius:8px;width:30px;height:30px;
+            cursor:pointer;font-size:14px;color:var(--ink-soft);}
+  .tocgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(240px,1fr));gap:8px;}
+  .tocgrid .ti{display:flex;align-items:center;gap:9px;padding:9px 12px;border-radius:10px;border:1px solid var(--line);
+               background:var(--panel);cursor:pointer;font-size:13px;color:var(--ink);text-decoration:none;}
+  .tocgrid .ti:hover{background:var(--accent-soft);border-color:var(--accent);}
+  .tocgrid .ti .num{flex:0 0 22px;height:22px;border-radius:6px;background:var(--accent-soft);color:var(--accent-ink);
+              font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+  .tocgrid .ti .lv{font-size:9px;text-transform:uppercase;letter-spacing:.07em;opacity:.6;margin-left:auto;}
+
+  .page{width:min(46vw,560px);height:calc(100vh - 120px);overflow-y:auto;overflow-x:hidden;
+        background:linear-gradient(180deg,#ffffff,#fcfcfe);
+        border:1px solid var(--line);border-radius:14px;padding:26px 30px;box-shadow:var(--shadow);}
+  .page::-webkit-scrollbar{width:10px;}
+  .page::-webkit-scrollbar-thumb{background:#cfd4db;border-radius:6px;}
+  .page.left{border-top-right-radius:0;border-bottom-right-radius:0;border-right:none;}
+  .page.right{background:linear-gradient(180deg,#fcfcfe,#ffffff);border-top-left-radius:0;border-bottom-left-radius:0;border-left:none;}
+  .leaf::before{content:"";position:absolute;top:0;bottom:0;left:50%;width:20px;transform:translateX(-50%);
+        background:linear-gradient(90deg,rgba(20,24,31,.13),rgba(20,24,31,0) 55%,rgba(20,24,31,0) 45%,rgba(20,24,31,.11));
+        pointer-events:none;z-index:5;}
+
+  .page-head{display:flex;gap:12px;align-items:flex-start;margin-bottom:6px;}
+  .page-ico{flex:0 0 40px;height:40px;border-radius:11px;background:var(--accent-soft);
+            display:flex;align-items:center;justify-content:center;font-size:20px;}
+  .page h2{font-family:'Space Grotesk',Georgia,serif;font-size:clamp(16px,2vw,21px);margin:0;letter-spacing:-.02em;line-height:1.2;}
+  .level{font-size:10.5px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin-top:3px;}
+  .intro{color:var(--ink-soft);font-size:13.5px;margin:10px 0 4px;}
+  .pagelabel{font-size:10px;text-transform:uppercase;letter-spacing:.12em;color:var(--muted);margin:2px 0 8px;font-weight:600;}
+
+  h3.sec{font-family:'Space Grotesk',Georgia,serif;font-size:16px;margin:18px 0 9px;
+         padding-bottom:6px;border-bottom:1px solid var(--line);letter-spacing:-.01em;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:9px;margin:9px 0;}
+  .card{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;padding:10px 12px;}
+  .card .t{font-weight:600;font-size:12.5px;margin-bottom:3px;color:var(--accent-ink);}
+  .card .d{font-size:12px;color:var(--ink-soft);}
+
+  .mermaid{background:var(--panel-2);border:1px solid var(--line);border-radius:11px;
+           padding:12px;margin:12px 0;text-align:center;overflow-x:auto;}
+  figure{margin:12px 0;}
+  figcaption{font-size:12px;color:var(--muted);margin-top:6px;text-align:center;}
+
+  pre{position:relative;background:#1e2329;color:#e6e6e6;border-radius:12px;padding:13px 15px;
+      margin:12px 0;overflow-x:auto;font-family:'JetBrains Mono',ui-monospace,monospace;font-size:11.5px;line-height:1.55;}
+  pre .copy{position:absolute;top:8px;right:8px;background:rgba(255,255,255,.12);color:#fff;border:none;
+            border-radius:7px;padding:4px 9px;font-size:11px;cursor:pointer;}
+  pre .copy:hover{background:rgba(255,255,255,.22);}
+  pre.out{background:#11231c;color:#b8e6c9;}
+
+  .lab{background:var(--accent-soft);border:1px solid #c7d2fe;border-radius:12px;padding:11px 15px;margin:12px 0;}
+  .lab h4{margin:0 0 6px;font-size:12px;color:var(--accent-ink);text-transform:uppercase;letter-spacing:.06em;}
+  .lab ol{margin:0;padding-left:18px;font-size:12.5px;color:var(--ink);}
+  .lab li{margin:4px 0;}
+
+  .tip{background:var(--accent-soft);border-left:3px solid var(--accent);border-radius:0 11px 11px 0;
+       padding:10px 14px;margin:12px 0;font-size:12.5px;color:#3730a3;}
+
+  .pagefoot{font-size:12px;color:var(--muted);text-align:center;padding:12px;flex:0 0 auto;}
+
+  /* Chapter jump overlay (press g) */
+  .jumplist{display:none;position:fixed;inset:0;background:rgba(20,24,31,.45);z-index:80;align-items:center;justify-content:center;}
+  .jumplist.show{display:flex;}
+  .jumplist .panel{background:#fff;border-radius:16px;width:min(440px,92vw);max-height:80vh;overflow-y:auto;padding:18px 20px;box-shadow:var(--shadow);}
+  .jumplist h3{margin:0 0 12px;font-size:15px;font-family:'Space Grotesk',Georgia,serif;}
+  .jumplist .ji{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:10px;cursor:pointer;font-size:13.5px;}
+  .jumplist .ji:hover{background:var(--panel-2);}
+  .jumplist .ji .num{flex:0 0 22px;height:22px;border-radius:6px;background:var(--accent-soft);
+             color:var(--accent-ink);font-size:11px;font-weight:600;display:flex;align-items:center;justify-content:center;}
+
+  .tblwrap{overflow-x:auto;margin:12px 0;border:1px solid var(--line);border-radius:12px;}
+  table.cmp{width:100%;border-collapse:collapse;font-size:12px;background:#fff;}
+  table.cmp th{background:var(--accent-soft);color:var(--accent-ink);text-align:left;font-weight:600;
+    padding:7px 10px;border-bottom:1px solid var(--line);font-size:11px;text-transform:uppercase;letter-spacing:.05em;}
+  table.cmp td{padding:6px 10px;border-bottom:1px solid var(--line);color:var(--ink);vertical-align:top;}
+  table.cmp tr:last-child td{border-bottom:none;}
+  table.cmp td:first-child{font-weight:600;color:var(--ink-soft);white-space:nowrap;}
+  table.cmp tr:nth-child(even) td{background:#fafbfc;}
+
+  @media (max-width:820px){
+    body{overflow:auto;}
+    #stage{flex-direction:column;overflow-y:auto;overflow-x:hidden;align-items:stretch;}
+    .leaf{flex-direction:column;margin:0 auto;width:92vw;}
+    .leaf::before{display:none;}
+    .page{width:100%;height:auto;min-height:60vh;overflow-y:auto;}
+    .page.left{border-radius:14px;border-right:1px solid var(--line);border-bottom:none;border-bottom-right-radius:0;}
+    .page.right{display:none;border-radius:14px;border-left:1px solid var(--line);border-top:none;border-top-left-radius:0;}
+    .leaf.flipped .page.left{display:none;}
+    .leaf.flipped .page.right{display:block;}
+    .stage-hint{display:none;}
+  }
+  </style>
+</head>
+<body>
+  <div class="tabbar">
+    <div class="tabbar-inner">
+      <div class="brand">🗓 Org Mode and Diary</div>
+      <div class="tabs" id="tabs"></div>
+    </div>
+  </div>
+
+  <div class="topbar" id="topbar">
+    <span class="now" id="nowchap">Ch 1</span>
+    <span class="track" id="track"></span>
+    <span class="hint">zoom <b id="zoomval">100%</b> · t contents · T top bar</span>
+  </div>
+
+  <div class="book-area">
+    <div class="stage-hint">← / → or p / n flip cards · 0 first · z last · <b>g</b> jump · <b>t</b> contents · <b>T</b> hide top bar · <b>s</b> search · <b>f</b> fullscreen</div>
+    <div id="stage"></div>
+    <div class="pagefoot">The Org Mode and Diary Field Guide · Planning and Achieving More · Light theme, responsive, printable.</div>
+  </div>
+
+  <div class="tocoverlay" id="tocoverlay">
+    <div class="tochead">
+      <span>Table of Contents</span>
+      <button class="tocclose" onclick="toggleTOC()">✕</button>
+    </div>
+    <div class="tocgrid" id="tocgrid"></div>
+  </div>
+
+  <div class="numentry" id="numentry"></div>
+
+  <div class="jumplist" id="jumplist" onclick="if(event.target===this)this.classList.remove('show')">
+    <div class="panel">
+      <h3>Jump to chapter</h3>
+      <div id="jumpitems"></div>
+    </div>
+  </div>
+
+  <div class="searchoverlay" id="searchoverlay" onclick="if(event.target===this)closeSearch()">
+    <div class="searchpanel">
+      <div class="searchbar">
+        <span class="mag">⌕</span>
+        <input id="search" class="search" type="text" placeholder="Search the field guide…" oninput="searchBooks(this.value)" autocomplete="off">
+        <span class="search-status" id="search-status"></span>
+      </div>
+      <div class="search-results" id="search-results"></div>
+    </div>
+  </div>
+<script>
+const chapters = [
+ {
+  "id": 1,
+  "icon": "🤔",
+  "title": "Why Plans Fail for Creative Minds",
+  "level": "Foundation",
+  "intro": "A plan dies the moment a better idea arrives. For someone who loves exploration, the day is a sequence of bright detours, each one more interesting than the list written in the morning. This book is not about suppressing that instinct. It is about building a capture habit that collects the detours, a daily container that protects the must-dos, and a review rhythm that turns scattered notes into visible progress.",
+  "concepts": [
+   {
+    "t": "Exploration bias",
+    "d": "Novel ideas outcompete planned tasks because they are new and interesting."
+   },
+   {
+    "t": "Capture habit",
+    "d": "Write the detour down immediately, then return to the plan. Nothing is lost."
+   },
+   {
+    "t": "Must-do ceiling",
+    "d": "A day holds about three real commitments. More than that is a wish list."
+   },
+   {
+    "t": "External memory",
+    "d": "The file system remembers better than you. Trust the list, not the mood."
+   },
+   {
+    "t": "Review loop",
+    "d": "Weekly reflection converts activity into direction. Without it, effort scatters."
+   }
+  ],
+  "table": {
+   "head": [
+    "Trap",
+    "Symptom",
+    "Org fix"
+   ],
+   "rows": [
+    [
+     "Bright idea",
+     "Switches task mid-slot",
+     "C-c c j capture, return"
+    ],
+    [
+     "Overbooking",
+     "Nothing finishes",
+     "Three must-dos max"
+    ],
+    [
+     "No memory",
+     "Same plan rewritten",
+     "Tasks.org + datetree journal"
+    ],
+    [
+     "No review",
+     "Busy but stuck",
+     "Weekly reflection entry"
+    ]
+   ]
+  },
+  "mermaid": "flowchart LR\n  A[\"bright idea\"] --> B[\"capture it\"]\n  B --> C[\"return to plan\"]\n  C --> D[\"finish must-do\"]\n  D --> E[\"evening review\"]\n  E --> F[\"tomorrow's list\"]",
+  "mermaidCap": "The loop that protects exploration without losing the day.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect x=\"30\" y=\"30\" width=\"700\" height=\"60\" rx=\"12\" fill=\"#f0fdfa\" stroke=\"#0f766e\"/>\n      <text x=\"50\" y=\"58\" font-family=\"monospace\" font-size=\"14\" fill=\"#115e59\">morning list: 3 must-dos</text>\n      <text x=\"50\" y=\"78\" font-family=\"monospace\" font-size=\"14\" fill=\"#115e59\">10:30 new idea interrupts</text>\n      <rect x=\"30\" y=\"110\" width=\"330\" height=\"50\" rx=\"10\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"50\" y=\"140\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">capture: journal + return</text>\n      <rect x=\"400\" y=\"110\" width=\"330\" height=\"50\" rx=\"10\" fill=\"#0f766e\"/>\n      <text x=\"420\" y=\"140\" font-family=\"monospace\" font-size=\"13\" fill=\"#ffffff\">finish the must-do</text>\n    </svg>",
+  "picCap": "The capture habit is the hinge: write it down, then come back.",
+  "commands": ";; capture the detour, then keep going\n;; C-c c j  -> journal snippet  (nothing is lost)\n;; C-c c t  -> quick TODO into Tasks.org Inbox\n;; C-c c a  -> job application entry",
+  "lab": [
+   "Write tomorrow's three must-dos tonight, not in the morning",
+   "Tomorrow, every time a new idea interrupts, capture it in under ten seconds",
+   "At the end of the day count how many must-dos actually finished"
+  ],
+  "tip": "A captured idea is not a lost task. It is a task with a timestamp and a future slot."
+ },
+ {
+  "id": 2,
+  "icon": "📖",
+  "title": "Org Mode in One Page",
+  "level": "Foundation",
+  "intro": "Org mode turns plain text into an organizer. A file is a tree of headings, and every heading can carry a TODO state, a deadline, a property drawer, or a timestamp. The same file serves as a task list, a journal, a diary, and a knowledge base. The power is that everything stays text: searchable, versioned in git, and readable by any tool, including an LLM.",
+  "concepts": [
+   {
+    "t": "Headlines",
+    "d": "Asterisks make the tree. Level 1 is the file, deeper levels are children."
+   },
+   {
+    "t": "TODO states",
+    "d": "Keywords like TODO, IN PROGRESS, DONE track lifecycle, not just text."
+   },
+   {
+    "t": "Properties",
+    "d": "Key-value drawers attach structured data to any heading."
+   },
+   {
+    "t": "Timestamps",
+    "d": "Active and inactive timestamps make headings appear in agendas."
+   },
+   {
+    "t": "Capture",
+    "d": "C-c c opens templates that file a thought in one keystroke."
+   }
+  ],
+  "table": {
+   "head": [
+    "Feature",
+    "What it gives",
+    "Keystroke"
+   ],
+   "rows": [
+    [
+     "Headlines",
+     "Structure for any thought",
+     "C-c C-n next heading"
+    ],
+    [
+     "TODO",
+     "Task lifecycle",
+     "C-c C-t cycle state"
+    ],
+    [
+     "Properties",
+     "Structured metadata",
+     ":PROPERTIES: drawer"
+    ],
+    [
+     "Agenda",
+     "Time-aware view",
+     "C-c a"
+    ],
+    [
+     "Capture",
+     "Zero-friction entry",
+     "C-c c"
+    ]
+   ]
+  },
+  "mermaid": "flowchart TD\n  A[\"plain text file\"] --> B[\"headlines\"]\n  B --> C[\"TODO states\"]\n  B --> D[\"timestamps\"]\n  B --> E[\"property drawers\"]\n  C --> F[\"agenda\"]\n  D --> F\n  E --> G[\"structured queries\"]",
+  "mermaidCap": "One text file grows into tasks, calendar, journal, and data.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <text x=\"40\" y=\"40\" font-family=\"monospace\" font-size=\"15\" fill=\"#115e59\">* TODO Ship gateway v2</text>\n      <text x=\"40\" y=\"68\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">  SCHEDULED: &lt;2026-09-04 Fri&gt;</text>\n      <text x=\"40\" y=\"96\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">  :PROPERTIES:</text>\n      <text x=\"40\" y=\"120\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">  :EFFORT: 4h</text>\n      <text x=\"40\" y=\"144\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">  :END:</text>\n    </svg>",
+  "picCap": "A heading is a task, a data record, and a journal line at once.",
+  "commands": ";; the five motions that cover 90% of use\n;; C-c C-t   cycle TODO -> IN PROGRESS -> DONE\n;; C-c C-s   schedule a date\n;; C-c a     open the agenda\n;; C-c c     capture\n;; C-c C-x C-c  column view over headings",
+  "lab": [
+   "Create a scratch file and write three headings",
+   "Cycle one through TODO, IN PROGRESS, DONE",
+   "Schedule one with C-c C-s and open the agenda"
+  ],
+  "tip": "Org files are plain text. That one fact makes them safe for git, grep, and LLM processing."
+ },
+ {
+  "id": 3,
+  "icon": "📅",
+  "title": "The Diary: Calendar and Anniversaries",
+  "level": "Foundation",
+  "intro": "The diary is Emacs's oldest organizer. It lives in a single file, usually named diary, and holds dated lines: appointments, birthdays, festivals, recurring events. The calendar command M-x calendar shows every date, and entries can repeat with simple sexp rules. The diary answers one question: what is fixed on this date, regardless of what I plan?",
+  "concepts": [
+   {
+    "t": "Dated lines",
+    "d": "A date followed by text becomes a diary entry for that day."
+   },
+   {
+    "t": "Recurring rules",
+    "d": "Anniversaries and festivals repeat with %%(diary-anniversary...) forms."
+   },
+   {
+    "t": "Calendar view",
+    "d": "M-x calendar highlights dates that have entries."
+   },
+   {
+    "t": "Appointments",
+    "d": "Times in entries can trigger reminders at the right moment."
+   },
+   {
+    "t": "Diary vs journal",
+    "d": "Diary holds fixed facts; journal holds what actually happened."
+   }
+  ],
+  "table": {
+   "head": [
+    "Question",
+    "Tool",
+    "Example"
+   ],
+   "rows": [
+    [
+     "When is the meetup?",
+     "Diary",
+     "Sep 5, 2026 AU-QUASAR event"
+    ],
+    [
+     "What did I do?",
+     "Journal",
+     "2026-08-30.org entries"
+    ],
+    [
+     "When is the birthday?",
+     "Diary",
+     "Aug 23 Sailu's birthday, yearly"
+    ],
+    [
+     "How long did the task take?",
+     "Journal",
+     "Clock-in with C-c C-x C-i"
+    ]
+   ]
+  },
+  "mermaid": "flowchart LR\n  A[\"diary file\"] --> B[\"calendar view\"]\n  A --> C[\"recurring rules\"]\n  D[\"journal files\"] --> E[\"work log\"]\n  E --> F[\"LLM reflection\"]",
+  "mermaidCap": "Diary is the fixed skeleton; journal is the living log.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect x=\"60\" y=\"30\" width=\"180\" height=\"130\" rx=\"10\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"150\" y=\"60\" font-family=\"monospace\" font-size=\"20\" fill=\"#115e59\">Aug</text>\n      <circle cx=\"110\" cy=\"95\" r=\"14\" fill=\"#0f766e\"/>\n      <text x=\"106\" y=\"100\" font-family=\"monospace\" font-size=\"12\" fill=\"#ffffff\">23</text>\n      <text x=\"130\" y=\"100\" font-family=\"monospace\" font-size=\"12\" fill=\"#23262b\">birthday</text>\n      <rect x=\"280\" y=\"30\" width=\"180\" height=\"130\" rx=\"10\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"370\" y=\"60\" font-family=\"monospace\" font-size=\"20\" fill=\"#115e59\">Sep</text>\n      <circle cx=\"330\" cy=\"95\" r=\"14\" fill=\"#0f766e\"/>\n      <text x=\"326\" y=\"100\" font-family=\"monospace\" font-size=\"12\" fill=\"#ffffff\">5</text>\n      <text x=\"350\" y=\"100\" font-family=\"monospace\" font-size=\"12\" fill=\"#23262b\">meetup</text>\n      <rect x=\"500\" y=\"30\" width=\"200\" height=\"130\" rx=\"10\" fill=\"#f0fdfa\" stroke=\"#0f766e\"/>\n      <text x=\"600\" y=\"70\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">diary file</text>\n      <text x=\"520\" y=\"100\" font-family=\"monospace\" font-size=\"11\" fill=\"#23262b\">Aug 23, 2026 birthday</text>\n      <text x=\"520\" y=\"120\" font-family=\"monospace\" font-size=\"11\" fill=\"#23262b\">Sep 5, 2026 meetup</text>\n      <text x=\"520\" y=\"140\" font-family=\"monospace\" font-size=\"11\" fill=\"#23262b\">%%(diary-anniversary ...)</text>\n    </svg>",
+  "picCap": "Fixed dates live in the diary and appear in the calendar.",
+  "commands": ";; add entries from the calendar\n;; M-x calendar   open it\n;; i d            insert a diary entry for the date under point\n;; i a            insert an anniversary entry (recurring yearly)\n;; M-x diary      view the diary for today",
+  "lab": [
+   "Open M-x calendar and press i d to add today's fixed commitment",
+   "Add one recurring anniversary with i a",
+   "Check that M-x diary shows today's entries"
+  ],
+  "tip": "Put anything fixed in the diary: events, festivals, birthdays. The journal stays free for what you actually do."
+ },
+ {
+  "id": 4,
+  "icon": "⚡",
+  "title": "Capture: Thoughts Out of the Way",
+  "level": "Core",
+  "intro": "Capture is the fastest path from a thought to a safe place. With org-capture you press C-c c, pick a template, fill one prompt, and the thought lands in the right file with a timestamp. The templates in this book are the ones configured for this setup: journal snippet, reflection, weekly review, job application, and quick task. Each one is a doorway into a specific file.",
+  "concepts": [
+   {
+    "t": "Templates",
+    "d": "C-c c shows a menu; each key is a door into a target file."
+   },
+   {
+    "t": "Prompts",
+    "d": "%^{...} asks you one question and fills the field."
+   },
+   {
+    "t": "Timestamps",
+    "d": "%U and %<...> stamp the entry so nothing is anonymous."
+   },
+   {
+    "t": "Targets",
+    "d": "Function targets find or create the right headline in the right file."
+   },
+   {
+    "t": "Instant file",
+    "d": ":kill-buffer t closes the capture window after saving."
+   }
+  ],
+  "table": {
+   "head": [
+    "Key",
+    "Template",
+    "Target file"
+   ],
+   "rows": [
+    [
+     "j",
+     "Journal snippet",
+     "journal/YYYY-MM-DD.org"
+    ],
+    [
+     "J",
+     "End-of-day reflection",
+     "same daily file"
+    ],
+    [
+     "w",
+     "Weekly review",
+     "journal/week-NN.org"
+    ],
+    [
+     "a",
+     "Job application",
+     "job-applications.org"
+    ],
+    [
+     "t",
+     "Quick TODO",
+     "notes/TODO.org"
+    ]
+   ]
+  },
+  "mermaid": "flowchart LR\n  A[\"C-c c\"] --> B[\"j snippet\"]\n  A --> C[\"t task\"]\n  A --> D[\"a job app\"]\n  B --> E[\"daily journal\"]\n  C --> F[\"Tasks.org\"]\n  D --> G[\"job-applications.org\"]",
+  "mermaidCap": "One prefix key, five doors, zero friction.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect x=\"40\" y=\"40\" width=\"140\" height=\"100\" rx=\"12\" fill=\"#0f766e\"/>\n      <text x=\"110\" y=\"85\" font-family=\"monospace\" font-size=\"22\" fill=\"#ffffff\">C-c c</text>\n      <text x=\"110\" y=\"110\" font-family=\"monospace\" font-size=\"12\" fill=\"#d1fae5\">capture menu</text>\n      <line x1=\"180\" y1=\"90\" x2=\"240\" y2=\"90\" stroke=\"#0f766e\" stroke-width=\"2\"/>\n      <rect x=\"245\" y=\"40\" width=\"150\" height=\"40\" rx=\"10\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"270\" y=\"65\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">j journal</text>\n      <rect x=\"245\" y=\"90\" width=\"150\" height=\"40\" rx=\"10\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"270\" y=\"115\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">t task</text>\n      <rect x=\"245\" y=\"140\" width=\"150\" height=\"40\" rx=\"10\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"270\" y=\"165\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">a job app</text>\n      <line x1=\"395\" y1=\"60\" x2=\"450\" y2=\"60\" stroke=\"#0f766e\" stroke-width=\"2\"/>\n      <rect x=\"455\" y=\"40\" width=\"260\" height=\"40\" rx=\"10\" fill=\"#f0fdfa\" stroke=\"#0f766e\"/>\n      <text x=\"475\" y=\"65\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">journal/2026-08-30.org</text>\n    </svg>",
+  "picCap": "Every template is a door into a file that already knows where to file the entry.",
+  "commands": ";; C-c c j   journal snippet with time\n;; C-c c J   end-of-day reflection\n;; C-c c w   weekly review\n;; C-c c a   job application with property drawer\n;; C-c c t   quick TODO into Tasks.org",
+  "lab": [
+   "Press C-c c j and capture the current thought",
+   "Press C-c c t and file a stray task into Tasks.org Inbox",
+   "Open the daily journal and confirm both entries landed"
+  ],
+  "tip": "The ten seconds of capture are cheaper than the hour of reconstruction later."
+ },
+ {
+  "id": 5,
+  "icon": "✅",
+  "title": "Tasks.org: One List to Rule Them",
+  "level": "Core",
+  "intro": "All tasks live in one file, notes/TODO.org, with an Inbox headline that capture uses as the landing zone. The whole list stays visible in one buffer, searchable by deft, and readable by the agenda. One file means one source of truth. No task is allowed to live anywhere else.",
+  "concepts": [
+   {
+    "t": "Inbox headline",
+    "d": "Capture drops new tasks under * Inbox; you sort them later."
+   },
+   {
+    "t": "TODO keywords",
+    "d": "TODO, IN PROGRESS, SCHEDULED, FOLLOWUP, DONE, CANCELLED."
+   },
+   {
+    "t": "Priorities",
+    "d": "[#A] marks what must happen; the rest can wait."
+   },
+   {
+    "t": "Tags",
+    "d": ":brand: :job: :phd: :tech: group tasks by life domain."
+   },
+   {
+    "t": "Single source",
+    "d": "One file means one list to scan, sort, and trust."
+   }
+  ],
+  "table": {
+   "head": [
+    "Keyword",
+    "Meaning",
+    "Next action"
+   ],
+   "rows": [
+    [
+     "TODO",
+     "Awaiting work",
+     "Pick it up when it has a slot"
+    ],
+    [
+     "IN PROGRESS",
+     "Being worked",
+     "Finish or log progress"
+    ],
+    [
+     "SCHEDULED",
+     "Has a date",
+     "Show up on the agenda"
+    ],
+    [
+     "FOLLOWUP",
+     "Needs a check",
+     "Return to the source"
+    ],
+    [
+     "DONE",
+     "Finished",
+     "Celebrate, then archive"
+    ]
+   ]
+  },
+  "mermaid": "flowchart TD\n  A[\"capture t\"] --> B[\"Inbox\"]\n  B --> C[\"tag + prioritize\"]\n  C --> D[\"TODO\"]\n  D --> E[\"IN PROGRESS\"]\n  E --> F[\"DONE\"]",
+  "mermaidCap": "Every task flows through the same pipeline.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect x=\"40\" y=\"30\" width=\"680\" height=\"130\" rx=\"12\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"60\" y=\"60\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">* TODO Send profile to Kavitha  :job:</text>\n      <text x=\"60\" y=\"86\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">* TODO Chapter 6 Mastering TypeScript  :brand:</text>\n      <text x=\"60\" y=\"112\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">* TODO One research paper  :phd:</text>\n      <text x=\"60\" y=\"138\" font-family=\"monospace\" font-size=\"13\" fill=\"#5b626b\">* TODO Explore Arazzo and LangChain  :job:</text>\n    </svg>",
+  "picCap": "A flat list with tags. Deft searches it in one keystroke.",
+  "commands": ";; C-c c t          capture a task into the Inbox\n;; C-c C-t          cycle TODO state\n;; C-c C-p          set priority [#A]\n;; C-c C-q          add a tag\n;; C-c n            deft search across Tasks.org and everything else",
+  "lab": [
+   "Capture three tasks with C-c c t",
+   "Tag one :phd: and set one to priority A",
+   "Search them with deft and confirm they are findable"
+  ],
+  "tip": "If a task is not in Tasks.org, it does not exist. That rule is what makes the list trustworthy."
+ },
+ {
+  "id": 6,
+  "icon": "⏰",
+  "title": "The Daily Template: Half-Hourly Slots",
+  "level": "Core",
+  "intro": "The daily template is the container for a realistic day. It opens with the three must-dos, each with a duration and a slot. Then it lays out the day in half-hour slots from morning to evening, so every hour has an owner. A progress line [1/3] shows, at a glance, how the day is going. The template makes the abstract day concrete.",
+  "concepts": [
+   {
+    "t": "Must-dos",
+    "d": "Exactly three items. Each gets a duration and a target slot."
+   },
+   {
+    "t": "Slots",
+    "d": "Half-hour rows from 08:00 to 21:00; each slot has an owner."
+   },
+   {
+    "t": "Progress line",
+    "d": "[1/3] checkboxes answer: am I on track?"
+   },
+   {
+    "t": "Buffer slots",
+    "d": "Two open slots per day absorb the creative detours."
+   },
+   {
+    "t": "Reflection line",
+    "d": "A closing line captures what actually happened."
+   }
+  ],
+  "table": {
+   "head": [
+    "Slot",
+    "Default owner",
+    "Why"
+   ],
+   "rows": [
+    [
+     "08:00 to 09:30",
+     "Deep work",
+     "Hardest task first, fresh mind"
+    ],
+    [
+     "09:30 to 12:00",
+     "Project blocks",
+     "Two 90-minute focus blocks"
+    ],
+    [
+     "12:00 to 13:30",
+     "Lunch + walk",
+     "Protected, not negotiable"
+    ],
+    [
+     "13:30 to 17:00",
+     "Project blocks",
+     "Second deep-work window"
+    ],
+    [
+     "17:00 to 19:00",
+     "Admin + jobs",
+     "Email, applications, errands"
+    ],
+    [
+     "19:00 to 21:00",
+     "Buffer",
+     "Detours, reading, overflow"
+    ]
+   ]
+  },
+  "mermaid": "flowchart TD\n  A[\"must-dos\"] --> B[\"slot allocation\"]\n  B --> C[\"half-hour grid\"]\n  C --> D[\"execute\"]\n  D --> E[\"[2/3] progress\"]\n  E --> F[\"evening reflection\"]",
+  "mermaidCap": "Plan downward from must-dos, execute against the grid, reflect at night.",
+  "picture": "<svg width=\"100%\" height=\"190\" viewBox=\"0 0 760 190\" xmlns=\"http://www.w3.org/2000/svg\">\n      <text x=\"40\" y=\"34\" font-family=\"monospace\" font-size=\"14\" fill=\"#115e59\">08:00-09:30 gateway design [ ]</text>\n      <text x=\"40\" y=\"62\" font-family=\"monospace\" font-size=\"14\" fill=\"#115e59\">09:30-11:00 paper reading [x]</text>\n      <text x=\"40\" y=\"90\" font-family=\"monospace\" font-size=\"14\" fill=\"#115e59\">11:00-12:30 job applications [x]</text>\n      <text x=\"40\" y=\"118\" font-family=\"monospace\" font-size=\"14\" fill=\"#115e59\">12:30-14:00 lunch walk [x]</text>\n      <text x=\"40\" y=\"146\" font-family=\"monospace\" font-size=\"14\" fill=\"#115e59\">14:00-15:30 buffer [ ]</text>\n      <text x=\"40\" y=\"174\" font-family=\"monospace\" font-size=\"14\" fill=\"#115e59\">15:30-17:00 deep work [ ]</text>\n      <rect x=\"420\" y=\"40\" width=\"280\" height=\"60\" rx=\"12\" fill=\"#f0fdfa\" stroke=\"#0f766e\"/>\n      <text x=\"440\" y=\"70\" font-family=\"monospace\" font-size=\"20\" fill=\"#115e59\">[2/3]</text>\n      <text x=\"440\" y=\"92\" font-family=\"monospace\" font-size=\"12\" fill=\"#5b626b\">must-dos done</text>\n    </svg>",
+  "picCap": "The grid is the plan; the counter is the truth.",
+  "commands": ";; the template as org text, kept in a file called day-template.org\n* Must-dos\n- [ ] 1. <must-do>  <4h>  slot 09:00\n- [ ] 2. <must-do>  <1h>  slot 14:00\n- [ ] 3. <must-do>  <30m> slot 17:00\n* Schedule\n| Time       | Task                |\n|------------+---------------------|\n| 08:00-08:30|                     |\n| 08:30-09:00|                     |\n* Reflection\n- What happened, what drifted, what to move",
+  "lab": [
+   "Write the template into a file named day-template.org",
+   "Fill in three must-dos with durations and slots",
+   "Check the [0/3] counter after filling the checkboxes"
+  ],
+  "tip": "Two buffer slots a day are the escape hatch that keeps the plan honest."
+ },
+ {
+  "id": 7,
+  "icon": "🌞",
+  "title": "Planning the Day",
+  "level": "Core",
+  "intro": "Plan the day the night before, in five minutes. Pick three must-dos from Tasks.org, give each a duration and a slot in the half-hour grid, and decide which detours you will allow. In the morning you do not think; you execute. The evening review closes the loop: what finished, what drifted, what moves to tomorrow.",
+  "concepts": [
+   {
+    "t": "Night before",
+    "d": "Five minutes at night beats thirty in the morning."
+   },
+   {
+    "t": "Pick three",
+    "d": "Must-dos come from Tasks.org by priority, not by mood."
+   },
+   {
+    "t": "Slot them",
+    "d": "Every must-do gets a time in the grid; unslotted tasks do not happen."
+   },
+   {
+    "t": "Allow two detours",
+    "d": "Exploration is not the enemy; unlimited exploration is."
+   },
+   {
+    "t": "Evening close",
+    "d": "The reflection entry captures drift and feeds tomorrow's list."
+   }
+  ],
+  "table": {
+   "head": [
+    "Moment",
+    "Action",
+    "Tool"
+   ],
+   "rows": [
+    [
+     "21:30 night",
+     "Pick 3 must-dos, slot them",
+     "day template"
+    ],
+    [
+     "08:00 morning",
+     "Start slot one, no thinking",
+     "grid"
+    ],
+    [
+     "Any time",
+     "Detour? Capture, return",
+     "C-c c j / t"
+    ],
+    [
+     "21:00 night",
+     "Count [x/3], write reflection",
+     "C-c c J"
+    ]
+   ]
+  },
+  "mermaid": "flowchart LR\n  A[\"night list\"] --> B[\"morning grid\"]\n  B --> C[\"execute\"]\n  C --> D[\"capture detours\"]\n  D --> B\n  C --> E[\"evening count\"]\n  E --> A",
+  "mermaidCap": "The daily loop: plan, execute, capture, count, replan.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <circle cx=\"110\" cy=\"90\" r=\"55\" fill=\"#f0fdfa\" stroke=\"#0f766e\" stroke-width=\"3\"/>\n      <text x=\"95\" y=\"95\" font-family=\"monospace\" font-size=\"24\" fill=\"#115e59\">21:30</text>\n      <line x1=\"165\" y1=\"90\" x2=\"225\" y2=\"90\" stroke=\"#0f766e\" stroke-width=\"2\"/>\n      <rect x=\"230\" y=\"45\" width=\"180\" height=\"90\" rx=\"12\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"250\" y=\"75\" font-family=\"monospace\" font-size=\"14\" fill=\"#115e59\">3 must-dos</text>\n      <text x=\"250\" y=\"100\" font-family=\"monospace\" font-size=\"12\" fill=\"#23262b\">durations</text>\n      <text x=\"250\" y=\"120\" font-family=\"monospace\" font-size=\"12\" fill=\"#23262b\">slots</text>\n      <line x1=\"410\" y1=\"90\" x2=\"470\" y2=\"90\" stroke=\"#0f766e\" stroke-width=\"2\"/>\n      <rect x=\"475\" y=\"45\" width=\"180\" height=\"90\" rx=\"12\" fill=\"#0f766e\"/>\n      <text x=\"495\" y=\"75\" font-family=\"monospace\" font-size=\"14\" fill=\"#ffffff\">execute grid</text>\n      <text x=\"495\" y=\"100\" font-family=\"monospace\" font-size=\"12\" fill=\"#d1fae5\">capture detours</text>\n      <text x=\"495\" y=\"120\" font-family=\"monospace\" font-size=\"12\" fill=\"#d1fae5\">count at night</text>\n    </svg>",
+  "picCap": "The day is a loop, not a list.",
+  "commands": ";; C-c c J          evening reflection entry\n;; C-c C-s          schedule a must-do onto the agenda\n;; C-c C-t          mark it IN PROGRESS when you start\n;; C-c c t          any stray task straight to Tasks.org",
+  "lab": [
+   "Tonight, pick three must-dos and slot them",
+   "Tomorrow, run the grid and capture every detour",
+   "At night, run C-c c J and write what drifted"
+  ],
+  "tip": "A must-do without a slot is a hope. A must-do with a slot is a plan."
+ },
+ {
+  "id": 8,
+  "icon": "📅",
+  "title": "Planning the Week",
+  "level": "Core",
+  "intro": "The week is where goals become real. On Sunday evening, open the weekly review template, look back at the week that ended, and name three outcomes for the week ahead. Then distribute them across the days: one deep-work block per day, one admin block, one buffer day. The weekly file, journal/week-NN.org, holds the whole arc.",
+  "concepts": [
+   {
+    "t": "Weekly review",
+    "d": "C-c c w opens the week's file and appends a reflection."
+   },
+   {
+    "t": "Three outcomes",
+    "d": "The week has three wins, not twenty tasks."
+   },
+   {
+    "t": "Daily distribution",
+    "d": "Map outcomes to days so each day inherits one chunk."
+   },
+   {
+    "t": "Recurring check",
+    "d": "The diary reminds you that Friday is review day."
+   },
+   {
+    "t": "Rolling memory",
+    "d": "week-NN.org files stack into a year of weekly arcs."
+   }
+  ],
+  "table": {
+   "head": [
+    "Day",
+    "Default shape",
+    "Focus"
+   ],
+   "rows": [
+    [
+     "Monday",
+     "Deep work + admin",
+     "Heaviest outcome"
+    ],
+    [
+     "Tuesday",
+     "Deep work",
+     "Outcome two"
+    ],
+    [
+     "Wednesday",
+     "Deep work + buffer",
+     "Outcome three"
+    ],
+    [
+     "Thursday",
+     "Deep work",
+     "Catch-up"
+    ],
+    [
+     "Friday",
+     "Review + jobs",
+     "Weekly review prep"
+    ],
+    [
+     "Saturday",
+     "Buffer + explore",
+     "Detours welcome"
+    ],
+    [
+     "Sunday",
+     "Plan next week",
+     "C-c c w"
+    ]
+   ]
+  },
+  "mermaid": "flowchart LR\n  A[\"3 outcomes\"] --> B[\"Mon\"]\n  A --> C[\"Tue\"]\n  A --> D[\"Wed\"]\n  B --> E[\"daily grids\"]\n  C --> E\n  D --> E\n  E --> F[\"Friday count\"]\n  F --> G[\"next week's 3\"]",
+  "mermaidCap": "Three outcomes fan out into five working days.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect x=\"40\" y=\"30\" width=\"660\" height=\"120\" rx=\"12\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"60\" y=\"60\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">Week 36</text>\n      <text x=\"60\" y=\"88\" font-family=\"monospace\" font-size=\"12\" fill=\"#23262b\">1. Finish gateway router  [x]</text>\n      <text x=\"60\" y=\"110\" font-family=\"monospace\" font-size=\"12\" fill=\"#23262b\">2. Paper reading plan     [x]</text>\n      <text x=\"60\" y=\"132\" font-family=\"monospace\" font-size=\"12\" fill=\"#23262b\">3. Five job applications  [ ]</text>\n    </svg>",
+  "picCap": "The week file holds three outcomes and their daily distribution.",
+  "commands": ";; C-c c w        append a weekly review entry\n;; journal/week-36.org   the file that grows all year\n;; M-x calendar  ->  Fri  ->  diary shows review reminder\n;; C-c a         agenda shows scheduled outcomes across the week",
+  "lab": [
+   "Sunday: run C-c c w and name three outcomes",
+   "Monday: distribute one outcome into the daily grid",
+   "Friday: count the outcomes, write the review"
+  ],
+  "tip": "A week with three outcomes finishes; a week with thirty outcomes finishes none."
+ },
+ {
+  "id": 9,
+  "icon": "🏡",
+  "title": "Planning the Month",
+  "level": "Advanced",
+  "intro": "The month is the planning horizon where themes live. One file per month, filed as a datetree under the year, holds the month's goals, the major dates from the diary, and the weekly chunks that carry the goals. The monthly review, at the end, is the meeting where the next month gets its three outcomes.",
+  "concepts": [
+   {
+    "t": "Month file",
+    "d": "A datetree node under the year holds the month's plan."
+   },
+   {
+    "t": "Themes",
+    "d": "Two or three themes per month, not ten goals."
+   },
+   {
+    "t": "Diary merge",
+    "d": "Fixed dates from the diary shape which weeks are realistic."
+   },
+   {
+    "t": "Weekly chunks",
+    "d": "Each theme maps to two or three weekly outcomes."
+   },
+   {
+    "t": "Monthly review",
+    "d": "The last day's reflection feeds the next month's plan."
+   }
+  ],
+  "table": {
+   "head": [
+    "Level",
+    "Unit",
+    "What lives there"
+   ],
+   "rows": [
+    [
+     "Year",
+     "4 quarters",
+     "Direction, milestones"
+    ],
+    [
+     "Month",
+     "2-3 themes",
+     "Goals for the month"
+    ],
+    [
+     "Week",
+     "3 outcomes",
+     "Distribution of themes"
+    ],
+    [
+     "Day",
+     "3 must-dos",
+     "Execution of outcomes"
+    ]
+   ]
+  },
+  "mermaid": "flowchart TD\n  A[\"year\"] --> B[\"Q1\"]\n  B --> C[\"month themes\"]\n  C --> D[\"weekly outcomes\"]\n  D --> E[\"daily must-dos\"]\n  E --> F[\"review up\"]",
+  "mermaidCap": "Every level inherits from the one above and reports to the one below.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect x=\"40\" y=\"30\" width=\"200\" height=\"120\" rx=\"12\" fill=\"#0f766e\"/>\n      <text x=\"140\" y=\"65\" font-family=\"monospace\" font-size=\"16\" fill=\"#ffffff\">September</text>\n      <text x=\"60\" y=\"95\" font-family=\"monospace\" font-size=\"12\" fill=\"#d1fae5\">theme: gateway v2</text>\n      <text x=\"60\" y=\"118\" font-family=\"monospace\" font-size=\"12\" fill=\"#d1fae5\">theme: thesis chapter</text>\n      <text x=\"60\" y=\"141\" font-family=\"monospace\" font-size=\"12\" fill=\"#d1fae5\">theme: job search</text>\n      <rect x=\"280\" y=\"45\" width=\"200\" height=\"90\" rx=\"12\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"300\" y=\"75\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">week 1: router</text>\n      <text x=\"300\" y=\"100\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">week 2: eval</text>\n      <text x=\"300\" y=\"125\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">week 3: audit</text>\n      <rect x=\"520\" y=\"45\" width=\"200\" height=\"90\" rx=\"12\" fill=\"#f0fdfa\" stroke=\"#0f766e\"/>\n      <text x=\"540\" y=\"75\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">5 Sep meetup</text>\n      <text x=\"540\" y=\"100\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">23 Aug done</text>\n      <text x=\"540\" y=\"125\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">diary fixed dates</text>\n    </svg>",
+  "picCap": "Themes, weekly chunks, and diary dates share one month.",
+  "commands": ";; the month as a datetree node in the journal\n;; * 2026\n;; ** 2026-09 September\n;; *** Goals\n;; - [ ] Theme: gateway v2\n;; *** Diary overlap\n;; - 5 Sep AU-QUASAR meetup",
+  "lab": [
+   "Open the month node under the year datetree",
+   "Write two or three themes, not ten goals",
+   "Merge the diary dates so the plan respects fixed days"
+  ],
+  "tip": "A month with two themes is a month that finishes something."
+ },
+ {
+  "id": 10,
+  "icon": "🌟",
+  "title": "Planning the Year",
+  "level": "Advanced",
+  "intro": "The year is the direction layer. Four milestones, one per quarter, each with a checkpoint in the datetree. The year file holds the milestones, the quarterly reviews, and the evidence: which weekly outcomes actually landed. The yearly review in December is the honest accounting that sets the next year.",
+  "concepts": [
+   {
+    "t": "Milestones",
+    "d": "Four outcomes, one per quarter, each measurable."
+   },
+   {
+    "t": "Quarter checkpoints",
+    "d": "Every three months the datetree gets a review node."
+   },
+   {
+    "t": "Evidence trail",
+    "d": "Weekly files and journals are the proof of the year."
+   },
+   {
+    "t": "Correction loop",
+    "d": "A missed quarter changes the plan, not the direction."
+   },
+   {
+    "t": "December review",
+    "d": "The year's last reflection names the next year's milestones."
+   }
+  ],
+  "table": {
+   "head": [
+    "Quarter",
+    "Milestone shape",
+    "Checkpoint"
+   ],
+   "rows": [
+    [
+     "Q1",
+     "Foundation",
+     "30 days: does it still fit?"
+    ],
+    [
+     "Q2",
+     "Build",
+     "90 days: working prototype"
+    ],
+    [
+     "Q3",
+     "Validate",
+     "180 days: evidence collected"
+    ],
+    [
+     "Q4",
+     "Ship and review",
+     "360 days: honest accounting"
+    ]
+   ]
+  },
+  "mermaid": "flowchart LR\n  A[\"Q1\"] --> B[\"Q2\"]\n  B --> C[\"Q3\"]\n  C --> D[\"Q4\"]\n  D --> E[\"December review\"]\n  E --> A",
+  "mermaidCap": "Four checkpoints, one direction, one honest review.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <circle cx=\"380\" cy=\"90\" r=\"70\" fill=\"none\" stroke=\"#0f766e\" stroke-width=\"4\"/>\n      <circle cx=\"380\" cy=\"90\" r=\"46\" fill=\"#f0fdfa\" stroke=\"#0f766e\" stroke-width=\"2\"/>\n      <text x=\"380\" y=\"97\" font-family=\"monospace\" font-size=\"18\" fill=\"#115e59\">2026</text>\n      <text x=\"300\" y=\"30\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">Q1</text>\n      <text x=\"455\" y=\"45\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">Q2</text>\n      <text x=\"455\" y=\"150\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">Q3</text>\n      <text x=\"300\" y=\"160\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">Q4</text>\n    </svg>",
+  "picCap": "The year is a circle of four checkpoints.",
+  "commands": ";; the year as a datetree node\n;; * 2026\n;; ** Goals for the year\n;; - [ ] Q1 milestone\n;; - [ ] Q2 milestone\n;; - [ ] Q3 milestone\n;; - [ ] Q4 milestone\n;; ** December review\n;; - what landed, what drifted, what next",
+  "lab": [
+   "Write four milestones, one per quarter",
+   "Add a review node for the current quarter",
+   "At each quarter end, mark it done or revise it"
+  ],
+  "tip": "Direction survives a bad quarter. Only the plan changes."
+ },
+ {
+  "id": 11,
+  "icon": "📊",
+  "title": "Tracking and Evaluation",
+  "level": "Advanced",
+  "intro": "A plan without measurement is a mood. The checkbox counters [1/3], the column view over tasks, the agenda's week view, and the journal's daily entries all produce numbers. The evaluation habit reads those numbers once a week and answers one question: is the system working? Numbers make drift visible before it becomes a lost month.",
+  "concepts": [
+   {
+    "t": "Checkbox counts",
+    "d": "[1/3] renders as a live counter anywhere in org."
+   },
+   {
+    "t": "Column view",
+    "d": "C-c C-x C-c turns headings into a spreadsheet-like table."
+   },
+   {
+    "t": "Agenda reports",
+    "d": "The agenda shows scheduled items across any span."
+   },
+   {
+    "t": "Clock time",
+    "d": "Clocking tasks produces real effort data."
+   },
+   {
+    "t": "Weekly reading",
+    "d": "Friday's review reads the week's numbers, not just its mood."
+   }
+  ],
+  "table": {
+   "head": [
+    "Metric",
+    "How to get it",
+    "What it answers"
+   ],
+   "rows": [
+    [
+     "Must-dos done",
+     "[x/3] counter",
+     "Did the day land?"
+    ],
+    [
+     "Outcomes hit",
+     "Week file checkboxes",
+     "Did the week land?"
+    ],
+    [
+     "Effort spent",
+     "Clock reports C-c C-x C-r",
+     "Where did time go?"
+    ],
+    [
+     "Task age",
+     "Column view by SCHEDULED",
+     "What is rotting?"
+    ]
+   ]
+  },
+  "mermaid": "flowchart LR\n  A[\"day [x/3]\"] --> E[\"week review\"]\n  B[\"week outcomes\"] --> E\n  C[\"clock data\"] --> E\n  D[\"agenda view\"] --> E\n  E --> F[\"adjust plan\"]",
+  "mermaidCap": "Four small numbers feed one weekly decision.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect x=\"40\" y=\"35\" width=\"660\" height=\"110\" rx=\"12\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"60\" y=\"65\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">Task          State     Effort</text>\n      <text x=\"60\" y=\"90\" font-family=\"monospace\" font-size=\"12\" fill=\"#23262b\">gateway router DONE      6h</text>\n      <text x=\"60\" y=\"112\" font-family=\"monospace\" font-size=\"12\" fill=\"#23262b\">eval harness   IN PROG   3h</text>\n      <text x=\"60\" y=\"134\" font-family=\"monospace\" font-size=\"12\" fill=\"#23262b\">audit trail    TODO      0h</text>\n    </svg>",
+  "picCap": "Column view turns the tree into a table you can read at a glance.",
+  "commands": ";; C-c C-x C-c    column view on the current subtree\n;; C-c C-x C-r    clock report for effort\n;; C-c a          agenda\n;; C-c a a        agenda for the week (custom view)\n;; C-c c w        weekly review entry with the numbers",
+  "lab": [
+   "Open column view on Tasks.org and read the table",
+   "Clock one task and generate a clock report",
+   "Put the week's numbers into the weekly review"
+  ],
+  "tip": "Read the numbers on Friday. The numbers will not lie to you; your memory will."
+ },
+ {
+  "id": 12,
+  "icon": "📚",
+  "title": "The Datetree Journal: Years of Entries",
+  "level": "Advanced",
+  "intro": "The journal is the memory of the system. Every snippet, reflection, and review lands in a dated file under org-files/journal, structured as a datetree: year, month, day. After a year you have 365 files that answer any question: what did I do in March? When did that idea first appear? The datetree makes the past searchable and the future predictable.",
+  "concepts": [
+   {
+    "t": "Daily files",
+    "d": "journal/YYYY-MM-DD.org, one per day, named for sorting."
+   },
+   {
+    "t": "Datetree headings",
+    "d": "* 2026 / ** 2026-08 August / *** 2026-08-30 Sunday."
+   },
+   {
+    "t": "Snippets",
+    "d": "C-c c j stamps each entry with HH:MM, keeping chronology."
+   },
+   {
+    "t": "Weekly files",
+    "d": "week-NN.org holds the arc of each week."
+   },
+   {
+    "t": "LLM-ready",
+    "d": "Structured, dated, tagged text is exactly what an LLM can summarize."
+   }
+  ],
+  "table": {
+   "head": [
+    "File",
+    "Contents",
+    "Question it answers"
+   ],
+   "rows": [
+    [
+     "2026-08-30.org",
+     "Hourly snippets + reflection",
+     "What happened today?"
+    ],
+    [
+     "week-36.org",
+     "Three outcomes + review",
+     "Did the week land?"
+    ],
+    [
+     "2026-09 September node",
+     "Month themes",
+     "What was the month about?"
+    ],
+    [
+     "2026 node",
+     "Year milestones",
+     "What was the year for?"
+    ]
+   ]
+  },
+  "mermaid": "flowchart TD\n  A[\"journal/\"] --> B[\"2026\"]\n  B --> C[\"2026-08 August\"]\n  C --> D[\"2026-08-30 Sunday\"]\n  D --> E[\"10:35 snippet\"]\n  D --> F[\"17:34 reflection\"]",
+  "mermaidCap": "The datetree is a filing cabinet with one drawer per day.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect x=\"60\" y=\"25\" width=\"120\" height=\"130\" rx=\"10\" fill=\"#0f766e\"/>\n      <text x=\"120\" y=\"60\" font-family=\"monospace\" font-size=\"14\" fill=\"#ffffff\">2026</text>\n      <rect x=\"200\" y=\"45\" width=\"120\" height=\"110\" rx=\"10\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"260\" y=\"80\" font-family=\"monospace\" font-size=\"12\" fill=\"#115e59\">Aug</text>\n      <rect x=\"340\" y=\"65\" width=\"120\" height=\"90\" rx=\"10\" fill=\"#f0fdfa\" stroke=\"#0f766e\"/>\n      <text x=\"400\" y=\"100\" font-family=\"monospace\" font-size=\"12\" fill=\"#115e59\">Aug 30</text>\n      <rect x=\"480\" y=\"85\" width=\"120\" height=\"70\" rx=\"10\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"540\" y=\"115\" font-family=\"monospace\" font-size=\"11\" fill=\"#23262b\">10:35</text>\n      <text x=\"540\" y=\"135\" font-family=\"monospace\" font-size=\"11\" fill=\"#23262b\">17:34</text>\n    </svg>",
+  "picCap": "Year, month, day, hour: the datetree nests them all.",
+  "commands": ";; C-c j            open today's journal file\n;; C-c c j          append a timestamped snippet\n;; C-c c J          append the end-of-day reflection\n;; C-c n            deft search across all journal files\n;; find journal -name '2026-*.org' | sort   # the year as a list",
+  "lab": [
+   "Open today with C-c j and confirm the datetree headings",
+   "Add two snippets with C-c c j",
+   "Search deft for a word from last week and find its file"
+  ],
+  "tip": "A year of daily files is a memory you can query. Start today; the stack builds itself."
+ },
+ {
+  "id": 13,
+  "icon": "🤖",
+  "title": "LLM Processing of Your Entries",
+  "level": "Platform",
+  "intro": "The journal you keep is already structured for machine reading. An LLM can summarize the day, compare weeks, find patterns, and draft next week's plan from the raw entries. The workflow is simple: point the model at the dated files, ask for a reflection, and let it draft while you correct. Local small models run privately; frontier models run fast.",
+  "concepts": [
+   {
+    "t": "Structured input",
+    "d": "Dated headings and tagged lines parse cleanly into prompts."
+   },
+   {
+    "t": "Daily digest",
+    "d": "Ask for a three-line summary of one day's file."
+   },
+   {
+    "t": "Weekly synthesis",
+    "d": "Feed week-NN.org and the daily files for a weekly arc."
+   },
+   {
+    "t": "Pattern mining",
+    "d": "Ask which themes recur, which tasks keep slipping."
+   },
+   {
+    "t": "Draft planning",
+    "d": "Have the model propose next week's outcomes from the evidence."
+   }
+  ],
+  "table": {
+   "head": [
+    "Task",
+    "Input",
+    "Output"
+   ],
+   "rows": [
+    [
+     "Day digest",
+     "2026-08-30.org",
+     "Three-line summary"
+    ],
+    [
+     "Week review",
+     "week-36.org + dailies",
+     "Arc, wins, drift"
+    ],
+    [
+     "Pattern find",
+     "All of journal/",
+     "Recurring themes"
+    ],
+    [
+     "Plan draft",
+     "Last 4 weeks",
+     "Next week's outcomes"
+    ]
+   ]
+  },
+  "mermaid": "flowchart LR\n  A[\"journal files\"] --> B[\"prompt\"]\n  B --> C[\"LLM\"]\n  C --> D[\"digest\"]\n  C --> E[\"patterns\"]\n  C --> F[\"plan draft\"]\n  D --> G[\"you correct\"]",
+  "mermaidCap": "The journal is the dataset; the LLM is the analyst; you are the editor.",
+  "picture": "<svg width=\"100%\" height=\"180\" viewBox=\"0 0 760 180\" xmlns=\"http://www.w3.org/2000/svg\">\n      <rect x=\"40\" y=\"40\" width=\"180\" height=\"100\" rx=\"12\" fill=\"#f0fdfa\" stroke=\"#0f766e\"/>\n      <text x=\"130\" y=\"70\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">journal</text>\n      <text x=\"130\" y=\"95\" font-family=\"monospace\" font-size=\"11\" fill=\"#23262b\">dated files</text>\n      <text x=\"130\" y=\"115\" font-family=\"monospace\" font-size=\"11\" fill=\"#23262b\">tagged text</text>\n      <line x1=\"220\" y1=\"90\" x2=\"280\" y2=\"90\" stroke=\"#0f766e\" stroke-width=\"2\"/>\n      <rect x=\"285\" y=\"40\" width=\"180\" height=\"100\" rx=\"12\" fill=\"#ffffff\" stroke=\"#0f766e\"/>\n      <text x=\"375\" y=\"70\" font-family=\"monospace\" font-size=\"13\" fill=\"#115e59\">prompt</text>\n      <text x=\"375\" y=\"95\" font-family=\"monospace\" font-size=\"11\" fill=\"#23262b\">summarize</text>\n      <text x=\"375\" y=\"115\" font-family=\"monospace\" font-size=\"11\" fill=\"#23262b\">find patterns</text>\n      <line x1=\"465\" y1=\"90\" x2=\"525\" y2=\"90\" stroke=\"#0f766e\" stroke-width=\"2\"/>\n      <rect x=\"530\" y=\"40\" width=\"190\" height=\"100\" rx=\"12\" fill=\"#0f766e\"/>\n      <text x=\"625\" y=\"70\" font-family=\"monospace\" font-size=\"13\" fill=\"#ffffff\">digest</text>\n      <text x=\"625\" y=\"95\" font-family=\"monospace\" font-size=\"11\" fill=\"#d1fae5\">you edit</text>\n      <text x=\"625\" y=\"115\" font-family=\"monospace\" font-size=\"11\" fill=\"#d1fae5\">you decide</text>\n    </svg>",
+  "picCap": "Files to prompt to digest: the LLM drafts, you decide.",
+  "commands": ";; a workable daily prompt\n;; \"Here is today's journal file. Summarize in three lines:\n;;  what got done, what drifted, one pattern you notice.\n;;  File: <paste 2026-MM-DD.org content>\"\"\n;; local model for privacy:  ollama run qwen3:4b\n;; fast frontier for volume:  DeepSeek V4 Flash via Hermes",
+  "lab": [
+   "Take one day's journal file and paste it into any LLM",
+   "Ask for a three-line digest and check it against your memory",
+   "Ask the same for a week and compare the two outputs"
+  ],
+  "tip": "The LLM is a fast first draft of reflection. The correction is where your judgment lives."
+ },
+ {
+  "id": 14,
+  "icon": "🌱",
+  "title": "Reflection, Productivity and Growth",
+  "level": "Platform",
+  "intro": "The last layer is the one that compounds. Reflection turns activity into learning: what worked, what drifted, what to change. Productivity is not doing more; it is finishing what matters. Growth is the slow evidence that the system is working, visible in the datetree and the weekly files, year after year.",
+  "concepts": [
+   {
+    "t": "Weekly reflection",
+    "d": "One honest entry per week beats daily perfection."
+   },
+   {
+    "t": "Drift as data",
+    "d": "Every missed slot is information about what to change."
+   },
+   {
+    "t": "Small systems",
+    "d": "A system that survives a bad week beats a perfect one that does not."
+   },
+   {
+    "t": "Compounding",
+    "d": "Dated entries stack into a record of growth you cannot fake."
+   },
+   {
+    "t": "Identity loop",
+    "d": "The review answers: am I becoming who I planned to be?"
+   }
+  ],
+  "table": {
+   "head": [
+    "Cadence",
+    "Entry",
+    "Growth effect"
+   ],
+   "rows": [
+    [
+     "Daily",
+     "Snippets + reflection",
+     "Accurate memory"
+    ],
+    [
+     "Weekly",
+     "Outcomes + review",
+     "Direction correction"
+    ],
+    [
+     "Monthly",
+     "Themes + count",
+     "Goal realignment"
+    ],
+    [
+     "Yearly",
+     "Milestones + December review",
+     "Identity check"
+    ]
+   ]
+  },
+  "mermaid": "flowchart LR\n  A[\"capture\"] --> B[\"plan\"]\n  B --> C[\"execute\"]\n  C --> D[\"reflect\"]\n  D --> E[\"adjust\"]\n  E --> A",
+  "mermaidCap": "The loop that turns effort into growth.",
+  "picture": "<svg width=\"100%\" height=\"190\" viewBox=\"0 0 760 190\" xmlns=\"http://www.w3.org/2000/svg\">\n      <circle cx=\"380\" cy=\"95\" r=\"62\" fill=\"none\" stroke=\"#0f766e\" stroke-width=\"4\"/>\n      <text x=\"345\" y=\"100\" font-family=\"monospace\" font-size=\"16\" fill=\"#115e59\">grow</text>\n      <text x=\"380\" y=\"38\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">plan</text>\n      <text x=\"500\" y=\"95\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">do</text>\n      <text x=\"380\" y=\"168\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">review</text>\n      <text x=\"262\" y=\"95\" font-family=\"monospace\" font-size=\"13\" fill=\"#23262b\">capture</text>\n    </svg>",
+  "picCap": "Capture, plan, do, review: the growth loop.",
+  "commands": ";; the Sunday ritual, fifteen minutes\n;; 1. C-c c w      write this week's outcomes\n;; 2. read last week's file\n;; 3. read the diary for fixed dates ahead\n;; 4. answer: what do I change this week?\n;; 5. C-c c J      close with a one-line reflection",
+  "lab": [
+   "Run the Sunday ritual for two weeks in a row",
+   "After week two, read both weekly files and compare",
+   "Name one change the evidence suggests"
+  ],
+  "tip": "You do not rise to your goals. You fall to your systems. Make the system honest."
+ }
+];
+
+function escapeHTML(s){ return (s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c])); }
+
+function copyCode(btn){
+  const code = btn.parentElement.querySelector('code').innerText;
+  navigator.clipboard.writeText(code).then(() => {
+    const t = btn.textContent; btn.textContent = 'Copied'; setTimeout(() => btn.textContent = t, 1200);
+  });
+}
+
+
+function saveBook(){
+  const html = '<!DOCTYPE html><html>' + document.documentElement.outerHTML + '</html>';
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'Org-Mode-Planning-Field-Guide.html';
+  a.click();
+}
+
+/* ================= UNIFIED SEARCH ================= */
+let BOOK_INDEX = [];
+let SEM_READY = false;
+let LAST_Q = "";
+let EXTRACTOR = null;
+let CHAPTER_EMB = [];
+
+function buildIndex(){
+  BOOK_INDEX = chapters.map(ch => {
+    const raw = [ch.title, ch.level, ch.intro,
+      ch.concepts.map(c => c.t + " " + c.d).join(" "),
+      ch.commands, ch.lab.join(" "), ch.tip, ch.mermaidCap, ch.picCap].join(" ");
+    return {id:ch.id, title:ch.title, level:ch.level, text:raw.toLowerCase(), raw:raw};
+  });
+}
+function escRe(s){ return s.replace(/[.*+?^${}()|[\]\\]/g,'\\$&'); }
+function makeContext(raw, q){
+  const term = q.split(/\s+/).filter(Boolean)[0] || q;
+  const re = new RegExp(escRe(term), "i");
+  const m = re.exec(raw);
+  if(!m) return raw.slice(0, 90) + (raw.length>90?"…":"");
+  const s = m.index;
+  const before = raw.slice(0, s).trim().split(/\s+/).slice(-2).join(" ");
+  const after  = raw.slice(s + m[0].length).trim().split(/\s+/).slice(0, 2).join(" ");
+  const snippet = (before ? before + " " : "") + m[0] + (after ? " " + after : "");
+  return escapeHTML(snippet).replace(new RegExp("("+escRe(term)+")","ig"), "<mark>$1</mark>");
+}
+function bestTerm(q, ch){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  for(const t of terms){ if(ch.text.includes(t)) return t; }
+  return terms[0] || q;
+}
+function keywordResults(q, limit){
+  const terms = q.toLowerCase().split(/\s+/).filter(Boolean);
+  if(!terms.length) return [];
+  const res = [];
+  for(const ch of BOOK_INDEX){
+    let score = 0, ctx = "";
+    for(const t of terms){ if(ch.text.includes(t)){ score++; if(!ctx) ctx = makeContext(ch.raw, t); } }
+    if(score > 0) res.push({ch, score, ctx, sem:false});
+  }
+  res.sort((a,b)=> b.score - a.score);
+  return res.slice(0, limit);
+}
+function cosine(a, b){
+  let d=0, na=0, nb=0;
+  for(let i=0;i<a.length;i++){ d+=a[i]*b[i]; na+=a[i]*a[i]; nb+=b[i]*b[i]; }
+  return d / ((Math.sqrt(na)*Math.sqrt(nb)) || 1);
+}
+async function getExtractor(){
+  if(EXTRACTOR) return EXTRACTOR;
+  const mod = await import("https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.0");
+  EXTRACTOR = await mod.pipeline("feature-extraction", "Xenova/all-MiniLM-L6-v2");
+  return EXTRACTOR;
+}
+async function embedText(text){
+  const ex = await getExtractor();
+  const out = await ex(text, {pooling:"mean", normalize:true});
+  return Array.from(out.data);
+}
+async function primeEmbeddings(){
+  const st = document.getElementById("search-status");
+  if(st) st.textContent = "indexing…";
+  try{
+    await getExtractor();
+    CHAPTER_EMB = [];
+    for(const ch of BOOK_INDEX){ CHAPTER_EMB[ch.id] = await embedText(ch.raw.slice(0, 400)); }
+    SEM_READY = true;
+    if(st) st.textContent = "semantic ✓";
+    if(LAST_Q.trim()) searchBooks(LAST_Q);
+  }catch(e){ if(st) st.textContent = "keyword only"; }
+}
+function renderResults(q, list){
+  const box = document.getElementById("search-results");
+  if(!box) return;
+  if(!list.length){ box.innerHTML = '<div class="sr-empty">No matches for “'+escapeHTML(q)+'”.</div>'; box.classList.add("show"); return; }
+  box.innerHTML = list.map(r => {
+    const ch = r.ch;
+    const ctx = r.ctx || makeContext(ch.raw, bestTerm(q, ch));
+    const tag = r.sem ? '<span class="sr-tag sem">semantic</span>' : '<span class="sr-tag">match</span>';
+    return '<a class="sr-item" href="javascript:void(0)" onclick="flipTo('+ch.id+',true);closeSearch()">'
+         + '<div class="sr-chap">Chapter '+ch.id+' · '+escapeHTML(ch.level)+'</div>'
+         + '<div class="sr-title"><span>'+escapeHTML(ch.title)+'</span>'+tag+'</div>'
+         + '<div class="sr-ctx">'+ctx+'</div></a>';
+  }).join("");
+  box.classList.add("show");
+}
+function searchBooks(q){
+  LAST_Q = q = (q||"").trim();
+  const box = document.getElementById("search-results");
+  if(!q){ closeSearch(); if(box) box.innerHTML=""; return; }
+  const kw = keywordResults(q, 14);
+  renderResults(q, kw);
+  if(SEM_READY && CHAPTER_EMB.length){
+    embedText(q).then(qe => {
+      const seen = new Set(kw.map(r=>r.ch.id));
+      const sem = BOOK_INDEX.map(ch => ({ch, sim: cosine(qe, CHAPTER_EMB[ch.id] || [])}))
+        .filter(r => r.sim > 0.12 && !seen.has(r.ch.id))
+        .sort((a,b)=> b.sim - a.sim).slice(0, 8)
+        .map(r => ({ch:r.ch, ctx:makeContext(r.ch.raw, bestTerm(q, r.ch)), sem:true}));
+      const merged = kw.concat(sem);
+      renderResults(q, merged.slice(0,14));
+    }).catch(()=>{});
+  } else if(!window.__embStarted){
+    window.__embStarted = true;
+    primeEmbeddings();
+  }
+}
+document.addEventListener("click", function(e){
+  const o = document.getElementById("searchoverlay");
+  if(o && o.classList.contains("show") && !o.querySelector(".searchpanel").contains(e.target)) closeSearch();
+});
+
+function renderTabs(){
+  const tabs = document.getElementById('tabs');
+  tabs.innerHTML = chapters.map(ch => `
+    <button class="tab" data-id="${ch.id}">
+      <span class="row"><span class="ti">${ch.icon}</span><span>${ch.title}</span></span>
+      <span class="tl">Ch ${ch.id} · ${ch.level}</span>
+    </button>`).join('');
+  tabs.querySelectorAll('.tab').forEach(t => {
+    t.addEventListener('click', () => flipTo(parseInt(t.dataset.id, 10), true));
+  });
+}
+
+function chapterHTML(ch){
+  return `
+    <div class="page-head">
+      <div class="page-ico">${ch.icon}</div>
+      <div>
+        <h2>${ch.title}</h2>
+        <div class="level">Chapter ${ch.id} · ${ch.level}</div>
+      </div>
+    </div>
+    <p class="intro">${ch.intro}</p>
+    <h3 class="sec">Key Concepts</h3>
+    <div class="cards">${ch.concepts.map(c => `<div class="card"><div class="t">${c.t}</div><div class="d">${c.d}</div></div>`).join('')}</div>
+    ${ch.table ? `<h3 class="sec">${ch.tableTitle || 'Comparative View'}</h3>
+      <div class="tblwrap"><table class="cmp">
+        <tr>${ch.table.head.map(hh => `<th>${hh}</th>`).join('')}</tr>
+        ${ch.table.rows.map(r => `<tr>${r.map(c => `<td>${c}</td>`).join('')}</tr>`).join('')}
+      </table></div>` : ''}
+    ${ch.mermaid ? `<h3 class="sec">How it fits together</h3><div class="mermaid">${ch.mermaid}</div>` : ''}
+    ${ch.mermaidCap ? `<p class="intro">${ch.mermaidCap}</p>` : ''}
+    ${ch.picture ? `<figure>${ch.picture}${ch.picCap ? `<figcaption>${ch.picCap}</figcaption>` : ''}</figure>` : ''}`;
+}
+function backHTML(ch){
+  return `
+    <h3 class="sec">Try it</h3>
+    <pre><button class="copy" onclick="copyCode(this)">Copy</button><code>${escapeHTML(ch.commands)}</code></pre>
+    ${ch.output ? `<pre class="out"><code>${escapeHTML(ch.output)}</code></pre>` : ''}
+    <div class="lab"><h4>Hands-on lab</h4><ol>${ch.lab.map(s => `<li>${escapeHTML(s)}</li>`).join('')}</ol></div>
+    <div class="tip">${escapeHTML(ch.tip)}</div>`;
+}
+
+function renderBook(){
+  const stage = document.getElementById('stage');
+  stage.innerHTML = `<div class="pages" id="pages">` + chapters.map(ch => `
+    <div class="leaf" id="leaf-${ch.id}" data-id="${ch.id}">
+      <div class="page left" id="chapter-${ch.id}">
+        <div class="pagelabel">Page 1 · Concepts</div>
+        ${chapterHTML(ch)}
+      </div>
+      <div class="page right">
+        <div class="pagelabel">Page 2 · Try it</div>
+        ${backHTML(ch)}
+      </div>
+    </div>`).join('');
+}
+
+function flipTo(id, scroll){
+  CURRENT = id;
+  scrolling = true;
+  const leaf = document.getElementById('leaf-' + id);
+  if(!leaf) return;
+  leaf.classList.remove('flipped');
+  leaf.classList.add('flipping');
+  setTimeout(() => leaf.classList.remove('flipping'), 560);
+  setTimeout(() => { scrolling = false; }, 650);
+  document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.id,10) === id));
+  updateBar();
+  if(scroll !== false){
+    const stage = document.getElementById('stage');
+    const lr = leaf.getBoundingClientRect();
+    const sr = stage.getBoundingClientRect();
+    const left = stage.scrollLeft + (lr.left - sr.left) - 14;
+    stage.scrollTo({left: Math.max(0, left), behavior:'smooth'});
+  }
+}
+let scrolling = false;
+function currentLeafId(){
+  const stage = document.getElementById('stage');
+  if(!stage) return CURRENT;
+  const sr = stage.getBoundingClientRect();
+  const mid = sr.left + sr.width/2;
+  let best = null, bestDist = Infinity;
+  document.querySelectorAll('.leaf').forEach(l => {
+    const r = l.getBoundingClientRect();
+    const c = r.left + r.width/2;
+    const d = Math.abs(c - mid);
+    if(d < bestDist){ bestDist = d; best = l; }
+  });
+  return best ? parseInt(best.dataset.id, 10) : CURRENT;
+}
+function toggleFlip(id){
+  const leaf = document.getElementById('leaf-' + id);
+  if(leaf) leaf.classList.toggle('flipped');
+}
+function step(dir){
+  const id = currentLeafId();
+  let idx = chapters.findIndex(c => c.id === id);
+  idx = Math.min(chapters.length - 1, Math.max(0, idx + dir));
+  flipTo(chapters[idx].id, true);
+}
+
+function renderJump(){
+  const box = document.getElementById('jumpitems');
+  box.innerHTML = chapters.map(ch => `<div class="ji" data-id="${ch.id}"><span class="num">${ch.id}</span><span>${ch.icon} ${ch.title}</span></div>`).join('');
+  box.querySelectorAll('.ji').forEach(j => j.addEventListener('click', () => {
+    flipTo(parseInt(j.dataset.id,10), true);
+    document.getElementById('jumplist').classList.remove('show');
+  }));
+}
+function renderTOC(){
+  const grid = document.getElementById('tocgrid');
+  grid.innerHTML = chapters.map(ch => `
+    <a class="ti" data-id="${ch.id}">
+      <span class="num">${ch.id}</span>
+      <span>${ch.icon} ${ch.title}</span>
+      <span class="lv">${ch.level}</span>
+    </a>`).join('');
+  grid.querySelectorAll('.ti').forEach(t => t.addEventListener('click', () => {
+    flipTo(parseInt(t.dataset.id,10), true);
+    toggleTOC();
+  }));
+}
+function toggleTOC(){
+  const o = document.getElementById('tocoverlay');
+  if(o) o.classList.toggle('show');
+}
+function toggleTabbar(){
+  const tb = document.querySelector('.tabbar');
+  if(tb) tb.classList.toggle('hidden');
+}
+function updateBar(){
+  const bar = document.getElementById('topbar');
+  const now = document.getElementById('nowchap');
+  const track = document.getElementById('track');
+  if(!bar || !now || !track) return;
+  const ch = chapters.find(c => c.id === CURRENT);
+  if(ch) now.textContent = 'Ch ' + ch.id + ' · ' + ch.title;
+  const pct = chapters.length > 1 ? Math.round((chapters.findIndex(c=>c.id===CURRENT)+1)/chapters.length*100) : 100;
+  track.innerHTML = '<i style="width:' + pct + '%"></i>';
+}
+function openJump(){ const j=document.getElementById('jumplist'); if(j) j.classList.add('show'); }
+function openSearch(){ const o=document.getElementById('searchoverlay'); const s=document.getElementById('search'); if(o){o.classList.add('show');} if(s){ s.focus(); s.select(); } }
+function closeSearch(){ const o=document.getElementById('searchoverlay'); const b=document.getElementById('search-results'); if(o) o.classList.remove('show'); if(b){ b.classList.remove('show'); b.innerHTML=''; } const s=document.getElementById('search'); if(s) s.value=''; }
+
+function setZoom(z){
+  zoom = Math.max(0.6, Math.min(2.2, z));
+  const p = document.getElementById('pages');
+  if(p) p.style.zoom = zoom;
+  const zv = document.getElementById('zoomval');
+  if(zv) zv.textContent = Math.round(zoom * 100) + '%';
+}
+let zoom = 1;
+function zoomBy(d){ setZoom(zoom + d); }
+function gotoPage(n){
+  const total = chapters.length * 2;
+  n = Math.max(1, Math.min(total, n));
+  const idx = Math.ceil(n / 2) - 1;
+  const leaf = chapters[idx];
+  if(leaf) flipTo(leaf.id, true);
+}
+function gotoChapter(n){ if(n >= 1 && n <= chapters.length) flipTo(n, true); }
+
+function toggleFullscreen(){
+  if(!document.fullscreenElement){
+    const el = document.documentElement;
+    (el.requestFullscreen || el.webkitRequestFullscreen || function(){}).call(el);
+  } else {
+    (document.exitFullscreen || document.webkitExitFullscreen || function(){}).call(document);
+  }
+}
+
+let numBuffer = '';
+let numTimer = null;
+function numDigit(d, shifted){
+  numBuffer += d;
+  if(numBuffer.length > 3) numBuffer = numBuffer.slice(-3);
+  showNum(numBuffer, shifted ? 'chapter' : 'page');
+  clearTimeout(numTimer);
+  numTimer = setTimeout(() => {
+    const n = parseInt(numBuffer, 10);
+    numBuffer = '';
+    hideNum();
+    if(shifted) gotoChapter(n); else gotoPage(n);
+  }, 500);
+}
+function showNum(txt, kind){
+  const el = document.getElementById('numentry');
+  if(!el) return;
+  el.textContent = txt + (kind === 'chapter' ? '  · chapter' : '  · page');
+  el.classList.add('show');
+}
+function hideNum(){ const el = document.getElementById('numentry'); if(el) el.classList.remove('show'); }
+
+document.addEventListener('keydown', function(e){
+  if(e.target && (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA')) return;
+  if(e.key === '+' || e.key === '='){ e.preventDefault(); zoomBy(0.1); }
+  else if(e.key === '-' || e.key === '_'){ e.preventDefault(); zoomBy(-0.1); }
+  else if(e.key === 'ArrowRight' || e.key === 'n' || e.key === 'N'){ e.preventDefault(); step(1); }
+  else if(e.key === 'ArrowLeft' || e.key === 'p' || e.key === 'P'){ e.preventDefault(); step(-1); }
+  else if(e.key === '0'){ e.preventDefault(); numDigit('0', e.shiftKey); }
+  else if(e.key === 'z' || e.key === 'Z'){ e.preventDefault(); flipTo(chapters[chapters.length-1].id, true); }
+  else if(e.key === 'g' || e.key === 'G'){ e.preventDefault(); openJump(); }
+  else if(e.key === 't'){ e.preventDefault(); toggleTOC(); }
+  else if(e.key === 'T'){ e.preventDefault(); toggleTabbar(); }
+  else if(e.key === 's' || e.key === 'S'){ e.preventDefault(); openSearch(); }
+  else if(e.key === 'f' || e.key === 'F'){ e.preventDefault(); toggleFullscreen(); }
+  else if(/^Digit[0-9]$/.test(e.code)){ e.preventDefault(); numDigit(e.code.slice(5), e.shiftKey); }
+  else if(/^Numpad[0-9]$/.test(e.code)){ e.preventDefault(); numDigit(e.code.slice(6), e.shiftKey); }
+  else if(e.key === 'Escape'){ const j=document.getElementById('jumplist'); if(j) j.classList.remove('show'); closeSearch(); }
+});
+
+document.addEventListener("DOMContentLoaded", function(){
+  renderTabs();
+  renderBook();
+  renderTOC();
+  renderJump();
+  buildIndex();
+  setTimeout(primeEmbeddings, 800);
+  mermaid.initialize({startOnLoad:false, theme:'base',
+    themeVariables:{fontSize:'13px',primaryColor:'#f0fdfa',lineColor:'#0f766e',
+      primaryBorderColor:'#0f766e',primaryTextColor:'#23262b'}});
+  if (window.mermaid && mermaid.run) mermaid.run();
+  flipTo(1, false);
+  const leaves = document.querySelectorAll('.leaf');
+  const obs = new IntersectionObserver(es => {
+    es.forEach(en => {
+      if(scrolling) return;
+      if(en.isIntersecting && en.intersectionRatio > 0.5){
+        const id = parseInt(en.target.dataset.id, 10);
+        if(!isNaN(id)){ CURRENT = id;
+          document.querySelectorAll('.tab').forEach(t => t.classList.toggle('active', parseInt(t.dataset.id,10) === id));
+        }
+      }
+    });
+  }, {root: document.getElementById('stage'), rootMargin:'0px', threshold:[0.5, 0.75]});
+  leaves.forEach(l => obs.observe(l));
+});
+</script>
+</body>
+</html>
