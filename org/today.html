@@ -216,8 +216,8 @@ function render(){
     const items = day.items || [];
     const today = isToday(day.date);
     const past = isPast(day.date);
-    const timed = items.map((i, idx) => ({i, idx})).filter(x => x.i.time && x.i.time.includes('-') && !x.i._done);
-    const others = items.map((i, idx) => ({i, idx})).filter(x => !(x.i.time && x.i.time.includes('-') && !x.i._done));
+    const timed = items.map((i, idx) => ({i, idx})).filter(x => isBlock(x.i));
+    const others = items.map((i, idx) => ({i, idx})).filter(x => !isBlock(x.i));
     return `<section class="day ${today?'today':''} ${past?'past':''}" data-date="${day.date}">
       <div class="day-head">
         <span class="dw">${fmtDay(day.date).split(',')[0]}</span>

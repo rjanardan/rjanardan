@@ -244,12 +244,26 @@ function renderTimeline(day, timed){
   const pxPerH = 34;
   const hours = [];
   for(let h = H0; h <= H1; h++) hours.push(h);
+  // dedupe: org emits a task with a range twice (once as "scheduled"
+  // point, once as "block" covering the range). Keep the range version.
+  const seen = new Set();
   const blocks = timed.map(({i, idx}) => {
+    const key = i.title;
+    const range = i.time.includes('-');
+    if(seen.has(key) && !range) return null;
+    seen.add(key);
     const [a, b] = i.time.split('-');
     const [ah, am] = a.split(':').map(Number);
-    const [bh, bm] = b ? b.split(':').map(Number) : [ah+1, am];
-    let top = ((ah + am/60) - H0) * pxPerH;
-    let bot = ((bh + bm/60) - H0) * pxPerH;
+    let top, bot;
+    if(b){
+      const [bh, bm] = b.split(':').map(Number);
+      top = ((ah + am/60) - H0) * pxPerH;
+      bot = ((bh + bm/60) - H0) * pxPerH;
+    } else {
+      // single time: block of 30 min starting at that time
+      top = ((ah + am/60) - H0) * pxPerH;
+      bot = top + 17;
+    }
     // clamp into the visible 06:00-22:00 window so early/late
     // blocks stay visible (clipped) instead of rendering off-canvas
     const clipTop = top < 0;
@@ -260,7 +274,7 @@ function renderTimeline(day, timed){
              style="top:${top}px;height:${Math.max(14, bot-top)}px;"
              onclick="openEdit('${day.date}', ${idx})">
       <div class="bt">${i.time}</div><div class="tt">${esc(i.title)}</div></div>`;
-  }).join('');
+  }).filter(Boolean).join('');
   return `<div class="timeline" style="height:${H*pxPerH}px">
     ${hours.map(h => `<div class="tl-hour" style="top:${(h-H0)*pxPerH}px"><span>${String(h).padStart(2,'0')}:00</span></div>`).join('')}
     ${blocks}
@@ -296,7 +310,7 @@ function esc(s){
 
 /* ---------- actions ---------- */
 function findDay(date){ return state.days.find(d => d.date === date); }
-function isBlock(i){ return !!(i.time && i.time.includes('-') && !i._done); }
+function isBlock(i){ return !!(i.time && !i._done); }
 function visibleItems(day){
   return (day.items || []).map((i, idx) => ({i, idx})).filter(x => !isBlock(x.i));
 }
