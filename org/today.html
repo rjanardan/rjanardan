@@ -1,0 +1,366 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Agenda — Today</title>
+<style>
+  :root{
+    --bg:#f6f7f9; --panel:#ffffff; --line:#e2e5ea; --ink:#23262b; --ink-soft:#5b626b;
+    --muted:#939aa4; --accent:#0f766e; --accent-soft:#e6f4f1; --accent-ink:#115e59;
+    --today:#0f766e; --past:#9aa1ab; --done:#8a919b; --danger:#b91c1c;
+    --shadow:0 1px 3px rgba(20,24,31,.08),0 8px 24px rgba(20,24,31,.06);
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--ink);line-height:1.5;
+       font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Inter,system-ui,sans-serif;
+       font-size:15px;-webkit-font-smoothing:antialiased;}
+  a{color:var(--accent);}
+
+  header{position:sticky;top:0;z-index:20;background:rgba(246,247,249,.92);
+         backdrop-filter:blur(8px);border-bottom:1px solid var(--line);}
+  .bar{max-width:860px;margin:0 auto;padding:12px 16px;display:flex;align-items:center;gap:10px;}
+  .bar h1{font-size:16px;margin:0;flex:1;}
+  .bar .date{font-size:12px;color:var(--muted);}
+  .btn{border:1px solid var(--line);background:var(--panel);color:var(--ink-soft);
+       border-radius:10px;padding:7px 12px;font-size:12.5px;cursor:pointer;font-weight:600;}
+  .btn:hover{border-color:var(--accent);color:var(--accent);}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff;}
+  .btn.primary:hover{opacity:.9;color:#fff;}
+
+  main{max-width:860px;margin:0 auto;padding:14px 16px 60px;}
+  .hint{font-size:12px;color:var(--muted);margin:0 0 12px;}
+
+  .day{background:var(--panel);border:1px solid var(--line);border-radius:14px;
+       margin-bottom:14px;box-shadow:var(--shadow);overflow:hidden;}
+  .day-head{display:flex;align-items:baseline;gap:10px;padding:12px 16px 8px;
+            border-bottom:1px solid var(--line);}
+  .day-head .dw{font-weight:700;font-size:14px;}
+  .day-head .dd{font-size:12px;color:var(--muted);}
+  .day-head .count{margin-left:auto;font-size:11px;color:var(--muted);font-weight:600;}
+  .day.today .day-head{background:var(--accent-soft);}
+  .day.today .day-head .dw{color:var(--accent-ink);}
+  .day.today .day-head{border-bottom-color:#cfe8e1;}
+  .day.past{opacity:.72;}
+  .day.past .day-head{opacity:1;}
+
+  .timeline{position:relative;padding:10px 12px 6px;}
+  .tl-hour{position:relative;height:34px;border-top:1px dashed #eef0f3;font-size:10px;
+           color:var(--muted);}
+  .tl-hour span{position:absolute;top:-6px;left:0;background:var(--panel);padding:0 4px;}
+  .block{position:absolute;left:52px;right:8px;background:var(--accent-soft);
+         border-left:3px solid var(--accent);border-radius:6px;padding:4px 8px;
+         font-size:12.5px;color:var(--ink);overflow:hidden;}
+  .block .bt{font-size:10.5px;color:var(--accent-ink);font-weight:600;margin-bottom:1px;}
+  .block .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+
+  .items{padding:4px 12px 10px;}
+  .item{display:flex;align-items:flex-start;gap:10px;padding:7px 6px;border-radius:8px;
+        cursor:pointer;font-size:13.5px;}
+  .item:hover{background:var(--accent-soft);}
+  .item .ck{flex:0 0 18px;height:18px;border:1.5px solid var(--line);border-radius:5px;
+            margin-top:1px;display:flex;align-items:center;justify-content:center;
+            font-size:11px;color:#fff;}
+  .item.done .ck{background:var(--accent);border-color:var(--accent);}
+  .item .body{flex:1;min-width:0;}
+  .item .t{display:flex;align-items:baseline;gap:8px;flex-wrap:wrap;}
+  .item .tt{font-weight:500;}
+  .item.done .tt{color:var(--done);text-decoration:line-through;}
+  .item .tm{font-size:11px;color:var(--muted);font-family:ui-monospace,monospace;white-space:nowrap;}
+  .item .tag{font-size:9.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);
+             border:1px solid var(--line);border-radius:5px;padding:1px 5px;}
+  .item .src{font-size:10px;color:var(--muted);margin-top:2px;white-space:nowrap;
+             overflow:hidden;text-overflow:ellipsis;}
+  .item .ops{display:none;gap:4px;flex:0 0 auto;}
+  .item:hover .ops{display:flex;}
+  .ops button{border:1px solid var(--line);background:var(--panel);border-radius:6px;
+              width:24px;height:24px;cursor:pointer;font-size:12px;color:var(--ink-soft);}
+  .ops button:hover{color:var(--accent);border-color:var(--accent);}
+  .ops button.del:hover{color:var(--danger);border-color:var(--danger);}
+
+  .add{padding:6px 12px 12px;}
+  .add-inner{display:flex;gap:8px;}
+  .add input{flex:1;border:1px solid var(--line);border-radius:10px;padding:9px 12px;
+             font-size:13.5px;outline:none;background:var(--panel);color:var(--ink);}
+  .add input:focus{border-color:var(--accent);}
+  .add .tm-in{width:74px;font-family:ui-monospace,monospace;font-size:12.5px;}
+
+  .editing{position:fixed;inset:0;background:rgba(20,24,31,.45);z-index:50;
+           display:none;align-items:flex-start;justify-content:center;padding-top:12vh;}
+  .editing.show{display:flex;}
+  .edit-panel{background:var(--panel);border-radius:16px;width:min(480px,92vw);
+              padding:20px;box-shadow:0 20px 60px rgba(20,24,31,.25);}
+  .edit-panel h3{margin:0 0 14px;font-size:15px;}
+  .edit-panel label{display:block;font-size:11px;color:var(--muted);margin:10px 0 4px;
+                    text-transform:uppercase;letter-spacing:.06em;font-weight:600;}
+  .edit-panel input,.edit-panel select,.edit-panel textarea{width:100%;border:1px solid var(--line);
+    border-radius:9px;padding:8px 10px;font-size:13.5px;outline:none;background:var(--panel);color:var(--ink);}
+  .edit-panel input:focus,.edit-panel select:focus{border-color:var(--accent);}
+  .edit-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;}
+  .edit-actions .btn{padding:9px 16px;}
+
+  .toast{position:fixed;bottom:20px;left:50%;transform:translateX(-50%);background:#23262b;
+         color:#fff;padding:9px 18px;border-radius:999px;font-size:12.5px;opacity:0;
+         transition:opacity .25s;pointer-events:none;z-index:60;}
+  .toast.show{opacity:1;}
+
+  @media (max-width:560px){
+    .bar .date{display:none;}
+    .ops{display:flex !important;}
+  }
+</style>
+</head>
+<body>
+<header>
+  <div class="bar">
+    <h1>Agenda <span class="date" id="head-date"></span></h1>
+    <button class="btn" onclick="exportEdits()" title="Download edited agenda as JSON">Export edits</button>
+    <button class="btn" onclick="exportHTML()" title="Download this page with edits baked in">Save HTML</button>
+    <button class="btn" onclick="resetAll()" title="Discard all local edits">Reset</button>
+  </div>
+</header>
+
+<main>
+  <p class="hint">Tap an item to edit or move it · tap the box to mark done · edits live in this browser until exported</p>
+  <div id="days"></div>
+</main>
+
+<div class="editing" id="editing" onclick="if(event.target===this)closeEdit()">
+  <div class="edit-panel">
+    <h3 id="edit-title">Edit item</h3>
+    <label>Task</label>
+    <input id="e-text" type="text">
+    <label>Time (blank = untimed, or 09:00, or 09:00-10:30)</label>
+    <input id="e-time" type="text" placeholder="09:00-10:30">
+    <label>Day</label>
+    <select id="e-day"></select>
+    <label>Status</label>
+    <select id="e-status">
+      <option value="TODO">TODO</option>
+      <option value="IN PROGRESS">IN PROGRESS</option>
+      <option value="FOLLOWUP">FOLLOWUP</option>
+      <option value="DONE">DONE</option>
+      <option value="CANCELLED">CANCELLED</option>
+    </select>
+    <div class="edit-actions">
+      <button class="btn" onclick="closeEdit()">Cancel</button>
+      <button class="btn primary" onclick="saveEdit()">Save</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script id="agenda-data" type="application/json">[{"date": "2026-08-29", "items": null}, {"date": "2026-08-30", "items": null}, {"date": "2026-08-31", "items": [{"time": "00:50", "title": "Check timesheet for team members", "todo": "TODO", "type": "scheduled", "duration": null, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 467, "tags": null}, {"time": "00:50-07:30", "title": "Check timesheet for team members", "todo": "TODO", "type": "block", "duration": 400.0, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 467, "tags": null}, {"time": "07:30", "title": "Submit timesheet for myself", "todo": "TODO", "type": "scheduled", "duration": null, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 362, "tags": null}, {"time": "07:40", "title": "Cancel Amex card", "todo": "FOLLOWUP", "type": "timestamp", "duration": null, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 143, "tags": null}, {"time": "08:30", "title": "Laptop return, call Bharat", "todo": "TODO", "type": "scheduled", "duration": null, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 596, "tags": null}, {"time": "11:00-13:00", "title": "Understand the process in MeshDefend, visit to office", "todo": "TODO", "type": "timestamp", "duration": 120.0, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 2323, "tags": null}, {"time": "", "title": "Mastering TypeScript Chapter 6", "todo": "TODO", "type": "past-scheduled", "duration": null, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 3063, "tags": null}]}, {"date": "2026-09-01", "items": [{"time": "17:00", "title": "Follow-up with Ajmal", "todo": "TODO", "type": "timestamp", "duration": null, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 1391, "tags": null}, {"time": "", "title": "Check mediassist insurance transfer", "todo": "TODO", "type": "scheduled", "duration": null, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 70, "tags": null}, {"time": "", "title": "Cancel Amex card", "todo": "FOLLOWUP", "type": "scheduled", "duration": null, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 143, "tags": null}]}, {"date": "2026-09-02", "items": null}, {"date": "2026-09-03", "items": [{"time": "", "title": "Follow-up with Kunal", "todo": "TODO", "type": "timestamp", "duration": null, "file": "/Users/janardan/Emacs/org-files/notes/TODO.org", "pos": 1509, "tags": null}]}]</script>
+<script>
+const EMBEDDED = JSON.parse(document.getElementById('agenda-data').textContent);
+const LS_KEY = 'agenda-today-v1';
+let state = loadState();
+
+function loadState(){
+  try{
+    const raw = localStorage.getItem(LS_KEY);
+    if(raw){ const s = JSON.parse(raw); if(s && s.days) return s; }
+  }catch(e){}
+  return {days: EMBEDDED, updated: new Date().toISOString()};
+}
+function saveState(){
+  state.updated = new Date().toISOString();
+  try{ localStorage.setItem(LS_KEY, JSON.stringify(state)); }catch(e){}
+}
+function fmtDay(iso){
+  const d = new Date(iso + 'T00:00:00');
+  const wd = d.toLocaleDateString(undefined, {weekday:'long'});
+  const md = d.toLocaleDateString(undefined, {month:'short', day:'numeric'});
+  return wd + ', ' + md;
+}
+function isToday(iso){
+  const now = new Date();
+  const t = now.getFullYear() + '-' + String(now.getMonth()+1).padStart(2,'0') + '-' + String(now.getDate()).padStart(2,'0');
+  return iso === t;
+}
+function isPast(iso){ return iso < new Date().toISOString().slice(0,10); }
+
+function tagColor(tag){
+  const map = {job:'#0f766e', phd:'#6d28d9', brand:'#b45309', tech:'#2563eb', personal:'#be123c'};
+  return map[tag] || '#5b626b';
+}
+
+function render(){
+  const root = document.getElementById('days');
+  const headDate = document.getElementById('head-date');
+  if(headDate && state.days.length) headDate.textContent = state.days[0].date + ' … ' + state.days[state.days.length-1].date;
+  root.innerHTML = state.days.map(day => {
+    const items = day.items || [];
+    const today = isToday(day.date);
+    const past = isPast(day.date);
+    const timed = items.map((i, idx) => ({i, idx})).filter(x => x.i.time && x.i.time.includes('-') && !x.i._done);
+    const others = items.map((i, idx) => ({i, idx})).filter(x => !(x.i.time && x.i.time.includes('-') && !x.i._done));
+    return `<section class="day ${today?'today':''} ${past?'past':''}" data-date="${day.date}">
+      <div class="day-head">
+        <span class="dw">${fmtDay(day.date).split(',')[0]}</span>
+        <span class="dd">${fmtDay(day.date).split(',')[1]}${today?' · today':''}</span>
+        <span class="count">${items.filter(i=>!i._done).length} open</span>
+      </div>
+      ${renderTimeline(day, timed)}
+      ${renderItems(day, others)}
+      <div class="add">
+        <div class="add-inner">
+          <input class="tm-in" placeholder="Time" id="nt-${day.date}">
+          <input placeholder="Add a task…" id="ntx-${day.date}" onkeydown="if(event.key==='Enter')addItem('${day.date}')">
+          <button class="btn" onclick="addItem('${day.date}')">Add</button>
+        </div>
+      </div>
+    </section>`;
+  }).join('');
+  document.getElementById('edit-title').textContent = 'Edit item';
+}
+
+function renderTimeline(day, timed){
+  if(!timed.length) return '';
+  const H0 = 6, H1 = 22, H = H1 - H0;
+  const pxPerH = 34;
+  const hours = [];
+  for(let h = H0; h <= H1; h++) hours.push(h);
+  const blocks = timed.map(({i, idx}) => {
+    const [a, b] = i.time.split('-');
+    const [ah, am] = a.split(':').map(Number);
+    const [bh, bm] = b ? b.split(':').map(Number) : [ah+1, am];
+    const top = ((ah + am/60) - H0) * pxPerH;
+    const bot = ((bh + bm/60) - H0) * pxPerH;
+    return `<div class="block" style="top:${top+10}px;height:${Math.max(20, bot-top-2)}px;"
+             onclick="openEdit('${day.date}', ${idx})">
+      <div class="bt">${i.time}</div><div class="tt">${esc(i.title)}</div></div>`;
+  }).join('');
+  return `<div class="timeline" style="height:${H*pxPerH+12}px">
+    ${hours.map(h => `<div class="tl-hour" style="top:${(h-H0)*pxPerH+10}px"><span>${String(h).padStart(2,'0')}:00</span></div>`).join('')}
+    ${blocks}
+  </div>`;
+}
+
+function renderItems(day, list){
+  if(!list.length) return '<div class="items"></div>';
+  return `<div class="items">${list.map(({i, idx}) => {
+    const done = i._done || i.todo === 'DONE';
+    const tags = (i.tags || []).map(t => `<span class="tag" style="color:${tagColor(t)};border-color:${tagColor(t)}33">${esc(t)}</span>`).join('');
+    return `<div class="item ${done?'done':''}" onclick="openEdit('${day.date}', ${idx})">
+      <div class="ck">${done?'✓':''}</div>
+      <div class="body">
+        <div class="t">
+          <span class="tt">${esc(i.title)}</span>
+          ${i.time ? `<span class="tm">${esc(i.time)}</span>` : ''}
+          ${tags}
+        </div>
+        ${i.file ? `<div class="src">${esc((i.file.split('/').slice(-2).join('/')))}</div>` : ''}
+      </div>
+      <div class="ops" onclick="event.stopPropagation()">
+        <button onclick="toggleDone('${day.date}', ${idx})" title="Toggle done">✓</button>
+        <button class="del" onclick="deleteItem('${day.date}', ${idx})" title="Delete">✕</button>
+      </div>
+    </div>`;
+  }).join('')}</div>`;
+}
+
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+}
+
+/* ---------- actions ---------- */
+function findDay(date){ return state.days.find(d => d.date === date); }
+function isBlock(i){ return !!(i.time && i.time.includes('-') && !i._done); }
+function visibleItems(day){
+  return (day.items || []).map((i, idx) => ({i, idx})).filter(x => !isBlock(x.i));
+}
+function findItem(date, idx){
+  const day = findDay(date);
+  return day ? (day.items || [])[idx] : null;
+}
+
+let editingKey = null;
+function openEdit(date, idx){
+  const it = findItem(date, idx);
+  if(!it) return;
+  editingKey = {date, idx};
+  document.getElementById('e-text').value = it.title || '';
+  document.getElementById('e-time').value = it.time || '';
+  document.getElementById('e-status').value = (it.todo === 'DONE' ? 'DONE' : (it.todo || 'TODO'));
+  const sel = document.getElementById('e-day');
+  sel.innerHTML = state.days.map(d => `<option value="${d.date}" ${d.date===date?'selected':''}>${fmtDay(d.date)}</option>`).join('');
+  document.getElementById('editing').classList.add('show');
+  document.getElementById('e-text').focus();
+}
+function closeEdit(){ document.getElementById('editing').classList.remove('show'); editingKey = null; }
+function saveEdit(){
+  if(!editingKey) return;
+  const {date, idx} = editingKey;
+  const day = findDay(date);
+  const it = findItem(date, idx);
+  if(!it) return;
+  it.title = document.getElementById('e-text').value.trim();
+  it.time = document.getElementById('e-time').value.trim();
+  const nd = document.getElementById('e-day').value;
+  it.todo = document.getElementById('e-status').value;
+  if(nd !== date){
+    const nday = findDay(nd);
+    day.items.splice(day.items.indexOf(it), 1);
+    nday.items.push(it);
+  }
+  saveState(); render(); toast('Saved');
+  closeEdit();
+}
+function addItem(date){
+  const day = findDay(date);
+  const text = document.getElementById('ntx-' + date).value.trim();
+  const time = document.getElementById('nt-' + date).value.trim();
+  if(!text) return;
+  day.items.push({time: time || '', title: text, todo: 'TODO', type: 'manual', file: null, pos: null, tags: [], _manual: true});
+  document.getElementById('ntx-' + date).value = '';
+  document.getElementById('nt-' + date).value = '';
+  saveState(); render(); toast('Added');
+}
+function toggleDone(date, idx){
+  const it = findItem(date, idx);
+  if(!it) return;
+  if(it._done){ delete it._done; it.todo = it._prevTodo || 'TODO'; }
+  else { it._prevTodo = it.todo; it._done = true; it.todo = 'DONE'; }
+  saveState(); render(); toast(it._done ? 'Marked done' : 'Reopened');
+}
+function deleteItem(date, idx){
+  const it = findItem(date, idx);
+  if(!it) return;
+  if(!confirm('Delete "' + (it.title||'').slice(0,40) + '"?')) return;
+  const day = findDay(date);
+  day.items.splice(day.items.indexOf(it), 1);
+  saveState(); render(); toast('Deleted');
+}
+function resetAll(){
+  if(!confirm('Discard all edits and restore the agenda from org files?')) return;
+  localStorage.removeItem(LS_KEY);
+  state = {days: EMBEDDED, updated: new Date().toISOString()};
+  render(); toast('Reset to org agenda');
+}
+function exportEdits(){
+  const blob = new Blob([JSON.stringify(state, null, 1)], {type:'application/json'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'agenda-edited-' + new Date().toISOString().slice(0,10) + '.json';
+  a.click(); toast('Exported edits');
+}
+function exportHTML(){
+  const html = '<!DOCTYPE html><html>' + document.documentElement.outerHTML + '</html>';
+  const blob = new Blob([html], {type:'text/html'});
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = 'agenda-' + new Date().toISOString().slice(0,10) + '.html';
+  a.click(); toast('Saved HTML');
+}
+function toast(msg){
+  const t = document.getElementById('toast');
+  t.textContent = msg; t.classList.add('show');
+  setTimeout(() => t.classList.remove('show'), 1600);
+}
+
+render();
+</script>
+</body>
+</html>
