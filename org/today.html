@@ -245,13 +245,12 @@ function renderTimeline(day, timed){
   const hours = [];
   for(let h = H0; h <= H1; h++) hours.push(h);
   // dedupe: org emits a task with a range twice (once as "scheduled"
-  // point, once as "block" covering the range). Keep the range version.
-  const seen = new Set();
+  // point, once as "block" covering the range). Keep the range version,
+  // drop the point version for the same title.
+  const rangeTitles = new Set(timed.filter(x => x.i.time.includes('-')).map(x => x.i.title));
   const blocks = timed.map(({i, idx}) => {
-    const key = i.title;
     const range = i.time.includes('-');
-    if(seen.has(key) && !range) return null;
-    seen.add(key);
+    if(!range && rangeTitles.has(i.title)) return null;
     const [a, b] = i.time.split('-');
     const [ah, am] = a.split(':').map(Number);
     let top, bot;
