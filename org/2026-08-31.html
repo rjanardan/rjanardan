@@ -44,14 +44,17 @@
   .day.past{opacity:.72;}
   .day.past .day-head{opacity:1;}
 
-  .timeline{position:relative;padding:10px 12px 6px;}
-  .tl-hour{position:relative;height:34px;border-top:1px dashed #eef0f3;font-size:10px;
-           color:var(--muted);}
-  .tl-hour span{position:absolute;top:-6px;left:0;background:var(--panel);padding:0 4px;}
-  .block{position:absolute;left:52px;right:8px;background:var(--accent-soft);
+  .timeline{position:relative;margin:8px 12px 10px 52px;min-height:24px;}
+  .tl-hour{position:absolute;left:-46px;right:0;height:34px;border-top:1px dashed #eef0f3;
+           font-size:10px;color:var(--muted);}
+  .tl-hour span{position:absolute;top:-6px;right:calc(100% + 8px);background:var(--panel);padding:0 2px;
+                font-family:ui-monospace,monospace;}
+  .block{position:absolute;left:0;right:0;background:var(--accent-soft);
          border-left:3px solid var(--accent);border-radius:6px;padding:4px 8px;
-         font-size:12.5px;color:var(--ink);overflow:hidden;}
-  .block .bt{font-size:10.5px;color:var(--accent-ink);font-weight:600;margin-bottom:1px;}
+         font-size:12.5px;color:var(--ink);overflow:hidden;cursor:pointer;}
+  .block:hover{background:#d7ece6;}
+  .block .bt{font-size:10.5px;color:var(--accent-ink);font-weight:600;margin-bottom:1px;
+             font-family:ui-monospace,monospace;}
   .block .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
 
   .items{padding:4px 12px 10px;}
@@ -96,6 +99,8 @@
   .edit-panel input,.edit-panel select,.edit-panel textarea{width:100%;border:1px solid var(--line);
     border-radius:9px;padding:8px 10px;font-size:13.5px;outline:none;background:var(--panel);color:var(--ink);}
   .edit-panel input:focus,.edit-panel select:focus{border-color:var(--accent);}
+  #e-time{width:130px;font-family:ui-monospace,monospace;font-size:13px;}
+  #e-day,#e-status{max-width:220px;}
   .edit-actions{display:flex;gap:8px;margin-top:16px;justify-content:flex-end;}
   .edit-actions .btn{padding:9px 16px;}
 
@@ -105,8 +110,22 @@
   .toast.show{opacity:1;}
 
   @media (max-width:560px){
+    body{font-size:15px;}
+    .bar{padding:10px 12px;gap:6px;flex-wrap:wrap;}
+    .bar h1{font-size:15px;}
     .bar .date{display:none;}
+    .btn{padding:6px 10px;font-size:12px;}
     .ops{display:flex !important;}
+    .ops button{width:30px;height:30px;font-size:13px;}
+    .item{padding:9px 6px;font-size:14px;}
+    .item .ck{width:20px;height:20px;flex-basis:20px;}
+    .day-head{padding:11px 14px 8px;}
+    .add input{padding:10px 12px;font-size:14px;}
+    .add .tm-in{width:80px;}
+    .hint{font-size:11.5px;}
+    .timeline{margin-left:48px;}
+    .tl-hour{left:-42px;}
+    .block{padding:5px 8px;font-size:13px;}
   }
 </style>
 </head>
@@ -228,12 +247,12 @@ function renderTimeline(day, timed){
     const [bh, bm] = b ? b.split(':').map(Number) : [ah+1, am];
     const top = ((ah + am/60) - H0) * pxPerH;
     const bot = ((bh + bm/60) - H0) * pxPerH;
-    return `<div class="block" style="top:${top+10}px;height:${Math.max(20, bot-top-2)}px;"
+    return `<div class="block" style="top:${top}px;height:${Math.max(20, bot-top-2)}px;"
              onclick="openEdit('${day.date}', ${idx})">
       <div class="bt">${i.time}</div><div class="tt">${esc(i.title)}</div></div>`;
   }).join('');
-  return `<div class="timeline" style="height:${H*pxPerH+12}px">
-    ${hours.map(h => `<div class="tl-hour" style="top:${(h-H0)*pxPerH+10}px"><span>${String(h).padStart(2,'0')}:00</span></div>`).join('')}
+  return `<div class="timeline" style="height:${H*pxPerH+2}px">
+    ${hours.map(h => `<div class="tl-hour" style="top:${(h-H0)*pxPerH}px"><span>${String(h).padStart(2,'0')}:00</span></div>`).join('')}
     ${blocks}
   </div>`;
 }
