@@ -1,0 +1,1307 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SOC Shift Console: 2016 vs 2026</title>
+<meta name="description" content="Two SOC dashboards for a medium-size company: the traditional pre-AI operations center and the AI-era operations center. Interactive alert queue, day-in-the-life walkthrough, and before/after comparison.">
+<style>
+  :root{
+    --bg:#f5f7fa;
+    --card:#ffffff;
+    --border:#dfe4ec;
+    --border-strong:#c9d1dd;
+    --text:#1b2434;
+    --muted:#5c6879;
+    --faint:#8a94a5;
+    --accent:#3d6a99;          /* 2016: steel blue */
+    --accent-ink:#2c4f73;
+    --accent-soft:#e9f0f7;
+    --accent-soft-2:#f2f6fb;
+    --ok:#0e7c66;
+    --crit:#b3342c;
+    --high:#c26514;
+    --med:#a16207;
+    --low:#64748b;
+    --shadow:0 1px 2px rgba(20,32,54,.05), 0 4px 14px rgba(20,32,54,.05);
+    --radius:10px;
+    --mono:ui-monospace, "Cascadia Mono", Consolas, "Segoe UI Mono", monospace;
+  }
+  body.era-ai{
+    --accent:#0e7c66;
+    --accent-ink:#0a5c4c;
+    --accent-soft:#e5f3ef;
+    --accent-soft-2:#f0f8f5;
+  }
+  *{box-sizing:border-box}
+  html{scroll-behavior:smooth}
+  body{
+    margin:0;
+    background:var(--bg);
+    color:var(--text);
+    font-family:"Segoe UI", system-ui, -apple-system, "Helvetica Neue", Arial, sans-serif;
+    font-size:15px;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:22px 22px 60px}
+
+  /* header */
+  header{
+    display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap;
+    padding:18px 0 4px;
+  }
+  .brand h1{font-size:23px;margin:0;font-weight:650;letter-spacing:-.2px}
+  .brand p{margin:2px 0 0;color:var(--muted);font-size:13.5px}
+  .era-switch{
+    display:flex;background:var(--card);border:1px solid var(--border);border-radius:999px;padding:3px;
+    box-shadow:var(--shadow);
+  }
+  .era-switch button{
+    border:0;background:transparent;font:inherit;font-size:13.5px;font-weight:600;
+    padding:7px 16px;border-radius:999px;color:var(--muted);cursor:pointer;transition:background .18s,color .18s;
+  }
+  .era-switch button.on{background:var(--accent);color:#fff}
+  .era-switch button:not(.on):hover{color:var(--text)}
+
+  /* context strip */
+  .context{
+    margin-top:16px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:12px 16px;display:flex;gap:22px;flex-wrap:wrap;align-items:baseline;box-shadow:var(--shadow);
+  }
+  .context .co{font-size:13px;color:var(--muted)}
+  .context .co b{color:var(--text);font-weight:600}
+  .context .era-line{margin-left:auto;font-size:13px;font-weight:600;color:var(--accent);max-width:340px;text-align:right}
+
+  /* section headings */
+  h2.sec{
+    font-size:21px;margin:34px 0 4px;font-weight:650;letter-spacing:-.2px;
+  }
+  .sec-sub{color:var(--muted);font-size:13.5px;margin:0 0 14px;max-width:760px}
+
+  /* KPI strip */
+  .kpis{display:grid;grid-template-columns:repeat(6,1fr);gap:10px}
+  .kpi{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);padding:12px 14px;
+    box-shadow:var(--shadow);transition:border-color .25s;
+  }
+  body.era-ai .kpi{border-color:color-mix(in srgb, var(--accent) 30%, var(--border))}
+  .kpi .lbl{font-size:11px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:600}
+  .kpi .num{font-size:27px;font-weight:700;margin:2px 0 0;font-variant-numeric:tabular-nums;letter-spacing:-.5px}
+  .kpi .num small{font-size:14px;font-weight:600;color:var(--muted)}
+  .kpi .sub{font-size:12px;color:var(--faint);margin-top:1px;line-height:1.4}
+  .kpi .vs{font-size:11px;margin-top:5px;padding-top:5px;border-top:1px dashed var(--border);color:var(--muted)}
+  .kpi .vs b{color:var(--accent);font-weight:700;font-variant-numeric:tabular-nums}
+
+  /* queue section */
+  .queue-grid{display:grid;grid-template-columns:minmax(0,1fr) 292px;gap:14px;align-items:start}
+  .panel{background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow)}
+  .panel .p-head{
+    padding:11px 16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:10px;flex-wrap:wrap;
+    background:var(--accent-soft-2);border-radius:var(--radius) var(--radius) 0 0;
+  }
+  .p-head .t{font-weight:650;font-size:14.5px}
+  .p-head .t span{color:var(--accent)}
+  .p-head .clock{margin-left:auto;font-family:var(--mono);font-size:13px;color:var(--muted);font-variant-numeric:tabular-nums}
+  .p-head .btn-row{display:flex;gap:6px}
+  .btn{
+    border:1px solid var(--border-strong);background:var(--card);color:var(--text);font:inherit;font-size:12.5px;font-weight:600;
+    padding:5px 11px;border-radius:7px;cursor:pointer;transition:background .15s,border-color .15s;
+  }
+  .btn:hover{border-color:var(--accent);color:var(--accent)}
+  .btn.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  .btn.primary:hover{color:#fff;opacity:.9}
+  .btn.small{padding:3px 9px;font-size:12px}
+
+  /* feed */
+  .feed{height:480px;overflow-y:auto;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+  .feed::-webkit-scrollbar{width:9px}
+  .feed::-webkit-scrollbar-thumb{background:#ccd4e0;border-radius:5px;border:2px solid var(--card)}
+  .feed-empty{color:var(--faint);font-size:13.5px;padding:18px 6px;text-align:center}
+  .al{
+    border:1px solid var(--border);border-radius:9px;padding:9px 12px;background:#fbfcfe;
+    transition:border-color .2s, opacity .3s;
+  }
+  .al .row1{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .al .tm{font-family:var(--mono);font-size:11.5px;color:var(--faint);font-variant-numeric:tabular-nums}
+  .al .nm{font-weight:600;font-size:13.5px}
+  .al .badge{font-size:10.5px;font-weight:700;letter-spacing:.05em;padding:1px 7px;border-radius:4px;text-transform:uppercase}
+  .b-low{background:#eef1f5;color:var(--low)} .b-med{background:#f7efe0;color:var(--med)}
+  .b-high{background:#f9e9d8;color:var(--high)} .b-crit{background:#f7e2e0;color:var(--crit)}
+  .b-auto{background:#eef1f5;color:var(--low)} .b-review{background:#f7efe0;color:var(--med)} .b-inv{background:#f7e2e0;color:var(--crit)}
+  .al .risk{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--accent)}
+  .al .src{font-size:11.5px;color:var(--faint);margin-left:auto;font-family:var(--mono)}
+  .al .sum{font-size:12.5px;color:var(--muted);margin-top:4px}
+  .al .row2{display:flex;align-items:center;gap:8px;margin-top:7px;flex-wrap:wrap}
+  .al .note{font-size:12px;color:var(--muted)}
+  .al .note b{font-weight:650}
+  .al .st-inv{font-size:12px;color:var(--high);font-style:italic}
+  .al .st-ok{font-size:12px;color:var(--ok);font-weight:600}
+  .al .st-bad{font-size:12px;color:var(--crit);font-weight:600}
+  .al.dim{opacity:.55}
+  .al.detail{border:1px solid var(--border-strong);background:var(--accent-soft-2)}
+  .al.detail ul{margin:7px 0 0;padding-left:18px;font-size:12.5px;color:var(--text)}
+  .al.detail li{margin:2px 0}
+  .al.detail .hl{color:var(--accent);font-weight:650}
+
+  /* sidebar */
+  .side{display:flex;flex-direction:column;gap:14px}
+  .sbox{padding:13px 15px}
+  .sbox h3{margin:0 0 8px;font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);font-weight:700}
+  .stat-row{display:flex;justify-content:space-between;font-size:13.5px;padding:3px 0;border-bottom:1px dashed var(--border)}
+  .stat-row:last-child{border-bottom:0}
+  .stat-row .v{font-weight:650;font-variant-numeric:tabular-nums}
+  .stat-row .v.bad{color:var(--crit)} .stat-row .v.good{color:var(--ok)}
+  .meter{height:9px;background:#edf0f5;border-radius:5px;overflow:hidden;margin-top:4px}
+  .meter i{display:block;height:100%;width:0%;background:var(--accent);border-radius:5px;transition:width .4s}
+  .meter.hot i{background:var(--crit)}
+  .flavor{font-size:12px;color:var(--muted);margin-top:7px;min-height:34px;line-height:1.45}
+  .side .btns{display:flex;gap:7px;flex-wrap:wrap}
+
+  /* summary card */
+  .summary{padding:20px 22px}
+  .summary h3{margin:0 0 10px;font-size:18px}
+  .summary .headline{font-size:14.5px;color:var(--text);margin:0 0 12px;line-height:1.6}
+  .summary .headline b{color:var(--accent)}
+  .summary .srow{font-size:13.5px;color:var(--muted);padding:3px 0;border-bottom:1px dashed var(--border)}
+  .summary .srow:last-child{border-bottom:0}
+  .summary .srow b{color:var(--text);font-variant-numeric:tabular-nums}
+
+  /* day in the life */
+  .steps{position:relative;padding-left:26px}
+  .steps::before{content:"";position:absolute;left:8px;top:6px;bottom:6px;width:2px;background:var(--border-strong)}
+  .step{position:relative;margin-bottom:14px;transition:opacity .35s}
+  .step .dot{
+    position:absolute;left:-26px;top:16px;width:14px;height:14px;border-radius:50%;
+    background:var(--card);border:3px solid var(--accent);
+  }
+  .step .tcard{
+    background:var(--card);border:1px solid var(--border);border-radius:var(--radius);box-shadow:var(--shadow);
+    padding:13px 16px;transition:border-color .25s, box-shadow .25s;
+  }
+  .step .tcard.active{border-color:var(--accent);box-shadow:0 0 0 3px color-mix(in srgb, var(--accent) 16%, transparent), var(--shadow)}
+  .step .thead{display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+  .step .ttime{font-family:var(--mono);font-size:12.5px;font-weight:700;color:var(--accent)}
+  .step .ttitle{font-size:15.5px;font-weight:650}
+  .step .cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:9px}
+  .step .col{background:var(--accent-soft-2);border-radius:8px;padding:10px 12px}
+  .step .col h4{margin:0 0 5px;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+  .step .col.trad h4{color:var(--accent-ink)}
+  .step .col p{margin:0;font-size:13.5px;line-height:1.55}
+  .step.fade{opacity:.35}
+  .play-row{margin:2px 0 14px;display:flex;gap:8px;align-items:center}
+  .play-row .hint{font-size:12.5px;color:var(--faint)}
+
+  /* compare */
+  .cmp-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;align-items:start}
+  .chart-box{padding:16px 18px}
+  .chart-box h3{margin:0 0 4px;font-size:15px;font-weight:650}
+  .chart-box .cb-sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+  .mbar{margin-bottom:14px}
+  .mbar .ml{font-size:12.5px;color:var(--muted);margin-bottom:4px}
+  .mbar .bars{display:flex;align-items:flex-end;gap:18px;height:64px;border-bottom:1px solid var(--border);padding-top:6px}
+  .mbar .g{display:flex;flex-direction:column;align-items:center;justify-content:flex-end;height:100%;gap:3px}
+  .mbar .g .val{font-size:11px;font-weight:700;font-variant-numeric:tabular-nums}
+  .mbar .g.t .val{color:var(--accent-ink)}
+  .mbar .g.a .val{color:var(--accent)}
+  .mbar .g .bar{width:52px;border-radius:4px 4px 0 0;transition:height .8s cubic-bezier(.22,.8,.3,1)}
+  .mbar .g.t .bar{background:color-mix(in srgb, var(--accent) 26%, #b9c6d6)}
+  .mbar .g.a .bar{background:var(--accent)}
+  .mbar .g .cap{font-size:10.5px;color:var(--faint);text-transform:uppercase;letter-spacing:.05em}
+  .legend{display:flex;gap:16px;font-size:12px;color:var(--muted);margin-top:8px}
+  .legend i{display:inline-block;width:10px;height:10px;border-radius:2px;margin-right:5px;vertical-align:-1px}
+  .effort h3{margin:0 0 4px;font-size:15px;font-weight:650}
+  .effort .cb-sub{font-size:12.5px;color:var(--muted);margin:0 0 12px}
+  .estack{margin-bottom:12px}
+  .estack .el{font-size:12px;font-weight:650;margin-bottom:4px;color:var(--muted)}
+  .estack .track{display:flex;height:26px;border-radius:6px;overflow:hidden;border:1px solid var(--border)}
+  .estack .seg{display:flex;align-items:center;justify-content:center;font-size:10.5px;font-weight:700;color:#fff;white-space:nowrap;transition:width .8s cubic-bezier(.22,.8,.3,1);min-width:0}
+  .estack .seg small{font-size:9.5px;opacity:.85;overflow:hidden;text-overflow:ellipsis}
+  .etag{display:flex;flex-wrap:wrap;gap:8px 14px;font-size:11.5px;color:var(--muted)}
+  .etag i{display:inline-block;width:9px;height:9px;border-radius:2px;margin-right:4px;vertical-align:-1px}
+
+  /* capability table */
+  table.cap{width:100%;border-collapse:collapse;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);overflow:hidden;box-shadow:var(--shadow);font-size:13px}
+  table.cap th,table.cap td{padding:9px 13px;text-align:left;vertical-align:top;border-bottom:1px solid var(--border)}
+  table.cap thead th{background:var(--accent-soft-2);font-size:11px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);font-weight:700}
+  table.cap tbody tr:last-child td{border-bottom:0}
+  table.cap td.rowname{font-weight:650;white-space:nowrap;width:110px}
+  table.cap tr:hover td{background:var(--accent-soft-2)}
+
+  .note-box{
+    margin-top:18px;background:var(--card);border:1px solid var(--border);border-radius:var(--radius);
+    padding:12px 16px;font-size:12.5px;color:var(--muted);box-shadow:var(--shadow);
+  }
+  .note-box b{color:var(--text)}
+  footer{margin-top:30px;padding-top:14px;border-top:1px solid var(--border);font-size:13px;color:var(--muted)}
+  footer .keep{font-size:14px;color:var(--text);max-width:720px;margin-bottom:6px}
+
+  /* guided triage panel */
+  .g-body{display:grid;grid-template-columns:minmax(0,1fr) 272px;gap:14px;padding:14px 16px}
+  .g-dots{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
+  .g-dot{width:24px;height:24px;border-radius:50%;border:1.5px solid var(--border-strong);background:var(--card);
+    font-size:11px;font-weight:700;color:var(--muted);cursor:pointer;display:flex;align-items:center;justify-content:center;transition:all .15s}
+  .g-dot:hover{border-color:var(--accent)}
+  .g-dot.done{background:var(--accent-soft);border-color:var(--accent);color:var(--accent-ink)}
+  .g-dot.cur{background:var(--accent);border-color:var(--accent);color:#fff}
+  .g-prog{font-size:12.5px;font-weight:650;color:var(--muted);margin-left:auto}
+  .g-stage h3{margin:0 0 6px;font-size:16px;font-weight:650}
+  .g-scenario{font-size:14px;line-height:1.6;color:var(--text)}
+  .g-choices{display:flex;flex-direction:column;gap:8px;margin-top:13px}
+  .g-choice{text-align:left;border:1px solid var(--border-strong);background:var(--card);border-radius:8px;
+    padding:9px 13px;font:inherit;font-size:13.5px;line-height:1.5;cursor:pointer;transition:border-color .15s,background .15s}
+  .g-choice:hover{border-color:var(--accent);background:var(--accent-soft-2)}
+  .g-outcome{border:1px solid var(--border-strong);background:var(--accent-soft-2);border-radius:8px;padding:12px 14px;margin-top:13px;font-size:13.5px;line-height:1.55}
+  .g-outcome .o-head{font-weight:700;font-size:11.5px;text-transform:uppercase;letter-spacing:.06em;color:var(--muted);margin-bottom:5px}
+  .g-good{color:var(--ok);font-weight:650}
+  .g-bad{color:var(--crit);font-weight:650}
+  .g-debrief h3{margin:0 0 8px;font-size:17px;font-weight:650}
+  .g-debrief .dline{font-size:14px;line-height:1.6;margin:8px 0}
+  .g-side{display:flex;flex-direction:column;gap:12px}
+  .g-side .sbox{padding:13px 15px}
+  .g-side .flavor{min-height:0}
+
+  @media (max-width:980px){
+    .kpis{grid-template-columns:repeat(3,1fr)}
+    .queue-grid{grid-template-columns:1fr}
+    .cmp-grid{grid-template-columns:1fr}
+    .g-body{grid-template-columns:1fr}
+    .step .cols{grid-template-columns:1fr}
+    .context .era-line{text-align:left}
+  }
+  @media (max-width:560px){.kpis{grid-template-columns:repeat(2,1fr)}}
+  @media (prefers-reduced-motion:reduce){
+    *{transition:none!important;animation:none!important}
+    html{scroll-behavior:auto}
+  }
+</style>
+</head>
+<body class="era-traditional">
+<div class="wrap">
+
+  <header>
+    <div class="brand">
+      <h1>SOC Shift Console</h1>
+      <p>Security operations at a medium-size company, two eras apart</p>
+    </div>
+    <div class="era-switch" role="tablist" aria-label="Choose SOC era">
+      <button id="sw-trad" class="on" role="tab" aria-selected="true">SOC 2016, pre-AI</button>
+      <button id="sw-ai" role="tab" aria-selected="false">SOC 2026, AI-era</button>
+    </div>
+  </header>
+
+  <div class="context">
+    <div class="co"><b>Meridian Manufacturing</b> · 2,400 employees · ~$420M revenue · security team of 4, two analysts per shift, MSSP covers overnight</div>
+    <div class="era-line" id="era-line"></div>
+  </div>
+
+  <h2 class="sec" id="kpis-h">The numbers that run the shift</h2>
+  <p class="sec-sub">A typical 24-hour picture for this company in each era. Values are an illustrative scenario, not a measurement of any real firm.</p>
+  <div class="kpis" id="kpis"></div>
+
+  <h2 class="sec" id="queue-h">Live queue: handle the shift yourself</h2>
+  <p class="sec-sub">You are Dana, the day-shift analyst, 08:00 to 16:00. This simulation compresses the busiest two hours of the shift into about two minutes. Click alerts to handle them, then end the shift to see how you did.</p>
+  <div class="queue-grid">
+    <div class="panel">
+      <div class="p-head">
+        <div class="t">Alert queue <span id="era-tag"></span></div>
+        <div class="clock" id="clock">08:00</div>
+        <div class="btn-row">
+          <button class="btn small" id="btn-pause">Pause</button>
+          <button class="btn small" id="btn-reset">Reset shift</button>
+          <button class="btn primary small" id="btn-end">End shift</button>
+        </div>
+      </div>
+      <div class="feed" id="feed"></div>
+    </div>
+    <div class="side">
+      <div class="panel sbox">
+        <h3>Shift counters</h3>
+        <div id="counters"></div>
+      </div>
+      <div class="panel sbox">
+        <h3 id="meter-lbl">Analyst fatigue</h3>
+        <div class="meter" id="meter"><i id="meter-fill"></i></div>
+        <div class="flavor" id="flavor"></div>
+      </div>
+      <div class="panel sbox">
+        <h3>How this shift works</h3>
+        <div class="flavor" id="howto" style="min-height:0"></div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec" id="day-h">The operator's day, step by step</h2>
+  <p class="sec-sub">Eight moments from Dana's shift, shown side by side for the two eras. Read a step, then click Next to move on.</p>
+  <div class="play-row">
+    <button class="btn" id="btn-prev" disabled>Back</button>
+    <button class="btn primary" id="btn-next">Next</button>
+    <span class="hint" id="play-hint">Step 1 of 8. Read, then click Next</span>
+  </div>
+  <div class="steps" id="steps"></div>
+
+  <h2 class="sec" id="guided-h">Guided shift: triage the day</h2>
+  <p class="sec-sub">The same day, played as a sequence of decisions. Read the situation, choose an action, and the consequence lands on your scoreboard. Choices differ by era because the tooling changes which options exist. Flip the era switch at the top to replay the day the other way. Your progress is saved in this browser, and the dots above the card let you jump back to any step.</p>
+  <div class="panel">
+    <div class="p-head">
+      <div class="t">Guided triage <span id="g-era-tag"></span></div>
+      <div class="g-prog" id="g-prog">Step 1 of 10</div>
+      <div class="clock" id="g-clock">08:00</div>
+      <div class="btn-row">
+        <button class="btn small" id="g-restart">Restart</button>
+      </div>
+    </div>
+    <div class="g-body">
+      <div class="g-main">
+        <div class="g-dots" id="g-dots"></div>
+        <div class="g-stage" id="g-stage"></div>
+      </div>
+      <div class="g-side">
+        <div class="panel sbox">
+          <h3>Scoreboard</h3>
+          <div id="g-score"></div>
+        </div>
+        <div class="panel sbox">
+          <h3>How this plays</h3>
+          <div class="flavor" id="g-flavor"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec" id="cmp-h">Before and after</h2>
+  <p class="sec-sub">Same team size, same company. What the tooling changes is where the hours go.</p>
+  <div class="cmp-grid">
+    <div class="panel chart-box">
+      <h3>Operational metrics</h3>
+      <p class="cb-sub">Left bar: 2016 SOC, right bar: 2026 SOC, scaled to the larger value</p>
+      <div id="bars"></div>
+      <div class="legend">
+        <span><i style="background:color-mix(in srgb, var(--accent) 26%, #b9c6d6)"></i>SOC 2016</span>
+        <span><i style="background:var(--accent)"></i>SOC 2026</span>
+      </div>
+    </div>
+    <div class="panel chart-box effort">
+      <h3>Where analyst hours go</h3>
+      <p class="cb-sub">Share of a shift by activity. The mix, not the headcount, is what moves.</p>
+      <div class="estack">
+        <div class="el">SOC 2016</div>
+        <div class="track" id="stack-trad"></div>
+      </div>
+      <div class="estack">
+        <div class="el">SOC 2026</div>
+        <div class="track" id="stack-ai"></div>
+      </div>
+      <div class="etag">
+        <span><i style="background:#93a4b8"></i>Triage</span>
+        <span><i style="background:var(--accent)"></i>Investigation</span>
+        <span><i style="background:var(--crit)"></i>Response</span>
+        <span><i style="background:#b8913f"></i>Reporting</span>
+        <span><i style="background:#7a5c9e"></i>Hunting</span>
+      </div>
+    </div>
+  </div>
+
+  <h2 class="sec" id="cap-h">Capability by era</h2>
+  <p class="sec-sub">How each stage of the work changes, in one table.</p>
+  <table class="cap">
+    <thead><tr><th></th><th>SOC 2016, pre-AI</th><th>SOC 2026, AI-era</th></tr></thead>
+    <tbody>
+      <tr><td class="rowname">Detection</td><td>Signature and correlation rules, static thresholds, IDS and antivirus feeds</td><td>Machine-learning anomaly detection, UEBA, EDR telemetry, cross-source AI correlation</td></tr>
+      <tr><td class="rowname">Triage</td><td>Every alert becomes a ticket; an analyst reads each one; 7 in 10 are noise</td><td>AI groups alerts into cases, scores risk, auto-closes noise; humans see the top 10-15%</td></tr>
+      <tr><td class="rowname">Investigation</td><td>Manual SIEM queries, log pivoting, copy-paste hash lookups, spreadsheets</td><td>Auto-built timelines, plain-language queries, sourced AI summaries, human verifies</td></tr>
+      <tr><td class="rowname">Response</td><td>Email and phone calls to IT, change tickets, manual isolation via firewall GUI</td><td>SOAR playbooks with approval gates, containment in minutes, audit trail by default</td></tr>
+      <tr><td class="rowname">Reporting</td><td>Hand-built spreadsheets and slides, weekly and monthly, always late</td><td>Reports draft themselves from the case log; the analyst reviews, edits, and signs</td></tr>
+      <tr><td class="rowname">Staffing</td><td>Two analysts per shift, on-call nights, high turnover, no time for hunting</td><td>Same team size; hours move from triage to response, hunting, and model review</td></tr>
+      <tr><td class="rowname">Coverage</td><td>Gaps found by accident; stale rules block nothing and nobody notices</td><td>AI surfaces stale detections, blind spots, and outdated agents before an attacker does</td></tr>
+    </tbody>
+  </table>
+
+  <div class="note-box">
+    <b>About these figures.</b> Scenario model for a 2,400-person company, informed by public SOC benchmarks (SANS SOC survey, Verizon DBIR, vendor SOC telemetry) and the alert-fatigue literature. MTTA and MTTR are typical published ranges for small teams; treat them as orders of magnitude, not precise measurements. The queue simulation generates the numbers you see.
+  </div>
+
+  <footer>
+    <p class="keep">What stays the same across both eras is the operator: judgment, escalation timing, knowing the business, and the 02:00 phone call. AI changes which hours are spent on noise and which on decisions.</p>
+    <p>Built as a single self-contained HTML file. No frameworks, no telemetry, no external requests.</p>
+  </footer>
+</div>
+
+<script>
+"use strict";
+/* ---------- helpers ---------- */
+const $  = (s, el) => (el || document).querySelector(s);
+const $$ = (s, el) => Array.from((el || document).querySelectorAll(s));
+const rand = (a, b) => a + Math.random() * (b - a);
+const pick = (arr) => arr[Math.floor(Math.random() * arr.length)];
+const fmtClock = (m) => {
+  const h = Math.floor(m / 60), mm = Math.floor(m % 60);
+  return String(h).padStart(2, "0") + ":" + String(mm).padStart(2, "0");
+};
+
+/* ---------- era config ---------- */
+const CFG = {
+  traditional: {
+    kpis: [
+      { lbl: "Alerts per day", num: 1150, sub: "every one lands in the human queue" },
+      { lbl: "False positive rate", num: 71, suffix: "%", sub: "7 of 10 alerts are noise" },
+      { lbl: "MTTA", num: 38, suffix: " min", sub: "mean time to acknowledge" },
+      { lbl: "MTTR", num: 6.4, suffix: " hr", sub: "mean time to resolve" },
+      { lbl: "Queue at 08:00", num: 87, sub: "left over from the night shift" },
+      { lbl: "Manual effort", num: 85, suffix: "%", sub: "of analyst time is click work" }
+    ],
+    vs: ["vs 2026: 10x more triage", "vs 2026: 8x more noise", "vs 2026: 19x slower", "vs 2026: 5x slower", "vs 2026: 7x deeper backlog", "vs 2026: 3x more manual"],
+    capacity: 16,
+    arrival: [1.3, 2.0],
+    line: "SOC 2016 · SIEM, IDS, antivirus, email. No automation. Every alert is yours.",
+    howto: "Alerts arrive raw and ungrouped. Acknowledge each one: it resolves as a false positive or an escalation. If the queue overflows, the oldest unread alert expires, and if it was real, that is a missed incident.",
+    meterLbl: "Analyst fatigue",
+    flavor: (f) => {
+      if (f > 75) return "Sustained triage is degrading accuracy: studies of SOC attention show error rates climbing after long runs of repetitive screening. You are more likely to click without reading.";
+      if (f > 55) return "The repetition is setting in. Same rule, same source, same noise. Attention drifts and real alerts start looking like the rest.";
+      if (f > 30) return "Repetitive screening is starting to cost focus. Most alerts here are not worth the keystroke.";
+      return "Fresh start. In 2016 the queue refills faster than anyone can read it.";
+    }
+  },
+  ai: {
+    kpis: [
+      { lbl: "Alerts per day", num: 1150, sub: "raw events: 1,032 auto-handled, 118 reach a human" },
+      { lbl: "False positive rate", num: 9, suffix: "%", sub: "after the AI filter, on what humans see" },
+      { lbl: "MTTA", num: 2, suffix: " min", sub: "mean time to acknowledge" },
+      { lbl: "MTTR", num: 1.2, suffix: " hr", sub: "mean time to resolve" },
+      { lbl: "Queue at 08:00", num: 12, sub: "cases, each with a decision trail" },
+      { lbl: "Manual effort", num: 30, suffix: "%", sub: "of analyst time; the rest is judgment" }
+    ],
+    vs: ["vs 2016: 9x fewer human tickets", "vs 2016: 8x less noise", "vs 2016: 19x faster", "vs 2016: 5x faster", "vs 2016: 7x less backlog", "vs 2016: 3x less manual"],
+    capacity: 14,
+    arrival: [1.6, 2.6],
+    line: "SOC 2026 · SIEM, EDR, SOAR, AI copilot. The machine filters; the human decides.",
+    howto: "Alerts arrive enriched: risk score, one-line summary, disposition. AUTO items close themselves. REVIEW and INVESTIGATE items need you: approve the recommendation, or open the detail and dig before deciding.",
+    meterLbl: "Attention load",
+    flavor: (f) => {
+      if (f > 55) return "Reading AI summaries still takes focus, and the summaries can be wrong. The skill is knowing when to distrust the machine.";
+      if (f > 30) return "Verifying sources is the new screening: each recommendation carries its evidence, and checking it is the job.";
+      return "Low load. The queue is short because the machine already did the filtering. Your attention is for decisions.";
+    }
+  }
+};
+
+/* ---------- alert pools ---------- */
+const TRAD_POOL = [
+  { n: "IDS signature match: ET TROJAN Win32/Injector", s: "IDS · edge-sensor-2", sev: "low" },
+  { n: "Excessive failed logins (24 in 5 min): svc-scanuser", s: "AD · dc-01", sev: "medium" },
+  { n: "AV detection: W32.Sality variant on workstn-114", s: "AV · workstn-114", sev: "medium" },
+  { n: "Outbound DNS: long TXT query, 3 hosts", s: "DNS · ns-02", sev: "low" },
+  { n: "Spam score above 8 sent to 40 recipients", s: "SMTP · mail-relay", sev: "medium" },
+  { n: "Port scan: 445 sweep from 10.24.8.14", s: "IDS · core-switch", sev: "medium" },
+  { n: "Phishing campaign: 40 users, 3 link clicks", s: "SMTP · mail-relay", sev: "high" },
+  { n: "SQL injection attempt on ERP portal", s: "WAF · erp-proxy", sev: "high" },
+  { n: "Powershell -enc from workstn-206", s: "EDR-log · workstn-206", sev: "critical" },
+  { n: "Web shell upload attempt on intranet app", s: "WAF · app-proxy", sev: "high" },
+  { n: "VPN burst login from new geo: 6 users", s: "VPN · fw-edge", sev: "medium" },
+  { n: "Unusual SMB traversal from backup agent", s: "IDS · core-switch", sev: "low" },
+  { n: "Failed RDP attempts, 3 hosts, same source", s: "FW · fw-edge", sev: "medium" },
+  { n: "Suspicious attachment: invoice.pdf.exe", s: "SMTP · mail-relay", sev: "high" },
+  { n: "Outbound beacon: 15 min interval, 2 KB", s: "Proxy · web-proxy", sev: "critical" },
+  { n: "User disabled then re-enabled, same hour", s: "AD · dc-02", sev: "low" },
+  { n: "Large file upload to personal storage", s: "Proxy · web-proxy", sev: "medium" },
+  { n: "SSL anomaly: cert mismatch, internal host", s: "IDS · edge-sensor-1", sev: "low" },
+  { n: "Password spray: 1,200 attempts, 9 accounts", s: "AD · dc-01", sev: "high" },
+  { n: "New service installed on domain controller", s: "AV · dc-01", sev: "critical" }
+];
+const SEV_WEIGHT = { low: 45, medium: 30, high: 15, critical: 10 };
+const REAL_BY_SEV = { low: 0.08, medium: 0.22, high: 0.55, critical: 0.8 };
+
+const AI_POOL = [
+  { t: "Credential stuffing on VPN", r: 78, d: "auto",  sum: "3,100 attempts in 4 min from 185.220.x.x, 2 accounts locked, source blocklisted, 1:1 matching against known stuffing pattern" },
+  { t: "Phishing campaign, 40 users", r: 84, d: "auto", sum: "3 clicked, 1 entered credentials, mailbox access blocked, password reset initiated, users notified, campaign grouped into one case" },
+  { t: "Scanner misconfiguration", r: 12, d: "auto", sum: "212 identical alerts from one host, traced to a misconfigured inventory scan, grouped and closed as noise, rule tuned" },
+  { t: "Powershell -enc on workstn-206", r: 66, d: "review", sum: "Matches hunting rule 4412, parent chain svchost to wscript, no user action at keyboard, hash 7/62 vendors flag it" },
+  { t: "Data exfil pattern from finance", r: 88, d: "review", sum: "1.2 GB upload to storage.googleapis.com over 40 min, user is CFO deputy, DLP rule not yet enabled on this bucket class" },
+  { t: "Lateral movement candidate", r: 74, d: "review", sum: "Admin session initiated from a non-admin host, credential used is 90 days old, matches pass-the-hash signature" },
+  { t: "Ransomware staging on 3 endpoints", r: 96, d: "investigate", sum: "Cobalt Strike beacon detected, 3 endpoints quarantined by EDR pending human confirmation, kill-switch candidate identified" },
+  { t: "User clicked personal link", r: 8, d: "auto", sum: "Dropbox link clicked on marketing laptop, no data accessed, no follow-on activity, closed" },
+  { t: "OAuth app granted mailbox scope", r: 81, d: "review", sum: "Third-party app requested full mailbox access, granted by an executive, no prior app from this vendor, unusual permission set" },
+  { t: "VPN access from new country", r: 24, d: "auto", sum: "Known traveler profile, matches prior pattern, risk-scored low, no action needed" },
+  { t: "Beaconing, 15 min interval", r: 92, d: "investigate", sum: "Host workstn-206 dialing out on 15 min cadence, 2 KB bursts, process tree shows injected svchost, containment recommended" },
+  { t: "Old agent on 3 endpoints", r: 41, d: "auto", sum: "EDR agent version 2 years old, known blind spot for this family, patch ticket auto-created" },
+  { t: "Mailbox rules forwarding", r: 63, d: "review", sum: "Finance mailbox auto-forwards to personal address, rule created 3 days ago, user reports no knowledge" },
+  { t: "Brute force on ERP portal", r: 52, d: "auto", sum: "Lockout policy engaged after 9 attempts, source is a known scanner, no account compromised" }
+];
+const DISP_WEIGHT = { auto: 66, review: 24, investigate: 10 };
+
+/* ---------- state ---------- */
+let state = null;
+function freshState(era) {
+  return {
+    era: era,
+    running: false,
+    paused: false,
+    shiftEnded: false,
+    shiftClock: 8 * 60,
+    alerts: [],
+    nextId: 1,
+    counts: { handled: 0, expired: 0, escalated: 0, fp: 0, auto: 0, validated: 0, investigates: 0, misses: 0 },
+    fatigue: 0,
+    spawnTimer: null,
+    tickTimer: null,
+    busy: new Set()
+  };
+}
+
+/* ---------- DOM refs ---------- */
+const feedEl = $("#feed"), kpisEl = $("#kpis"), barsEl = $("#bars"), countersEl = $("#counters"),
+      meterFill = $("#meter-fill"), flavorEl = $("#flavor"), howtoEl = $("#howto"),
+      clockEl = $("#clock"), eraTag = $("#era-tag"), eraLine = $("#era-line"), meterLbl = $("#meter-lbl"),
+      stepsEl = $("#steps"), playHint = $("#play-hint");
+
+/* ---------- KPI strip ---------- */
+function renderKPIs() {
+  const cfg = CFG[state.era];
+  kpisEl.innerHTML = cfg.kpis.map((k, i) => `
+    <div class="kpi">
+      <div class="lbl">${k.lbl}</div>
+      <div class="num" data-to="${k.num}">0</div>
+      <div class="sub">${k.sub}</div>
+      <div class="vs"><b>${cfg.vs[i]}</b></div>
+    </div>`).join("");
+  $$(".kpi .num", kpisEl).forEach(el => countUp(el, parseFloat(el.dataset.to)));
+}
+function countUp(el, to) {
+  const dur = 800, t0 = performance.now(), from = 0;
+  function frame(t) {
+    const p = Math.min(1, (t - t0) / dur), e = 1 - Math.pow(1 - p, 3);
+    const v = from + (to - from) * e;
+    el.textContent = Number.isInteger(to) ? Math.round(v) : v.toFixed(1);
+    if (p < 1) requestAnimationFrame(frame);
+  }
+  requestAnimationFrame(frame);
+}
+
+/* ---------- charts ---------- */
+const BARS = [
+  { l: "MTTA", unit: " min", trad: 38, ai: 2 },
+  { l: "MTTR", unit: " hr", trad: 6.4, ai: 1.2 },
+  { l: "Alerts reaching a human, per day", unit: "", trad: 1150, ai: 118 },
+  { l: "False positive rate", unit: "%", trad: 71, ai: 9 },
+  { l: "Manual effort", unit: "%", trad: 85, ai: 30 }
+];
+const EFFORT = {
+  trad: [["Triage", 58, "#93a4b8"], ["Investigation", 22, "#7d9cbb"], ["Response", 12, "#c05b50"], ["Reporting", 8, "#b8913f"]],
+  ai:   [["Triage", 10, "#93a4b8"], ["Investigation", 34, "#0e7c66"], ["Response", 28, "#c05b50"], ["Reporting", 12, "#b8913f"], ["Hunting", 16, "#7a5c9e"]]
+};
+function renderBars() {
+  barsEl.innerHTML = BARS.map(m => {
+    const max = Math.max(m.trad, m.ai);
+    const hT = Math.round((m.trad / max) * 100), hA = Math.round((m.ai / max) * 100);
+    return `
+    <div class="mbar">
+      <div class="ml">${m.l}</div>
+      <div class="bars">
+        <div class="g t"><div class="val">${m.trad}${m.unit}</div><div class="bar" data-h="${hT}" style="height:0"></div><div class="cap">2016</div></div>
+        <div class="g a"><div class="val">${m.ai}${m.unit}</div><div class="bar" data-h="${hA}" style="height:0"></div><div class="cap">2026</div></div>
+      </div>
+    </div>`;
+  }).join("");
+  requestAnimationFrame(() => {
+    $$(".mbar .bar").forEach(b => { b.style.height = b.dataset.h + "%"; });
+  });
+}
+function renderStacks() {
+  function stack(id, data) {
+    const el = $(id);
+    el.innerHTML = data.map(([name, pct, color]) =>
+      `<div class="seg" style="width:0%;background:${color}" data-w="${pct}"><small>${name} ${pct}%</small></div>`
+    ).join("");
+    requestAnimationFrame(() => {
+      $$(".seg", el).forEach(s => { s.style.width = s.dataset.w + "%"; });
+    });
+  }
+  stack("#stack-trad", EFFORT.trad);
+  stack("#stack-ai", EFFORT.ai);
+}
+
+/* ---------- day in the life ---------- */
+const STEPS = [
+  { t: "07:45", title: "Shift handover",
+    trad: "Forty minutes reading the shared binder: what happened overnight, which tickets are open, which rules are noisy today. The night analyst is asleep; questions wait until they wake.",
+    ai: "Two minutes reading an AI-generated shift summary: overnight events, open cases with risk scores, recommended focus for the day. Every case carries a decision trail you can trace back to source events." },
+  { t: "08:30", title: "Queue triage",
+    trad: "Eighty-seven alerts are waiting. Most are the same noise: a misconfigured scanner, an internal tool tripping an IDS rule. You click 'close as false positive' repeatedly, then answer a manager asking why 40 users got phishing alerts for one campaign.",
+    ai: "Twelve cases, each grouped by campaign. One case: 'Phishing, 40 users, 3 clicked, 1 credential entered, blocked, password reset initiated, users notified.' You check the logic, approve. Two minutes for what used to take an hour." },
+  { t: "09:15", title: "First real investigation",
+    trad: "Powershell execution on a finance workstation. You open the SIEM, write a query, wait for the search, pivot to the endpoint, check processes, pull the hash, paste it into VirusTotal. Forty-five minutes to establish what happened.",
+    ai: "The case arrives with a timeline already built: process tree, parent chain, hash reputation, six similar executions on other hosts, MITRE mapping. You verify the timeline, ask the copilot in plain language what the script exfiltrated, and get a sourced answer. Fifteen minutes including the verification." },
+  { t: "10:30", title: "Escalation to IT",
+    trad: "You email the sysadmin team, then call. The ticket sits in their queue for two hours while the compromised account stays active, because nobody has authority to disable it without a change ticket.",
+    ai: "The SOAR playbook quarantined the endpoint and disabled the account at minute four, behind an approval gate you set. The case notes list exactly what was done and what to reverse. IT receives a handoff with context, not a request to investigate." },
+  { t: "12:00", title: "Reporting and metrics",
+    trad: "An hour updating tickets, copying times into a spreadsheet, hand-writing the weekly metric deck. The VP asks how many alerts came in and you count manually.",
+    ai: "Tickets update themselves from the case log. The weekly report drafts itself from the case database. You review it in ten minutes and catch one number that looks wrong, which is the actual value of the human in the loop." },
+  { t: "14:00", title: "Threat hunting and gaps",
+    trad: "There is no time for hunting. The queue is full again. You investigate a repeat: the same phishing kit, the same command, blocked last month, not blocked this month, because nobody updated the rule.",
+    ai: "The AI surfaces a gap on its own: the EDR blocks this family, but three endpoints run an outdated agent. You write the query to find the blind spot, verify it, and the fix gets scheduled. The shift includes proactive work for the first time." },
+  { t: "16:00", title: "The real incident",
+    trad: "A ransomware alert fires. The runbook is a PDF on a share nobody can find. The incident commander is on vacation. You improvise, call the MSSP, and isolate the subnet by hand through the firewall GUI while the clock runs.",
+    ai: "The runbook is a playbook in the SOAR. Containment steps execute with your approval at each gate, leadership comms draft themselves, evidence collection runs in parallel. Your job is judgment: is this the real thing, and what does the business need?" },
+  { t: "17:30", title: "Handover, again",
+    trad: "You write three pages of notes by hand, hoping the night analyst understands your shorthand. You carry the incident in your head overnight. The on-call phone pings at 02:00: the same noise, again.",
+    ai: "The handover writes itself from the case log. The night shift starts with the same picture you had. You go home; the AI watchdog pages a human only when a decision is needed." }
+];
+function renderSteps() {
+  stepsEl.innerHTML = STEPS.map((s, i) => `
+    <div class="step" data-i="${i}">
+      <div class="dot"></div>
+      <div class="tcard">
+        <div class="thead"><span class="ttime">${s.t}</span><span class="ttitle">${s.title}</span></div>
+        <div class="cols">
+          <div class="col trad"><h4>SOC 2016</h4><p>${s.trad}</p></div>
+          <div class="col ai"><h4>SOC 2026</h4><p>${s.ai}</p></div>
+        </div>
+      </div>
+    </div>`).join("");
+}
+let stepIdx = 0;
+function renderStepNav() {
+  const steps = $$(".step");
+  steps.forEach((s, k) => {
+    s.classList.toggle("active", k === stepIdx);
+    s.classList.toggle("fade", k !== stepIdx);
+  });
+  $("#btn-prev").disabled = stepIdx === 0;
+  $("#btn-next").textContent = stepIdx >= steps.length - 1 ? "Restart" : "Next";
+  $("#play-hint").textContent = "Step " + (stepIdx + 1) + " of " + steps.length + ". Read, then click Next";
+}
+function stepNext() {
+  const steps = $$(".step");
+  stepIdx = stepIdx >= steps.length - 1 ? 0 : stepIdx + 1;
+  steps[stepIdx].scrollIntoView({ behavior: "smooth", block: "center" });
+  renderStepNav();
+}
+function stepPrev() {
+  if (stepIdx === 0) return;
+  stepIdx--;
+  $$(".step")[stepIdx].scrollIntoView({ behavior: "smooth", block: "center" });
+  renderStepNav();
+}
+
+/* ---------- queue engine ---------- */
+function cfg() { return CFG[state.era]; }
+
+function spawnAlert() {
+  state.shiftClock += 2 + rand(0, 4);
+  const t = fmtClock(state.shiftClock);
+  if (state.era === "traditional") {
+    const p = pick(TRAD_POOL);
+    const sev = weightedSev();
+    const real = Math.random() < REAL_BY_SEV[sev];
+    state.alerts.push({ id: state.nextId++, era: "traditional", time: t, name: p.n, src: p.s, sev, real, status: "new" });
+  } else {
+    const p = pick(AI_POOL);
+    const id = state.nextId++;
+    state.alerts.push({ id: id, era: "ai", time: t, title: p.t, risk: p.r, disp: p.d, sum: p.sum, status: p.d === "auto" ? "auto-pending" : "new" });
+    if (p.d === "auto") {
+      setTimeout(() => {
+        const a = state.alerts.find(x => x.id === id);
+        if (a && a.status === "auto-pending") { a.status = "closed"; state.counts.auto++; renderFeed(); renderCounters(); }
+      }, 1600);
+    }
+  }
+  renderFeed();
+}
+
+function weightedSev() {
+  const r = Math.random() * 100;
+  let acc = 0;
+  for (const [k, w] of Object.entries(SEV_WEIGHT)) { acc += w; if (r <= acc) return k; }
+  return "low";
+}
+function scheduleNext() {
+  if (state.spawnTimer) clearTimeout(state.spawnTimer);
+  if (state.paused || state.shiftEnded || !state.running) return;
+  state.spawnTimer = setTimeout(() => { spawnAlert(); scheduleNext(); }, rand(...cfg().arrival) * 1000);
+}
+
+function tick() {
+  if (state.shiftEnded) return;
+  clockEl.textContent = fmtClock(state.shiftClock);
+  // expiry: overflow drops the oldest unread alert
+  const cap = cfg().capacity;
+  while (state.alerts.filter(a => a.status === "new").length > cap) {
+    const oldest = state.alerts.filter(a => a.status === "new").sort((a, b) => a.id - b.id)[0];
+    oldest.status = "expired";
+    state.counts.expired++;
+    if (oldest.real) { state.counts.misses++; }
+    renderFeed(); renderCounters();
+  }
+  // fatigue dynamics
+  const decay = state.era === "traditional" ? 0.35 : 0.15;
+  state.fatigue = Math.max(0, state.fatigue - decay);
+  renderMeter();
+}
+
+function renderMeter() {
+  const f = Math.min(100, state.fatigue);
+  meterFill.style.width = f + "%";
+  meterFill.parentElement.classList.toggle("hot", f > 70);
+  flavorEl.textContent = cfg().flavor(f);
+}
+
+function handleAlert(id, action) {
+  const a = state.alerts.find(x => x.id === id);
+  if (!a) return;
+  if (state.era === "traditional") {
+    if (action === "ack") {
+      if (a.status !== "new" || state.busy.has(id)) return;
+      state.busy.add(id);
+      a.status = "investigating";
+      state.fatigue += 1.4;
+      renderFeed(); renderMeter();
+      setTimeout(() => {
+        state.busy.delete(id);
+        if (a.real) { a.status = "escalated"; state.counts.escalated++; }
+        else { a.status = "fp"; state.counts.fp++; }
+        state.counts.handled++;
+        renderFeed(); renderCounters(); renderMeter();
+      }, 1300);
+    }
+  } else {
+    if (action === "approve") {
+      if (a.status !== "new") return;
+      a.status = "validated";
+      state.counts.validated++;
+      state.fatigue += 0.3;
+      if (a.disp === "investigate") state.counts.investigates++;
+      renderFeed(); renderCounters(); renderMeter();
+    } else if (action === "deep") {
+      if (a.status !== "new") return;
+      a.status = "detail";
+      state.fatigue += 0.4;
+      renderFeed(); renderMeter();
+    } else if (action === "close-detail") {
+      if (a.status !== "detail") return;
+      a.status = "new";
+      renderFeed();
+    }
+  }
+}
+
+/* ---------- render feed ---------- */
+function sevBadge(sev) { return `<span class="badge b-${sev}">${sev}</span>`; }
+function dispBadge(d) { return `<span class="badge b-${d}">${d === "auto" ? "auto" : d === "review" ? "review" : "investigate"}</span>`; }
+
+function tradCard(a) {
+  const foot = a.status === "new"
+    ? `<button class="btn small" data-act="ack" data-id="${a.id}">Acknowledge</button><span class="note">${a.src}</span>`
+    : a.status === "investigating"
+      ? `<span class="st-inv">Investigating: pulling logs, checking hash... </span>`
+      : a.status === "escalated"
+        ? `<span class="st-bad">Escalated to IT, ticket #${1000 + a.id} opened</span><span class="note">${a.src}</span>`
+        : a.status === "fp"
+          ? `<span class="st-ok">Closed: false positive</span><span class="note">${a.src}</span>`
+          : `<span class="st-bad">EXPIRED in queue before review</span>`;
+  const dim = a.status === "fp" || a.status === "escalated" ? " dim" : "";
+  return `<div class="al${dim}" data-id="${a.id}">
+    <div class="row1"><span class="tm">${a.time}</span><span class="nm">${a.name}</span>${sevBadge(a.sev)}</div>
+    <div class="row2">${foot}</div>
+  </div>`;
+}
+
+function aiDetail(a) {
+  return `<div class="row2">
+      <button class="btn primary small" data-act="approve" data-id="${a.id}">Approve recommendation</button>
+      <button class="btn small" data-act="close-detail" data-id="${a.id}">Back</button>
+    </div>
+    <ul>
+      <li><span class="hl">Timeline:</span> 3 stages, 6 source events, earliest 07:52</li>
+      <li><span class="hl">Evidence:</span> process tree, network flows, 2 log sources, hash lookups attached</li>
+      <li><span class="hl">Similar:</span> 2 prior cases this quarter, same family, both contained</li>
+      <li><span class="hl">Suggested action:</span> quarantine host, reset account, notify asset owner</li>
+    </ul>`;
+}
+
+function aiCard(a) {
+  const head = a.status === "auto-pending"
+    ? `<div class="row1"><span class="tm">${a.time}</span><span class="nm">${a.title}</span><span class="risk">${a.risk}</span>${dispBadge(a.disp)}</div><div class="sum">${a.sum}</div><div class="row2"><span class="st-inv">auto-handling, closing... </span></div>`
+    : a.status === "closed"
+      ? `<div class="row1"><span class="tm">${a.time}</span><span class="nm">${a.title}</span><span class="risk">${a.risk}</span>${dispBadge(a.disp)}</div><div class="sum">${a.sum}</div><div class="row2"><span class="st-ok">Auto-closed: noise or fully automated response</span></div>`
+      : a.status === "validated"
+        ? `<div class="row1"><span class="tm">${a.time}</span><span class="nm">${a.title}</span><span class="risk">${a.risk}</span>${dispBadge(a.disp)}</div><div class="sum">${a.sum}</div><div class="row2"><span class="st-ok">Validated and actioned by you</span></div>`
+        : a.status === "detail"
+          ? `<div class="row1"><span class="tm">${a.time}</span><span class="nm">${a.title}</span><span class="risk">${a.risk}</span>${dispBadge(a.disp)}</div><div class="sum">${a.sum}</div>${aiDetail(a)}`
+          : `<div class="row1"><span class="tm">${a.time}</span><span class="nm">${a.title}</span><span class="risk">${a.risk}</span>${dispBadge(a.disp)}</div><div class="sum">${a.sum}</div><div class="row2">
+              <button class="btn primary small" data-act="approve" data-id="${a.id}">Approve</button>
+              <button class="btn small" data-act="deep" data-id="${a.id}">Deep dive</button>
+            </div>`;
+  return `<div class="al" data-id="${a.id}">${head}</div>`;
+}
+
+function renderFeed() {
+  if (!state.alerts.length) { feedEl.innerHTML = `<div class="feed-empty">Queue is quiet. Alerts start arriving now.</div>`; return; }
+  const list = state.alerts.slice(-18);
+  feedEl.innerHTML = list.map(a => a.era === "traditional" ? tradCard(a) : aiCard(a)).join("");
+}
+
+/* ---------- counters ---------- */
+function renderCounters() {
+  const c = state.counts;
+  if (state.era === "traditional") {
+    countersEl.innerHTML = `
+      <div class="stat-row"><span>Queue depth</span><span class="v">${state.alerts.filter(a => a.status === "new" || a.status === "investigating").length}</span></div>
+      <div class="stat-row"><span>Acknowledged</span><span class="v">${c.handled}</span></div>
+      <div class="stat-row"><span>Escalated</span><span class="v good">${c.escalated}</span></div>
+      <div class="stat-row"><span>False positives</span><span class="v">${c.fp}</span></div>
+      <div class="stat-row"><span>Expired in queue</span><span class="v ${c.misses ? "bad" : ""}">${c.expired}</span></div>
+      <div class="stat-row"><span>Genuine threats missed</span><span class="v ${c.misses ? "bad" : "good"}">${c.misses}</span></div>`;
+  } else {
+    countersEl.innerHTML = `
+      <div class="stat-row"><span>Cases needing you</span><span class="v">${state.alerts.filter(a => a.status === "new" || a.status === "detail").length}</span></div>
+      <div class="stat-row"><span>Auto-handled by AI</span><span class="v good">${c.auto}</span></div>
+      <div class="stat-row"><span>You validated</span><span class="v">${c.validated}</span></div>
+      <div class="stat-row"><span>Investigations approved</span><span class="v">${c.investigates}</span></div>`;
+  }
+}
+
+/* ---------- summary ---------- */
+function renderSummary() {
+  const c = state.counts;
+  let html = "";
+  if (state.era === "traditional") {
+    const missedLine = c.misses > 0
+      ? `<p class="headline">You missed <b>${c.misses} genuine threat${c.misses > 1 ? "s" : ""}</b> that expired in the queue. In a real 2016 shift, that gap is discovered weeks later, usually in the breach report.</p>`
+      : `<p class="headline">Nothing genuine expired while you watched. In 2016, that was luck, and luck was the control.</p>`;
+    html = `
+      <h3>Shift summary: SOC 2016</h3>
+      ${missedLine}
+      <div class="srow">Alerts handled: <b>${c.handled}</b></div>
+      <div class="srow">Escalated to IT: <b>${c.escalated}</b></div>
+      <div class="srow">False positives closed: <b>${c.fp}</b></div>
+      <div class="srow">Expired in queue: <b>${c.expired}</b></div>
+      <div class="srow">Estimated MTTA this shift: <b>${c.handled ? (Math.max(8, 38 - c.handled * 0.4)).toFixed(0) : "n/a"} min</b></div>
+      <div style="margin-top:12px" class="btn-row"><button class="btn primary" id="btn-new-shift">Start a new shift</button></div>`;
+  } else {
+    const contained = c.investigates > 0
+      ? `<p class="headline">The critical case was <b>contained within 22 minutes</b> of first sighting, with your approval at each gate. In 2016 the same incident took the team six hours and a missed night of sleep.</p>`
+      : `<p class="headline">No critical case needed you this window. The AI handled the background, and your attention stayed with the cases that mattered.</p>`;
+    html = `
+      <h3>Shift summary: SOC 2026</h3>
+      ${contained}
+      <div class="srow">Events auto-handled by AI: <b>${c.auto}</b></div>
+      <div class="srow">Decisions you validated: <b>${c.validated}</b></div>
+      <div class="srow">Investigations approved: <b>${c.investigates}</b></div>
+      <div class="srow">Estimated MTTA this shift: <b>2 min</b></div>
+      <div style="margin-top:12px" class="btn-row"><button class="btn primary" id="btn-new-shift">Start a new shift</button></div>`;
+  }
+  feedEl.innerHTML = `<div class="summary" style="padding:0">${html}</div>`;
+  $("#btn-new-shift").addEventListener("click", () => startShift());
+}
+
+/* ---------- shift control ---------- */
+function startShift() {
+  stopTimers();
+  state = freshState(state.era);
+  state.running = true;
+  clockEl.textContent = "08:00";
+  renderFeed(); renderCounters(); renderMeter();
+  $("#btn-pause").textContent = "Pause";
+  $("#btn-pause").disabled = false;
+  $("#btn-end").disabled = false;
+  scheduleNext();
+  state.tickTimer = setInterval(tick, 350);
+}
+function stopTimers() {
+  if (state && state.spawnTimer) clearTimeout(state.spawnTimer);
+  if (state && state.tickTimer) clearInterval(state.tickTimer);
+}
+function setEra(era) {
+  if (state && state.era === era) return;
+  stopTimers();
+  state = freshState(era);
+  document.body.classList.toggle("era-ai", era === "ai");
+  $("#sw-trad").classList.toggle("on", era === "traditional");
+  $("#sw-ai").classList.toggle("on", era === "ai");
+  $("#sw-trad").setAttribute("aria-selected", era === "traditional");
+  $("#sw-ai").setAttribute("aria-selected", era === "ai");
+  eraTag.textContent = era === "traditional" ? "2016" : "2026";
+  eraLine.textContent = cfg().line;
+  meterLbl.textContent = cfg().meterLbl;
+  howtoEl.textContent = cfg().howto;
+  renderKPIs();
+  renderCounters();
+  gRestart();
+  startShift();
+}
+
+/* ---------- events ---------- */
+feedEl.addEventListener("click", (e) => {
+  const btn = e.target.closest("button[data-act]");
+  if (!btn) return;
+  handleAlert(parseInt(btn.dataset.id, 10), btn.dataset.act);
+});
+$("#btn-pause").addEventListener("click", () => {
+  state.paused = !state.paused;
+  $("#btn-pause").textContent = state.paused ? "Resume" : "Pause";
+  if (!state.paused) scheduleNext();
+});
+$("#btn-reset").addEventListener("click", () => startShift());
+$("#btn-end").addEventListener("click", () => {
+  if (state.shiftEnded) return;
+  state.shiftEnded = true;
+  stopTimers();
+  renderSummary();
+  $("#btn-pause").disabled = true;
+  $("#btn-end").disabled = true;
+  renderCounters();
+});
+$("#sw-trad").addEventListener("click", () => setEra("traditional"));
+$("#sw-ai").addEventListener("click", () => setEra("ai"));
+$("#btn-next").addEventListener("click", stepNext);
+$("#btn-prev").addEventListener("click", stepPrev);
+
+/* ---------- guided triage ---------- */
+const GKEY = "soc-guided-v1";
+const GUIDE = {
+  traditional: [
+    { t: "08:05", title: "Shift handover", text: "The night analyst left two lines in the binder: 'quiet night, but IDS fired a lot. Something on 10.24.8.14.' The queue already shows 87 alerts and you have one cup of coffee to your name.",
+      choices: [
+        { label: "Start at the top of the queue, newest first", impact: { hours: 0.5 },
+          outcome: "The queue sorts by time, not by importance. The 10.24.8.14 signal sinks under a scanner noise flood and goes stale." },
+        { label: "Check 10.24.8.14 first, the night analyst flagged it", impact: { hours: 0.3, caught: 1 },
+          outcome: "It is a 445 sweep from a host that should never scan. You block the source and note it. The day starts with one less unknown." },
+        { label: "Coffee and news first, the queue can wait", impact: { hours: 1.2 },
+          outcome: "Thirty more alerts land while you are away. None of them is the one that matters, but you do not know that yet." }
+      ] },
+    { t: "08:30", title: "The scanner flood", text: "212 identical alerts from one host: a new inventory scanner tripping the IDS signature for SMB traversal. Same rule, same source, all week. The queue is 60% this one thing.",
+      choices: [
+        { label: "Close all 212 as false positives", impact: { hours: 0.4 },
+          outcome: "The queue clears, and the scanner fires again tomorrow, and the rule fires with it. The real SMB anomaly will arrive inside the same noise." },
+        { label: "Write a correlation rule for this source, then tune the signature", impact: { hours: 1.5, caught: 1 },
+          outcome: "Forty minutes of rule tuning. The queue stays quiet for the first time this week, and the genuine anomaly, when it comes, is visible. This is the work 2016 never pays for." },
+        { label: "Ignore them, the queue will bury them", impact: { hours: 0, missed: 1 },
+          outcome: "They bury the one alert that matters: a lateral move from workstn-206, unseen under 200 duplicates." }
+      ] },
+    { t: "09:00", title: "The phishing campaign", text: "40 users got the same invoice phishing email. Three clicked. One entered credentials. The sender domain is two hours old.",
+      choices: [
+        { label: "Block the domain, reset the credential, email all 40", impact: { hours: 1.2, caught: 1 },
+          outcome: "The campaign stops. You write the notification email twice because the first draft blames the user. The user who clicked swears they knew it was fake." },
+        { label: "Block the domain only", impact: { hours: 0.4, missed: 1 },
+          outcome: "The domain dies, but the credential is still live. At 14:00 the mailbox shows a login from Romania." },
+        { label: "Wait for users to report it", impact: { hours: 0, missed: 1 },
+          outcome: "Two more users click the resend wave at 10:15. The mailbox compromise is found by the vendor, not by you." }
+      ] },
+    { t: "09:40", title: "Powershell on workstn-206", text: "High severity: Powershell -enc from a finance workstation. The user is in a meeting. The host is connected to the finance segment.",
+      choices: [
+        { label: "Quarantine the host first, investigate after", impact: { hours: 0.7, caught: 1 },
+          outcome: "The box is off the network in four minutes. The encoded script was dropped by this morning's click. The 45-minute manual hunt still takes the rest of the hour." },
+        { label: "Investigate first: process list, logons, hash lookup", impact: { hours: 1.6, caught: 1 },
+          outcome: "You build the picture while the host stays connected. The script finishes its second stage while you are reading the first. Nothing exfiltrates, this time." },
+        { label: "Acknowledge and move on, Powershell is noisy", impact: { hours: 0.2, missed: 1 },
+          outcome: "It is not noisy. This host beacons on a 15-minute cadence all afternoon, and at 13:30 you will call it a false positive because the last three were." }
+      ] },
+    { t: "10:30", title: "Escalation to IT", text: "The compromised account needs to die. The change ticket takes two hours. The sysadmin team is three desks away.",
+      choices: [
+        { label: "Call the sysadmin directly, stay on the line", impact: { hours: 0.5, caught: 1 },
+          outcome: "The account dies in 20 minutes. The sysadmin owes you one and you owe them a coffee. The ticket gets backfilled later." },
+        { label: "Email the ticket and wait", impact: { hours: 2.0, missed: 1 },
+          outcome: "The account stays live through lunch. The attacker logs in again at 13:10. This is the 2016 bottleneck: authority, not skill." },
+        { label: "Disable it yourself, ticket later", impact: { hours: 0.3, overreach: 1 },
+          outcome: "You have the rights, so you do it. It works, and it is exactly the kind of boundary-crossing that gets SOCs audited when something else goes wrong." }
+      ] },
+    { t: "12:00", title: "The VP question", text: "The VP stops by the SOC. 'Are we OK?' You have not pulled today's numbers.",
+      choices: [
+        { label: "Answer from memory: 'Holding, one account compromised, contained'", impact: { hours: 0.1 },
+          outcome: "Close enough, but the numbers you quote are from Tuesday, and the VP writes them down. Tuesday's numbers become Thursday's report." },
+        { label: "'Let me pull the numbers', then spend 45 minutes in the SIEM", impact: { hours: 0.8 },
+          outcome: "You give a real answer: 212 alerts, four real, one contained. The VP is happy. The queue quietly grows while you are gone." },
+        { label: "Deflect: 'the MSSP handles the night, we are fine'", impact: { hours: 0, missed: 1 },
+          outcome: "The VP tells the board 'we are fine'. The beaconing host from the morning is still unresolved. Fine is a mood, not a metric." }
+      ] },
+    { t: "13:30", title: "The cry-wolf moment", text: "Three outbound beacon alerts in two hours. The last three you chased were all false: a backup agent, a monitoring tool, a webhook. The pattern says false.",
+      choices: [
+        { label: "Close all three fast", impact: { hours: 0.1, missed: 1 },
+          outcome: "Two are the backup agent and the webhook. The third is workstn-206, the host from this morning, dialing out on the same 15-minute cadence you saw at 09:40. It expires unseen." },
+        { label: "Check each one for ten minutes", impact: { hours: 0.5, caught: 1 },
+          outcome: "The third is real: same host, same interval, same 2 KB bursts. You escalate and the containment clock starts. The first two were noise, and you are allowed to be tired of them." },
+        { label: "Escalate all three to IT", impact: { hours: 0.9, overreach: 1 },
+          outcome: "IT chases two false alarms and one real beacon. You burn their goodwill and your own: next time you escalate, they will assume noise." }
+      ] },
+    { t: "14:30", title: "The coverage gap", text: "You remember the same phishing kit from last month: blocked then, not blocked now. Nobody updated the rule.",
+      choices: [
+        { label: "Fix the rule now, twenty minutes", impact: { hours: 0.3, caught: 1 },
+          outcome: "The kit's domain and hash go on the blocklist. It is the third rule you have fixed this week. The queue is a swamp you are draining with a teaspoon." },
+        { label: "Note it for next week's change window", impact: { hours: 0.1, missed: 1 },
+          outcome: "The note joins the other notes. The kit is used against a vendor's mailbox at 16:40, and the vendor calls you at 17:05." },
+        { label: "Assume the AV vendor covers it", impact: { hours: 0, missed: 1 },
+          outcome: "The kit is polymorphic, and AV signatures lag it by a week. The rule was the only thing that would have caught it." }
+      ] },
+    { t: "15:45", title: "Ransomware staging", text: "Three endpoints show the same malicious service installing itself. The runbook is a PDF somewhere on the share. The incident commander is on vacation.",
+      choices: [
+        { label: "Call the MSSP while you isolate the subnet by hand", impact: { hours: 1.8, caught: 1 },
+          outcome: "Two tracks run at once: the MSSP analyst walks the runbook with you, and you cut the finance subnet at the firewall. The encryption wave hits a dead network. Contained in 41 minutes." },
+        { label: "Find the runbook first, twenty-five minutes", impact: { hours: 1.3, caught: 1 },
+          outcome: "You find it, version 2019, wrong firewall vendor. You improvise from memory. Contained in 58 minutes, and your hands are shaking." },
+        { label: "Isolate the single host only", impact: { hours: 0.6, missed: 1 },
+          outcome: "The service was already pushed to the other two. They encrypt at 16:20. The company loses a day of order processing." }
+      ] },
+    { t: "17:30", title: "Handover, again", text: "You have three pages of notes and a head full of incident. The night analyst is on their way in.",
+      choices: [
+        { label: "Write the full handover, including the 10.24.8.14 thread from this morning", impact: { hours: 0.7 },
+          outcome: "The night analyst reads it twice and calls you once. The thread survives. Tomorrow you will read their two-line version of your three pages." },
+        { label: "Brief verbally, keep the notes brief", impact: { hours: 0.3 },
+          outcome: "The verbal briefing covers the incident. The small stuff, the scanner rule, the stale blocklist, evaporates. It comes back next week." },
+        { label: "Leave a one-line note and go home", impact: { hours: 0.1, missed: 1 },
+          outcome: "The note says 'incident contained'. The night analyst does not know which host, which segment, or what to watch. The 02:00 ping is about a host you forgot to mention." }
+      ] }
+  ],
+  ai: [
+    { t: "08:05", title: "Shift handover", text: "The AI shift summary lists 12 cases. Priority one: beaconing from workstn-206, evidence attached. The rest are noise groups with risk scores in single digits.",
+      choices: [
+        { label: "Open the priority case first", impact: { hours: 0.4, caught: 1 },
+          outcome: "The auto timeline shows 15-minute cadence dial-outs, 2 KB bursts, first seen 03:12. You mark it for follow-up and the day starts with the real problem already named." },
+        { label: "Skim the summary and approve all auto-recommendations", impact: { hours: 0.2, overreach: 1 },
+          outcome: "You approve 9 of 9 in one pass. One was a mailbox-rule case where the recommendation was 'revoke the forwarding rule', but the rule is the CFO's own, set up with IT last week. Your approval revokes it, and the CFO notices." },
+        { label: "Start with the newest case, not the priority", impact: { hours: 0.4 },
+          outcome: "The newest case is a scanner misconfiguration, already grouped. The beaconing case waits 20 minutes. Nothing breaks, but the day starts slightly behind." }
+      ] },
+    { t: "08:30", title: "The scanner flood", text: "The AI grouped 212 events from one host as AUTO, disposition: noise. One case, one summary, 212 source events attached.",
+      choices: [
+        { label: "Approve the grouping and tune the rule", impact: { hours: 0.6, caught: 1 },
+          outcome: "The rule stops firing. The case closes with a tuning note attached. The machine grouped, you tuned, and the genuine anomaly will be visible when it arrives." },
+        { label: "Dig into all 212 events anyway", impact: { hours: 1.8 },
+          outcome: "You confirm 212 instances of the same scanner. The AI was right, and you spent the hour proving it. Trust is built by checking, but not by checking everything." },
+        { label: "Close the group without a tuning note", impact: { hours: 0.2 },
+          outcome: "The case closes, the rule still fires, and tomorrow the AI presents you the same group again. Garbage in, same garbage out." }
+      ] },
+    { t: "09:00", title: "The phishing campaign", text: "AI case: campaign grouped, 40 users, 3 clicks, 1 credential, mailbox access blocked, password reset initiated, users notified. Pending your review.",
+      choices: [
+        { label: "Verify the reset went through, then approve", impact: { hours: 0.4, caught: 1 },
+          outcome: "You spot that user 3 clicked twice. The AI missed the second click because it deduped the two emails. You add the second session to the case. This is the review that matters." },
+        { label: "Approve as-is", impact: { hours: 0.1, missed: 1 },
+          outcome: "Clean and fast. The second click is in the logs but nobody counts it, until the vendor report quotes it at the next board review." },
+        { label: "Override: force MFA on the whole finance group", impact: { hours: 0.8, overreach: 1 },
+          outcome: "Good security, bad politics: the finance group loses email for an hour while MFA enrolls. The contained case is now an incident of your making." }
+      ] },
+    { t: "09:40", title: "Powershell on workstn-206", text: "Case: Powershell -enc, auto timeline built, hash 7/62 vendors flag it, matches hunting rule 4412. EDR can quarantine the host on your word.",
+      choices: [
+        { label: "Verify the timeline, then approve quarantine", impact: { hours: 0.6, caught: 1 },
+          outcome: "You trace the parent chain yourself: svchost to wscript, spawned 40 seconds after the click. The quarantine lands. Fifteen minutes, and you would bet your name on it." },
+        { label: "Approve quarantine without reading the timeline", impact: { hours: 0.1, overreach: 1 },
+          outcome: "The quarantine lands on the right host, but you do not know that. The model pinned the wrong process tree once last month. Today it was right. Today." },
+        { label: "Ask the copilot: what did the script exfiltrate?", impact: { hours: 0.9, caught: 1 },
+          outcome: "The answer comes back with three source events: nothing left the host. The script was the downloader stage, not the exfil stage. You approve quarantine with the question answered. Question, verify, act." }
+      ] },
+    { t: "10:30", title: "Escalation to IT", text: "The SOAR already quarantined the host and disabled the account at minute four, behind your approval gate. The handoff to IT is drafted.",
+      choices: [
+        { label: "Approve the gate and the handoff", impact: { hours: 0.2, caught: 1 },
+          outcome: "Contained at minute 4, documented at minute 6. IT picks it up with context, and the case writes its own ticket." },
+        { label: "Check the quarantine scope before approving", impact: { hours: 0.5, caught: 1 },
+          outcome: "The quarantine covered workstn-206 and the two hosts that touched it. You expand it to the segment. The extra 20 minutes pay for themselves at 16:00, when the sibling host tries the same beacon." },
+        { label: "Hold the gate for more evidence", impact: { hours: 1.5, missed: 1 },
+          outcome: "You want certainty. The account stays disabled and the host stays quarantined, but the case stalls with no note, and the 14:00 metrics review asks why. Delay is a decision too." }
+      ] },
+    { t: "12:00", title: "The VP question", text: "The weekly report drafted itself from the case log. The VP emails: 'send me the numbers'.",
+      choices: [
+        { label: "Review the draft, fix the stale number, send", impact: { hours: 0.3, caught: 1 },
+          outcome: "The draft had last week's MTTR. You correct it, add one context line about the campaign, and send. Ten minutes, and the report is better than any 2016 version." },
+        { label: "Send the draft as-is", impact: { hours: 0.05 },
+          outcome: "It is 90% right. The 10% is the stale MTTR, which the CFO's team will catch and quietly wonder about." },
+        { label: "Rewrite it in your own words entirely", impact: { hours: 1.2 },
+          outcome: "Your version is better prose and worse data: you dropped the auto-attached evidence links. The machine and you each wrote half a good report." }
+      ] },
+    { t: "13:30", title: "The cry-wolf moment", text: "AI risk scores on three beacon alerts: 12, 8, 74. The first two auto-closed. The 74 is flagged for your review.",
+      choices: [
+        { label: "Open the 74 and verify the evidence", impact: { hours: 0.4, caught: 1 },
+          outcome: "It is workstn-206 again, 15-minute cadence, matching the morning case. The model flagged it because the cadence is anomalous for a finance host. You approve containment. The score earned your attention." },
+        { label: "Trust the scores and skip the review", impact: { hours: 0.1, missed: 1 },
+          outcome: "The 74 sits in the review queue until 15:00. It resolves the same way, just later, because the AI will not act on a review case without you." },
+        { label: "Override: mark all three as noise and tune the model", impact: { hours: 0.3, missed: 1 },
+          outcome: "You are tired of the pattern. The tuning suppresses the cadence signal for the whole segment. The beacon keeps dialing out, and the model no longer reports it." }
+      ] },
+    { t: "14:30", title: "The coverage gap", text: "The AI surfaced a gap on its own: three endpoints on a two-year-old EDR agent, blind to this family. Patch tickets are drafted.",
+      choices: [
+        { label: "Schedule the patch for tonight's window", impact: { hours: 0.3, caught: 1 },
+          outcome: "The tickets go to IT with priority. The gap closes at 02:00. This is the proactive hour that 2016 never had." },
+        { label: "Defer it, the queue is short today", impact: { hours: 0.1, missed: 1 },
+          outcome: "The queue is short because the machine did the triage. The agents stay stale for another week, and the gap stays open, quietly." },
+        { label: "Investigate the three endpoints yourself first", impact: { hours: 1.4, caught: 1 },
+          outcome: "You verify all three are genuine blind spots. They are. The patch still happens tonight, and you have built the evidence trail for the audit." }
+      ] },
+    { t: "15:45", title: "Ransomware staging", text: "Playbook executing: quarantine at gate 1, kill-switch at gate 2, leadership comms draft at gate 3. Each gate waits for your approval.",
+      choices: [
+        { label: "Approve gate by gate, checking each scope", impact: { hours: 0.8, caught: 1 },
+          outcome: "Gate 1 quarantines the three hosts. Gate 2 kills the C2 beacon. Gate 3 drafts the note: 'contained in 22 minutes, no exfiltration'. You sign it. This is the job now: judgment at each gate." },
+        { label: "Approve everything in one click", impact: { hours: 0.2, overreach: 1 },
+          outcome: "Fast, and the blast radius was small today. But the playbook's default scope was wider than the evidence required, and the finance segment was down for 90 minutes of a quiet Friday. One-click approval is a habit with a bill." },
+        { label: "Pause and reassess the whole picture first", impact: { hours: 1.2, caught: 1 },
+          outcome: "You confirm the scope is right, then approve. The 22-minute containment becomes 34 minutes. Slower, but you own the decision fully." }
+      ] },
+    { t: "17:30", title: "Handover, again", text: "The handover drafted itself from the case log: 12 cases, one contained incident, two open, decision trails attached.",
+      choices: [
+        { label: "Review, add your judgment note, send", impact: { hours: 0.3, caught: 1 },
+          outcome: "You add one line: 'the CFO mailbox rule case needs a human call on Monday'. The night shift starts with your head in their hands." },
+        { label: "Send it as-is", impact: { hours: 0.1 },
+          outcome: "Complete and accurate. The one thing missing is the thing you know and the log does not: the CFO is still annoyed. Monday will handle it." },
+        { label: "Rewrite the handover yourself", impact: { hours: 0.9 },
+          outcome: "Your version is warmer and loses the evidence links. The night analyst re-asks questions the log already answered. The machine's draft was better; your edit made it human, which was the point." }
+      ] }
+  ]
+};
+
+let g = { idx: 0, path: [], phase: "choice", last: null };
+
+function gScore() {
+  const s = { caught: 0, missed: 0, overreach: 0, hours: 0 };
+  const nodes = GUIDE[state.era];
+  g.path.forEach((ci, i) => {
+    const imp = nodes[i].choices[ci].impact || {};
+    s.caught += imp.caught || 0;
+    s.missed += imp.missed || 0;
+    s.overreach += imp.overreach || 0;
+    s.hours += imp.hours || 0;
+  });
+  return s;
+}
+function gPersist() {
+  try { localStorage.setItem(GKEY, JSON.stringify({ era: state.era, idx: g.idx, path: g.path, phase: g.phase, last: g.last })); } catch (e) {}
+}
+function gRestore() {
+  try {
+    const raw = localStorage.getItem(GKEY);
+    if (!raw) return;
+    const p = JSON.parse(raw);
+    if (p.era === state.era && Array.isArray(p.path) && p.path.length <= GUIDE[state.era].length) {
+      g = { idx: Math.min(p.idx, GUIDE[state.era].length - 1), path: p.path, phase: p.phase === "debrief" ? "debrief" : "choice", last: p.last };
+    }
+  } catch (e) {}
+  renderGuided();
+}
+function gRestart() {
+  g = { idx: 0, path: [], phase: "choice", last: null };
+  gPersist();
+  renderGuided();
+}
+function impactLine(imp) {
+  const bits = [];
+  if (imp.caught) bits.push(`<span class="g-good">+${imp.caught} signal caught</span>`);
+  if (imp.missed) bits.push(`<span class="g-bad">${imp.missed} signal missed</span>`);
+  if (imp.overreach) bits.push(`<span class="g-bad">${imp.overreach} over-reach</span>`);
+  if (imp.hours) bits.push(`<span>+${imp.hours.toFixed(1)} h worked</span>`);
+  return bits.length ? bits.join(" · ") : "<span>no score change</span>";
+}
+function renderGuided() {
+  const nodes = GUIDE[state.era];
+  $("#g-era-tag").textContent = state.era === "traditional" ? "2016" : "2026";
+  $("#g-prog").textContent = g.phase === "debrief" ? "Debrief" : "Step " + Math.min(g.idx + 1, nodes.length) + " of " + nodes.length;
+  $("#g-clock").textContent = g.phase === "debrief" ? "17:45" : nodes[Math.min(g.idx, nodes.length - 1)].t;
+  // dots
+  $("#g-dots").innerHTML = nodes.map((n, i) => {
+    const cls = i === g.idx && g.phase === "choice" ? "cur" : (i < g.idx || (i === g.idx && g.phase === "outcome") ? "done" : "");
+    return `<button class="g-dot ${cls}" data-di="${i}" title="${n.title}">${i + 1}</button>`;
+  }).join("");
+  $$(".g-dot").forEach(b => b.addEventListener("click", () => gBack(+b.dataset.di)));
+  // stage
+  const stage = $("#g-stage");
+  if (g.phase === "debrief") {
+    const s = gScore();
+    const trad = state.era === "traditional";
+    const missedLine = trad
+      ? (s.missed >= 2
+        ? "The misses are structural: queue depth, noise, stale rules. The 2016 SOC did not fail because analysts were lazy. It failed because the workload was engineered to bury the signal."
+        : s.missed === 1
+          ? "One signal got away. In a real shift, that one is how the breach report starts."
+          : "You caught everything the queue threw at you. In 2016, that made you the exception the team wrote procedures around.")
+      : (s.missed >= 1
+        ? "The misses are yours now: approving without reading, trusting scores, one-click authority. The model does not get tired. You still do."
+        : "Nothing got past you. The system held because the filter and the judgment both held.");
+    const overLine = s.overreach > 0
+      ? (trad
+        ? `You also spent ${s.overreach} unit${s.overreach > 1 ? "s" : ""} of credibility on process and false alarms. That is the other 2016 tax, paid in small coins.`
+        : `The ${s.overreach} over-reach cost you trust, and trust is the one resource the machine cannot rebuild for you.`)
+      : "";
+    const compareLine = trad
+      ? "The same day in 2026 costs about 6 hours, and the beaconing host is caught at 09:40 instead of 13:30, because the triage is the machine's and the judgment is yours."
+      : "The same day in 2016 costs about 11 hours, and the beaconing host is found by luck, not by design.";
+    stage.innerHTML = `<div class="g-debrief">
+      <h3>Debrief: your ${trad ? "2016" : "2026"} day</h3>
+      <div class="dline">The day ends. You caught <b>${s.caught}</b> real signals, missed <b>${s.missed}</b>, and worked <b>${s.hours.toFixed(1)} hours</b> of an 8-hour shift.</div>
+      <div class="dline">${missedLine}</div>
+      ${overLine ? `<div class="dline">${overLine}</div>` : ""}
+      <div class="dline">${compareLine}</div>
+      <div class="btn-row" style="margin-top:14px">
+        <button class="btn" id="g-replay">Replay this era</button>
+        <button class="btn primary" id="g-other">Play the ${trad ? "2026" : "2016"} day</button>
+      </div>
+    </div>`;
+    $("#g-replay").addEventListener("click", gRestart);
+    $("#g-other").addEventListener("click", () => setEra(trad ? "ai" : "traditional"));
+  } else {
+    const n = nodes[g.idx];
+    if (g.phase === "outcome") {
+      const c = n.choices[g.last];
+      stage.innerHTML = `<h3>${n.title}</h3>
+        <div class="g-outcome">
+          <div class="o-head">What happened</div>
+          ${c.outcome}
+          <div style="margin-top:10px">${impactLine(c.impact || {})}</div>
+          <div style="margin-top:12px"><button class="btn primary" id="g-next">Continue</button></div>
+        </div>`;
+      $("#g-next").addEventListener("click", gNext);
+    } else {
+      stage.innerHTML = `<h3>${n.title}</h3>
+        <div class="g-scenario">${n.text}</div>
+        <div class="g-choices">${n.choices.map((c, i) => `<button class="g-choice" data-ci="${i}">${c.label}</button>`).join("")}</div>`;
+      $$(".g-choice", stage).forEach(b => b.addEventListener("click", () => gChoose(+b.dataset.ci)));
+    }
+  }
+  renderScore();
+}
+function renderScore() {
+  const s = gScore();
+  $("#g-score").innerHTML = `
+    <div class="stat-row"><span>Signals caught</span><span class="v good">${s.caught}</span></div>
+    <div class="stat-row"><span>Signals missed</span><span class="v ${s.missed ? "bad" : ""}">${s.missed}</span></div>
+    <div class="stat-row"><span>Over-reach</span><span class="v ${s.overreach ? "bad" : ""}">${s.overreach}</span></div>
+    <div class="stat-row"><span>Hours worked</span><span class="v">${s.hours.toFixed(1)}</span></div>`;
+  $("#g-flavor").textContent = state.era === "traditional"
+    ? "Every click is a decision. In 2016, the clicks outnumber the decisions."
+    : "Every decision is a click. In 2026, the machine removes the noise, not the judgment.";
+}
+function gChoose(ci) {
+  g.path = g.path.slice(0, g.idx).concat(ci);
+  g.last = ci;
+  g.phase = "outcome";
+  gPersist();
+  renderGuided();
+}
+function gNext() {
+  g.idx++;
+  g.phase = g.idx >= GUIDE[state.era].length ? "debrief" : "choice";
+  g.last = null;
+  gPersist();
+  renderGuided();
+}
+function gBack(i) {
+  if (i === g.idx && g.phase === "choice") return;
+  g.idx = i;
+  g.phase = "choice";
+  g.last = null;
+  g.path = g.path.slice(0, i);
+  gPersist();
+  renderGuided();
+}
+$("#g-restart").addEventListener("click", gRestart);
+document.addEventListener("keydown", (e) => {
+  if (e.key === "ArrowRight" && g.phase === "outcome") gNext();
+  if (e.key === "ArrowLeft" && g.idx > 0) gBack(g.phase === "choice" ? g.idx - 1 : g.idx);
+});
+
+/* ---------- boot ---------- */
+renderSteps();
+renderStepNav();
+renderBars();
+renderStacks();
+setEra("traditional");
+gRestore();
+</script>
+</body>
+</html>
