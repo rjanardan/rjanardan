@@ -59,6 +59,11 @@
   .block .tt{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
   .block.clip-top{border-top-left-radius:0;border-top-right-radius:0;}
   .block.clip-top::before{content:"↑";position:absolute;top:2px;right:6px;font-size:9px;color:var(--accent-ink);}
+  /* point-time items (single HH:MM): one row, time + title side by side */
+  .block.point{display:flex;align-items:center;gap:7px;padding:3px 8px;
+               min-height:26px;border-left-width:3px;}
+  .block.point .bt{margin-bottom:0;flex:0 0 auto;}
+  .block.point .tt{flex:1;font-size:12.5px;}
 
   .items{padding:4px 12px 10px;}
   .item{display:flex;align-items:flex-start;gap:10px;padding:7px 6px;border-radius:8px;
@@ -253,15 +258,16 @@ function renderTimeline(day, timed){
     if(!range && rangeTitles.has(i.title)) return null;
     const [a, b] = i.time.split('-');
     const [ah, am] = a.split(':').map(Number);
-    let top, bot;
+    let top, bot, isPoint = false;
     if(b){
       const [bh, bm] = b.split(':').map(Number);
       top = ((ah + am/60) - H0) * pxPerH;
       bot = ((bh + bm/60) - H0) * pxPerH;
     } else {
-      // single time: block of 30 min starting at that time
+      // single time: a point block, min height so text is always readable
+      isPoint = true;
       top = ((ah + am/60) - H0) * pxPerH;
-      bot = top + 17;
+      bot = top + 26;
     }
     // clamp into the visible 06:00-22:00 window so early/late
     // blocks stay visible (clipped) instead of rendering off-canvas
@@ -269,8 +275,8 @@ function renderTimeline(day, timed){
     const clipBot = bot > H * pxPerH;
     if(top < 0) top = 0;
     if(bot > H * pxPerH) bot = H * pxPerH;
-    return `<div class="block ${clipTop?'clip-top':''} ${clipBot?'clip-bot':''}"
-             style="top:${top}px;height:${Math.max(14, bot-top)}px;"
+    return `<div class="block ${isPoint?'point':''} ${clipTop?'clip-top':''} ${clipBot?'clip-bot':''}"
+             style="top:${top}px;height:${Math.max(isPoint?26:14, bot-top)}px;"
              onclick="openEdit('${day.date}', ${idx})">
       <div class="bt">${i.time}</div><div class="tt">${esc(i.title)}</div></div>`;
   }).filter(Boolean).join('');
