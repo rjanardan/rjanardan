@@ -1,0 +1,1342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>System Design Path - Principal Level</title>
+<script src="https://cdn.jsdelivr.net/npm/mermaid@10.9.1/dist/mermaid.min.js"></script>
+<style>
+:root{
+  --bg:#f6f7f9; --surface:#ffffff; --ink:#1a2332; --muted:#5b6472;
+  --line:#dfe3ea; --line-2:#eef1f5; --accent:#1d4ed8; --accent-soft:#eaf0fe;
+  --ok:#16a34a; --ok-soft:#e8f5e9; --warn:#d97706; --warn-soft:#fef3e2;
+  --bad:#dc2626; --bad-soft:#fdeaea;
+  --shadow:0 1px 2px rgba(16,24,40,.05), 0 4px 14px rgba(16,24,40,.06);
+  --radius:12px;
+  --mono:ui-monospace,"Cascadia Mono",Consolas,"SF Mono",monospace;
+  --sans:-apple-system,"Segoe UI",Roboto,"Helvetica Neue",Arial,sans-serif;
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0}
+body{background:var(--bg);color:var(--ink);font:15px/1.55 var(--sans);-webkit-font-smoothing:antialiased}
+::selection{background:#cfe3ff}
+button{font:inherit;cursor:pointer}
+h1,h2,h3{margin:0;line-height:1.25}
+h1{font-size:clamp(24px,3vw,32px);font-weight:700;letter-spacing:-.02em}
+h2{font-size:clamp(19px,2.4vw,23px);font-weight:650;letter-spacing:-.01em}
+code{font-family:var(--mono);font-size:12.5px;background:var(--line-2);padding:1px 5px;border-radius:5px}
+.hidden{display:none!important}
+
+/* Topbar */
+.topbar{position:sticky;top:0;z-index:50;background:var(--surface);border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;padding:10px 22px;gap:16px}
+.brand{display:flex;align-items:center;gap:10px;font-weight:650;font-size:15px}
+.brand .chip{font-family:var(--mono);font-size:11px;letter-spacing:.08em;background:var(--ink);color:#fff;padding:3px 8px;border-radius:6px}
+.mode-toggle{display:flex;background:var(--line-2);border:1px solid var(--line);border-radius:10px;padding:3px;gap:2px}
+.mode-toggle button{border:0;background:transparent;color:var(--muted);padding:6px 14px;border-radius:8px;font-weight:600;font-size:13px}
+.mode-toggle button.active{background:var(--surface);color:var(--ink);box-shadow:0 1px 3px rgba(16,24,40,.12)}
+.mode-toggle button[disabled]{opacity:.55;cursor:not-allowed}
+
+/* Home */
+main{max-width:none;margin:0;padding:26px 40px 80px}
+.hero{margin:14px 0 26px}
+.hero p{color:var(--muted);max-width:660px;margin:10px 0 0}
+.howto{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin:20px 0 6px}
+.howto .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:14px 16px;box-shadow:var(--shadow)}
+.howto .num{font-family:var(--mono);font-size:12px;color:var(--accent);font-weight:700}
+.howto h3{font-size:15px;margin:6px 0 4px}
+.howto p{margin:0;color:var(--muted);font-size:13.5px}
+
+.layer-strip{margin:26px 0 8px}
+.layer-strip .ls-head{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.layer-strip h2{font-size:clamp(19px,2.4vw,23px)}
+.layer-strip .ls-sub{color:var(--muted);font-size:13.5px}
+.layers{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+.layer-chip{background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:5px 12px;font-size:12.5px;color:var(--ink);cursor:default;transition:border-color .15s}
+.layer-chip:hover{border-color:var(--accent)}
+.layer-chip b{font-family:var(--mono);color:var(--accent);margin-right:5px}
+
+.sec-head{margin:30px 0 12px;display:flex;align-items:baseline;gap:10px;flex-wrap:wrap}
+.sec-head .count{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.problem-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:14px}
+.pcard{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);padding:18px;box-shadow:var(--shadow);text-align:left;display:flex;flex-direction:column;gap:8px;transition:transform .15s,box-shadow .15s,border-color .15s}
+.pcard:hover{transform:translateY(-2px);box-shadow:0 6px 20px rgba(16,24,40,.09);border-color:#c7d2fe}
+.pcard .pcode{font-family:var(--mono);font-size:11px;letter-spacing:.08em;color:var(--accent);background:var(--accent-soft);align-self:flex-start;padding:2px 8px;border-radius:5px}
+.pcard h3{font-size:16.5px}
+.pcard .ptag{color:var(--muted);font-size:13.5px;margin:0;flex:1}
+.pcard .pscale{font-family:var(--mono);font-size:12px;color:var(--ink);background:var(--line-2);padding:5px 9px;border-radius:7px}
+.pcard .pnfr{display:flex;flex-wrap:wrap;gap:5px}
+.pcard .pnfr span{font-size:11px;color:var(--muted);border:1px solid var(--line);padding:1px 7px;border-radius:999px}
+.pcard .pgo{font-size:13px;font-weight:600;color:var(--accent)}
+
+/* Workspace */
+.ws-head{display:flex;align-items:center;gap:14px;flex-wrap:wrap;margin-bottom:14px}
+.ws-head .back{border:1px solid var(--line);background:var(--surface);border-radius:9px;padding:8px 12px;font-size:13px;font-weight:600;color:var(--ink)}
+.ws-head .back:hover{border-color:var(--accent);color:var(--accent)}
+.ws-title{flex:1;min-width:200px}
+.ws-title h1{font-size:clamp(19px,2.4vw,24px)}
+.ws-title .ws-scale{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.dots{display:flex;gap:6px;flex-wrap:wrap;align-items:center}
+.dot{width:26px;height:26px;border-radius:50%;border:1.5px solid var(--line);background:var(--surface);color:var(--muted);font-size:11.5px;font-weight:700;display:flex;align-items:center;justify-content:center;transition:all .2s;padding:0}
+.dot:hover{border-color:var(--accent);color:var(--accent)}
+.dot.done{background:var(--ok-soft);border-color:var(--ok);color:var(--ok)}
+.dot.cur{background:var(--accent);border-color:var(--accent);color:#fff;transform:scale(1.12);box-shadow:0 0 0 4px var(--accent-soft)}
+
+.ws-body{display:grid;grid-template-columns:minmax(0,7fr) minmax(0,3fr);gap:16px;align-items:start}
+.ws-body > .panel,.ws-body > .explain-panel{min-width:0}
+.explain-panel > .panel{min-width:0}
+.panel{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+.panel-head{display:flex;align-items:center;gap:10px;padding:11px 16px;border-bottom:1px solid var(--line);font-weight:650;font-size:13.5px;flex-wrap:wrap}
+.panel-head .spacer{flex:1}
+.panel-head .legend{display:flex;gap:12px;font-weight:500;color:var(--muted);font-size:11.5px}
+.legend .lg{display:flex;align-items:center;gap:5px}
+.legend .sw{width:11px;height:11px;border-radius:3px;border:1px solid}
+.sw-ok{background:var(--ok-soft);border-color:var(--ok)}
+.sw-cur{background:#fff7ed;border-color:var(--warn)}
+.sw-off{background:#f1f5f9;border-color:#cbd5e1}
+
+.diagram-scroll{overflow:auto;max-height:calc(100vh - 250px);min-height:520px;padding:14px;position:relative}
+.diagram-scroll svg{min-width:860px;display:block;margin:0 auto}
+.diagram-scroll .loading{color:var(--muted);font-size:13.5px;padding:30px;text-align:center}
+.diagram-scroll .derr{color:var(--bad);font-size:13.5px;padding:20px}
+
+/* Mermaid node animation */
+#diagram g.node{transition:opacity .35s ease}
+#diagram g.node rect,#diagram g.node polygon{transition:fill .35s ease,stroke .35s ease}
+#diagram g.node.dim{opacity:.38}
+#diagram g.node.vis{opacity:1}
+#diagram g.node.cur{opacity:1}
+#diagram g.node.cur rect,#diagram g.node.cur polygon{stroke:var(--warn)!important;stroke-width:3px!important;filter:drop-shadow(0 0 6px rgba(217,119,6,.45));animation:pulseNode 1.5s ease-in-out infinite}
+#diagram g.edgePaths path{opacity:.32;transition:opacity .35s ease,stroke .35s}
+#diagram g.edgePaths path.vis{opacity:.9}
+#diagram g.edgePaths path.cur{opacity:1;stroke:var(--warn)!important;stroke-width:2.6px!important;filter:drop-shadow(0 0 4px rgba(217,119,6,.5))}
+@keyframes pulseNode{0%,100%{stroke-opacity:1}50%{stroke-opacity:.45}}
+@media (prefers-reduced-motion:reduce){
+  #diagram g.node.cur rect,#diagram g.node.cur polygon{animation:none}
+  *{transition:none!important}
+}
+
+/* Explain panel */
+.explain-panel{display:flex;flex-direction:column;gap:14px}
+.ch-head{display:flex;align-items:center;justify-content:space-between;font-weight:650;font-size:13.5px;padding:11px 16px;border-bottom:1px solid var(--line)}
+.ch-count{font-family:var(--mono);font-size:12px;color:var(--muted)}
+.ch-list{max-height:300px;overflow:auto;padding:6px 0}
+.ch-item{border-bottom:1px solid var(--line-2);padding:9px 16px;transition:background .3s,opacity .3s}
+.ch-item:last-child{border-bottom:0}
+.ch-item.ticked{background:var(--ok-soft)}
+.ch-row{display:flex;align-items:center;gap:9px}
+.ch-row input{accent-color:var(--ok);width:15px;height:15px;cursor:default}
+.ch-row label{font-weight:650;font-size:13.5px;cursor:default}
+.ch-row .nfr{margin-left:auto;font-size:10.5px;font-family:var(--mono);color:var(--muted);border:1px solid var(--line);padding:1px 7px;border-radius:999px;white-space:nowrap}
+.ch-def{font-size:12.5px;color:var(--muted);margin:5px 0 0 24px}
+.ch-def .why{display:block;margin-top:2px;color:#3f4a5a}
+.ch-def .why::before{content:"Why it matters: ";color:var(--accent);font-weight:600}
+
+.step-card{padding:16px;border-bottom:1px solid var(--line)}
+.step-layer{display:inline-block;font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--accent);background:var(--accent-soft);padding:3px 9px;border-radius:6px;font-weight:700}
+.step-q{font-size:clamp(17px,2vw,20px);margin:10px 0 12px;letter-spacing:-.01em}
+.decision-card{background:var(--ok-soft);border:1px solid #bbe7c6;border-radius:10px;padding:12px 14px}
+.dc-label{font-family:var(--mono);font-size:10.5px;letter-spacing:.08em;color:var(--ok);font-weight:700}
+.dc-title{font-weight:700;font-size:14.5px;margin:3px 0 6px}
+.decision-card p{margin:0;font-size:13.5px;color:#1c3a26}
+.alt-block{margin-top:12px}
+.alt-head{font-weight:650;font-size:13px;margin-bottom:7px;color:var(--ink)}
+.alt-item{display:flex;gap:10px;padding:8px 10px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;background:#fbfcfd;cursor:pointer;transition:border-color .15s,background .15s}
+.alt-item:hover{border-color:var(--accent);background:#f5f8ff}
+.alt-item .x{color:var(--bad);font-weight:800;font-size:13px;line-height:1.4}
+.alt-name{font-weight:650;font-size:13px;flex:0 0 150px}
+.alt-why{font-size:12.5px;color:var(--muted)}
+.alt-explore{margin-left:auto;align-self:center;font-size:11px;color:var(--accent);font-weight:700;white-space:nowrap;opacity:.75}
+.alt-item:hover .alt-explore{opacity:1}
+.ticks-block{margin-top:12px}
+.ticks-head{font-weight:650;font-size:13px;margin-bottom:7px}
+.tick-chip{display:inline-block;font-size:11.5px;background:var(--accent-soft);color:var(--accent);border:1px solid #c7d6f8;border-radius:999px;padding:2px 10px;margin:0 5px 5px 0}
+.bt-callout{margin-top:12px;background:var(--warn-soft);border:1px solid #f5d9a8;border-radius:10px;padding:11px 14px;font-size:13px}
+.bt-head{font-weight:700;font-size:12px;color:#92400e;margin-bottom:4px}
+.bt-if{color:#7c4a03;font-weight:600}
+.bt-then{color:#7c4a03;margin-top:2px}
+
+/* Review summary */
+.review-table{width:100%;border-collapse:collapse;font-size:13px;margin-top:6px}
+.review-table th{text-align:left;font-family:var(--mono);font-size:10.5px;letter-spacing:.06em;color:var(--muted);text-transform:uppercase;padding:6px 8px;border-bottom:1px solid var(--line)}
+.review-table td{padding:7px 8px;border-bottom:1px solid var(--line-2);vertical-align:top}
+.review-table td:first-child{font-family:var(--mono);color:var(--accent);white-space:nowrap}
+.review-table tr:last-child td{border-bottom:0}
+.bt-card{margin-top:10px;background:var(--warn-soft);border:1px solid #f5d9a8;border-radius:9px;padding:10px 12px;font-size:13px}
+.bt-card b{color:#92400e}
+
+/* Branch exploration */
+.branch-head{display:flex;align-items:center;justify-content:space-between;gap:10px}
+.branch-head .step-layer{background:var(--warn-soft);color:#92400e}
+.branch-close{border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:5px 12px;font-size:12px;font-weight:600;color:var(--muted);min-height:32px}
+.branch-close:hover{color:var(--bad);border-color:var(--bad)}
+.branch-card{padding:14px 16px}
+.branch-q{font-size:clamp(16px,1.8vw,19px);margin:10px 0 10px;letter-spacing:-.01em}
+.branch-why{font-size:13px;color:#3f4a5a;background:var(--warn-soft);border:1px solid #f5d9a8;border-radius:9px;padding:9px 12px;margin-bottom:10px}
+.branch-tree{margin-top:12px;background:#fff;border:1px solid var(--line);border-radius:10px;padding:12px;overflow:auto}
+.branch-tree svg{max-width:100%;height:auto;display:block;margin:0 auto}
+.stage-item{display:flex;gap:10px;align-items:flex-start;padding:8px 10px;border:1px solid var(--line);border-radius:9px;margin-bottom:7px;background:#fbfcfd}
+.stage-layer{font-family:var(--mono);font-size:11px;color:var(--bad);background:var(--bad-soft);padding:2px 8px;border-radius:5px;white-space:nowrap;margin-top:1px}
+.stage-text{font-size:13px;color:var(--ink)}
+.branch-recover{margin-top:10px;background:var(--ok-soft);border:1px solid #bbe7c6;border-radius:9px;padding:10px 12px;font-size:13px}
+.branch-recover b{color:var(--ok)}
+#diagram g.node.branch rect,#diagram g.node.branch polygon{stroke:var(--warn)!important;stroke-width:2.5px!important;stroke-dasharray:5 3;fill:#fff7ed!important}
+#diagram g.node{cursor:default}
+#diagram g.node[id*="A"]{cursor:pointer}
+
+/* Nav */
+.nav{display:flex;gap:10px;padding:14px 16px;position:sticky;bottom:0;background:var(--surface);border-top:1px solid var(--line);border-radius:0 0 var(--radius) var(--radius)}
+.btn{border:0;border-radius:10px;padding:11px 18px;font-weight:650;font-size:13.5px;min-height:44px;transition:filter .15s,background .15s}
+.btn:disabled{opacity:.45;cursor:not-allowed}
+.btn-prev{background:var(--line-2);color:var(--ink);border:1px solid var(--line)}
+.btn-prev:hover:not(:disabled){border-color:var(--accent);color:var(--accent)}
+.btn-next{background:var(--accent);color:#fff;flex:1}
+.btn-next:hover:not(:disabled){filter:brightness(1.08)}
+.toast{position:fixed;bottom:26px;left:50%;transform:translateX(-50%) translateY(20px);background:var(--ink);color:#fff;padding:11px 18px;border-radius:10px;font-size:13.5px;opacity:0;pointer-events:none;transition:all .25s;z-index:100;box-shadow:0 8px 24px rgba(0,0,0,.25);max-width:80vw}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+.foot{margin-top:34px;padding-top:16px;border-top:1px solid var(--line);color:var(--muted);font-size:12.5px;display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap}
+.foot code{font-size:11.5px}
+a{color:var(--accent)}
+@media (max-width:980px){
+  main{padding:18px 14px 60px}
+  .ws-body{grid-template-columns:1fr}
+  .howto{grid-template-columns:1fr}
+  .diagram-scroll{max-height:480px;min-height:380px}
+}
+</style>
+</head>
+<body>
+<header class="topbar">
+  <div class="brand"><span class="chip">SYS-DESIGN</span> Principal Path</div>
+  <div class="mode-toggle">
+    <button id="modeTeach" class="active">Teaching</button>
+    <button id="modePractice" title="Practice mode ships after teaching mode">Practice</button>
+  </div>
+</header>
+
+<main>
+  <section id="home">
+    <div class="hero">
+      <h1>Design decisions, layer by layer</h1>
+      <p>Every system design problem is the same decision tree walked with a different set of answers. This tool makes the tree explicit: at each layer you see the question, the optimal choice, and why every other option loses for that particular problem. Teaching mode first: a checklist drives each decision and explains every term as it appears.</p>
+    </div>
+    <div class="howto">
+      <div class="card"><span class="num">01</span><h3>Pick a problem</h3><p>Six core problems, from URL shortener to video streaming. Each one walks the full tree.</p></div>
+      <div class="card"><span class="num">02</span><h3>Read the checklist</h3><p>Every term is defined and tied to a decision. Items tick off as the walkthrough covers them.</p></div>
+      <div class="card"><span class="num">03</span><h3>Step through the tree</h3><p>Next advances one decision. Click any step dot to jump back and backtrack when a requirement breaks.</p></div>
+    </div>
+    <div class="layer-strip">
+      <div class="ls-head"><h2>One tree, nine layers</h2><span class="ls-sub">Entry to review, top to bottom. Functional scope and non-functional targets (availability, latency, consistency, scale, cost) are checked at every layer.</span></div>
+      <div class="layers" id="layerStrip"></div>
+    </div>
+    <div class="sec-head"><h2>Problems</h2><span class="count" id="probCount"></span></div>
+    <div class="problem-grid" id="problemGrid"></div>
+  </section>
+
+  <section id="workspace" class="hidden">
+    <div class="ws-head">
+      <button class="back" id="backHome">All problems</button>
+      <div class="ws-title"><h1 id="wsTitle"></h1><div class="ws-scale" id="wsScale"></div></div>
+      <div class="dots" id="dots"></div>
+    </div>
+    <div class="ws-body">
+      <div class="panel">
+        <div class="panel-head">
+          <span>Decision tree</span>
+          <span class="spacer"></span>
+          <span id="stepCounter" style="font-family:var(--mono);font-size:12px;color:var(--muted)"></span>
+          <span class="legend">
+            <span class="lg"><span class="sw sw-ok"></span>chosen</span>
+            <span class="lg"><span class="sw sw-cur"></span>current</span>
+            <span class="lg"><span class="sw sw-off"></span>not chosen</span>
+            <span class="lg"><span class="sw" style="background:#fff7ed;border-color:var(--warn);border-style:dashed"></span>explored branch</span>
+          </span>
+        </div>
+        <div style="padding:7px 16px 0;font-size:12.5px;color:var(--muted)">Click any gray branch node (or an alternative below) to follow that path downward and see what breaks later.</div>
+        <div class="diagram-scroll" id="diagram"><div class="loading">Rendering decision tree...</div></div>
+      </div>
+      <div class="explain-panel">
+        <div class="panel">
+          <div class="ch-head"><span id="topPaneTitle">Checklist</span><span class="ch-count" id="chCount"></span></div>
+          <div class="ch-list" id="checklist"></div>
+          <div id="branchBox" class="hidden"></div>
+        </div>
+        <div class="panel">
+          <div id="stepBox"></div>
+          <div class="nav">
+            <button class="btn btn-prev" id="prevBtn">Back</button>
+            <button class="btn btn-next" id="nextBtn">Next</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <footer class="foot">
+    <span>Teaching mode. Practice mode (you drive the decisions, the tree validates) is the next stage.</span>
+    <span><code>9 layers</code> <code>6 problems</code> <code>1 tree</code></span>
+  </footer>
+</main>
+<div class="toast" id="toast"></div>
+
+<script>
+"use strict";
+const $ = s => document.querySelector(s);
+const LAYERS = [
+  {id:"L0", name:"Requirements", desc:"Capture functional scope and non-functional targets (availability, latency, consistency, scale, cost) before any component choice."},
+  {id:"L1", name:"Estimation", desc:"Convert the brief into numbers: QPS, peak factor, storage, bandwidth, cache size. Numbers drive every later decision."},
+  {id:"L2", name:"Entry", desc:"DNS, CDN, load balancer. Where traffic lands and how it is distributed, secured, and cached at the edge."},
+  {id:"L3", name:"Service layer", desc:"Application logic: API gateway, service decomposition, statelessness, async workers."},
+  {id:"L4", name:"Cache", desc:"Where hot reads are served from. Placement, eviction, and consistency of cached data."},
+  {id:"L5", name:"Storage", desc:"The source of truth: relational vs NoSQL, object storage, and how the data model fits the access pattern."},
+  {id:"L6", name:"Consistency", desc:"Strong vs eventual, ordering guarantees, idempotency. The trade you accept between correctness and scale."},
+  {id:"L7", name:"Scaling", desc:"Replicas for reads, shards for writes, partitions, hot-spot handling."},
+  {id:"L8", name:"Availability", desc:"Multi-AZ, failover, retries, dead-letter queues. Surviving component loss."},
+  {id:"L9", name:"Review", desc:"Re-check every non-functional target against the choices made. Backtrack when a requirement is not met."}
+];
+
+const PROBLEMS = [];
+PROBLEMS.push({
+  id:"url", code:"URL", title:"URL Shortener", tagline:"TinyURL / bit.ly class service: shorten long URLs, redirect at high speed, survive global scale.",
+  scale:"100M new URLs/day, 10:1 read:write, 5-year horizon",
+  checklist:[
+    {term:"QPS (queries per second)", nfr:"Scale", def:"Requests per second across the write and read paths.", why:"100M writes/day is roughly 1,200 writes/s and 12,000 reads/s at the 10:1 ratio. These numbers decide load balancer tier, cache size, and storage engine."},
+    {term:"Read:write ratio", nfr:"Scale", def:"How many reads every write generates.", why:"A 10:1 ratio makes this a read-dominated system: caching and read replicas pay off before write sharding does."},
+    {term:"Key space and collision", nfr:"Correctness", def:"Short keys are base62-encoded (62^7 is about 3.5 trillion combinations).", why:"Key length fixes the maximum number of URLs before collisions appear, which decides whether you need collision retry or a counter-based generator."},
+    {term:"Cache hit ratio", nfr:"Latency", def:"Fraction of reads served from cache instead of storage.", why:"Redirects must stay under 100 ms. A hot-set cache absorbs most of the 12,000 reads/s and keeps the database cold."},
+    {term:"Idempotent creation", nfr:"Correctness", def:"Creating the same long URL twice should return the same short key, not duplicate rows.", why:"Duplicate keys waste key space and confuse analytics. A unique index or a dedup check on the write path fixes this."},
+    {term:"Availability target", nfr:"Availability", def:"The uptime percentage the service promises, usually 99.9% or higher.", why:"A redirect failure breaks every link that embeds it. Stateless services and multi-AZ placement make failover trivial."},
+    {term:"Latency budget", nfr:"Latency", def:"The end-to-end time budget for a redirect, here under 100 ms.", why:"Every layer added to the request path spends part of this budget, so cache placement and edge location matter more than database tuning."}
+  ],
+  steps:[
+    {layer:"L1", q:"What QPS and storage numbers does this brief produce?",
+     chosen:{label:"1.2K writes/s, 12K reads/s, ~100 GB in 5 years", why:"100M/day divided by 86,400 seconds is about 1.2K writes/s; reads are 10x. Five years of 100M URLs/day with 500-byte records is roughly 90 GB, which fits a modest cluster. Small storage means the database is not the bottleneck; read traffic is."},
+     alt:[
+      {label:"Only peak numbers", why:"Peak without baseline hides the average load the cache must serve; sizing cache for peak alone overspends."},
+      {label:"Ignoring growth", why:"Sizing for today's traffic only means sharding later under load, which is the most expensive way to add capacity."}
+     ], ticks:[0,1]},
+    {layer:"L2", q:"How does traffic enter the system?",
+     chosen:{label:"L7 load balancer with TLS termination", why:"An application-layer balancer (ALB, nginx) terminates TLS, routes on path, and health-checks the stateless service. DNS round-robin alone cannot handle TLS or a failed instance without client retry."},
+     alt:[
+      {label:"L4 load balancer", why:"L4 balances TCP connections but cannot inspect paths, terminate TLS, or route /api vs /static differently, so it pushes TLS and routing work into the app."},
+      {label:"Single DNS A record", why:"No health checks and no failover: a dead instance takes down a third of traffic until TTL expires."}
+     ], ticks:[5,6]},
+    {layer:"L3", q:"How is the shortener service structured?",
+     chosen:{label:"Stateless API service + gateway", why:"Stateless instances scale horizontally behind the balancer; the gateway handles auth, rate limiting, and TLS. Key generation is delegated to a counter service so instances never mint duplicate keys."},
+     alt:[
+      {label:"Stateful monolith", why:"Session and key state on each instance makes scaling require sticky routing and careful state migration, and a crash loses in-flight keys."},
+      {label:"Serverless functions", why:"Cold starts add tens of milliseconds to a redirect whose whole budget is 100 ms, and per-invocation cost is poor at 12K reads/s."}
+     ], ticks:[3]},
+    {layer:"L4", q:"Where do reads get served from?",
+     chosen:{label:"Cache-aside with Redis, hot keys only", why:"Redirects read the same popular URLs over and over. Cache-aside serves ~80% of reads from Redis at sub-millisecond latency and only misses hit the database. The cache holds the hot subset, roughly 20-30 GB, not all 90 GB."},
+     alt:[
+      {label:"Write-through cache", why:"Every write also updates the cache, adding write latency and duplicating storage for keys that may never be read. The write path is small here, so cache-aside keeps writes simple."},
+      {label:"No cache", why:"12K reads/s straight into the database works at small scale but every popular URL creates a thundering herd on the same row, and read latency climbs past the 100 ms budget."}
+     ], ticks:[3]},
+    {layer:"L5", q:"What storage engine holds the URL mapping?",
+     chosen:{label:"Key-value store (DynamoDB, Cassandra) or MySQL with unique index", why:"The access pattern is one lookup by short key. A KV store matches that exactly and scales horizontally. MySQL also works: a (short_key, long_url) table with a unique index gives idempotent creation for free. Either is defensible; the decision hinges on whether the team already runs one."},
+     alt:[
+      {label:"Graph database", why:"URLs have no relationship graph to traverse. A graph engine adds query complexity and operational cost for zero benefit."},
+      {label:"Document store without unique constraint", why:"Without a unique constraint on the key, duplicate inserts slip through, and idempotent creation has to be reimplemented in the app layer."}
+     ], ticks:[2,4]},
+    {layer:"L6", q:"What consistency does the mapping need?",
+     chosen:{label:"Strong for key uniqueness, eventual for reads", why:"The unique constraint on the short key is what makes creation idempotent, so it must be strong at write time. Redirect reads can be eventually consistent: a stale mapping for a few milliseconds is invisible to users."},
+     alt:[
+      {label:"Strong consistency everywhere", why:"Read-after-write strong consistency for every redirect doubles read latency and constrains the database to a single writer or quorum reads, which is expensive at 12K reads/s."},
+      {label:"Eventual key uniqueness", why:"Two users could get the same short key for different URLs, breaking the core promise of the service. Uniqueness is not a place to relax."}
+     ], ticks:[2,4]},
+    {layer:"L7", q:"How does the system scale past the initial sizing?",
+     chosen:{label:"Read replicas and cache first; shard writes only when needed", why:"The 10:1 read ratio means reads hit limits first, and replicas plus cache absorb them cheaply. Writes at 1.2K/s fit one primary for years, so sharding is deferred until the write path is actually the bottleneck."},
+     alt:[
+      {label:"Shard the key space immediately", why:"Consistent-hash sharding adds operational complexity, cross-shard joins, and rebalancing while the write path sits at 10% utilization. Premature sharding is the classic over-engineering failure."},
+      {label:"Vertical scaling only", why:"A single big database instance has a hard ceiling and a bigger blast radius; the moment it fails, the whole service is down."}
+     ], ticks:[0,1]},
+    {layer:"L8", q:"How does the redirect survive component failure?",
+     chosen:{label:"Multi-AZ stateless fleet, health-checked by the balancer", why:"Because every service instance is stateless, a failing instance is simply drained by the health check and replaced. The database runs multi-AZ with automated failover; the cache rebuilds from the database on restart."},
+     alt:[
+      {label:"Active-passive database", why:"A warm standby that never serves reads wastes capacity, and failover still takes minutes. With multi-AZ replication the secondary can serve reads."},
+      {label:"No redundancy", why:"One balancer, one app instance, one database: every component is a single point of failure, and the availability target is unreachable."}
+     ], ticks:[5]},
+    {layer:"L9", q:"Review: do all non-functional targets hold?",
+     chosen:{label:"Yes: latency, availability, scale, cost all check out", why:"Sub-100 ms redirects via edge DNS plus cache, 99.9% availability via stateless multi-AZ services, 12K reads/s on cache plus replicas, and a total footprint of ~100 GB storage plus 30 GB cache keeps cost modest."},
+     alt:[
+      {label:"Strong read-after-write needed", why:"If custom domains or analytics demand immediate consistency, drop the eventual-read cache and route through the primary, trading latency for correctness."},
+      {label:"Very long URLs or analytics per click", why:"Per-click analytics adds a write-heavy log path, so the design gains a queue and a separate analytics store and stops being a pure KV read problem."}
+     ], ticks:[5,6],
+     bt:{if:"the product adds per-click analytics", then:"revisit L4 and L5: click events stream to a queue (Kafka) into an analytics store, and the read path keeps its cache. The tree branch at L4 changes from pure cache-aside to cache plus event pipeline."}}
+  ],
+  backtrack:[
+    {if:"analytics per click are required", then:"add a Kafka ingestion layer and a separate analytics store; the L4 and L5 branches change, the core redirect path does not."},
+    {if:"custom short domains need instant propagation", then:"the DNS layer (L2) must support fast TTLs and the cache must be bypassable for those domains."},
+    {if:"keys must be unguessable (security review)", then:"switch from counter-based keys to random base62 keys at L3, accepting a slightly larger key space and collision retries."}
+  ]
+});
+
+PROBLEMS.push({
+  id:"ratelimit", code:"RL", title:"Rate Limiter", tagline:"Distributed rate limiting at the gateway: token bucket, sliding window, Redis-backed, sub-millisecond.",
+  scale:"100K req/s peak, per-user limits, sub-1ms overhead budget",
+  checklist:[
+    {term:"Token bucket algorithm", nfr:"Correctness", def:"A bucket holds tokens that refill at a fixed rate; each request spends one. Bursts up to bucket size pass, steady rate is capped.", why:"Token bucket allows short bursts while enforcing a long-run rate, which matches real API traffic better than a rigid fixed window."},
+    {term:"Fixed vs sliding window", nfr:"Correctness", def:"Fixed window counts requests per clock interval; sliding window counts over a rolling interval.", why:"Fixed window allows 2x spikes at interval boundaries (requests at 00:59 and 01:01 both count in full windows). Sliding window closes that hole at a small memory cost."},
+    {term:"Atomic counter (INCR + EXPIRE)", nfr:"Correctness", def:"Redis INCR increments and EXPIRE sets expiry in one server-side step, or a Lua script does both atomically.", why:"Without atomicity, two balancer instances read the same count and both let a request through, exceeding the limit. Atomicity is what makes a distributed limiter correct."},
+    {term:"Consistent hashing of users", nfr:"Scale", def:"Each user maps to exactly one Redis shard, so their limit state lives in one place.", why:"If a user's requests scatter across shards, each shard sees a fraction of the traffic and the limit is never enforced. Consistent hashing keeps one user on one shard with minimal rebalancing when shards are added."},
+    {term:"Fail-open vs fail-closed", nfr:"Availability", def:"Fail-open serves requests when the limiter is down; fail-closed rejects them.", why:"For a rate limiter, fail-closed means a Redis outage becomes a full API outage. Fail-open with a local fallback keeps the API up and accepts temporarily loose limits."},
+    {term:"Memory per tracked user", nfr:"Cost", def:"Sliding windows keep one or two counters per user for the window duration.", why:"At millions of tracked users, per-user state is the dominant memory cost of the limiter tier; eviction policy (LRU, TTL) decides whether memory stays bounded."},
+    {term:"Limiter placement", nfr:"Latency", def:"Where enforcement runs: edge balancer, gateway middleware, or sidecar.", why:"A limiter is on the hot path of every request, so an extra network hop to Redis adds latency. Placement trades accuracy (shared state) against speed (local state)."}
+  ],
+  steps:[
+    {layer:"L1", q:"What load does the limiter itself carry?",
+     chosen:{label:"100K req/s with a 1 ms overhead budget", why:"Every request passes through the limiter, so its own cost must be under 1 ms and mostly constant. That rules out database lookups on the hot path and favors Redis (sub-ms) or in-memory state."},
+     alt:[
+      {label:"Budget of 10 ms per check", why:"A 10 ms budget would let the limiter become 10% of total request latency, which users notice and which fails the latency target of the APIs it protects."},
+      {label:"No overhead budget", why:"Without a stated budget, the limiter drifts into expensive designs (SQL writes per request) that quietly destroy p99 latency."}
+     ], ticks:[0,6]},
+    {layer:"L2", q:"Where does the limiter sit in the request path?",
+     chosen:{label:"Middleware in the API gateway behind the L7 balancer", why:"The gateway sees every request before the backend does, which is exactly where enforcement belongs. The L7 balancer spreads gateway instances, and each runs the same limiter middleware with shared state."},
+     alt:[
+      {label:"Inside each backend service", why:"Backends are duplicated per service and often bypassed by internal callers, so limits become inconsistent and can be dodged by calling the service directly."},
+      {label:"L4 balancer layer", why:"L4 cannot read HTTP headers, so per-user and per-API-key limits are impossible; only raw connection limits work there."}
+     ], ticks:[6]},
+    {layer:"L3", q:"How is the limiter service structured?",
+     chosen:{label:"Thin sidecar/middleware plus a shared Redis tier", why:"The middleware checks local state first for speed and falls back to shared Redis for correctness across instances. This hybrid keeps p99 low while enforcing global limits."},
+     alt:[
+      {label:"Pure in-memory counters per instance", why:"Each instance enforces its own count, so the limit multiplies by the number of instances. Five instances means five times the allowed traffic."},
+      {label:"Pure Redis for every check", why:"A network round trip per request is correct but adds ~0.5-1 ms at the 50th percentile and more under load; the local-first hybrid avoids paying that on every request."}
+     ], ticks:[2,3]},
+    {layer:"L4", q:"What holds the limiter state?",
+     chosen:{label:"Redis with Lua scripts for atomic window updates", why:"Redis INCR with EXPIRE, or a Lua script, updates the counter and the window in one atomic step. The 100K req/s load is well within one Redis cluster, and state survives instance restarts because it is external."},
+     alt:[
+      {label:"Application memory only", why:"Instance restarts wipe all counters and instances disagree with each other; the limit becomes a suggestion."},
+      {label:"SQL database", why:"A database write per request cannot sustain 100K req/s and adds milliseconds; rate limiting is a state problem, not a durability problem."}
+     ], ticks:[2,5]},
+    {layer:"L5", q:"Does the limiter state need durability?",
+     chosen:{label:"Ephemeral Redis, no persistence needed", why:"If the limiter restarts, users simply start with fresh windows; nobody needs yesterday's counters after a crash. Skipping AOF saves write amplification and keeps the tier fast."},
+     alt:[
+      {label:"Fully durable counters", why:"Persisting every counter increment to disk makes the limiter the slowest component in the system, for data that expires within minutes anyway."},
+      {label:"SQLite on each node", why:"Local persistence gives a false sense of durability and still cannot share state across instances, so limits stay per-node."}
+     ], ticks:[5]},
+    {layer:"L6", q:"What consistency does enforcement need?",
+     chosen:{label:"Atomic operations, not read-modify-write", why:"Check-and-increment must be one atomic step in Redis. A read-modify-write in app code lets two concurrent requests both pass on the same counter, which is how limits get exceeded by exactly the traffic that matters."},
+     alt:[
+      {label:"Eventually consistent counters", why:"If counters replicate asynchronously, the limiter enforces yesterday's totals today. Rate limiting is one place eventual consistency is not acceptable."},
+      {label:"Distributed lock per user", why:"Locking per user serializes their requests and adds latency, solving a problem atomic Redis ops already solve without locks."}
+     ], ticks:[2]},
+    {layer:"L7", q:"How does the limiter scale to millions of tracked users?",
+     chosen:{label:"Consistent-hash users to Redis shards", why:"Each user's counters live on exactly one shard, so enforcement is correct at any size. Adding a shard only rebalances a fraction of keys. Memory stays bounded with per-user TTLs."},
+     alt:[
+      {label:"Random shard assignment", why:"A user's requests land on different shards, each seeing a fraction of the count, so the limit is never actually enforced."},
+      {label:"Single giant Redis node", why:"One node caps out around 100K-200K ops/s and is a single point of failure; a cluster with sharding is the same price with headroom."}
+     ], ticks:[3,5]},
+    {layer:"L8", q:"What happens when Redis is down?",
+     chosen:{label:"Fail-open with a local sliding-window fallback", why:"The gateway keeps serving with per-instance local windows, slightly loosening limits during the outage but keeping the API up. This trades a few minutes of loose limits for no downtime."},
+     alt:[
+      {label:"Fail-closed", why:"Redis outage becomes a full API outage. For a component whose whole job is protecting availability, causing an outage is the worst failure mode."},
+      {label:"No fallback, crash the request", why:"Every request errors during the outage, and the limiter becomes the availability bottleneck it was meant to prevent."}
+     ], ticks:[4,1]},
+    {layer:"L9", q:"Review: do the non-functional targets hold?",
+     chosen:{label:"Yes: sub-ms overhead, 99.99% availability, exact limits", why:"Local-first checks keep overhead under 1 ms; fail-open keeps the API up through Redis outages; consistent hashing keeps limits exact at any fleet size. Cost is a few Redis shards, which is small next to the API traffic they protect."},
+     alt:[
+      {label:"Limits must be exact across regions", why:"Global enforcement needs a multi-region Redis cluster with relaxed per-region budgets; the tree branch at L7 changes from single-region sharding to geo-distributed sharding."},
+      {label:"Per-IP limits at the edge", why:"IP-based limits move enforcement into the CDN/edge tier and no longer need per-user Redis state; a different branch at L2."}
+     ], ticks:[0,4],
+     bt:{if:"the API is multi-region and limits must be enforced globally", then:"revisit L7: shard by user across a geo-replicated Redis cluster and allocate per-region budgets, accepting cross-region propagation delay for the global total."}}
+  ],
+  backtrack:[
+    {if:"limits must hold exactly across multiple regions", then:"move from single-region sharding (L7) to geo-replicated shards with per-region budgets."},
+    {if:"the protected API is read-heavy and cacheable", then:"enforce limits at the CDN edge (L2 branch) so cached responses never reach the limiter."},
+    {if:"users must never be locked out by a limiter bug", then:"set fail-open (L8) as the default and monitor the fallback path's drift from the true limit."}
+  ]
+});
+
+PROBLEMS.push({
+  id:"notif", code:"NOTIF", title:"Notification System", tagline:"Multi-channel push, email, SMS at 1M messages/day with viral fanout to 10M users.",
+  scale:"1M notifications/day, 100x spikes, fanout to 10M recipients",
+  checklist:[
+    {term:"Async decoupling", nfr:"Latency", def:"The request that triggers a notification returns immediately; the send happens later in a worker.", why:"Provider calls take 100 ms to seconds. Doing them synchronously in the request path makes every trigger slow and couples trigger latency to provider health."},
+    {term:"Queue vs pub-sub", nfr:"Scale", def:"A queue delivers each message to one consumer; pub-sub (topic) delivers to many.", why:"A notification system needs both: a queue for work distribution and a topic for fanout (one event, millions of subscribers). Choosing the wrong primitive breaks one of the two shapes."},
+    {term:"At-least-once delivery", nfr:"Correctness", def:"The queue guarantees a message is delivered at least once; duplicates are possible.", why:"At-least-once is the cheapest durable guarantee and pairs with idempotency. Exactly-once is expensive and most push/email providers cannot offer it anyway."},
+    {term:"Idempotency key", nfr:"Correctness", def:"A unique delivery_id stored with the send; a retry with the same id is skipped.", why:"Retries are guaranteed to happen, so without dedup the same notification is sent twice, which users notice immediately and SMS providers bill twice for."},
+    {term:"Fanout and write amplification", nfr:"Scale", def:"One event becomes N recipient messages; a viral event with 10M followers becomes 10M sends.", why:"Fanout decides whether the system writes one message or millions per event. Grouping fanout (one message, many recipients) versus per-user fanout is the biggest scaling fork in the design."},
+    {term:"Backpressure and throttling", nfr:"Cost", def:"Workers pull at the rate providers accept, never faster.", why:"SMS costs money per message and providers rate-limit hard. Without throttling, a spike either burns budget or gets the integration banned."},
+    {term:"Dead-letter queue (DLQ)", nfr:"Availability", def:"Messages that exhaust retries move to a quarantine queue for inspection.", why:"Without a DLQ, a poisoned message blocks the queue or is silently dropped. The DLQ turns failures into an observable, replayable artifact."},
+    {term:"Channel abstraction", nfr:"Maintainability", def:"A provider interface (FCM, APNs, Twilio, SES) behind one send API.", why:"Providers fail and change contracts. An abstraction lets one channel fail over to another without touching the core flow."}
+  ],
+  steps:[
+    {layer:"L1", q:"What does the message volume look like?",
+     chosen:{label:"12/s average, 100x spikes, 10M-message viral fanout", why:"Average volume is trivial (1M/day is ~12/s), but a single viral event fans out to 10M recipients. The design is sized for the spike shape, not the average: queues and workers must absorb 100x without dropping messages."},
+     alt:[
+      {label:"Size for average only", why:"A viral event then becomes a multi-hour backlog, and time-sensitive pushes (OTP, alerts) arrive after they matter."},
+      {label:"Size for peak continuously", why:"Provisioning worker fleets for 100x at all times leaves 99% of capacity idle and makes the service uneconomical."}
+     ], ticks:[5]},
+    {layer:"L2", q:"How does a notification request enter?",
+     chosen:{label:"API gateway behind an L7 balancer, request returns immediately", why:"The trigger API accepts the message, writes it to the queue, and returns 202. The sender never waits for provider delivery, which is the whole point of async decoupling."},
+     alt:[
+      {label:"Synchronous provider call in the API", why:"Every trigger waits for FCM/APNs latency, and one slow provider slows every caller. The trigger path becomes as unreliable as the least reliable provider."},
+      {label:"Direct database insert from clients", why:"Clients bypass validation, dedup, and channel routing, and the database absorbs traffic it was never designed for."}
+     ], ticks:[0]},
+    {layer:"L3", q:"How is the service decomposed?",
+     chosen:{label:"Event-driven microservices: ingest, queue, workers, providers", why:"Each stage scales independently: ingest handles trigger rate, workers scale with fanout, and the provider layer is a thin retry/abstraction tier. A failure in one stage does not block the others."},
+     alt:[
+      {label:"Monolithic batch sender", why:"A nightly batch cannot deliver time-sensitive notifications, and a crash mid-batch loses everything with no replay boundary."},
+      {label:"Single worker doing everything", why:"Channel routing, templating, retry, and fanout in one process means a Twilio outage blocks emails and pushes too, and the worker cannot scale per channel."}
+     ], ticks:[0,7]},
+    {layer:"L4", q:"What gets cached?",
+     chosen:{label:"Device tokens and templates in Redis", why:"Sending 10M pushes reads the device token for each recipient and a template for each channel. These are hot, stable reads; caching them keeps them off the database and makes fanout fast."},
+     alt:[
+      {label:"Cache the messages themselves", why:"Messages are write-once, read-once by a worker. Caching them saves nothing and wastes memory on data that is consumed immediately."},
+      {label:"No cache, read tokens from the DB", why:"A 10M fanout becomes 10M database reads, which is the exact load caching exists to avoid."}
+     ], ticks:[]},
+    {layer:"L5", q:"Where do messages and delivery logs live?",
+     chosen:{label:"Append-heavy store (Cassandra/Postgres) for messages and delivery status", why:"Notifications are append-mostly and queried by time range (my recent notifications). Cassandra's write-optimized, partition-by-user model fits perfectly; Postgres works if volume stays moderate and you want joins with user data."},
+     alt:[
+      {label:"Relational OLTP for everything", why:"Heavy writes contend with reads on the same rows, and history tables grow without bound, forcing painful archiving."},
+      {label:"No delivery log", why:"No audit trail means no retry reasoning, no compliance evidence, and no way to answer 'did this notification actually send?'."}
+     ], ticks:[]},
+    {layer:"L6", q:"What delivery semantics are acceptable?",
+     chosen:{label:"At-least-once with idempotency keys", why:"Queues deliver at least once; the worker stores a delivery_id and skips duplicates. This is the cheapest correct answer, and no push/email provider can guarantee exactly-once anyway."},
+     alt:[
+      {label:"Exactly-once delivery", why:"Exactly-once requires distributed transactions across queue, worker, and provider, which adds latency and complexity for a guarantee providers themselves do not honor."},
+      {label:"At-most-once", why:"Dropping duplicates by dropping messages means transient worker failures lose notifications silently, which breaks OTP and alert use cases."}
+     ], ticks:[2,3]},
+    {layer:"L7", q:"How does fanout scale?",
+     chosen:{label:"Partitioned topic (Kafka) with consumer groups per channel", why:"Kafka partitions by channel and tenant, so a viral event is spread across partitions and each partition scales independently. Consumer groups let worker fleets scale horizontally while preserving per-partition order where needed."},
+     alt:[
+      {label:"Single FIFO queue", why:"One queue serializes everything: a slow SMS provider backs up pushes for all users, and the viral event blocks the queue (head-of-line blocking)."},
+      {label:"SQS only", why:"SQS has no fanout semantics: you would have to write the same message N times yourself for N consumers, and ordering is not guaranteed."}
+     ], ticks:[1,5,4]},
+    {layer:"L8", q:"How do provider failures get handled?",
+     chosen:{label:"Exponential backoff retries, DLQ, per-channel circuit breakers", why:"Retries with jitter survive transient provider errors; the DLQ quarantines messages that exhaust retries; circuit breakers stop hammering a provider that is already down. Each channel fails over independently."},
+     alt:[
+      {label:"Infinite retries", why:"A dead provider accumulates unbounded backlog and the retry storm makes the outage worse; there is no point where the system admits the message needs human attention."},
+      {label:"Drop on first failure", why:"Transient failures are normal; dropping on the first error loses notifications that a single retry would have delivered."}
+     ], ticks:[6,7]},
+    {layer:"L9", q:"Review: do the targets hold?",
+     chosen:{label:"Yes: triggers return in ms, fanout scales, nothing is silently lost", why:"Async decoupling keeps trigger latency at milliseconds; partitioned topics absorb 100x spikes; at-least-once plus DLQ guarantees every message is either delivered or visible for repair. Cost scales with actual send volume, not provisioned peak."},
+     alt:[
+      {label:"Ordering per user is required", why:"If notifications must arrive in order per user (like chat), partition by user_id instead of channel, and per-channel isolation at L7 gives way to per-user ordering."},
+      {label:"SMS cost must be capped hard", why:"A per-channel rate limiter (the RL problem's tree) must sit before the SMS provider; the L8 branch changes from retry-only to retry plus budget enforcement."}
+     ], ticks:[0,5],
+     bt:{if:"notifications must be delivered in order per user", then:"revisit L7: partition Kafka by user_id and drop the per-channel partitioning, accepting that a slow channel now affects ordering for that user only."}}
+  ],
+  backtrack:[
+    {if:"SMS budget is hard-capped", then:"insert a rate limiter (per-channel token bucket) between workers and the SMS provider at L8."},
+    {if:"regulatory retention is required (comms compliance)", then:"the delivery log at L5 must be immutable and append-only with a defined retention window."},
+    {if:"email volume dominates", then:"add a dedicated email queue with its own worker fleet at L7 so bulk email cannot starve push/OTP traffic."}
+  ]
+});
+PROBLEMS.push({
+  id:"chat", code:"CHAT", title:"Real-time Chat", tagline:"WhatsApp-class messaging: websockets, presence, per-conversation ordering, offline delivery.",
+  scale:"50M DAU, 10 msg/s/user at peak, group chats with 10K members",
+  checklist:[
+    {term:"WebSocket vs HTTP polling", nfr:"Latency", def:"WebSocket keeps a persistent bidirectional connection; polling re-requests on a timer.", why:"Chat latency is measured in hundreds of milliseconds. Polling every second wastes bandwidth and still feels slow; websockets push messages the moment they exist."},
+    {term:"Connection affinity (sticky sessions)", nfr:"Correctness", def:"Routing a user's subsequent requests to the same gateway instance that holds their socket.", why:"A socket lives on one instance; if the balancer moves the next request elsewhere, the gateway cannot reach the socket. Affinity or a socket registry solves this."},
+    {term:"Message ordering", nfr:"Correctness", def:"Messages in one conversation appear in send order on every device.", why:"Ordering is the core UX promise of chat. It forces the sharding key (conversation) and a sequence number per conversation."},
+    {term:"Fanout: 1:1 vs group chat", nfr:"Scale", def:"One message delivered to one recipient, or to 10K members of a group.", why:"Group fanout is write amplification: one send becomes 10K inbox writes or 10K socket pushes. The design must bound this per group."},
+    {term:"Presence and sessions", nfr:"Latency", def:"Online/offline state per user plus the list of their active devices and sockets.", why:"Presence is ephemeral state that changes constantly. It belongs in a fast volatile store (Redis) with TTLs, not in the durable database."},
+    {term:"Offline inbox", nfr:"Correctness", def:"Messages for users with no active socket are queued and delivered on reconnect.", why:"Users are offline most of the time. Without an inbox, messages are lost; with one, the system needs a per-user message store that replays on connect."},
+    {term:"Read receipts and delivery status", nfr:"Correctness", def:"Per-message state: sent, delivered, read.", why:"Receipts add a second write per message and a push to the sender. They are high-frequency and low-durability, which shapes how they are stored."},
+    {term:"Media uploads", nfr:"Cost", def:"Images, voice notes, and files travel as object-store blobs with a CDN, not through the chat path.", why:"Media dominates storage and bandwidth. Keeping it off the message path protects chat latency and keeps the database small."}
+  ],
+  steps:[
+    {layer:"L1", q:"What does 50M DAU mean for the numbers?",
+     chosen:{label:"~5.8K msg/s average, 20x peak, millions of concurrent sockets", why:"50M users sending ~10 messages/day averages under 6K writes/s, but sockets are the real load: millions of long-lived connections that must be spread across a gateway fleet. Sizing follows the connection count and the peak, not the average."},
+     alt:[
+      {label:"Size only for message writes", why:"Ignoring the socket count means the gateway fleet is undersized; connection churn and reconnects then throttle message delivery even though the database is idle."},
+      {label:"Assume one connection per user", why:"Users have phones, tablets, and web clients at once. Multiple devices multiply sockets and break naive one-socket-per-user designs."}
+     ], ticks:[0]},
+    {layer:"L2", q:"How does the balancer handle long-lived sockets?",
+     chosen:{label:"L7 balancer with WebSocket upgrade and connection affinity", why:"The L7 balancer upgrades HTTP to websocket, routes on path, and pins each connection to one gateway instance so the socket stays reachable. Health checks drain dying gateways gracefully."},
+     alt:[
+      {label:"Round-robin without affinity", why:"A reconnect or a second request lands on a different gateway, which does not own the socket. Every message then misses and forces a reconnection storm."},
+      {label:"L4 balancer only", why:"L4 balances TCP fine but cannot inspect the HTTP upgrade handshake or route REST and websocket paths separately, pushing protocol handling into the app."}
+     ], ticks:[0,1]},
+    {layer:"L3", q:"How is the chat service decomposed?",
+     chosen:{label:"Stateless chat API plus a dedicated websocket gateway tier", why:"The API tier handles auth, history, and send; the gateway tier owns sockets and presence. Each scales independently, and a gateway restart only drops connections, which clients can resume."},
+     alt:[
+      {label:"Stateful monolith holding sockets", why:"Sockets in the app process tie instance state to connections; scaling means migrating live sockets, and any deploy disconnects everyone."},
+      {label:"Serverless for the socket tier", why:"Functions cannot hold long-lived websocket connections without a proxy layer, and per-connection cold starts break the latency budget."}
+     ], ticks:[0]},
+    {layer:"L4", q:"Where do presence and hot state live?",
+     chosen:{label:"Redis for presence, sessions, and recent-message cache", why:"Presence and device sessions are ephemeral, high-churn, and read on every send. Redis pub/sub pushes presence updates to gateway instances, and a short-TTL cache serves the last N messages without hitting storage."},
+     alt:[
+      {label:"Presence in the durable database", why:"Presence changes on every connect and disconnect; writing that churn to the database turns idle scrolling into heavy write load for data that expires in minutes."},
+      {label:"No presence store", why:"Without presence, the UI cannot show online status and senders cannot know if a message was delivered; the product promise disappears."}
+     ], ticks:[4,6]},
+    {layer:"L5", q:"Where does message history live?",
+     chosen:{label:"Write-optimized store partitioned by conversation (Cassandra/DynamoDB)", why:"History is append-heavy and read as time-ordered ranges per conversation. Cassandra partitions by conversation_id with a time-ordered clustering key, giving cheap inserts and ordered scans at any scale."},
+     alt:[
+      {label:"Single MySQL primary", why:"All conversations share one write path; at 6K msg/s plus group fanout the primary becomes the bottleneck, and history tables bloat the hot dataset."},
+      {label:"Document store without ordering keys", why:"Without a conversation partition plus sequence, ordered paging requires application-side sorting and pagination breaks at group scale."}
+     ], ticks:[2,3]},
+    {layer:"L6", q:"What consistency does chat need?",
+     chosen:{label:"Strong ordering per conversation, eventual for receipts", why:"Each conversation is ordered by a per-conversation sequence number, which is exact because all writers for that conversation go through one partition. Read receipts are eventual: a few seconds of staleness is invisible."},
+     alt:[
+      {label:"Global ordering across everything", why:"A global sequence number would serialize all writes worldwide and cap throughput at one writer; chat scale makes this impossible."},
+      {label:"No ordering guarantee", why:"Messages arriving out of order break conversation coherence, and every device would render a different history."}
+     ], ticks:[2]},
+    {layer:"L7", q:"How do conversations and groups scale?",
+     chosen:{label:"Shard by conversation_id; split hot groups; async fanout for large groups", why:"Conversation sharding keeps ordering and puts each conversation on one partition. For groups over a few hundred members, fanout turns async: one write plus per-member inbox rows. Hot groups get split or their own partition."},
+     alt:[
+      {label:"Shard by user_id only", why:"A group's members live on different shards, so every group message becomes a multi-shard fanout with cross-shard ordering problems; hot groups amplify this into a meltdown."},
+      {label:"One partition for all groups", why:"A 10K-member group writes 10K rows synchronously on one partition; the partition saturates and stalls every conversation on it."}
+     ], ticks:[3]},
+    {layer:"L8", q:"How do offline users and gateway failures get handled?",
+     chosen:{label:"Per-user inbox plus resume-on-reconnect", why:"Every message lands in the recipient's inbox (Cassandra row per conversation). On reconnect, the client fetches everything after its last sequence and the gateway re-subscribes to presence. Gateway loss only forces a reconnect, not data loss."},
+     alt:[
+      {label:"Deliver only to online users", why:"Offline messages vanish; the product becomes unusable for the majority of users who are not connected at the moment of send."},
+      {label:"Client-to-client relay", why:"P2P relay breaks behind NATs and offline users, and it cannot provide history or receipts; every serious chat system is server-backed."}
+     ], ticks:[2,5,7]},
+    {layer:"L9", q:"Review: do the targets hold?",
+     chosen:{label:"Yes: ms delivery, exact ordering, no message loss", why:"Websocket push delivers in milliseconds; conversation sharding keeps ordering exact; the inbox guarantees offline delivery and replay. Cost is dominated by the gateway fleet and the write-optimized store, both of which scale linearly with DAU."},
+     alt:[
+      {label:"End-to-end encryption required", why:"E2EE adds key distribution and removes server-side search; the tree branches at L5 toward encrypted message blobs with metadata-only indexing."},
+      {label:"Voice/video calls in scope", why:"Real-time media needs a separate WebRTC/SFU tier with its own bandwidth math; the tree branches at L2 toward a media path that bypasses the chat store entirely."}
+     ], ticks:[2,5],
+     bt:{if:"group chats must support 100K-member broadcasts", then:"revisit L7: replace per-member inbox fanout with a broadcast list per group and lazy reads, accepting higher read cost for members who join late."}}
+  ],
+  backtrack:[
+    {if:"end-to-end encryption is required", then:"message bodies at L5 become opaque blobs, search moves client-side, and the server stores metadata only."},
+    {if:"message retention must be deleted on request (GDPR)", then:"the L5 store needs per-user tombstone and compaction paths; conversation-partitioned rows must be split by user for deletion."},
+    {if:"voice and video calls join the scope", then:"add a WebRTC/SFU tier at L2 with its own bandwidth sizing, separate from the message path."}
+  ]
+});
+
+PROBLEMS.push({
+  id:"video", code:"VIDEO", title:"Video Streaming", tagline:"Netflix-class on-demand video: CDN-first delivery, adaptive bitrate, transcoding pipeline, 20 Tbps egress.",
+  scale:"10M DAU, 5M concurrent streams, 720p to 4K",
+  checklist:[
+    {term:"Bandwidth and egress cost", nfr:"Cost", def:"Concurrent streams times bitrate: 5M streams at 4 Mbps is ~20 Tbps of egress.", why:"Egress is the dominant cost and the hard constraint. It decides the entire delivery architecture: CDN/edge caching is not optional, it is the design."},
+    {term:"CDN and edge caching", nfr:"Latency", def:"Video segments cached at edge PoPs close to viewers; origin serves only cache misses.", why:"A CDN absorbs 95%+ of playback traffic and keeps origin and bandwidth bills sane. The 80/20 hot-cold split decides cache hierarchy and eviction."},
+    {term:"Adaptive bitrate (ABR)", nfr:"Correctness", def:"Each video is encoded into multiple bitrates, split into segments (HLS/DASH); the player switches segments as bandwidth changes.", why:"ABR is what makes playback smooth on variable networks. It multiplies storage (N renditions) and forces a segment-based delivery path."},
+    {term:"Transcoding pipeline", nfr:"Scale", def:"Source videos converted into renditions by an offline job queue with GPU workers.", why:"Transcoding is CPU/GPU-heavy and slow, so it must be async and horizontal. The queue absorbs upload spikes and workers scale with catalog ingest."},
+    {term:"Metadata vs media separation", nfr:"Latency", def:"Catalog, titles, and user state in a database; video bytes in object storage.", why:"Mixing the two couples a hot, low-latency read path (metadata) with a huge, cold storage path (media), and neither performs well in the other's home."},
+    {term:"Hot vs cold content", nfr:"Cost", def:"A small fraction of titles drives most views (Pareto 80/20).", why:"Hot titles must be cached aggressively at the edge; long-tail content can stream from regional storage. Confusing the two wastes cache space or bandwidth."},
+    {term:"Regional replication", nfr:"Availability", def:"Content and metadata replicated across regions to serve viewers near home.", why:"Latency, compliance, and regional outages all push toward multi-region placement. A single-region origin fails the latency budget for distant viewers."},
+    {term:"Playback start time", nfr:"Latency", def:"Time from click to first frame, targeted under 2-3 seconds.", why:"Start time is the user-visible metric that matters most. It is set by the CDN hit, not the database, which is why the media path is kept free of business logic."}
+  ],
+  steps:[
+    {layer:"L1", q:"What does 5M concurrent streams mean?",
+     chosen:{label:"~20 Tbps egress, must live at the edge", why:"5M streams times 4 Mbps average is 20 Tbps. No origin data center can serve that; the traffic must be absorbed by CDN PoPs near viewers. The number alone decides the architecture: edge-first or bankrupt."},
+     alt:[
+      {label:"Serve from one origin region", why:"A single region cannot carry 20 Tbps, and cross-continent latency ruins start time; both the cost and the latency targets fail."},
+      {label:"Ignore bitrate mix", why:"4K bursts at 15 Mbps spike egress 4x; without accounting for the rendition mix, the CDN bill and capacity plan are wrong."}
+     ], ticks:[0,7]},
+    {layer:"L2", q:"How does playback traffic enter?",
+     chosen:{label:"CDN first: DNS routes viewers to the nearest edge PoP", why:"The CDN serves segments from edge caches and only misses go to the origin. DNS-level routing gets viewers to the nearest PoP, and TLS terminates at the edge. Origin bandwidth drops by ~95%."},
+     alt:[
+      {label:"Origin-only delivery", why:"Every stream hits the origin data center: 20 Tbps of egress at full price and poor latency for distant viewers. Not viable beyond small scale."},
+      {label:"Single CDN without failover", why:"A regional CDN outage takes down playback everywhere; multi-CDN with health-based routing is the standard resilience pattern."}
+     ], ticks:[0,1]},
+    {layer:"L3", q:"How is the service decomposed?",
+     chosen:{label:"Separate metadata API and media delivery path", why:"The media path (segment fetch) carries 99% of traffic and must be as thin as possible: CDN plus object storage, no business logic. The metadata path (catalog, auth, recommendations) is a normal API service. Separation lets each scale and fail independently."},
+     alt:[
+      {label:"One service for both", why:"Playback requests would queue behind catalog queries and recommendation work; a metadata bug could take down all playback."},
+      {label:"Serverless on the media path", why:"Segment serving is a pure static read; functions add cold-start latency to the exact path that must start playback in under 3 seconds."}
+     ], ticks:[4,7]},
+    {layer:"L4", q:"What gets cached where?",
+     chosen:{label:"Edge CDN caches segments; Redis caches hot metadata", why:"Segments are cached at the edge by popularity with LRU eviction, so hot titles never touch the origin. Metadata (catalog, watch progress) is cached in Redis behind the API. The hierarchy matches the two access patterns: huge static bytes at the edge, small hot records in memory."},
+     alt:[
+      {label:"Cache video in Redis", why:"Video bytes are gigabytes per title; Redis is measured in gigabytes total. Impossible size and pointless cost."},
+      {label:"No cache, origin for everything", why:"Every viewer of a hot title hits the origin; a hit title becomes a DDoS of its own and the origin saturates."}
+     ], ticks:[1,5]},
+    {layer:"L5", q:"Where do media files and catalog data live?",
+     chosen:{label:"Object storage (S3-class) for segments, database for catalog", why:"Media is immutable, append-only, and read-heavy at the edge: object storage is purpose-built for it. Catalog, users, and progress are small and transactional: a database. The two never share infrastructure."},
+     alt:[
+      {label:"Database for video blobs", why:"Blobs in a database bloat the hot working set, wreck backups, and cost 10x object storage per GB; databases are for records, not bytes."},
+      {label:"Local disk on origin", why:"Local disk is not durable, not elastic, and cannot survive instance loss; object storage gives durability and unbounded capacity for the same job."}
+     ], ticks:[4]},
+    {layer:"L6", q:"What consistency does streaming need?",
+     chosen:{label:"Eventual for catalog and metadata, strong for entitlements", why:"A slightly stale catalog or watch-progress read is invisible. But entitlements (is this account allowed to stream this?) gate revenue and piracy, so they need strong reads at play time."},
+     alt:[
+      {label:"Strong consistency everywhere", why:"Quorum reads on every catalog request multiply metadata latency and cost for data that tolerates seconds of staleness."},
+      {label:"Eventual entitlements", why:"A user could start playback of a title they just unsubscribed from, or fail to resume after a purchase; entitlement is a money path, not a cache path."}
+     ], ticks:[6]},
+    {layer:"L7", q:"How does the transcoding pipeline scale?",
+     chosen:{label:"Async encode queue with autoscaling GPU workers", why:"Uploads land in object storage; a job queue (Kafka/SQS) feeds workers that encode renditions and write segments back. Workers scale with catalog ingest, and the user's upload API never waits for encoding."},
+     alt:[
+      {label:"Synchronous encoding on upload", why:"Encoding a 2-hour title takes minutes to hours; blocking the upload request on it is impossible, and users would wait forever for a 'done' response."},
+      {label:"Pre-encode everything up front", why:"Encoding every title in every rendition without knowing demand multiplies storage cost for long-tail content nobody watches; encode-on-demand plus lazy long-tail is cheaper."}
+     ], ticks:[2,3]},
+    {layer:"L8", q:"How does playback survive failures?",
+     chosen:{label:"Multi-CDN routing, multi-region origin, catalog DR", why:"Health-based routing shifts viewers between CDNs when one degrades. Origin runs multi-AZ in each region, and the catalog database has cross-region DR. Playback start time is protected by edge availability, not origin heroics."},
+     alt:[
+      {label:"Single CDN, single region", why:"A CDN regional failure or an origin-region outage stops playback for all affected viewers; both are common enough that 'wait it out' fails the availability target."},
+      {label:"Failover to origin under load", why:"Failing playback traffic to the origin converts a CDN blip into an origin outage; the origin must never be the escape hatch for edge traffic."}
+     ], ticks:[6]},
+    {layer:"L9", q:"Review: do the targets hold?",
+     chosen:{label:"Yes: 2-3s start, 20 Tbps at edge cost, 99.9% playback", why:"Edge CDN plus object storage keeps start time and egress cost under control; multi-CDN and multi-region origin hold availability; the metadata/entitlements split keeps the money path correct. Cost is dominated by CDN egress, which scales with actual viewing, not catalog size."},
+     alt:[
+      {label:"Live streaming required", why:"Live adds low-latency ABR (LL-HLS/DASH) and chunked ingest; the tree branches at L1 toward a latency budget in seconds and at L5 toward a live segment store."},
+      {label:"User-generated content", why:"UGC adds upload pipelines, abuse detection, and per-creator quotas; the tree branches at L3 toward an ingest tier before the transcode queue."}
+     ], ticks:[0,7],
+     bt:{if:"the catalog must show newly added titles instantly", then:"revisit L6: catalog reads for new releases route to the primary for a short window instead of the eventual cache."}}
+  ],
+  backtrack:[
+    {if:"live streaming joins the scope", then:"switch the delivery path to low-latency ABR with chunked transfer; the L1 sizing and L5 storage branches change, the metadata path does not."},
+    {if:"UGC uploads are required", then:"add an ingest service with virus scanning and quota checks at L3 before the transcode queue."},
+    {if:"a region must fail over fully", then:"catalog DR at L8 becomes active-active with a global database, not backup-restore."}
+  ]
+});
+
+PROBLEMS.push({
+  id:"cache", code:"CACHE", title:"Distributed Cache", tagline:"Redis-class cache tier: 1M QPS, sub-millisecond p95, consistent hashing, hot-key survival.",
+  scale:"1M QPS reads, 10K writes/s, 100-200 GB working set",
+  checklist:[
+    {term:"Cache-aside vs write-through", nfr:"Correctness", def:"Cache-aside: app reads cache, fills on miss, invalidates on write. Write-through: every write also updates the cache.", why:"Cache-aside keeps the cache a pure accelerator with bounded staleness; write-through adds write latency and fails when the cache is unavailable. The choice fixes the consistency contract."},
+    {term:"Eviction policy", nfr:"Correctness", def:"LRU, LFU, or TTL decide which keys leave when memory fills.", why:"The working set vs total keys decides how much eviction matters. LFU suits skewed traffic (a few hot keys); TTL bounds staleness for time-sensitive data."},
+    {term:"Consistent hashing", nfr:"Scale", def:"Keys map to nodes on a hash ring; adding or removing a node moves only a fraction of keys.", why:"Modulo sharding moves nearly all keys on reshard, causing a full cache flush and a database stampede. Consistent hashing keeps reshard local and small."},
+    {term:"Replication and failover", nfr:"Availability", def:"Leader-follower replicas; followers serve reads and can be promoted when the leader dies.", why:"A cache failure is not just a missing cache: it is a direct hit storm on the database. Replication shrinks the blast radius and gives the DB a chance."},
+    {term:"Hot key problem", nfr:"Scale", def:"One key (a celebrity profile, a viral post) receives a disproportionate share of traffic.", why:"A single hot key saturates one shard and the hash ring sends everything to one node. Mitigations: replicate the hot key to followers, add a local cache, or shard the key itself."},
+    {term:"Thundering herd", nfr:"Latency", def:"A cache miss for a popular key makes all concurrent requests hit the database at once.", why:"The herd converts one miss into thousands of simultaneous DB queries. Single-flight (one in-flight load, others wait) collapses the herd."},
+    {term:"Memory sizing", nfr:"Cost", def:"Total key count and value size determine node count and memory cost.", why:"Sizing the working set instead of total keys keeps node count and cost honest; over-provisioning memory is the most common and most avoidable cache waste."},
+    {term:"Failure mode and DB protection", nfr:"Availability", def:"What the app does when the cache is unreachable.", why:"The cache must fail without taking the database down with it. Circuit breakers, local fallback, and degraded reads are the standard protections."}
+  ],
+  steps:[
+    {layer:"L1", q:"What does the cache need to carry?",
+     chosen:{label:"1M QPS reads, 10K writes/s, 100-200 GB working set", why:"Reads dominate by 100x, so the tier is sized for reads; the working set (the hot keys that actually get read) is 100-200 GB, which is a Redis cluster of 8-16 shards, not one node. Sizing the working set, not the total key count, keeps memory and cost honest."},
+     alt:[
+      {label:"Size for total key count", why:"Storing every key that ever existed triples memory for keys read once and never again; the working set is what matters for hit rate."},
+      {label:"One node for everything", why:"A single Redis node tops out around 100K-200K ops/s and 50-100 GB; 1M QPS across one node fails on both throughput and memory."}
+     ], ticks:[6]},
+    {layer:"L2", q:"How do clients reach the right shard?",
+     chosen:{label:"Client-side consistent hashing, L4 for raw connection balancing", why:"The client computes the shard for a key locally and talks to it directly, skipping a proxy hop. L4 balances connections without parsing keys. This is the standard Redis cluster pattern."},
+     alt:[
+      {label:"L7 proxy in front", why:"A proxy adds a network hop and a serialization point to every one of 1M QPS; the proxy becomes a new bottleneck and failure domain."},
+      {label:"Random or round-robin routing", why:"Random routing sends each key to a random shard, so every read misses and the cache becomes a bandwidth-burning pass-through."}
+     ], ticks:[2]},
+    {layer:"L3", q:"How is the cache tier structured?",
+     chosen:{label:"Dedicated cache cluster with a thin client library", why:"A dedicated Redis cluster serves all services, and a thin client handles hashing, retries, and local fallback. Centralizing the tier gives one place to size, monitor, and fail over."},
+     alt:[
+      {label:"Embedded per-app caches", why:"Each app caches its own copy: no sharing, no central sizing, and every app rebuilds its cache independently on restart, multiplying the database load."},
+      {label:"Database as the cache", why:"Serving hot reads from the database turns 1M QPS into 1M DB reads; the DB becomes the bottleneck the cache was meant to relieve."}
+     ], ticks:[7]},
+    {layer:"L4", q:"Which cache engine fits?",
+     chosen:{label:"Redis with replication (Memcached only if no persistence needed)", why:"Redis gives replication, atomic ops, and data structures; replication lets followers serve reads and survive leader loss. Memcached is faster per core but has no replication or failover story, which fails the availability target at this scale."},
+     alt:[
+      {label:"Memcached everywhere", why:"Without replication, a node loss is a full shard loss and a database stampede; fine for a toy, wrong for a tier protecting a database."},
+      {label:"Local LRU on each app instance", why:"Per-instance caches duplicate data N times and go cold on every deploy; hit rate collapses and the database sees the full traffic."}
+     ], ticks:[3,1]},
+    {layer:"L5", q:"Does the cache persist?",
+     chosen:{label:"RDB snapshots only, no AOF", why:"The cache rebuilds from the database after a full restart, so durability is a warm-start convenience, not a contract. RDB snapshots give fast restart; AOF everysec would add write amplification for data that is regenerable."},
+     alt:[
+      {label:"AOF everysec on everything", why:"Paying disk-write costs on 10K writes/s for regenerable data slows the tier for no correctness gain."},
+      {label:"No persistence at all", why:"A restart then triggers a cold cache and a database stampede as 1M QPS floods in; a snapshot makes restart recoverable in seconds."}
+     ], ticks:[7]},
+    {layer:"L6", q:"What consistency does the cache promise?",
+     chosen:{label:"Bounded staleness via TTL + cache-aside invalidation", why:"Cache-aside with explicit invalidation on writes plus TTLs caps staleness at a known bound. Reads that need current data bypass the cache. This is the standard, honest contract for a cache."},
+     alt:[
+      {label:"Write-through strong consistency", why:"Every write updates the cache synchronously, doubling write latency and making the cache a hard dependency of the write path; the availability target suffers."},
+      {label:"No invalidation, pure TTL", why:"Deleted or updated keys linger until TTL expiry, serving stale data for the whole TTL window and breaking any write-heavy workload."}
+     ], ticks:[0]},
+    {layer:"L7", q:"How does the cluster scale and survive hot keys?",
+     chosen:{label:"Consistent hashing with virtual nodes, hot-key replication to followers", why:"Virtual nodes spread keys evenly and make reshard move only a fraction of keys. Hot keys are replicated to follower shards or cached locally so one celebrity key cannot saturate one shard. Single-flight collapses thundering herds on miss."},
+     alt:[
+      {label:"Modulo sharding", why:"Adding one node moves nearly every key: a full-cache flush and a database stampede at every reshard, which makes scaling events into outages."},
+      {label:"No hot-key handling", why:"One viral key pins one shard at 100% CPU while the cluster idles; p99 latency for that key and its neighbors collapses."}
+     ], ticks:[2,4,5]},
+    {layer:"L8", q:"What happens when a node or the cluster fails?",
+     chosen:{label:"Leader-follower replication, automatic promotion, local fallback", why:"A leader failure promotes a follower within seconds, and app-side local fallback serves reads from a small in-process cache while the tier recovers. The database is shielded from the failure."},
+     alt:[
+      {label:"No replicas, accept the loss", why:"A node loss empties its shard instantly; the database absorbs that shard's full traffic and likely dies too, turning a cache node failure into a database outage."},
+      {label:"Fail-closed on cache error", why:"Every request errors when the cache hiccups; the cache, whose job is protecting the system, becomes the system's outage."}
+     ], ticks:[3,7]},
+    {layer:"L9", q:"Review: do the targets hold?",
+     chosen:{label:"Yes: sub-ms p95, 1M QPS, database protected", why:"Client-side hashing keeps the hot path at one network hop; consistent hashing makes reshard safe; replication plus local fallback keeps the database alive through node loss. Cost is the working-set memory, which is the honest price of a sub-millisecond read tier."},
+     alt:[
+      {label:"Strong read-after-write required", why:"If the product cannot tolerate any staleness, the cache must be bypassed for those reads (L6 branch), accepting higher latency for correctness."},
+      {label:"Multi-region reads required", why:"Each region gets its own cache with regional replicas (L2 branch), and cross-region invalidation becomes an explicit, bounded step."}
+     ], ticks:[0,6],
+     bt:{if:"a single key must serve 10x the traffic of the next hottest", then:"revisit L7: replicate that key to all shard followers or shard the key by suffix so no single node carries it."}}
+  ],
+  backtrack:[
+    {if:"reads must never be stale", then:"bypass the cache for those reads at L6 and accept the latency of primary reads."},
+    {if:"the cache must survive a full cluster loss", then:"add AOF persistence at L5 and a warm-standby cluster; the cost is write throughput."},
+    {if:"multi-region is required", then:"deploy per-region clusters at L2 and treat cross-region invalidation as an explicit event with bounded delay."}
+  ]
+});
+
+/* Branch consequences: what breaks downstream if you pick each rejected option */
+const CONSEQUENCES = {
+  /* URL Shortener */
+  "url:0:0": [{s:"L1 Estimation", t:"cache sized for peak, mostly idle"},{s:"L4 Cache", t:"overspend on memory for traffic that never arrives"},{s:"L9 Review", t:"cost target fails despite correct latency"}],
+  "url:0:1": [{s:"L1 Estimation", t:"year-3 traffic exceeds provisioned capacity"},{s:"L7 Scaling", t:"forced sharding under live load"},{s:"L8 Availability", t:"reshard churn causes redirect errors during migration"}],
+  "url:1:0": [{s:"L2 Entry", t:"no TLS termination or path routing"},{s:"L3 Service", t:"every instance does TLS and routing itself"},{s:"L7 Scaling", t:"routing rules duplicated across the fleet, drift and break"}],
+  "url:1:1": [{s:"L2 Entry", t:"no health checks, no failover"},{s:"L8 Availability", t:"dead instance takes a third of traffic until TTL expires"},{s:"L9 Review", t:"availability target unreachable"}],
+  "url:2:0": [{s:"L3 Service", t:"key state pinned to instances"},{s:"L7 Scaling", t:"sticky routing required; deploy restarts drop in-flight state"},{s:"L8 Availability", t:"instance loss loses unflushed keys"}],
+  "url:2:1": [{s:"L3 Service", t:"cold starts on every warmup"},{s:"L2 Entry", t:"100 ms redirect budget partly eaten by cold start"},{s:"L9 Review", t:"latency target fails at peak"}],
+  "url:3:0": [{s:"L4 Cache", t:"every write also updates the cache"},{s:"L6 Consistency", t:"cache and DB must update together or drift"},{s:"L9 Review", t:"write latency doubles for a 10:1 read workload"}],
+  "url:3:1": [{s:"L4 Cache", t:"all 12K reads/s hit the database"},{s:"L5 Storage", t:"hot rows contend; DB CPU climbs"},{s:"L7 Scaling", t:"forced read replicas earlier than planned"}],
+  "url:4:0": [{s:"L5 Storage", t:"no graph queries exist; engine idle"},{s:"L7 Scaling", t:"graph partitioning complexity for a key lookup"},{s:"L9 Review", t:"ops cost with zero benefit"}],
+  "url:4:1": [{s:"L5 Storage", t:"duplicate keys for the same long URL"},{s:"L6 Consistency", t:"dedup reimplemented in app code, races under load"},{s:"L3 Service", t:"write path needs locks, adding latency"}],
+  "url:5:0": [{s:"L6 Consistency", t:"every redirect does a quorum read"},{s:"L4 Cache", t:"cache cannot serve reads; must invalidate aggressively"},{s:"L7 Scaling", t:"read replicas cannot serve; single-writer ceiling"}],
+  "url:5:1": [{s:"L6 Consistency", t:"two users can mint the same key"},{s:"L3 Service", t:"collision retry storms under load"},{s:"L9 Review", t:"core promise of the service broken"}],
+  "url:6:0": [{s:"L7 Scaling", t:"consistent-hash complexity from day one"},{s:"L5 Storage", t:"cross-shard uniqueness checks needed"},{s:"L9 Review", t:"ops overhead while the write path is 10% utilized"}],
+  "url:6:1": [{s:"L7 Scaling", t:"single DB ceiling hit at ~4x current load"},{s:"L8 Availability", t:"bigger instance means a bigger blast radius"},{s:"L9 Review", t:"capacity cliff, not a curve"}],
+  "url:7:0": [{s:"L8 Availability", t:"standby never serves reads"},{s:"L7 Scaling", t:"read capacity paid twice, used once"},{s:"L9 Review", t:"failover still takes minutes"}],
+  "url:7:1": [{s:"L8 Availability", t:"every component is a single point of failure"},{s:"L2 Entry", t:"a balancer restart takes the service down"},{s:"L9 Review", t:"availability target impossible"}],
+  "url:8:0": [{s:"L6 Consistency", t:"reads route to the primary"},{s:"L4 Cache", t:"bypassed for correctness"},{s:"L7 Scaling", t:"read replicas idle; the write path turns hot"}],
+  "url:8:1": [{s:"L4 Cache", t:"click events join the read path"},{s:"L5 Storage", t:"a new analytics store is needed"},{s:"L3 Service", t:"event pipeline added to the service layer"}],
+  /* Rate Limiter */
+  "ratelimit:0:0": [{s:"L1 Estimation", t:"limiter eats 10% of API latency"},{s:"L2 Entry", t:"limiter becomes the slowest hop"},{s:"L9 Review", t:"latency target of protected APIs fails"}],
+  "ratelimit:0:1": [{s:"L1 Estimation", t:"design drifts into slow checks"},{s:"L4 Cache", t:"SQL writes per request sneak in"},{s:"L9 Review", t:"p99 quietly destroyed"}],
+  "ratelimit:1:0": [{s:"L2 Entry", t:"limits per service, not per user"},{s:"L7 Scaling", t:"internal callers bypass limits"},{s:"L9 Review", t:"inconsistent enforcement across the fleet"}],
+  "ratelimit:1:1": [{s:"L2 Entry", t:"no HTTP headers at L4"},{s:"L3 Service", t:"per-API-key limits impossible"},{s:"L9 Review", t:"only raw connection limits exist"}],
+  "ratelimit:2:0": [{s:"L3 Service", t:"counters are per-instance"},{s:"L7 Scaling", t:"N instances allow N times the limit"},{s:"L9 Review", t:"the limit becomes a suggestion"}],
+  "ratelimit:2:1": [{s:"L3 Service", t:"network round trip per request"},{s:"L4 Cache", t:"p50 +0.5-1 ms, p99 worse under load"},{s:"L9 Review", t:"overhead budget eroded at peak"}],
+  "ratelimit:3:0": [{s:"L4 Cache", t:"state lost on restart"},{s:"L7 Scaling", t:"instances disagree on counts"},{s:"L9 Review", t:"limits reset to zero on every deploy"}],
+  "ratelimit:3:1": [{s:"L4 Cache", t:"database write per request"},{s:"L7 Scaling", t:"cannot sustain 100K req/s"},{s:"L9 Review", t:"millisecond overhead per check"}],
+  "ratelimit:4:0": [{s:"L5 Storage", t:"every increment hits disk"},{s:"L7 Scaling", t:"limiter becomes the slowest component"},{s:"L9 Review", t:"data expires within minutes anyway"}],
+  "ratelimit:4:1": [{s:"L5 Storage", t:"local persistence only"},{s:"L7 Scaling", t:"state still not shared across nodes"},{s:"L9 Review", t:"limits stay per-node"}],
+  "ratelimit:5:0": [{s:"L6 Consistency", t:"counters lag reality"},{s:"L8 Availability", t:"outage windows let traffic through"},{s:"L9 Review", t:"limits enforce yesterday's totals"}],
+  "ratelimit:5:1": [{s:"L6 Consistency", t:"per-user serialization"},{s:"L4 Cache", t:"lock latency on every request"},{s:"L9 Review", t:"solves what atomic ops already solve"}],
+  "ratelimit:6:0": [{s:"L7 Scaling", t:"user state scattered across shards"},{s:"L6 Consistency", t:"each shard sees a fraction of the count"},{s:"L9 Review", t:"the limit is never enforced"}],
+  "ratelimit:6:1": [{s:"L7 Scaling", t:"ops ceiling around 100K-200K/s"},{s:"L8 Availability", t:"one node is a single point of failure"},{s:"L9 Review", t:"no headroom for growth"}],
+  "ratelimit:7:0": [{s:"L8 Availability", t:"Redis outage becomes an API outage"},{s:"L2 Entry", t:"gateway rejects everything"},{s:"L9 Review", t:"limiter causes the outage it prevents"}],
+  "ratelimit:7:1": [{s:"L8 Availability", t:"every request errors during the outage"},{s:"L3 Service", t:"errors propagate to clients"},{s:"L9 Review", t:"limiter becomes the bottleneck"}],
+  "ratelimit:8:0": [{s:"L7 Scaling", t:"geo-replicated shards needed"},{s:"L6 Consistency", t:"cross-region propagation delay"},{s:"L8 Availability", t:"region loss affects global counts"}],
+  "ratelimit:8:1": [{s:"L2 Entry", t:"enforcement moves to the CDN edge"},{s:"L7 Scaling", t:"no per-user Redis state"},{s:"L3 Service", t:"a different limiter tier entirely"}],
+  /* Notification System */
+  "notif:0:0": [{s:"L1 Estimation", t:"viral event becomes a multi-hour backlog"},{s:"L8 Availability", t:"OTP and alerts arrive late"},{s:"L9 Review", t:"time-sensitive sends miss their window"}],
+  "notif:0:1": [{s:"L1 Estimation", t:"99% of worker capacity sits idle"},{s:"L7 Scaling", t:"autoscaling wasted"},{s:"L9 Review", t:"cost scales with peak, not demand"}],
+  "notif:1:0": [{s:"L2 Entry", t:"trigger waits for provider latency"},{s:"L8 Availability", t:"a slow provider slows every caller"},{s:"L9 Review", t:"trigger path as fragile as the providers"}],
+  "notif:1:1": [{s:"L2 Entry", t:"no validation or dedup"},{s:"L5 Storage", t:"DB absorbs untracked writes"},{s:"L9 Review", t:"no channel routing"}],
+  "notif:2:0": [{s:"L3 Service", t:"nightly batch only"},{s:"L8 Availability", t:"crash mid-batch loses everything"},{s:"L9 Review", t:"no time-sensitive delivery"}],
+  "notif:2:1": [{s:"L3 Service", t:"channel coupling in one worker"},{s:"L8 Availability", t:"a Twilio outage blocks email and push"},{s:"L7 Scaling", t:"cannot scale per channel"}],
+  "notif:3:0": [{s:"L4 Cache", t:"messages are write-once, read-once"},{s:"L5 Storage", t:"duplicate of the queue"},{s:"L9 Review", t:"cache saves nothing, wastes memory"}],
+  "notif:3:1": [{s:"L4 Cache", t:"10M fanout becomes 10M DB reads"},{s:"L5 Storage", t:"read load spikes with viral events"},{s:"L7 Scaling", t:"DB replica fleet grows with fanout"}],
+  "notif:4:0": [{s:"L5 Storage", t:"write contention with reads"},{s:"L7 Scaling", t:"history tables grow unbounded"},{s:"L9 Review", t:"painful archiving later"}],
+  "notif:4:1": [{s:"L5 Storage", t:"no audit trail"},{s:"L8 Availability", t:"cannot reason about retries"},{s:"L9 Review", t:"did it send? unanswerable"}],
+  "notif:5:0": [{s:"L6 Consistency", t:"distributed transactions needed"},{s:"L3 Service", t:"worker complexity explodes"},{s:"L9 Review", t:"providers cannot honor it anyway"}],
+  "notif:5:1": [{s:"L6 Consistency", t:"transient failures drop messages"},{s:"L8 Availability", t:"OTP and alerts silently lost"},{s:"L9 Review", t:"delivery promise broken"}],
+  "notif:6:0": [{s:"L7 Scaling", t:"head-of-line blocking"},{s:"L8 Availability", t:"a slow SMS provider backs up pushes"},{s:"L9 Review", t:"viral event blocks the queue"}],
+  "notif:6:1": [{s:"L7 Scaling", t:"no fanout semantics"},{s:"L3 Service", t:"write N copies yourself"},{s:"L9 Review", t:"ordering not guaranteed"}],
+  "notif:7:0": [{s:"L8 Availability", t:"unbounded backlog"},{s:"L7 Scaling", t:"retry storm worsens the outage"},{s:"L9 Review", t:"no point of human attention"}],
+  "notif:7:1": [{s:"L8 Availability", t:"transient errors lose messages"},{s:"L6 Consistency", t:"at-least-once promise broken"},{s:"L9 Review", t:"a single retry would have delivered"}],
+  "notif:8:0": [{s:"L7 Scaling", t:"partition by user_id instead of channel"},{s:"L6 Consistency", t:"per-user ordering guaranteed"},{s:"L9 Review", t:"channel isolation sacrificed"}],
+  "notif:8:1": [{s:"L8 Availability", t:"rate limiter must sit before the SMS provider"},{s:"L7 Scaling", t:"per-channel budget enforcement"},{s:"L9 Review", t:"retry-only branch changes"}],
+  /* Real-time Chat */
+  "chat:0:0": [{s:"L1 Estimation", t:"gateway fleet undersized"},{s:"L8 Availability", t:"connection churn throttles delivery"},{s:"L9 Review", t:"DB idle while sockets fail"}],
+  "chat:0:1": [{s:"L1 Estimation", t:"multi-device users multiply sockets"},{s:"L7 Scaling", t:"gateway count wrong"},{s:"L9 Review", t:"naive one-socket-per-user design"}],
+  "chat:1:0": [{s:"L2 Entry", t:"reconnect lands on another gateway"},{s:"L3 Service", t:"gateway does not own the socket"},{s:"L8 Availability", t:"reconnection storm on every message"}],
+  "chat:1:1": [{s:"L2 Entry", t:"no HTTP upgrade inspection"},{s:"L3 Service", t:"REST and socket paths mixed"},{s:"L9 Review", t:"protocol handling pushed into the app"}],
+  "chat:2:0": [{s:"L3 Service", t:"sockets tied to the instance"},{s:"L7 Scaling", t:"live socket migration on every deploy"},{s:"L8 Availability", t:"any deploy disconnects everyone"}],
+  "chat:2:1": [{s:"L3 Service", t:"no long-lived connections in functions"},{s:"L2 Entry", t:"cold starts break the latency budget"},{s:"L9 Review", t:"proxy layer needed anyway"}],
+  "chat:3:0": [{s:"L4 Cache", t:"write churn on every connect"},{s:"L5 Storage", t:"idle scrolling becomes heavy write load"},{s:"L9 Review", t:"data expires within minutes anyway"}],
+  "chat:3:1": [{s:"L4 Cache", t:"no online status"},{s:"L3 Service", t:"senders cannot know if a message was delivered"},{s:"L9 Review", t:"product promise disappears"}],
+  "chat:4:0": [{s:"L5 Storage", t:"one write path for all conversations"},{s:"L7 Scaling", t:"primary bottleneck at 6K msg/s plus fanout"},{s:"L9 Review", t:"history bloat in the hot dataset"}],
+  "chat:4:1": [{s:"L5 Storage", t:"no conversation partition"},{s:"L6 Consistency", t:"app-side sorting required"},{s:"L7 Scaling", t:"pagination breaks at group scale"}],
+  "chat:5:0": [{s:"L6 Consistency", t:"single writer worldwide"},{s:"L7 Scaling", t:"throughput capped at one writer"},{s:"L9 Review", t:"chat scale makes it impossible"}],
+  "chat:5:1": [{s:"L6 Consistency", t:"messages arrive out of order"},{s:"L4 Cache", t:"conversation coherence broken"},{s:"L9 Review", t:"devices render different histories"}],
+  "chat:6:0": [{s:"L7 Scaling", t:"group members spread across shards"},{s:"L6 Consistency", t:"multi-shard fanout per group message"},{s:"L9 Review", t:"hot groups melt down"}],
+  "chat:6:1": [{s:"L7 Scaling", t:"10K-member group writes 10K rows synchronously"},{s:"L8 Availability", t:"partition saturates and stalls every conversation"},{s:"L9 Review", t:"single point of congestion"}],
+  "chat:7:0": [{s:"L8 Availability", t:"offline messages vanish"},{s:"L6 Consistency", t:"no replay possible"},{s:"L9 Review", t:"most users are offline at send time"}],
+  "chat:7:1": [{s:"L8 Availability", t:"breaks behind NATs"},{s:"L5 Storage", t:"server-backed store still required"},{s:"L9 Review", t:"no history or receipts"}],
+  "chat:8:0": [{s:"L5 Storage", t:"bodies become opaque blobs"},{s:"L4 Cache", t:"key distribution added"},{s:"L9 Review", t:"server-side search removed"}],
+  "chat:8:1": [{s:"L2 Entry", t:"WebRTC/SFU tier added"},{s:"L1 Estimation", t:"bandwidth math for media"},{s:"L9 Review", t:"media path bypasses the chat store"}],
+  /* Video Streaming */
+  "video:0:0": [{s:"L1 Estimation", t:"a single region cannot carry 20 Tbps"},{s:"L2 Entry", t:"cross-continent latency ruins start time"},{s:"L9 Review", t:"cost and latency both fail"}],
+  "video:0:1": [{s:"L1 Estimation", t:"4K bursts at 15 Mbps"},{s:"L4 Cache", t:"edge cache footprint miscalculated"},{s:"L9 Review", t:"egress bill and capacity plan wrong"}],
+  "video:1:0": [{s:"L2 Entry", t:"every stream hits the origin"},{s:"L1 Estimation", t:"20 Tbps egress at full price"},{s:"L9 Review", t:"not viable beyond small scale"}],
+  "video:1:1": [{s:"L2 Entry", t:"regional CDN outage stops playback"},{s:"L8 Availability", t:"no escape path"},{s:"L9 Review", t:"availability target fails"}],
+  "video:2:0": [{s:"L3 Service", t:"playback queues behind catalog work"},{s:"L8 Availability", t:"a metadata bug takes down playback"},{s:"L9 Review", t:"99% traffic path coupled to the 1% path"}],
+  "video:2:1": [{s:"L3 Service", t:"cold start on every segment fetch"},{s:"L2 Entry", t:"start time budget broken"},{s:"L9 Review", t:"static read given function overhead"}],
+  "video:3:0": [{s:"L4 Cache", t:"gigabytes per title"},{s:"L1 Estimation", t:"impossible size"},{s:"L9 Review", t:"pointless cost"}],
+  "video:3:1": [{s:"L4 Cache", t:"a hot title becomes a self-DDoS"},{s:"L8 Availability", t:"origin saturates"},{s:"L9 Review", t:"peak egress impossible"}],
+  "video:4:0": [{s:"L5 Storage", t:"bloats the hot working set"},{s:"L7 Scaling", t:"backups wrecked"},{s:"L9 Review", t:"10x the cost of object storage"}],
+  "video:4:1": [{s:"L5 Storage", t:"not durable"},{s:"L8 Availability", t:"instance loss loses content"},{s:"L9 Review", t:"not elastic either"}],
+  "video:5:0": [{s:"L6 Consistency", t:"quorum reads on every catalog call"},{s:"L4 Cache", t:"cost for data that tolerates staleness"},{s:"L9 Review", t:"metadata latency multiplied"}],
+  "video:5:1": [{s:"L6 Consistency", t:"playback of just-unsubscribed titles"},{s:"L3 Service", t:"revenue and piracy gates weakened"},{s:"L9 Review", t:"money path is not a cache path"}],
+  "video:6:0": [{s:"L7 Scaling", t:"hours-long encode blocks the request"},{s:"L3 Service", t:"upload API couples to GPU work"},{s:"L9 Review", t:"users wait forever for done"}],
+  "video:6:1": [{s:"L7 Scaling", t:"storage multiplied for the long tail"},{s:"L1 Estimation", t:"encode demand nobody watches"},{s:"L9 Review", t:"storage cost balloons"}],
+  "video:7:0": [{s:"L8 Availability", t:"regional failure stops playback"},{s:"L2 Entry", t:"no routing escape"},{s:"L9 Review", t:"availability target fails"}],
+  "video:7:1": [{s:"L8 Availability", t:"a CDN blip becomes an origin outage"},{s:"L7 Scaling", t:"origin absorbs edge traffic"},{s:"L9 Review", t:"origin is not an escape hatch"}],
+  "video:8:0": [{s:"L1 Estimation", t:"latency budget in seconds"},{s:"L5 Storage", t:"live segment store"},{s:"L9 Review", t:"LL-HLS/DASH chunked path"}],
+  "video:8:1": [{s:"L3 Service", t:"ingest tier added"},{s:"L8 Availability", t:"abuse detection required"},{s:"L9 Review", t:"per-creator quotas"}],
+  /* Distributed Cache */
+  "cache:0:0": [{s:"L1 Estimation", t:"keys read once stored forever"},{s:"L4 Cache", t:"eviction pressure misjudged"},{s:"L9 Review", t:"memory tripled for no hit-rate gain"}],
+  "cache:0:1": [{s:"L1 Estimation", t:"1M QPS exceeds the single-node ceiling"},{s:"L8 Availability", t:"one node is a single point of failure"},{s:"L9 Review", t:"throughput and memory both fail"}],
+  "cache:1:0": [{s:"L2 Entry", t:"extra hop per request"},{s:"L7 Scaling", t:"proxy serializes 1M QPS"},{s:"L9 Review", t:"new bottleneck and failure domain"}],
+  "cache:1:1": [{s:"L2 Entry", t:"every read misses"},{s:"L4 Cache", t:"bandwidth burned"},{s:"L9 Review", t:"cache becomes a pass-through"}],
+  "cache:2:0": [{s:"L3 Service", t:"no sharing across apps"},{s:"L8 Availability", t:"every restart rebuilds cold"},{s:"L5 Storage", t:"database load multiplied"}],
+  "cache:2:1": [{s:"L3 Service", t:"1M QPS becomes 1M DB reads"},{s:"L7 Scaling", t:"DB becomes the bottleneck"},{s:"L9 Review", t:"the cache's purpose inverted"}],
+  "cache:3:0": [{s:"L4 Cache", t:"no replication"},{s:"L8 Availability", t:"node loss equals shard loss plus a DB stampede"},{s:"L9 Review", t:"availability target fails"}],
+  "cache:3:1": [{s:"L4 Cache", t:"N copies of the data"},{s:"L7 Scaling", t:"cold on every deploy"},{s:"L9 Review", t:"hit rate collapses"}],
+  "cache:4:0": [{s:"L5 Storage", t:"disk writes on every mutation"},{s:"L7 Scaling", t:"tier slowed for regenerable data"},{s:"L9 Review", t:"no correctness gain"}],
+  "cache:4:1": [{s:"L5 Storage", t:"restart equals a cold cache"},{s:"L8 Availability", t:"DB stampede on restart"},{s:"L9 Review", t:"1M QPS floods storage"}],
+  "cache:5:0": [{s:"L6 Consistency", t:"every write updates the cache synchronously"},{s:"L8 Availability", t:"cache becomes a hard dependency"},{s:"L9 Review", t:"write latency doubled"}],
+  "cache:5:1": [{s:"L6 Consistency", t:"deleted keys linger until TTL"},{s:"L3 Service", t:"write-heavy workloads break"},{s:"L9 Review", t:"stale reads for the whole TTL window"}],
+  "cache:6:0": [{s:"L7 Scaling", t:"adding a node moves nearly every key"},{s:"L8 Availability", t:"full cache flush plus a DB stampede"},{s:"L9 Review", t:"scaling events become outages"}],
+  "cache:6:1": [{s:"L7 Scaling", t:"one viral key pins a shard"},{s:"L8 Availability", t:"p99 collapses for neighboring keys"},{s:"L9 Review", t:"cluster idles while one node burns"}],
+  "cache:7:0": [{s:"L8 Availability", t:"node loss empties its shard instantly"},{s:"L5 Storage", t:"DB absorbs the full shard traffic"},{s:"L9 Review", t:"a cache node failure becomes a DB outage"}],
+  "cache:7:1": [{s:"L8 Availability", t:"every request errors on a cache hiccup"},{s:"L3 Service", t:"apps depend on cache availability"},{s:"L9 Review", t:"the cache becomes the outage"}],
+  "cache:8:0": [{s:"L6 Consistency", t:"cache bypassed for those reads"},{s:"L4 Cache", t:"staleness not tolerated"},{s:"L9 Review", t:"latency traded for correctness"}],
+  "cache:8:1": [{s:"L2 Entry", t:"regional replicas per region"},{s:"L6 Consistency", t:"cross-region invalidation becomes explicit"},{s:"L9 Review", t:"a bounded delay step"}]
+};
+
+/* merge branch consequences into alternatives */
+PROBLEMS.forEach(p => p.steps.forEach((s, si) => (s.alt||[]).forEach((a, ai) => {
+  const c = CONSEQUENCES[p.id + ":" + si + ":" + ai];
+  if(c) a.then = c;
+})));
+
+/* ---------- state ---------- */
+const state = { problem:null, step:0, ticked:new Set(), mmCounter:0, branch:null };
+const LS_KEY = "sysdesign-path-v1";
+let toastTimer = null;
+
+function toast(msg){
+  const t = $("#toast");
+  t.textContent = msg;
+  t.classList.add("show");
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(()=>t.classList.remove("show"), 3200);
+}
+
+/* ---------- mermaid ---------- */
+function mermaidReady(){ return typeof mermaid !== "undefined" && typeof mermaid.render === "function"; }
+
+function buildMermaid(p){
+  const lines = ["flowchart TD"];
+  const allQ=[], allC=[], allO=[], all=[];
+  const altEdges=[], spineEdges=[];
+  let e = 0;
+  p.steps.forEach((s,i)=>{
+    const layer = LAYERS.find(l=>l.id===s.layer);
+    const tag = layer.id+" "+layer.name;
+    const qid = "S"+i+"Q", cid = "S"+i+"C";
+    lines.push(qid+'["'+tag+": "+s.q+'"]');
+    lines.push(cid+'["'+s.chosen.label+'"]');
+    allQ.push(qid); allC.push(cid); all.push(qid); all.push(cid);
+    const n = s.alt.length, half = Math.ceil(n/2);
+    s.alt.forEach((a,j)=>{
+      lines.push("S"+i+"A"+j+'["'+a.label+'"]');
+      allO.push("S"+i+"A"+j); all.push("S"+i+"A"+j);
+    });
+    // edge order places the chosen node between left and right alternatives,
+    // so the spine stays vertical and the alternatives balance both sides
+    for(let j=0;j<half;j++){ lines.push(qid+" --> S"+i+"A"+j); altEdges.push(e++); }
+    lines.push(qid+" --> "+cid); spineEdges.push(e++);
+    for(let j=half;j<n;j++){ lines.push(qid+" --> S"+i+"A"+j); altEdges.push(e++); }
+    if(i < p.steps.length-1){ lines.push(cid+" --> S"+(i+1)+"Q"); spineEdges.push(e++); }
+  });
+  all.forEach(id => lines.push("style "+id+" whiteSpace:nowrap"));
+  lines.push("classDef q fill:#eef2f7,stroke:#64748b,color:#0f172a,stroke-width:1.5px");
+  lines.push("classDef opt fill:#ffffff,stroke:#94a3b8,color:#334155");
+  lines.push("classDef chosen fill:#e8f5e9,stroke:#16a34a,stroke-width:2px,color:#14532d");
+  lines.push("class "+allQ.join(",")+" q");
+  lines.push("class "+allO.join(",")+" opt");
+  lines.push("class "+allC.join(",")+" chosen");
+  lines.push("linkStyle "+altEdges.join(",")+" stroke:#94a3b8,stroke-width:1.6px,stroke-dasharray:5 5");
+  lines.push("linkStyle "+spineEdges.join(",")+" stroke:#64748b,stroke-width:2.2px");
+  return lines.join("\n");
+}
+
+function relayoutTree(){
+  const diag = $("#diagram");
+  const svg = diag.querySelector("svg");
+  if(!svg) return;
+  const nodes = [...svg.querySelectorAll("g.node")];
+  const info = {};
+  nodes.forEach(g=>{
+    const rect = g.querySelector("rect");
+    if(!rect) return;
+    const id = g.id.replace(/^flowchart-/,"").replace(/-\d+$/,"");
+    const m = id.match(/^S(\d+)(Q|C|A(\d+))$/);
+    if(!m) return;
+    info[id] = {
+      g, w: parseFloat(rect.getAttribute("width")), h: parseFloat(rect.getAttribute("height")),
+      kind: m[2], altIdx: m[3] !== undefined ? +m[3] : -1
+    };
+  });
+  // column widths
+  const qw=[], cw=[], lw=[], rw=[];
+  Object.values(info).forEach(n=>{
+    if(n.kind==="Q") qw.push(n.w);
+    else if(n.kind==="C") cw.push(n.w);
+    else if(n.altIdx%2===0) lw.push(n.w);
+    else rw.push(n.w);
+  });
+  const maxLW = Math.max(...lw), maxRW = Math.max(...rw), maxSW = Math.max(...qw, ...cw);
+  const GAP = 46, MARGIN = 40;
+  const SPINE_X = maxLW/2 + GAP + maxSW/2;
+  const LEFT_X = maxLW/2;
+  const RIGHT_X = SPINE_X + maxSW/2 + GAP + maxRW/2;
+  const STEP_H = 220, C_OFF = 110, Y0 = 60;
+  const totalW = RIGHT_X + maxRW/2 + MARGIN;
+  const totalH = Y0 + 8*STEP_H + C_OFF + 100;
+  // assign new centers
+  Object.keys(info).forEach(id=>{
+    const n = info[id];
+    const i = +id.match(/^S(\d+)/)[1];
+    let x, y;
+    if(n.kind==="Q"){ x = SPINE_X; y = Y0 + i*STEP_H; }
+    else if(n.kind==="C"){ x = SPINE_X; y = Y0 + i*STEP_H + C_OFF; }
+    else { x = n.altIdx%2===0 ? LEFT_X : RIGHT_X; y = Y0 + i*STEP_H + C_OFF; }
+    n.x = x; n.y = y;
+    n.g.setAttribute("transform", "translate("+x+","+y+")");
+  });
+  // redraw edges as straight lines between new anchors
+  svg.querySelectorAll("g.edgePaths path").forEach(p=>{
+    const m = p.id.match(/^L-(S\d+(?:Q|C|A\d+))-(S\d+(?:Q|C|A\d+))/);
+    if(!m) return;
+    const s = info[m[1]], t = info[m[2]];
+    if(!s || !t) return;
+    let sx, sy;
+    if(t.kind === "Q"){ sx = s.x; sy = s.y + s.h/2; }                 // C -> next Q: straight down
+    else if(t.kind === "C"){ sx = s.x; sy = s.y + s.h/2; }           // Q -> C: straight down
+    else if(t.altIdx%2===0){ sx = s.x - s.w/2 + 10; sy = s.y + s.h/2; } // Q -> left alt: bottom-left
+    else { sx = s.x + s.w/2 - 10; sy = s.y + s.h/2; }                  // Q -> right alt: bottom-right
+    const tx = t.x, ty = t.y - t.h/2;
+    p.setAttribute("d", "M "+sx+" "+sy+" L "+tx+" "+ty);
+  });
+  svg.setAttribute("width", totalW);
+  svg.setAttribute("height", totalH);
+  svg.setAttribute("viewBox", "0 0 "+totalW+" "+totalH);
+  svg.style.maxWidth = "none";
+  return { spineX: SPINE_X, width: totalW, height: totalH };
+}
+
+async function renderDiagram(p){
+  const diag = $("#diagram");
+  diag.innerHTML = '<div class="loading">Rendering decision tree...</div>';
+  if(!mermaidReady()){
+    diag.innerHTML = '<div class="derr">Could not load Mermaid from the CDN (network blocked?). The walkthrough below still works without the diagram.</div>';
+    return;
+  }
+  try{
+    const code = buildMermaid(p);
+    const id = "mmd"+(++state.mmCounter);
+    const {svg} = await mermaid.render(id, code);
+    diag.innerHTML = svg;
+    relayoutTree();
+    // make every alternative node clickable for branch exploration
+    diag.querySelectorAll('g.node[id*="A"]').forEach(g=>{
+      g.addEventListener("click", ()=>{
+        const m = g.id.match(/S(\d+)A(\d+)/);
+        if(m) exploreBranch(+m[1], +m[2]);
+      });
+    });
+    applyStepVisuals();
+  }catch(err){
+    diag.innerHTML = '<div class="derr">Diagram failed to render: '+String(err && err.message ? err.message : err)+'</div>';
+  }
+}
+
+function applyStepVisuals(){
+  const i = state.step;
+  const diag = $("#diagram");
+  if(!diag) return;
+  // dim all option nodes not on the path; reset path classes
+  diag.querySelectorAll("g.node").forEach(g=>{ g.classList.remove("vis","cur","dim","branch"); });
+  diag.querySelectorAll("g.edgePaths path").forEach(g=>{ g.classList.remove("vis","cur"); });
+  // dim off-path options (all A nodes, plus any node never visited)
+  diag.querySelectorAll('g.node[id*="A"]').forEach(g=>{ const m=g.id.match(/S(\d+)A/); if(m && +m[1] > i) g.classList.add("dim"); });
+  for(let k=0;k<=i;k++){
+    const q = diag.querySelector('g.node[id*="S'+k+'Q"]');
+    const c = diag.querySelector('g.node[id*="S'+k+'C"]');
+    const qc = diag.querySelector('g.edgePaths path[id*="S'+k+'Q-S'+k+'C"]');
+    const isCur = (k===i);
+    [q,c].forEach(n=>{ if(n) n.classList.add(isCur?"cur":"vis"); });
+    if(qc) qc.classList.add(isCur?"cur":"vis");
+    if(k<i){
+      const cq = diag.querySelector('g.edgePaths path[id*="S'+k+'C-S'+(k+1)+'Q"]');
+      if(cq) cq.classList.add("vis");
+    }
+  }
+  const cur = diag.querySelector('g.node[id*="S'+i+'Q"]') || diag.querySelector('g.node[id*="S'+i+'C"]');
+  if(cur) centerNode(cur);
+}
+
+function centerNode(el){
+  const sc = $("#diagram");
+  const cr = sc.getBoundingClientRect();
+  const er = el.getBoundingClientRect();
+  const left = sc.scrollLeft + (er.left + er.width/2) - (cr.left + cr.width/2);
+  const top  = sc.scrollTop  + (er.top  + er.height/2) - (cr.top  + cr.height/2);
+  const reduce = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+  sc.scrollTo({left:Math.max(0,left), top:Math.max(0,top), behavior: reduce?"auto":"smooth"});
+}
+
+/* ---------- branch exploration ---------- */
+function buildBranchMermaid(chain){
+  const lines = ["flowchart TD"];
+  chain.forEach((st, i) => {
+    lines.push("B"+i+'["'+st.s+": "+st.t+'"]');
+    if(i > 0) lines.push("B"+(i-1)+" --> B"+i);
+  });
+  lines.push("classDef choice fill:#fff7ed,stroke:#d97706,color:#92400e,stroke-width:1.5px");
+  lines.push("classDef problem fill:#fdeaea,stroke:#dc2626,color:#7f1d1d,stroke-width:1.5px");
+  lines.push("class B0 choice");
+  lines.push("class " + chain.map((_,i) => "B"+i).slice(1).join(",") + " problem");
+  return lines.join("\n");
+}
+
+function exploreBranch(stepIdx, altIdx){
+  const p = state.problem;
+  const s = p.steps[stepIdx];
+  const a = s.alt[altIdx];
+  if(!a) return;
+  state.branch = { step:stepIdx, alt:altIdx };
+  renderStep();
+  applyStepVisuals();
+  const diag = $("#diagram");
+  const node = diag.querySelector('g.node[id*="S'+stepIdx+'A'+altIdx+'"]');
+  if(node) node.classList.add("branch");
+}
+
+function closeBranch(){
+  state.branch = null;
+  renderStep();
+  applyStepVisuals();
+}
+
+/* ---------- checklist ---------- */
+function renderChecklist(){
+  const p = state.problem;
+  const box = $("#checklist");
+  box.innerHTML = p.checklist.map((c,i)=>{
+    const ticked = state.ticked.has(i);
+    return '<div class="ch-item'+(ticked?" ticked":"")+'" data-i="'+i+'">'+
+      '<div class="ch-row"><input type="checkbox" id="chk'+i+'"'+(ticked?" checked":"")+' disabled>'+
+      '<label for="chk'+i+'">'+c.term+'</label>'+(c.nfr?'<span class="nfr">'+c.nfr+"</span>":"")+"</div>"+
+      '<div class="ch-def">'+c.def+'<span class="why">'+c.why+"</span></div></div>";
+  }).join("");
+  updateChCount();
+}
+function updateChCount(){
+  const p = state.problem;
+  $("#chCount").textContent = state.ticked.size + " / " + p.checklist.length + " covered";
+}
+
+/* ---------- step panel ---------- */
+function renderStep(){
+  const p = state.problem;
+  const s = p.steps[state.step];
+  const layer = LAYERS.find(l=>l.id===s.layer);
+  const last = state.step === p.steps.length-1;
+  const box = $("#stepBox");
+  let html = '<div class="step-card">';
+  html += '<span class="step-layer">'+layer.id+" · "+layer.name+"</span>";
+  html += '<h2 class="step-q">'+s.q+"</h2>";
+  html += '<div class="decision-card"><div class="dc-label">OPTIMAL CHOICE</div><div class="dc-title">'+s.chosen.label+"</div><p>"+s.chosen.why+"</p></div>";
+  if(s.alt && s.alt.length){
+    html += '<div class="alt-block"><div class="alt-head">Why the other options lose here (click one to follow its path)</div>';
+    html += s.alt.map((a,j)=>'<div class="alt-item" data-step="'+state.step+'" data-alt="'+j+'" title="Follow this branch downward"><span class="x">&#10005;</span><div><div class="alt-name">'+a.label+'</div><div class="alt-why">'+a.why+'</div></div><span class="alt-explore">explore branch &rarr;</span></div>').join("");
+    html += "</div>";
+  }
+  if(s.ticks && s.ticks.length){
+    html += '<div class="ticks-block"><div class="ticks-head">Checklist this decision covers</div>';
+    html += s.ticks.map(t=>'<span class="tick-chip">'+p.checklist[t].term+"</span>").join("");
+    html += "</div>";
+  }
+  if(s.bt){
+    html += '<div class="bt-callout"><div class="bt-head">BACKTRACK IF REQUIREMENTS CHANGE</div>'+
+      '<div class="bt-if">'+s.bt.if+"</div><div class=\"bt-then\">"+s.bt.then+"</div></div>";
+  }
+  if(last) html += reviewSummary(p);
+  html += "</div>";
+  box.innerHTML = html;
+  $("#prevBtn").disabled = (state.step===0);
+  $("#nextBtn").disabled = last;
+  $("#nextBtn").textContent = last ? "Finish" : "Next";
+  $("#stepCounter").textContent = "Step "+(state.step+1)+" of "+p.steps.length;
+  if(state.branch) renderBranchBox(); else clearBranchBox();
+}
+
+function renderBranchBox(){
+  const p = state.problem;
+  const b = state.branch;
+  const s = p.steps[b.step];
+  const a = s.alt[b.alt];
+  const layer = LAYERS.find(l=>l.id===s.layer);
+  $("#topPaneTitle").textContent = "Branch exploration";
+  $("#chCount").style.display = "none";
+  $("#checklist").classList.add("hidden");
+  const box = $("#branchBox");
+  box.classList.remove("hidden");
+  let html = '<div class="branch-card">';
+  html += '<div class="branch-head"><span class="step-layer">'+layer.id+" "+layer.name+"</span><button class=\"branch-close\" id=\"branchClose\">close</button></div>";
+  html += '<h2 class="branch-q">If you chose: <em>'+a.label+'</em></h2>';
+  html += '<div class="branch-why"><b>Why it loses here:</b> '+a.why+"</div>";
+  if(a.then && a.then.length){
+    html += '<div class="alt-block"><div class="alt-head">What breaks later, layer by layer</div>';
+    html += a.then.map(st=>'<div class="stage-item"><span class="stage-layer">'+st.s+'</span><span class="stage-text">'+st.t+"</span></div>").join("");
+    html += "</div>";
+    html += '<div class="branch-recover"><b>Backtrack:</b> return to '+layer.id+" "+layer.name+" and choose &ldquo;"+s.chosen.label+"&rdquo; to rejoin the optimal path.</div>";
+    html += '<div class="branch-tree" id="branchTree"><div class="loading">Rendering consequence path...</div></div>';
+  }
+  html += "</div>";
+  box.innerHTML = html;
+  $("#branchClose").addEventListener("click", closeBranch);
+  const treeBox = $("#branchTree");
+  if(treeBox && mermaidReady() && a.then){
+    try{
+      const code = buildBranchMermaid(a.then);
+      const id = "mmb"+(++state.mmCounter);
+      mermaid.render(id, code).then(res => { treeBox.innerHTML = res.svg; })
+        .catch(e => { treeBox.innerHTML = '<div class="loading">Branch diagram failed: '+String(e.message||e)+"</div>"; });
+    }catch(e){
+      treeBox.innerHTML = '<div class="loading">Branch diagram failed: '+String(e.message||e)+"</div>";
+    }
+  }
+}
+
+function clearBranchBox(){
+  $("#topPaneTitle").textContent = "Checklist";
+  $("#chCount").style.display = "";
+  $("#checklist").classList.remove("hidden");
+  const box = $("#branchBox");
+  if(box){ box.classList.add("hidden"); box.innerHTML = ""; }
+}
+
+function reviewSummary(p){
+  let html = '<div class="alt-block"><div class="alt-head">Full decision path</div>';
+  html += '<table class="review-table"><tr><th>Layer</th><th>Decision</th></tr>';
+  p.steps.forEach((s,i)=>{
+    const layer = LAYERS.find(l=>l.id===s.layer);
+    html += "<tr><td>"+layer.id+" "+layer.name+"</td><td><b>"+s.chosen.label+"</b></td></tr>";
+  });
+  html += "</table></div>";
+  if(p.backtrack && p.backtrack.length){
+    html += '<div class="alt-block"><div class="alt-head">Backtrack scenarios for this problem</div>';
+    html += p.backtrack.map(b=>'<div class="bt-card"><b>If '+b.if+"</b><div>"+b.then+"</div></div>").join("");
+    html += "</div>";
+  }
+  return html;
+}
+
+/* ---------- dots ---------- */
+function renderDots(){
+  const p = state.problem;
+  $("#dots").innerHTML = p.steps.map((s,i)=>{
+    const layer = LAYERS.find(l=>l.id===s.layer);
+    let cls = "dot";
+    if(i < state.step) cls += " done";
+    if(i === state.step) cls += " cur";
+    return '<button class="'+cls+'" data-step="'+i+'" title="'+layer.id+" "+layer.name+": "+s.q+'">'+(i+1)+"</button>";
+  }).join("");
+}
+
+/* ---------- navigation ---------- */
+function goStep(n){
+  const p = state.problem;
+  if(n < 0 || n >= p.steps.length) return;
+  state.step = n;
+  state.branch = null;
+  for(let k=0;k<=n;k++){ (p.steps[k].ticks||[]).forEach(t=>state.ticked.add(t)); }
+  renderStep(); renderChecklist(); renderDots(); applyStepVisuals();
+  persist();
+}
+function nextStep(){ goStep(state.step+1); }
+function prevStep(){ goStep(state.step-1); }
+
+/* ---------- open / close ---------- */
+async function openProblem(id){
+  const p = PROBLEMS.find(x=>x.id===id);
+  if(!p) return;
+  state.problem = p; state.step = 0; state.ticked = new Set();
+  (p.steps[0].ticks||[]).forEach(t=>state.ticked.add(t));
+  $("#home").classList.add("hidden");
+  $("#workspace").classList.remove("hidden");
+  $("#wsTitle").textContent = p.title;
+  $("#wsScale").textContent = p.scale;
+  renderStep(); renderChecklist(); renderDots();
+  await renderDiagram(p);
+  persist();
+  window.scrollTo({top:0, behavior:"auto"});
+}
+function backHome(){
+  state.problem = null;
+  $("#workspace").classList.add("hidden");
+  $("#home").classList.remove("hidden");
+  window.scrollTo({top:0, behavior:"auto"});
+}
+
+function persist(){
+  try{ localStorage.setItem(LS_KEY, JSON.stringify({id:state.problem?state.problem.id:null, step:state.step})); }catch(e){}
+}
+function restore(){
+  try{
+    const v = JSON.parse(localStorage.getItem(LS_KEY)||"null");
+    if(v && v.id && PROBLEMS.find(x=>x.id===v.id)){
+      openProblem(v.id).then(()=>{ if(v.step>0 && v.step<state.problem.steps.length) goStep(v.step); });
+    }
+  }catch(e){}
+}
+
+/* ---------- home render ---------- */
+function renderLayers(){
+  $("#layerStrip").innerHTML = LAYERS.map(l=>'<span class="layer-chip" title="'+l.desc+'"><b>'+l.id+"</b>"+l.name+"</span>").join("");
+}
+function renderProblemGrid(){
+  const grid = $("#problemGrid");
+  grid.innerHTML = PROBLEMS.map(p=>{
+    const nfr = [...new Set(p.checklist.map(c=>c.nfr).filter(Boolean))].slice(0,4);
+    return '<button class="pcard" data-id="'+p.id+'">'+
+      '<span class="pcode">'+p.code+"</span>"+
+      "<h3>"+p.title+"</h3>"+
+      '<p class="ptag">'+p.tagline+"</p>"+
+      '<span class="pscale">'+p.scale+"</span>"+
+      '<span class="pnfr">'+nfr.map(n=>"<span>"+n+"</span>").join("")+"</span>"+
+      '<span class="pgo">Open walkthrough &rarr;</span></button>';
+  }).join("");
+  $("#probCount").textContent = PROBLEMS.length + " problems";
+}
+
+/* ---------- events ---------- */
+function wire(){
+  $("#problemGrid").addEventListener("click", e=>{
+    const card = e.target.closest(".pcard");
+    if(card) openProblem(card.dataset.id);
+  });
+  $("#backHome").addEventListener("click", backHome);
+  $("#nextBtn").addEventListener("click", nextStep);
+  $("#prevBtn").addEventListener("click", prevStep);
+  $("#stepBox").addEventListener("click", e=>{
+    const item = e.target.closest(".alt-item");
+    if(item && state.branch === null){
+      exploreBranch(+item.dataset.step, +item.dataset.alt);
+    }
+  });
+  $("#dots").addEventListener("click", e=>{
+    const d = e.target.closest(".dot");
+    if(d) goStep(+d.dataset.step);
+  });
+  $("#modePractice").addEventListener("click", ()=>{
+    toast("Practice mode comes after teaching mode. Finish a walkthrough first, then I will add it.");
+  });
+  document.addEventListener("keydown", e=>{
+    if(!state.problem) return;
+    if(e.key==="Escape"){ if(state.branch){ closeBranch(); } else { backHome(); } }
+    else if(e.key==="ArrowRight") nextStep();
+    else if(e.key==="ArrowLeft") prevStep();
+  });
+}
+
+/* ---------- init ---------- */
+(function init(){
+  if(mermaidReady()){
+    mermaid.initialize({
+      startOnLoad:false,
+      securityLevel:"loose",
+      theme:"base",
+      themeVariables:{
+        fontFamily:"-apple-system, Segoe UI, Roboto, sans-serif",
+        fontSize:"16px",
+        primaryColor:"#ffffff",
+        primaryTextColor:"#1a2332",
+        primaryBorderColor:"#cbd5e1",
+        lineColor:"#94a3b8",
+        textColor:"#1a2332",
+        edgeLabelBackground:"#ffffff"
+      },
+      flowchart:{ curve:"linear", nodeSpacing:32, rankSpacing:64, htmlLabels:true }
+    });
+  }
+  renderLayers();
+  renderProblemGrid();
+  wire();
+  restore();
+})();
+</script>
+</body>
+</html>
