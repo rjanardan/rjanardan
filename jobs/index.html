@@ -1,0 +1,825 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Job tracker</title>
+<style>
+  :root{
+    --paper:#f7f5f1; --card:#ffffff; --line:#e6e2da; --line2:#d8d3c9;
+    --ink:#26231d; --muted:#7a746a; --faint:#b3ada1;
+    --accent:#2f66d0;
+    --c-saved:#64748b; --c-applied:#2563eb; --c-screening:#0f766e;
+    --c-interviewing:#b45309; --c-offer:#15803d; --c-rejected:#b91c1c;
+    --c-withdrawn:#57534e; --c-ghosted:#7e22ce; --c-researching:#0369a1;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;padding:0}
+  body{
+    background:var(--paper); color:var(--ink);
+    font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  .wrap{max-width:1120px;margin:0 auto;padding:26px 22px 60px}
+
+  /* header */
+  header.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
+  h1{font-size:22px;margin:0 0 2px;letter-spacing:-0.2px}
+  .sub{color:var(--muted);font-size:13.5px;margin:0}
+  .top-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+  .save-note{color:var(--faint);font-size:12px;white-space:nowrap;margin-right:4px}
+
+  .btn{
+    font:inherit;font-size:13.5px;padding:7px 14px;border-radius:9px;cursor:pointer;
+    border:1px solid var(--line2);background:#fff;color:var(--ink);
+  }
+  .btn:hover{border-color:var(--faint)}
+  .btn.primary{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .btn.primary:hover{opacity:.88}
+  .btn.ghost{border-color:transparent;background:transparent;color:var(--muted)}
+  .btn.ghost:hover{color:var(--ink);background:#ece9e3}
+  .btn.danger-2{background:#fdeaea;border-color:#f0b9b9;color:#b91c1c}
+
+  .card{background:var(--card);border:1px solid var(--line);border-radius:12px}
+
+  /* status chips */
+  #stats{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px;align-items:center}
+  .chip{
+    font:inherit;font-size:13px;cursor:pointer;display:inline-flex;align-items:center;
+    padding:6px 12px;border-radius:999px;border:1px solid var(--line2);background:#fff;color:var(--muted);
+  }
+  .chip:hover{border-color:var(--faint);color:var(--ink)}
+  .chip.active{background:var(--ink);color:#fff;border-color:var(--ink)}
+  .chip.ghost{margin-left:auto;background:transparent;border-color:transparent}
+  .chip.ghost:hover{color:#b91c1c}
+  .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:7px}
+  .dot-saved{background:var(--c-saved)} .dot-applied{background:var(--c-applied)}
+  .dot-screening{background:var(--c-screening)} .dot-interviewing{background:var(--c-interviewing)}
+  .dot-offer{background:var(--c-offer)} .dot-rejected{background:var(--c-rejected)}
+  .dot-withdrawn{background:var(--c-withdrawn)} .dot-ghosted{background:var(--c-ghosted)}
+  .dot-researching{background:var(--c-researching)}
+
+  /* filters */
+  .filters{display:flex;gap:10px;align-items:center;padding:10px 12px;margin-bottom:14px;flex-wrap:wrap}
+  #searchInput{flex:1;min-width:220px}
+  .filters select{min-width:150px}
+  input[type=text],input[type=search],input[type=url],input[type=password],select,textarea{
+    font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line2);
+    border-radius:8px;background:#fff;color:var(--ink);outline:none;
+  }
+  input:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 0 0 2px rgba(47,102,208,.14)}
+  select{appearance:auto}
+
+  /* add form */
+  .form-card{padding:18px 20px 20px;margin-bottom:14px}
+  .form-card h2{font-size:16px;margin:0 0 14px}
+  .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px 16px}
+  .fld{display:flex;flex-direction:column;gap:4px}
+  .fld.full{grid-column:1/-1}
+  .fld label{font-size:12px;color:var(--muted);font-weight:600;letter-spacing:.2px}
+  .fld input,.fld select,.fld textarea{width:100%}
+  .form-actions{display:flex;justify-content:flex-end;gap:8px;margin-top:16px}
+
+  /* table */
+  .table-card{overflow:hidden}
+  .table-wrap{overflow-x:auto}
+  table{border-collapse:collapse;width:100%;min-width:1060px}
+  thead th{
+    font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);
+    text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);
+    font-weight:600;white-space:nowrap;background:#fbfaf8;
+  }
+  td{padding:11px 12px;border-bottom:1px solid var(--line);vertical-align:top;font-size:14px}
+  tbody tr.app-row{cursor:pointer}
+  tbody tr.app-row:hover td{background:#faf9f6}
+  tbody tr.app-row.open td{background:#f6f4ef;border-bottom:0}
+  tbody tr.row-detail td{background:#fbfaf8;padding:6px 12px 16px;border-bottom:1px solid var(--line)}
+  .chev{display:inline-block;width:12px;color:var(--faint);font-size:11px;transition:transform .12s}
+  .app-row.open .chev{transform:rotate(90deg)}
+  .c-name .name{font-weight:600;font-size:14.5px}
+  .c-desc{color:var(--muted);font-size:13px;max-width:260px}
+  .c-funding{font-size:13px}
+  .muted{color:var(--faint)}
+  .small{font-size:12px}
+  .c-comments{max-width:230px}
+  .snippet{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}
+  .c-upd{white-space:nowrap;color:var(--muted);font-size:13px}
+  .c-act{white-space:nowrap;text-align:right}
+  .icon-btn{
+    font:inherit;border:0;background:transparent;cursor:pointer;color:var(--faint);
+    padding:3px 6px;border-radius:6px;font-size:14px;line-height:1;
+  }
+  .icon-btn:hover{color:#b91c1c;background:#fdeaea}
+
+  .status-select{font:inherit;font-size:13px;padding:4px 7px;border-radius:8px;border:1px solid var(--line2);cursor:pointer;max-width:150px}
+  .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;border:1px solid transparent;font-weight:600}
+  .st-saved{background:#f1f5f9;color:#475569;border-color:#d3dce6}
+  .st-applied{background:#e8f0fe;color:#1a56c4;border-color:#c5d9f8}
+  .st-screening{background:#e0f2ef;color:#0b6b62;border-color:#b7e0da}
+  .st-interviewing{background:#fdf0e0;color:#a85a0a;border-color:#f5dcb8}
+  .st-offer{background:#e4f5e8;color:#1d7a3a;border-color:#bfe4c9}
+  .st-rejected{background:#fdeaea;color:#b91c1c;border-color:#f6cccc}
+  .st-withdrawn{background:#f2f0ed;color:#57534e;border-color:#ddd9d2}
+  .st-ghosted{background:#f4eafd;color:#7e22ce;border-color:#e3ccf8}
+  .st-researching{background:#e6f2fb;color:#0b5c8f;border-color:#bfdcf2}
+  .status-select.st-saved,.status-select.st-applied,.status-select.st-screening,.status-select.st-interviewing,
+  .status-select.st-offer,.status-select.st-rejected,.status-select.st-withdrawn,.status-select.st-ghosted,.status-select.st-researching{border-width:1px}
+  .pill.neutral{background:#f1f0ec;color:var(--muted);border-color:var(--line2)}
+
+  /* list message */
+  #listMsg{padding:46px 20px;text-align:center}
+  .empty-title{font-size:16px;font-weight:600;margin:0 0 4px}
+  #listMsg .muted{margin:0 0 16px}
+  .empty-actions{display:flex;gap:8px;justify-content:center}
+
+  /* detail panel */
+  .detail-inner{display:grid;grid-template-columns:1.15fr 1fr;gap:18px 26px;padding:14px 6px 6px}
+  .detail-inner .dfields{display:grid;grid-template-columns:1fr 1fr;gap:10px 14px}
+  .fld .static-row{display:flex;align-items:center;gap:9px;min-height:32px}
+  .dhead{font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);font-weight:600;margin:2px 0 7px}
+  .clist{list-style:none;margin:0 0 10px;padding:0;display:flex;flex-direction:column;gap:7px;max-height:200px;overflow-y:auto}
+  .clist li{background:#f4f2ee;border:1px solid var(--line);border-radius:9px;padding:7px 10px;font-size:13.5px}
+  .clist .cmt{white-space:pre-line;word-wrap:break-word}
+  .clist .cmt-meta{display:flex;justify-content:space-between;align-items:center;margin-top:3px;color:var(--faint);font-size:11.5px}
+  .ccomp{display:flex;flex-direction:column;gap:6px;align-items:flex-start}
+  .ccomp textarea{width:100%;resize:vertical;min-height:52px}
+  .hlist{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:5px;max-height:120px;overflow-y:auto}
+  .hlist li{font-size:12.5px;color:var(--muted);display:flex;align-items:center;gap:7px;flex-wrap:wrap}
+  .hlist time{color:var(--faint);font-size:11.5px;margin-left:auto}
+
+  /* github sync */
+  .sync-status{font-size:13px;color:var(--muted);min-height:20px;word-break:break-word}
+  .sync-status.ok{color:#15803d}
+  .sync-status.err{color:#b91c1c}
+  .sync-status.pending{color:#b45309}
+  .sync-hint{font-size:12px;color:var(--faint);line-height:1.6;margin:12px 0 0;border-top:1px dashed var(--line);padding-top:10px}
+  .sync-hint code{font-size:11.5px;background:#f1f0ec;padding:1px 5px;border-radius:4px}
+  footer{margin-top:18px;color:var(--faint);font-size:12px;text-align:center}
+  @media (max-width:760px){
+    .form-grid,.detail-inner{grid-template-columns:1fr}
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Job tracker</h1>
+      <p class="sub" id="subline">Startup applications — status, notes, follow-ups</p>
+    </div>
+    <div class="top-actions">
+      <span class="save-note" id="saveNote"></span>
+      <button class="btn" id="exportBtn" title="Download a JSON backup of everything">Export backup</button>
+      <button class="btn" id="importBtn" title="Merge applications from a backup file">Import</button>
+      <button class="btn" id="syncBtn" title="Record every change as a git commit in a GitHub repo">GitHub sync</button>
+      <input type="file" id="fileInput" accept=".json,application/json" hidden>
+      <button class="btn primary" id="addBtn">+ Add application</button>
+    </div>
+  </header>
+
+  <section class="card form-card" id="syncPanel" hidden>
+    <h2>GitHub sync</h2>
+    <div class="form-grid">
+      <div class="fld"><label for="syncRepo">Repo (owner/name)</label><input type="text" id="syncRepo" placeholder="e.g. rjanardan/rjanardan" spellcheck="false"></div>
+      <div class="fld"><label for="syncBranch">Branch</label><input type="text" id="syncBranch" value="main" spellcheck="false"></div>
+      <div class="fld"><label for="syncPath">Data file in repo</label><input type="text" id="syncPath" value="jobs/data/jobs.json" spellcheck="false"></div>
+      <div class="fld"><label for="syncToken">Fine-grained token (Contents: read &amp; write, one repo)</label><input type="password" id="syncToken" placeholder="github_pat_&hellip;" autocomplete="off" spellcheck="false"></div>
+      <div class="fld full"><div class="sync-status" id="syncStatus"></div></div>
+    </div>
+    <div class="form-actions">
+      <button type="button" class="btn" id="syncNowBtn" title="Push the current list to the repo now">Sync now</button>
+      <button type="button" class="btn" id="syncOffBtn">Turn off sync</button>
+      <button type="button" class="btn primary" id="syncSaveBtn">Save &amp; test connection</button>
+    </div>
+    <p class="sync-hint">Every change here is committed to <code>&lt;data file&gt;</code> in the repo — status changes and notes become permanent git history, readable from any device that opens this page. Generate a token at GitHub &rarr; Settings &rarr; Developer settings &rarr; Fine-grained tokens: Contents set to <b>Read and write</b>, limited to this one repo. The token is stored only in this browser and is never included in backups. If the repo&rsquo;s Pages site is public, the tracker and its notes are public too.</p>
+  </section>
+
+  <div id="stats"></div>
+
+  <div class="card filters">
+    <input type="search" id="searchInput" placeholder="Search name, role, funding, notes…">
+    <button class="btn ghost" id="clearFilters" hidden>Clear filters</button>
+  </div>
+
+  <section class="card form-card" id="addPanel" hidden>
+    <h2>Add application</h2>
+    <form id="addForm" autocomplete="off">
+      <div class="form-grid">
+        <div class="fld"><label for="fName">Startup name *</label><input type="text" id="fName" placeholder="e.g. Bramble AI"></div>
+        <div class="fld"><label for="fRole">Job title</label><input type="text" id="fRole" placeholder="e.g. Founding ML Engineer"></div>
+        <div class="fld"><label for="fDesc">Short description</label><textarea id="fDesc" rows="2" placeholder="What the company does, one line"></textarea></div>
+        <div class="fld"><label for="fFunding">Funding status</label><input type="text" id="fFunding" list="fundingList" placeholder="e.g. Series B ($40M, 2024)"></div>
+        <div class="fld"><label for="fStatus">Application status</label><select id="fStatus"></select></div>
+        <div class="fld full"><label for="fNote">First comment (optional)</label><textarea id="fNote" rows="2" placeholder="e.g. referred by …, applied on their site"></textarea></div>
+      </div>
+      <div class="form-actions">
+        <button type="button" class="btn" id="cancelAdd">Cancel</button>
+        <button type="submit" class="btn primary">Save application</button>
+      </div>
+    </form>
+  </section>
+
+  <datalist id="fundingList"></datalist>
+
+  <section class="card table-card">
+    <div class="table-wrap">
+      <table>
+        <colgroup>
+          <col style="width:13%"><col style="width:20%"><col style="width:16%">
+          <col style="width:13%"><col style="width:11%"><col style="width:15%">
+          <col style="width:7%"><col style="width:2%">
+        </colgroup>
+        <thead>
+          <tr>
+            <th>Startup name</th><th>Short description</th><th>Funding</th><th>Job title</th>
+            <th>Application status</th><th>Comments / Notes</th><th>Updated</th><th></th>
+          </tr>
+        </thead>
+        <tbody id="tbody"></tbody>
+      </table>
+    </div>
+    <div id="listMsg" hidden></div>
+  </section>
+
+  <footer>Data is saved automatically in this browser. Use Export backup to keep a file copy and Import to move it to another machine or browser.</footer>
+</div>
+
+<script>
+(function(){
+'use strict';
+
+var STATUSES=['Researching','Saved','Applied','Screening','Interviewing','Offer','Rejected','Withdrawn','Ghosted'];
+var FUNDING=['Unknown','Bootstrapped','Pre-seed','Seed','Series A','Series B','Series C','Series D+'];
+var KEY='jobTracker.v2'; // v2: seeds your real company list on first run; funding is free text
+var SK='jobTracker.sync'; // sync config lives under its own key, never inside backups
+
+function $id(s){return document.getElementById(s);}
+function esc(s){return String(s==null?'':s).replace(/[&<>"']/g,function(c){return {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c];});}
+function newId(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'id-'+Date.now().toString(36)+'-'+Math.random().toString(36).slice(2,9);}
+function iso(){return new Date().toISOString();}
+function cls(st){return 'st-'+st.toLowerCase().replace(/\s+/g,'-');}
+function fmt(s){var d=new Date(s);if(isNaN(d))return '';return d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}
+function rel(s){
+  var d=new Date(s);if(isNaN(d))return '';
+  var sec=(Date.now()-d.getTime())/1000;
+  if(sec<45)return 'now';
+  if(sec<3600)return Math.floor(sec/60)+'m ago';
+  if(sec<86400)return Math.floor(sec/3600)+'h ago';
+  if(sec<7*86400)return Math.floor(sec/86400)+'d ago';
+  return d.toLocaleDateString(undefined,{month:'short',day:'numeric'});
+}
+
+function normalizeApp(a){
+  a=a||{};
+  var comments=Array.isArray(a.comments)?a.comments:[];
+  var history=Array.isArray(a.history)?a.history:[];
+  return {
+    id:String(a.id||newId()),
+    name:String(a.name||a.startup||'').trim()||'Untitled',
+    description:String(a.description||''),
+    funding:String(a.funding||'').trim().replace(/^Unknown$/i,''),
+    role:String(a.role||a.jobTitle||a.job_title||''),
+    status:STATUSES.indexOf(a.status)>-1?a.status:'Saved',
+    createdAt:a.createdAt||iso(),
+    updatedAt:a.updatedAt||a.createdAt||iso(),
+    comments:comments.map(function(c){return {id:String(c.id||newId()),at:c.at||c.createdAt||iso(),text:String(c.text||c.note||'')};}),
+    history:history.map(function(h){return {at:h.at||iso(),from:String(h.from||''),to:String(h.to||'')};}),
+    sample:!!a.sample
+  };
+}
+
+var DEFAULT_SEED=[
+  {name:'Emergent',description:'AI coding / "vibe-coding" platform, Bengaluru-heavy team',funding:'Series C ($130M, Jul 2026)',role:'',status:'Researching',comments:[{text:'YC + Together Fund backed. Manav Garg (Together co-founder) now Exec Chairman.'}]},
+  {name:'Sarvam AI',description:'Sovereign multilingual foundation models',funding:'Series B ($234M, Jun 2026)',role:'',status:'Researching',comments:[{text:'Bengaluru HQ. HCLTech-led, Khosla/Peak XV backing.'}]},
+  {name:'Whatfix',description:'AI-driven digital adoption platform',funding:'Series E ($125M, 2024)',role:'',status:'Researching',comments:[{text:'Bangalore HQ. SoftBank, Sequoia India, Cisco.'}]},
+  {name:'Kore.ai',description:'Enterprise conversational/agentic AI platform',funding:'$150M round (2024) + PE (2026)',role:'',status:'Researching',comments:[{text:'FTV Capital, Nvidia participation. Bangalore + Hyderabad eng.'}]},
+  {name:'Yellow.ai',description:'Agentic customer-service AI',funding:'Series C ($78M, 2021)',role:'',status:'Researching',comments:[{text:'Founded in Bangalore. Had ~30% layoff Dec 2025 — diligence flag.'}]}
+];
+
+function load(){
+  var raw=null;
+  try{raw=window.localStorage.getItem(KEY);}catch(e){return {apps:[]};}
+  if(!raw){
+    var apps=DEFAULT_SEED.map(normalizeApp);
+    try{
+      var oldRaw=window.localStorage.getItem('jobTracker.v1');
+      if(oldRaw){var op=JSON.parse(oldRaw);
+        if(op&&Array.isArray(op.apps))op.apps.forEach(function(x){if(!x.sample)apps.push(normalizeApp(x));});}
+    }catch(e){}
+    return {apps:apps,seeded:true};
+  }
+  try{
+    var p=JSON.parse(raw);
+    if(p&&Array.isArray(p.apps))return {apps:p.apps.map(normalizeApp),seeded:!!p.seeded};
+  }catch(e){
+    try{window.localStorage.setItem(KEY+'.corrupt',raw);}catch(_){}
+  }
+  return {apps:[]};
+}
+
+var data=load();if(!data.seeded)data.seeded=false;
+var boot=true; // suppresses auto-commit of the initial boot save
+var expandedId=null;
+var statusFilter='';
+var q='';
+var flashTimer=null;
+
+function byId(id){for(var i=0;i<data.apps.length;i++){if(data.apps[i].id===id)return data.apps[i];}return null;}
+
+function persistLocal(){
+  try{
+    window.localStorage.setItem(KEY,JSON.stringify({schema:1,exportedAt:iso(),seeded:!!data.seeded,apps:data.apps}));
+    return true;
+  }catch(e){return false;}
+}
+function save(){
+  if(!persistLocal()){flash('Save failed — storage blocked or full');return;}
+  flash('Saved '+new Date().toLocaleTimeString(undefined,{hour:'numeric',minute:'2-digit'}));
+  if(!boot&&syncReady())enqueueCommit(true);
+}
+function flash(msg){
+  var el=$id('saveNote');
+  el.textContent=msg;
+  el.style.color='#15803d';
+  if(flashTimer)clearTimeout(flashTimer);
+  flashTimer=setTimeout(function(){el.style.color='';},2600);
+}
+
+function visible(){
+  var list=data.apps.filter(function(a){
+    if(statusFilter&&a.status!==statusFilter)return false;
+    if(q){
+      var hay=(a.name+' '+a.role+' '+a.funding+' '+a.description+' '+a.comments.map(function(c){return c.text;}).join(' ')).toLowerCase();
+      if(hay.indexOf(q)===-1)return false;
+    }
+    return true;
+  });
+  list.sort(function(a,b){return String(b.updatedAt).localeCompare(String(a.updatedAt));});
+  return list;
+}
+
+function statusOptions(sel){
+  return STATUSES.map(function(s){return '<option value="'+esc(s)+'"'+(s===sel?' selected':'')+'>'+esc(s)+'</option>';}).join('');
+}
+function pill(st){
+  var has=STATUSES.indexOf(st)>-1;
+  return '<span class="pill '+(has?cls(st):'neutral')+'">'+esc(st||'—')+'</span>';
+}
+
+function rowHtml(a){
+  var last=a.comments.length?a.comments[a.comments.length-1]:null;
+  return '<tr class="app-row'+(a.id===expandedId?' open':'')+'" data-id="'+esc(a.id)+'">'
+    +'<td class="c-name"><span class="chev">▸</span><span class="name">'+esc(a.name)+'</span></td>'
+    +'<td class="c-desc">'+(a.description?esc(a.description):'<span class="muted">—</span>')+'</td>'
+    +'<td class="c-funding">'+(a.funding?esc(a.funding):'<span class="muted">—</span>')+'</td>'
+    +'<td class="c-role">'+(a.role?esc(a.role):'<span class="muted">—</span>')+'</td>'
+    +'<td><select class="status-select '+cls(a.status)+'" title="Update status">'+statusOptions(a.status)+'</select></td>'
+    +'<td class="c-comments">'+(last?'<div class="snippet" title="'+esc(last.text)+'">'+esc(last.text)+'</div>':'<span class="muted">—</span>')+'</td>'
+    +'<td class="c-upd" title="'+esc(fmt(a.updatedAt))+'">'+rel(a.updatedAt)+'</td>'
+    +'<td class="c-act"><button class="icon-btn" data-del="'+esc(a.id)+'" title="Delete application">✕</button></td>'
+    +'</tr>';
+}
+
+function detailHtml(a){
+  var cmts=a.comments.map(function(c){
+    return '<li data-cid="'+esc(c.id)+'">'
+      +'<div class="cmt">'+esc(c.text)+'</div>'
+      +'<div class="cmt-meta"><span>'+esc(fmt(c.at))+'</span><button class="icon-btn" data-id="'+esc(a.id)+'" data-cid="'+esc(c.id)+'" data-delc title="Delete comment">✕</button></div>'
+      +'</li>';
+  }).join('')||'<li><span class="muted small">No comments yet.</span></li>';
+
+  var hist=a.history.map(function(h){
+    var f=STATUSES.indexOf(h.from)>-1?h.from:null;
+    return '<li><span class="pill '+(f?cls(f):'neutral')+'">'+esc(h.from||'Added')+'</span>'
+      +'<span class="muted">→</span>'+pill(h.to)+'<time>'+esc(fmt(h.at))+'</time></li>';
+  }).join('')||'<li><span class="muted small">No status changes logged yet.</span></li>';
+
+  return '<tr class="row-detail" data-id="'+esc(a.id)+'"><td colspan="8"><div class="detail-inner">'
+    +'<div class="dfields">'
+    +'<div class="fld"><label>Startup name</label><input type="text" data-field="name" value="'+esc(a.name)+'"></div>'
+    +'<div class="fld"><label>Job title</label><input type="text" data-field="role" value="'+esc(a.role)+'"></div>'
+    +'<div class="fld"><label>Funding status</label><input type="text" data-field="funding" list="fundingList" placeholder="e.g. Series B ($40M, 2024)" value="'+esc(a.funding)+'"></div>'
+    +'<div class="fld"><label>Status</label><div class="static-row">'+pill(a.status)+'<span class="muted small">added '+esc(fmt(a.createdAt))+'</span></div></div>'
+    +'<div class="fld full"><label>Short description</label><textarea data-field="description" rows="2">'+esc(a.description)+'</textarea></div>'
+    +'</div>'
+    +'<div>'
+    +'<div class="dhead">Comments / notes ('+a.comments.length+')</div>'
+    +'<ul class="clist">'+cmts+'</ul>'
+    +'<div class="ccomp"><textarea class="c-input" rows="2" placeholder="Add a comment — call scheduled, follow-up sent, comp range discussed…"></textarea><button class="btn primary" data-addc="'+esc(a.id)+'">Add comment</button></div>'
+    +'</div>'
+    +'<div class="full" style="grid-column:1/-1">'
+    +'<div class="dhead">Status history</div>'
+    +'<ol class="hlist">'+hist+'</ol>'
+    +'</div>'
+    +'</div></td></tr>';
+}
+
+var tbody=$id('tbody');
+var listMsg=$id('listMsg');
+
+function renderChips(){
+  var counts={};STATUSES.forEach(function(s){counts[s]=0;});
+  data.apps.forEach(function(a){counts[a.status]=(counts[a.status]||0)+1;});
+  var html='<button class="chip'+(statusFilter===''?' active':'')+'" data-status="">All · '+data.apps.length+'</button>';
+  STATUSES.forEach(function(s){
+    if(!counts[s])return;
+    html+='<button class="chip'+(statusFilter===s?' active':'')+'" data-status="'+esc(s)+'"><span class="dot dot-'+cls(s).slice(3)+'"></span>'+esc(s)+' · '+counts[s]+'</button>';
+  });
+  $id('stats').innerHTML=html;
+}
+
+function renderTable(){
+  var list=visible();
+  var open=null;
+  if(expandedId){for(var i=0;i<list.length;i++){if(list[i].id===expandedId){open=expandedId;break;}}}
+  var html='';
+  list.forEach(function(a){
+    html+=rowHtml(a);
+    if(a.id===open)html+=detailHtml(a);
+  });
+  tbody.innerHTML=html;
+
+  if(data.apps.length===0){
+    listMsg.hidden=false;
+    listMsg.innerHTML='<p class="empty-title">No applications yet</p>'
+      +'<p class="muted">Add your first application to get started.</p>'
+      +'<div class="empty-actions">'
+      +'<button class="btn primary" id="emptyAdd">Add application</button>'
+      +'</div>';
+    var ea=$id('emptyAdd');if(ea)ea.onclick=function(){openAdd();};
+  }else if(list.length===0){
+    listMsg.hidden=false;
+    listMsg.innerHTML='<p class="muted">Nothing matches the current filters.</p>'
+      +'<div class="empty-actions"><button class="btn" id="emptyClear">Clear filters</button></div>';
+    var ec=$id('emptyClear');if(ec)ec.onclick=function(){clearFilters();};
+  }else{
+    listMsg.hidden=true;
+  }
+  $id('subline').textContent=data.apps.length+' application'+(data.apps.length===1?'':'s')+' · updated newest first';
+  $id('clearFilters').hidden=!(statusFilter||q);
+}
+
+function render(){renderChips();renderTable();}
+
+/* ---- mutations ---- */
+function changeStatus(id,val){
+  var a=byId(id);if(!a||a.status===val)return;
+  a.history.push({at:iso(),from:a.status,to:val});
+  a.status=val;a.updatedAt=iso();data.seeded=false;
+  save();render();
+}
+function setField(id,field,val){
+  var a=byId(id);if(!a)return;
+  if(field==='name'||field==='role')val=val.trim();
+  a[field]=val;data.seeded=false;
+  save();render();
+}
+function addComment(id,text){
+  var a=byId(id);if(!a)return;
+  text=(text||'').trim();
+  if(!text)return;
+  a.comments.push({id:newId(),at:iso(),text:text});
+  a.updatedAt=a.comments[a.comments.length-1].at;data.seeded=false;
+  save();render();
+  var box=document.querySelector('tr.row-detail[data-id="'+id+'"] .c-input');
+  if(box)box.focus();
+}
+function removeComment(id,cid){
+  var a=byId(id);if(!a)return;
+  a.comments=a.comments.filter(function(c){return c.id!==cid;});data.seeded=false;
+  save();render();
+}
+function removeApp(id){
+  var a=byId(id);if(!a)return;
+  if(!window.confirm('Delete "'+a.name+'" and its comments?'))return;
+  data.apps=data.apps.filter(function(x){return x.id!==id;});
+  if(expandedId===id)expandedId=null;
+  data.seeded=false;
+  save();render();
+}
+
+/* ---- static control handlers ---- */
+function openAdd(){
+  var p=$id('addPanel');p.hidden=false;
+  $id('fName').focus();
+}
+function closeAdd(){$id('addPanel').hidden=true;}
+
+$id('addBtn').onclick=openAdd;
+$id('cancelAdd').onclick=function(){closeAdd();};
+$id('addForm').onsubmit=function(e){
+  e.preventDefault();
+  var name=$id('fName').value.trim();
+  if(!name){$id('fName').focus();return;}
+  var note=$id('fNote').value.trim();
+  var app=normalizeApp({
+    name:name,
+    description:$id('fDesc').value.trim(),
+    funding:$id('fFunding').value,
+    role:$id('fRole').value.trim(),
+    status:$id('fStatus').value,
+    comments:note?[{text:note}]:[]
+  });
+  data.apps.push(app);data.seeded=false;
+  expandedId=app.id;
+  $id('addForm').reset();
+  closeAdd();
+  save();render();
+  flash('Added "'+app.name+'"');
+};
+
+$id('exportBtn').onclick=function(){
+  var blob=new Blob([JSON.stringify({schema:1,exportedAt:iso(),apps:data.apps},null,2)],{type:'application/json'});
+  var a=document.createElement('a');
+  a.href=URL.createObjectURL(blob);
+  a.download='job-tracker-backup-'+new Date().toISOString().slice(0,10)+'.json';
+  document.body.appendChild(a);a.click();
+  setTimeout(function(){URL.revokeObjectURL(a.href);a.remove();},500);
+  flash('Backup file downloaded');
+};
+$id('importBtn').onclick=function(){$id('fileInput').click();};
+$id('fileInput').onchange=function(){
+  var file=this.files[0];if(!file)return;
+  var reader=new FileReader();
+  reader.onload=function(){
+    try{
+      var p=JSON.parse(String(reader.result));
+      if(!p||!Array.isArray(p.apps))throw new Error('bad');
+      var existing={};data.apps.forEach(function(a){existing[a.id]=1;});
+      var added=0;
+      p.apps.forEach(function(x){
+        var n=normalizeApp(x);
+        if(!existing[n.id]){data.apps.push(n);existing[n.id]=1;added++;}
+      });
+      data.seeded=false;
+      save();render();
+      flash('Imported '+added+' application'+(added===1?'':'s')+' (existing rows kept)');
+    }catch(err){flash('That file does not look like a backup');}
+  };
+  reader.readAsText(file);
+  this.value='';
+};
+
+$id('searchInput').addEventListener('input',function(){q=this.value.trim().toLowerCase();renderTable();});
+$id('clearFilters').onclick=function(){clearFilters();};
+function clearFilters(){
+  statusFilter='';q='';
+  $id('searchInput').value='';
+  render();
+}
+
+$id('stats').addEventListener('click',function(e){
+  var chip=e.target.closest('.chip');
+  if(!chip)return;
+  var s=chip.dataset.status;
+  statusFilter=(s===undefined?'':s);
+  render();
+});
+
+tbody.addEventListener('click',function(e){
+  var del=e.target.closest('[data-del]');
+  if(del){e.stopPropagation();removeApp(del.getAttribute('data-del'));return;}
+  var delc=e.target.closest('[data-delc]');
+  if(delc){e.stopPropagation();removeComment(delc.getAttribute('data-id'),delc.getAttribute('data-cid'));return;}
+  var addc=e.target.closest('[data-addc]');
+  if(addc){
+    e.stopPropagation();
+    var box=addc.closest('.ccomp').querySelector('.c-input');
+    addComment(addc.getAttribute('data-addc'),box.value);
+    return;
+  }
+  var row=e.target.closest('tr.app-row');
+  if(row&&!e.target.closest('select,button,input,textarea,a')){
+    expandedId=(expandedId===row.getAttribute('data-id'))?null:row.getAttribute('data-id');
+    renderTable();
+  }
+});
+tbody.addEventListener('change',function(e){
+  var tr=e.target.closest('tr[data-id]');
+  if(!tr)return;
+  var id=tr.getAttribute('data-id');
+  if(e.target.classList.contains('status-select')){changeStatus(id,e.target.value);return;}
+  var f=e.target.getAttribute('data-field');
+  if(f)setField(id,f,e.target.value);
+});
+
+/* ---- GitHub sync: every change commits to the repo, updates recorded in git history ---- */
+var cfg=loadCfg();
+function loadCfg(){
+  var d={repo:'',branch:'main',path:'jobs/data/jobs.json',token:'',on:false};
+  try{
+    var r=window.localStorage.getItem(SK);
+    if(r){var p=JSON.parse(r);for(var k in d){if(p[k]!==undefined&&p[k]!==null)d[k]=p[k];}}
+  }catch(e){}
+  return d;
+}
+function saveCfg(){try{window.localStorage.setItem(SK,JSON.stringify(cfg));}catch(e){}}
+function syncReady(){return !!(cfg.on&&cfg.repo&&cfg.token);}
+function utf8ToB64(s){
+  if(typeof TextEncoder!=='undefined'){
+    var bytes=new TextEncoder().encode(s),bin='';
+    for(var i=0;i<bytes.length;i+=0x8000)bin+=String.fromCharCode.apply(null,bytes.subarray(i,i+0x8000));
+    return btoa(bin);
+  }
+  return btoa(unescape(encodeURIComponent(s)));
+}
+function b64ToUtf8(b){
+  var bin=atob(b);
+  if(typeof TextDecoder!=='undefined'){
+    var bytes=new Uint8Array(bin.length);
+    for(var i=0;i<bin.length;i++)bytes[i]=bin.charCodeAt(i);
+    return new TextDecoder('utf-8').decode(bytes);
+  }
+  return decodeURIComponent(escape(bin));
+}
+function ghFetch(urlPath,opts,useTokenPrefix){
+  opts=opts||{};
+  var headers={
+    Accept:'application/vnd.github+json',
+    'X-GitHub-Api-Version':'2022-11-28',
+    Authorization:(useTokenPrefix?'token ':'Bearer ')+cfg.token
+  };
+  return window.fetch('https://api.github.com'+urlPath,{method:opts.method||'GET',headers:headers,body:opts.body}).then(function(resp){
+    return resp.json().then(function(j){return {status:resp.status,json:j};})['catch'](function(){return {status:resp.status,json:{}};});
+  }).then(function(res){
+    if(res.status===401&&!useTokenPrefix)return ghFetch(urlPath,opts,true);
+    return res;
+  });
+}
+function repoPath(p){return p.split('/').map(encodeURIComponent).join('/');}
+function fetchRemoteApps(){
+  if(!cfg.repo)return Promise.resolve({ok:false,reason:'noconfig'});
+  return ghFetch('/repos/'+cfg.repo+'/contents/'+repoPath(cfg.path)+'?ref='+encodeURIComponent(cfg.branch)).then(function(r){
+    if(r.status===200){
+      if(Array.isArray(r.json))return {ok:false,reason:'dir'};
+      try{
+        var p=JSON.parse(b64ToUtf8(r.json.content));
+        if(!p||!Array.isArray(p.apps))throw new Error('bad');
+        return {ok:true,sha:r.json.sha,apps:p.apps.map(normalizeApp)};
+      }catch(e){return {ok:false,reason:'badfile'};}
+    }
+    if(r.status===404)return {ok:false,reason:'notfound'};
+    if(r.status===401||r.status===403)return {ok:false,reason:'auth'};
+    return {ok:false,reason:'offline'};
+  })['catch'](function(){return {ok:false,reason:'offline'};});
+}
+function ghPut(content,msg,sha){
+  var body={message:msg,content:content,branch:cfg.branch};
+  if(sha)body.sha=sha;
+  return ghFetch('/repos/'+cfg.repo+'/contents/'+repoPath(cfg.path),{method:'PUT',body:JSON.stringify(body)}).then(function(r){
+    if(r.status>=200&&r.status<300&&r.json&&r.json.content)return r.json;
+    var e=new Error('put failed '+r.status);e.status=r.status;throw e;
+  });
+}
+function equalApps(a,b){
+  if(a.length!==b.length)return false;
+  var B={};b.forEach(function(x){B[x.id]=x;});
+  for(var i=0;i<a.length;i++){if(!B[a[i].id])return false;if(JSON.stringify(a[i])!==JSON.stringify(B[a[i].id]))return false;}
+  return true;
+}
+function mergeApps(local,remote){
+  var map={};
+  local.forEach(function(a){map[a.id]=a;});
+  remote.forEach(function(a){
+    var l=map[a.id];
+    if(!l){map[a.id]=a;return;}
+    map[a.id]=(String(l.updatedAt)>=String(a.updatedAt))?l:a;
+  });
+  return Object.keys(map).map(function(k){return map[k];});
+}
+var syncState={klass:'muted',msg:''};
+function setSync(k,m){syncState.klass=k;syncState.msg=m;updateSyncUI();}
+function updateSyncUI(){
+  var b=$id('syncBtn');
+  var st=$id('syncStatus');
+  if(!cfg.on){
+    b.textContent='GitHub sync: off';
+    if(st){st.textContent=cfg.repo?'Sync is off — changes stay in this browser only':'Not configured — data is saved in this browser only';st.className='sync-status';}
+    return;
+  }
+  b.textContent=syncState.klass==='ok'?'GitHub sync: on ✓':(syncState.klass==='err'?'GitHub sync: error':'GitHub sync…');
+  if(st){st.textContent=syncState.msg||'Configured — syncs after every change';st.className='sync-status'+(syncState.klass!=='muted'?' '+syncState.klass:'');}
+}
+var lastSha=null;
+var commitBusy=false;
+var commitQueued=false;
+function enqueueCommit(notify){
+  if(boot||!syncReady())return;
+  if(commitBusy){commitQueued=true;return;}
+  commitBusy=true;
+  commitNow(notify,false)['catch'](function(){}).then(function(){
+    commitBusy=false;
+    if(commitQueued){commitQueued=false;enqueueCommit(notify);}
+  });
+}
+function commitNow(notify,retried){
+  setSync('pending','Pushing to GitHub…');
+  var n=data.apps.length;
+  var payload={schema:1,exportedAt:iso(),seeded:!!data.seeded,apps:data.apps};
+  return ghPut(utf8ToB64(JSON.stringify(payload)),'Update job list — '+n+' application'+(n===1?'':'s'),lastSha).then(function(r){
+    lastSha=r.content.sha;
+    setSync('ok','Synced to GitHub · commit '+r.commit.sha.slice(0,7));
+    if(notify)flash('Synced to GitHub ✓');
+  })['catch'](function(e){
+    if(e&&e.status===409&&!retried)return recoverAndRetry(notify);
+    if(e&&(e.status===401||e.status===403))setSync('err','Sync auth failed — the token needs Contents: Read and write on this repo');
+    else if(e&&e.status===404)setSync('err','Repo, branch, or path not found — check the GitHub sync settings');
+    else if(e&&e.status===422)setSync('err','GitHub rejected the commit — is the branch protected?');
+    else if(e&&e.status===409)setSync('err','Repeated conflict — changes were merged locally; press Sync now to push');
+    else setSync('err','Offline — changes are saved locally and will sync on the next change');
+  });
+}
+function recoverAndRetry(notify){
+  return fetchRemoteApps().then(function(r){
+    if(!r.ok){
+      if(r.reason==='auth')setSync('err','Sync auth failed — check the token');
+      else setSync('err','Could not re-read the repo — press Sync now to retry');
+      return;
+    }
+    lastSha=r.sha;
+    if(!equalApps(data.apps,r.apps)){
+      data.apps=mergeApps(data.apps,r.apps);
+      data.seeded=false;
+      persistLocal();
+      render();
+    }
+    return commitNow(notify,true);
+  });
+}
+function syncReconcile(){
+  if(!cfg.on||!cfg.repo||!cfg.token)return;
+  fetchRemoteApps().then(function(r){
+    if(!r.ok){
+      if(r.reason==='notfound'){if(data.seeded||data.apps.length)commitNow(false)['catch'](function(){});return;}
+      if(r.reason==='auth'){setSync('err','Sync auth failed — check the token in GitHub sync');return;}
+      if(r.reason==='dir'||r.reason==='badfile'){setSync('err','Repo path "'+cfg.path+'" is not a readable jobs file');return;}
+      setSync('err','Offline — showing local data; will sync when back online');return;
+    }
+    lastSha=r.sha;
+    if(data.seeded){
+      data.apps=r.apps;data.seeded=false;persistLocal();render();
+      setSync('ok','Synced from repo — '+r.apps.length+' application'+(r.apps.length===1?'':'s'));
+    }else{
+      var merged=mergeApps(data.apps,r.apps);
+      if(!equalApps(merged,r.apps)){
+        data.apps=merged;data.seeded=false;persistLocal();render();
+        commitNow(false)['catch'](function(){});
+      }else{
+        setSync('ok','Up to date with repo · '+r.apps.length+' application'+(r.apps.length===1?'':'s'));
+      }
+    }
+  });
+}
+function populateSyncFields(){
+  $id('syncRepo').value=cfg.repo;
+  $id('syncBranch').value=cfg.branch;
+  $id('syncPath').value=cfg.path;
+  $id('syncToken').value=cfg.token;
+}
+function wireSync(){
+  populateSyncFields();
+  var panel=$id('syncPanel');
+  $id('syncBtn').onclick=function(){panel.hidden=!panel.hidden;};
+  $id('syncSaveBtn').onclick=function(){
+    var repo=$id('syncRepo').value.trim();
+    if(!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)){flash('Repo must be owner/name — e.g. rjanardan/job-tracker');return;}
+    cfg.repo=repo;
+    cfg.branch=$id('syncBranch').value.trim()||'main';
+    cfg.path=$id('syncPath').value.trim()||'jobs/data/jobs.json';
+    cfg.token=$id('syncToken').value.trim();
+    if(!cfg.token){flash('Paste a fine-grained token first');return;}
+    cfg.on=true;
+    saveCfg();
+    populateSyncFields();
+    setSync('pending','Testing connection…');
+    ghFetch('/repos/'+cfg.repo).then(function(r){
+      if(r.status===200){commitNow(false)['catch'](function(){});}
+      else if(r.status===401||r.status===403){cfg.on=false;saveCfg();populateSyncFields();setSync('err','Auth failed — the token cannot read this repo');}
+      else if(r.status===404){cfg.on=false;saveCfg();populateSyncFields();setSync('err','Repo not found — check owner/name');}
+      else setSync('err','Could not reach GitHub — check your connection');
+    })['catch'](function(){setSync('err','Could not reach GitHub — check your connection');});
+  };
+  $id('syncNowBtn').onclick=function(){
+    if(!syncReady()){flash('Fill in repo and token, then Save & test');return;}
+    commitNow(false)['catch'](function(){});
+  };
+  $id('syncOffBtn').onclick=function(){
+    cfg.on=false;saveCfg();populateSyncFields();
+    setSync('muted','Sync is off — changes stay in this browser only');
+  };
+}
+
+/* ---- init ---- */
+$id('fStatus').innerHTML=statusOptions('Researching');
+$id('fundingList').innerHTML=FUNDING.map(function(f){return '<option value="'+esc(f)+'"></option>';}).join('');
+wireSync();
+updateSyncUI();
+render();
+save();          // boot save: persisted locally, not committed
+boot=false;
+syncReconcile(); // pull the repo's list, or publish the seed, when sync is on
+})();
+</script>
+</body>
+</html>
