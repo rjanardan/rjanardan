@@ -722,7 +722,7 @@ function commitNow(notify,retried){
     setSync('ok','Synced to GitHub · commit '+r.commit.sha.slice(0,7));
     if(notify)flash('Synced to GitHub ✓');
   })['catch'](function(e){
-    if(e&&e.status===409&&!retried)return recoverAndRetry(notify);
+    if(e&&(e.status===409||(e.status===422&&!retried)))return recoverAndRetry(notify);
     if(e&&(e.status===401||e.status===403))setSync('err','Sync auth failed — the token needs Contents: Read and write on this repo');
     else if(e&&e.status===404)setSync('err','Repo, branch, or path not found — check the GitHub sync settings');
     else if(e&&e.status===422)setSync('err','GitHub rejected the commit — is the branch protected?');
