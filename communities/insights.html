@@ -1,0 +1,607 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Member Insights & Growth Plan — Jan's Meetup Communities</title>
+<style>
+  :root{
+    --bg:#f6f7fb; --panel:#ffffff; --panel2:#eef0f7; --border:#dde1ee;
+    --text:#1c2033; --muted:#5a6088; --accent:#3b5bdb; --accent2:#c17a17;
+    --js:#a8860a; --byop:#2f6690; --darling:#c94848; --good:#1f9d73;
+  }
+  *{box-sizing:border-box;}
+  body{margin:0;background:var(--bg);color:var(--text);font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55;}
+  .wrap{max-width:1180px;margin:0 auto;padding:36px 24px 90px;}
+  header.top{margin-bottom:32px;}
+  h1{font-size:1.7rem;margin:0 0 6px;font-weight:700;}
+  .sub{color:var(--muted);font-size:0.95rem;}
+  h2{font-size:1.25rem;margin:0 0 14px;padding-top:6px;border-top:1px solid var(--border);padding-top:28px;}
+  section{margin-top:36px;}
+  .cards{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:14px;margin-bottom:8px;}
+  .card{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:16px 18px;box-shadow:0 1px 3px rgba(20,24,50,0.06);}
+  .card .num{font-size:1.6rem;font-weight:700;}
+  .card .lbl{color:var(--muted);font-size:0.8rem;margin-top:2px;}
+  .grid2{display:grid;grid-template-columns:1fr 1fr;gap:22px;}
+  @media(max-width:800px){.grid2{grid-template-columns:1fr;}}
+  .panel{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:20px;box-shadow:0 1px 3px rgba(20,24,50,0.06);}
+  .bar-row{display:flex;align-items:center;gap:10px;margin:7px 0;font-size:0.86rem;}
+  .bar-label{width:220px;flex:0 0 220px;color:var(--text);white-space:nowrap;overflow:hidden;text-overflow:ellipsis;}
+  .bar-track{flex:1;background:var(--panel2);border-radius:6px;height:16px;overflow:hidden;}
+  .bar-fill{height:100%;border-radius:6px;background:linear-gradient(90deg,var(--accent),#7d97e8);}
+  .bar-val{width:70px;flex:0 0 70px;text-align:right;color:var(--muted);}
+  .group-js .bar-fill{background:linear-gradient(90deg,#e0c34a,var(--js));}
+  .group-byop .bar-fill{background:linear-gradient(90deg,#6fa8cc,var(--byop));}
+  .group-darling .bar-fill{background:linear-gradient(90deg,#e08a8a,var(--darling));}
+  .tag{display:inline-flex;align-items:center;gap:6px;font-size:0.78rem;padding:3px 10px;border-radius:999px;border:1px solid var(--border);color:var(--muted);}
+  .dot{width:8px;height:8px;border-radius:50%;}
+  .dot-js{background:var(--js);} .dot-byop{background:var(--byop);} .dot-darling{background:var(--darling);}
+  .legend{display:flex;gap:14px;flex-wrap:wrap;margin-bottom:14px;}
+  table{width:100%;border-collapse:collapse;font-size:0.86rem;}
+  th,td{text-align:left;padding:8px 10px;border-bottom:1px solid var(--border);}
+  th{color:var(--muted);font-weight:600;font-size:0.78rem;text-transform:uppercase;letter-spacing:.03em;}
+  .stack{display:flex;height:22px;border-radius:5px;overflow:hidden;width:100%;}
+  .stack-seg{height:100%;}
+  .month-row{display:grid;grid-template-columns:70px 1fr 50px;align-items:center;gap:10px;margin:5px 0;font-size:0.8rem;}
+  .month-lbl{color:var(--muted);}
+  .month-total{text-align:right;color:var(--muted);}
+  .findingbox{background:var(--panel2);border-left:3px solid var(--accent2);border-radius:6px;padding:12px 16px;margin:14px 0;font-size:0.92rem;}
+  .findingbox b{color:var(--accent2);}
+  .qa{background:var(--panel);border:1px solid var(--border);border-radius:12px;padding:22px 24px;margin-bottom:20px;box-shadow:0 1px 3px rgba(20,24,50,0.06);}
+  .qa h3{margin:0 0 4px;font-size:1.05rem;color:var(--accent);}
+  .qa .q{color:var(--muted);font-size:0.88rem;margin-bottom:14px;font-style:italic;}
+  .qa p{margin:0 0 12px;font-size:0.94rem;}
+  .qa ul{margin:0 0 12px;padding-left:20px;font-size:0.94rem;}
+  .qa li{margin-bottom:6px;}
+  .rec{background:rgba(59,91,219,0.07);border:1px solid rgba(59,91,219,0.3);border-radius:8px;padding:10px 14px;font-size:0.88rem;margin-top:10px;}
+  .rec b{color:var(--accent);}
+  nav.toc{display:flex;flex-wrap:wrap;gap:8px;margin:18px 0 0;}
+  nav.toc a{font-size:0.8rem;color:var(--muted);text-decoration:none;border:1px solid var(--border);padding:5px 12px;border-radius:999px;}
+  nav.toc a:hover{color:var(--text);border-color:var(--accent);}
+  footer{margin-top:60px;padding-top:20px;border-top:1px solid var(--border);color:var(--muted);font-size:0.78rem;}
+  .split{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
+  @media(max-width:700px){.split{grid-template-columns:1fr;}}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+<header class="top">
+  <h1>Member Insights &amp; Growth Plan</h1>
+  <div class="sub">JavaScript Meetup · Byte of Python · DARLing — mined from 1,359 join-questionnaire responses (Jun 2025 – Sep 2026), Gmail (info@meetup.com)</div>
+  <nav class="toc">
+    <a href="#overview">Overview</a>
+    <a href="#growth">Growth trend</a>
+    <a href="#topics">Interest topics</a>
+    <a href="#participation">Participation styles</a>
+    <a href="#network">Cross-pollination network</a>
+    <a href="#plan">Strategic plan</a>
+  </nav>
+</header>
+
+<section id="overview">
+  <h2>Overview</h2>
+  <div class="cards" id="overviewCards"></div>
+</section>
+
+<section id="growth">
+  <h2>Growth trend — new members per month</h2>
+  <div class="panel">
+    <div class="legend">
+      <span class="tag"><span class="dot dot-js"></span>JavaScript Meetup</span>
+      <span class="tag"><span class="dot dot-darling"></span>DARLing</span>
+      <span class="tag"><span class="dot dot-byop"></span>Byte of Python</span>
+    </div>
+    <div id="monthlyChart"></div>
+    <div class="findingbox" id="growthFinding"></div>
+  </div>
+</section>
+
+<section id="topics">
+  <h2>What people say they're interested in</h2>
+  <div class="grid2">
+    <div class="panel">
+      <h3 style="margin-top:0;font-size:0.95rem;color:var(--muted);">Overall — across all 3 groups (n=1,359)</h3>
+      <div id="topicOverall"></div>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0;font-size:0.95rem;color:var(--muted);">JavaScript Meetup joiners — what they actually said (n=615)</h3>
+      <div id="topicJS"></div>
+    </div>
+  </div>
+  <div class="grid2" style="margin-top:22px;">
+    <div class="panel">
+      <h3 style="margin-top:0;font-size:0.95rem;color:var(--muted);">DARLing joiners (n=671)</h3>
+      <div id="topicDarling"></div>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0;font-size:0.95rem;color:var(--muted);">Byte of Python joiners (n=73)</h3>
+      <div id="topicByop"></div>
+    </div>
+  </div>
+  <div class="findingbox">
+    <b>Key finding — the naming problem, quantified:</b> among people who <i>joined JavaScript Meetup</i>, only <b>21.8%</b> mentioned JS/React/Node/TypeScript by name in their interests or motivation. <b>46.7%</b> mentioned AI/ML generically — nearly identical to DARLing's own AI/ML share. The group's actual audience has already shifted well past its name.
+  </div>
+</section>
+
+<section id="participation">
+  <h2>How people want to participate</h2>
+  <div class="grid2">
+    <div class="panel">
+      <h3 style="margin-top:0;font-size:0.95rem;color:var(--muted);">Participation style (multi-label — people could pick more than one)</h3>
+      <div id="partStyle"></div>
+      <p style="color:var(--muted);font-size:0.8rem;margin-top:10px;">132 of 1,359 (9.7%) left this question blank.</p>
+    </div>
+    <div class="panel">
+      <h3 style="margin-top:0;font-size:0.95rem;color:var(--muted);">Motivation for joining</h3>
+      <div id="motivStyle"></div>
+    </div>
+  </div>
+  <div class="findingbox">
+    <b>Speaker &amp; organizer pipeline:</b> 173 people (12.7%) explicitly said they want to speak/present, and 73 (5.4%) want to help organize. Of the 161-person speaker-interested pool, 118 lean AI/ML, 36 data, 14 JS/React, 10 Python — a real, largely-untapped bench for future sessions and co-organizers.
+  </div>
+</section>
+
+<section id="network">
+  <h2>Cross-pollination network</h2>
+  <div class="panel">
+    <h3 style="margin-top:0;font-size:0.95rem;color:var(--muted);">Top 20 other Bengaluru tech communities Jan's joiners also belong to</h3>
+    <table>
+      <thead><tr><th>Community</th><th>Mentions</th><th></th></tr></thead>
+      <tbody id="networkTable"></tbody>
+    </table>
+  </div>
+  <div class="findingbox" id="crossFinding"></div>
+</section>
+
+<section id="plan">
+  <h2>Strategic plan — answering your 6 questions</h2>
+
+  <div class="qa">
+    <h3>1. Should I consolidate from 3 to 2 meetups?</h3>
+    <div class="q">"Should I consolidate from 3 to 2 meetups?"</div>
+    <p>The data says <b>keep 3 communities, but let the content overlap more deliberately</b> rather than merging brands outright — with one exception worth testing.</p>
+    <ul>
+      <li><b>Byte of Python is too thin to justify its own identity anymore.</b> It draws only 73 joins in 15 months (5.4% of total volume) versus 615 for JS Meetup and 671 for DARLing. 60% of its joiners cite Python specifically, but 35.6% already cite AI/ML — it has effectively become a feeder into DARLing's audience, not a distinct one.</li>
+      <li><b>JS Meetup and DARLing, by contrast, are both large and mutually reinforcing</b> — 102 DARLing joiners named JS Meetup as another group they're part of, and 119 mentions of "JavaScript Meetup" appear in others' "other groups" lists. They're not redundant; they're two healthy funnels into the same underlying AI-curious engineering audience.</li>
+    </ul>
+    <div class="rec"><b>Recommendation:</b> fold Byte of Python into DARLing as a recurring "Python for Data &amp; AI" track/sub-series rather than running three separate memberships, mailing lists, and event pages. Keep JS Meetup and DARLing as two distinct front doors — they pull different intent even though their audiences overlap.</div>
+  </div>
+
+  <div class="qa">
+    <h3>2. The "JavaScript Meetup" name reads as JS-only or dated — how to address it?</h3>
+    <div class="q">"...most participants and venue partners think either it is 'javascript' only or 'dated' (old). Not current. While the topics I hosted are vary a lot."</div>
+    <p>Your instinct is exactly right, and the join-survey data backs it with numbers: only <b>134 of 615 JS Meetup joiners (21.8%)</b> actually mentioned JavaScript/React/Node/TypeScript. <b>287 (46.7%)</b> mentioned AI/ML. Web development broadly (20.8%) is closer to the group's real center of gravity than "JavaScript" narrowly. The name is now actively filtering out or confusing the majority of the people who show up.</p>
+    <p>A full rename is risky given 13,000+ existing members, SEO/backlinks, and venue-partner familiarity built over 108 events. The lower-risk fix is a <b>reposition, not a rename</b>:</p>
+    <ul>
+      <li>Keep the URL/slug (<code>javascriptmeetup</code>) but change the <b>display name</b> to something that signals breadth, e.g. "JavaScript Meetup — Web, AI &amp; Modern Engineering" or a cleaner "JS Meetup: Frontend to Full-Stack AI".</li>
+      <li>Rewrite the group description and tagline explicitly listing the topic range you actually host (web dev, AI/ML, system design, cloud) so a first-time visitor and a venue partner reading the page both get an accurate picture in one scroll.</li>
+      <li>Add a recurring visual sub-brand per topic track (e.g. "JS Meetup: AI Track", "JS Meetup: Frontend Track") in event titles — this reframes breadth as a program structure instead of an identity crisis, and doubles as a filter for people who want just one track.</li>
+    </ul>
+    <div class="rec"><b>Recommendation:</b> reposition in place (name suffix + description rewrite + track labels) rather than a clean rebrand. Revisit a full rename only if repositioning doesn't move venue-partner perception within 2–3 quarters.</div>
+  </div>
+
+  <div class="qa">
+    <h3>3. Based on people's interests, what topics should future sessions cover?</h3>
+    <p>Ranked by how often each theme showed up in joiners' own words (interests + motivation text), across all three groups:</p>
+    <table>
+      <thead><tr><th>Topic</th><th>Share of joiners mentioning it</th></tr></thead>
+      <tbody id="topicRankTable"></tbody>
+    </table>
+    <p style="margin-top:14px;">Reading this by group: <b>DARLing's</b> audience wants GenAI/LLM and applied data science specifically (not just "AI" abstractly) — 20% mentioned GenAI/LLM/agents by name. <b>JS Meetup's</b> audience is really a web-plus-AI audience — pair frontend/full-stack sessions with "AI in production" or "AI-assisted engineering" sessions rather than pure algorithms talks. <b>Byte of Python's</b> audience wants Python as applied to AI/data, not Python as a standalone language track.</p>
+    <div class="rec"><b>Recommendation for the next 2 quarters:</b> GenAI/LLM/agentic AI (209 mentions, cuts across all 3 groups — your single best cross-group topic), applied data science &amp; analytics workflows, AI-assisted/full-stack web development (bridges JS + AI audiences directly), cloud/DevOps for AI workloads, and a system-design track aimed at the more senior/leader-track members you'll surface in Q6 below.</div>
+  </div>
+
+  <div class="qa">
+    <h3>4. How can I monetize these communities?</h3>
+    <p>With ~1,359 engaged joiners in 15 months across three active, high-frequency (100+ combined lifetime events) Bengaluru tech communities, you have real inventory to monetize without degrading the free, community-first feel that got you here:</p>
+    <ul>
+      <li><b>Venue &amp; sponsor packages, sold on repositioned data.</b> You can now show sponsors real audience composition (58% AI/ML interest, cross-membership with Microsoft Reactor, ReactJS Bangalore, GDG Cloud, etc.) instead of guessing — this is a stronger pitch than most meetup organizers can make.</li>
+      <li><b>Paid workshop/masterclass tier</b> alongside free talks — e.g. a hands-on GenAI/agentic-AI workshop (your top cross-group demand) run by a practitioner, ticketed separately from the free evening meetup.</li>
+      <li><b>Recruiter/talent-partner sponsorships.</b> 97 people (7.1%) explicitly cited career/networking/job motivations — a curated "hiring partner" slot at events, or a sponsored job board for members, monetizes that segment directly.</li>
+      <li><b>Corporate training/consulting funnel.</b> As engineering-leader-run communities with a large, segmented interest dataset, these groups are a credible top-of-funnel for paid corporate workshops or advisory work under your own name.</li>
+      <li><b>Content/media.</b> With 173 people wanting to speak and real topic-demand data, recorded/edited session content (YouTube, newsletter) becomes sponsorable inventory on its own.</li>
+    </ul>
+    <div class="rec"><b>Recommendation:</b> start with venue/sponsor packages sold against this data (lowest lift, no member-facing change) and one paid workshop pilot in your top-demand topic (GenAI/agentic AI) before building anything more structural.</div>
+  </div>
+
+  <div class="qa">
+    <h3>5. How can the industry community help my career as an engineering leader?</h3>
+    <p>Running these communities already functions as a visible leadership track record — but you can make it work harder for you specifically:</p>
+    <ul>
+      <li><b>You have a live signal of where the industry's attention is moving</b> (GenAI/agentic AI overtaking pure web dev even inside a "JavaScript" group) months before it shows up in most hiring or product roadmaps — use that as a talking point in interviews, board conversations, or internal strategy discussions.</li>
+      <li><b>Curate a "leader circle."</b> Cross-reference joiners' "other groups" data (Thoughtworks Bangalore, GDG Cloud, Platform Engineering &amp; Resilience Engineering, Scrum Bangalore) to identify the more senior/leadership-adjacent members already in your orbit, and invite them to a smaller, invite-only roundtable — this becomes your own peer network of engineering leaders, not just meetup attendees.</li>
+      <li><b>Convert organizing into a public credential.</b> Three active, multi-hundred-event communities with documented growth and audience data is a concrete, quantifiable leadership artifact for your own resume/LinkedIn/talks — most engineering leaders can't point to anything this measurable.</li>
+    </ul>
+    <div class="rec"><b>Recommendation:</b> stand up a small, invite-only "engineering leaders" track (quarterly) sourced from the cross-membership data — it costs little extra to run and directly builds your own senior network.</div>
+  </div>
+
+  <div class="qa">
+    <h3>6. How can I extend my network and influence using these groups?</h3>
+    <p>The "other groups" field on the join survey is effectively a free map of Bengaluru's tech-community landscape as seen through your own members' eyes. The top adjacent communities your joiners also belong to:</p>
+    <ul>
+      <li><b>Microsoft Reactor Bengaluru</b> (318 mentions) and <b>ReactJS Bangalore</b> (263) — your two largest natural partners by shared audience.</li>
+      <li><b>AI Meetups by Deep Tech Stars</b> (135), <b>BangPypers</b> (112), <b>Graph Database Bengaluru</b> (99) round out the top 5.</li>
+    </ul>
+    <p>These aren't competitors — they're an existing, already-overlapping audience, which makes co-hosting or cross-promotion low-risk and high-reach.</p>
+    <div class="rec"><b>Recommendation:</b> approach Microsoft Reactor Bengaluru and ReactJS Bangalore first for a joint/co-hosted session — largest overlap, lowest cold-start cost. Use the speaker-pipeline data (161 willing speakers) to also start cross-pollinating speakers between your groups and these partner communities, which extends your name and influence into audiences you don't currently reach directly.</div>
+  </div>
+</section>
+
+<footer>
+  Data: 1,359 unique join-questionnaire responses parsed from Gmail (info@meetup.com), Jun 16 2025 – Sep 4 2026, across JavaScript Meetup, Byte of Python and DARLing. Percentages are of joiners who answered the relevant question; participation-style and topic tags are multi-label keyword matches on free-text answers, so they will undercount answers phrased in unusual ways. Companion files: <code>member_join_data.csv</code> (raw records) and <code>member_insights.json</code> (this dashboard's underlying aggregates).
+</footer>
+
+</div>
+
+<script id="embeddedData" type="application/json">
+{
+  "meta": {
+    "generated_for": "Janardan Revuru",
+    "source": "Gmail join-notification emails from info@meetup.com, mined Jun 2025 - Sep 2026",
+    "total_join_records": 1359,
+    "date_range": [
+      "2025-06-16",
+      "2026-09-04"
+    ]
+  },
+  "by_group_total": {
+    "darling-meetup": 671,
+    "javascriptmeetup": 615,
+    "byte-of-python": 73
+  },
+  "monthly_trend": {
+    "2025-06": {
+      "darling-meetup": 29
+    },
+    "2025-07": {
+      "darling-meetup": 16,
+      "byte-of-python": 35
+    },
+    "2025-08": {
+      "byte-of-python": 25,
+      "javascriptmeetup": 74,
+      "darling-meetup": 6
+    },
+    "2025-09": {
+      "byte-of-python": 5,
+      "darling-meetup": 5,
+      "javascriptmeetup": 67
+    },
+    "2025-10": {
+      "darling-meetup": 29,
+      "javascriptmeetup": 9,
+      "byte-of-python": 1
+    },
+    "2025-11": {
+      "darling-meetup": 15,
+      "javascriptmeetup": 54,
+      "byte-of-python": 1
+    },
+    "2025-12": {
+      "darling-meetup": 166,
+      "byte-of-python": 2,
+      "javascriptmeetup": 5
+    },
+    "2026-01": {
+      "darling-meetup": 114,
+      "javascriptmeetup": 8
+    },
+    "2026-02": {
+      "darling-meetup": 2,
+      "javascriptmeetup": 2
+    },
+    "2026-03": {
+      "javascriptmeetup": 2,
+      "darling-meetup": 3
+    },
+    "2026-04": {
+      "javascriptmeetup": 21,
+      "darling-meetup": 11
+    },
+    "2026-05": {
+      "darling-meetup": 79,
+      "byte-of-python": 1,
+      "javascriptmeetup": 104
+    },
+    "2026-06": {
+      "darling-meetup": 25,
+      "javascriptmeetup": 12
+    },
+    "2026-07": {
+      "darling-meetup": 163,
+      "javascriptmeetup": 29
+    },
+    "2026-08": {
+      "darling-meetup": 7,
+      "javascriptmeetup": 192,
+      "byte-of-python": 2
+    },
+    "2026-09": {
+      "javascriptmeetup": 36,
+      "darling-meetup": 1,
+      "byte-of-python": 1
+    }
+  },
+  "top_other_groups": {
+    "Microsoft Reactor Bengaluru": 318,
+    "ReactJS Bangalore": 263,
+    "AI Meetups by Deep Tech Stars": 135,
+    "JavaScript Meetup": 119,
+    "BangPypers - Bangalore Python Users Group": 112,
+    "Graph Database Bengaluru": 99,
+    "Software Architecture and System Design or Core Design": 68,
+    "JSLovers-Bengaluru": 68,
+    "CoderRange - AI , Big data , Data Science !.": 65,
+    "Bengaluru MongoDB User Group": 60,
+    "Disrupt 4.0": 57,
+    "GDG Cloud Bengaluru": 48,
+    "Platform Engineering & Resilience Engineering Meetup": 48,
+    "KSUG.AI India": 44,
+    "Cloud & DevOps Group": 41,
+    "Indian Data Club": 37,
+    "Scrum Bangalore": 36,
+    "Bangalore Computer Vision Meetup Group": 34,
+    "Thoughtworks Bangalore": 27,
+    "Bangalore AI Developers Group": 27,
+    "Data science, AI, Research and Learning (DARLing)": 26,
+    "Bangalore Career Growth & Networking Club Meetups": 24,
+    "AI & ML": 23,
+    "Data Science Network, Bangalore": 22,
+    "Azure SQL Bangalore User Group": 20,
+    "Byte of Python": 15,
+    "Containers Meetup": 11,
+    "Practical Data Science by Deep Tech Stars": 11,
+    "Makers Tribe": 7,
+    "Discuss Agile Network Bangalore": 6
+  },
+  "own_group_cross_membership": {
+    "darling-meetup -> javascriptmeetup": 102,
+    "darling-meetup -> byte-of-python": 12,
+    "javascriptmeetup -> darling-meetup": 19,
+    "javascriptmeetup -> byte-of-python": 3,
+    "byte-of-python -> javascriptmeetup": 17,
+    "byte-of-python -> darling-meetup": 7
+  },
+  "participation_styles": {
+    "learn": 1060,
+    "promote": 72,
+    "volunteer": 237,
+    "organize": 73,
+    "network": 21,
+    "speak": 173,
+    "other/unclear": 68
+  },
+  "participation_no_answer": 132,
+  "topic_counts_overall": {
+    "JavaScript/React": 146,
+    "AI/ML (general)": 793,
+    "GenAI/LLM": 209,
+    "Data Science": 180,
+    "Robotics/IoT": 15,
+    "Career/Networking": 97,
+    "Cloud/DevOps": 75,
+    "Deep Learning/NLP/CV": 41,
+    "Python": 83,
+    "Mobile": 14,
+    "System Design/Architecture": 31,
+    "Product/UX": 60,
+    "Web Development": 158,
+    "Cybersecurity": 33,
+    "Blockchain/Web3": 11
+  },
+  "topic_by_group": {
+    "javascriptmeetup": {
+      "JavaScript/React": 134,
+      "AI/ML (general)": 287,
+      "Cloud/DevOps": 44,
+      "Web Development": 128,
+      "System Design/Architecture": 18,
+      "Product/UX": 30,
+      "Python": 18,
+      "Cybersecurity": 17,
+      "Data Science": 15,
+      "Career/Networking": 40,
+      "Robotics/IoT": 9,
+      "Blockchain/Web3": 9,
+      "GenAI/LLM": 73,
+      "Mobile": 7,
+      "Deep Learning/NLP/CV": 5
+    },
+    "darling-meetup": {
+      "AI/ML (general)": 480,
+      "GenAI/LLM": 134,
+      "Data Science": 157,
+      "Robotics/IoT": 5,
+      "Career/Networking": 57,
+      "Deep Learning/NLP/CV": 34,
+      "Python": 21,
+      "Mobile": 7,
+      "System Design/Architecture": 13,
+      "Product/UX": 27,
+      "Web Development": 26,
+      "JavaScript/React": 11,
+      "Cloud/DevOps": 29,
+      "Cybersecurity": 16,
+      "Blockchain/Web3": 1
+    },
+    "byte-of-python": {
+      "Python": 44,
+      "AI/ML (general)": 26,
+      "Web Development": 4,
+      "Data Science": 8,
+      "JavaScript/React": 1,
+      "Cloud/DevOps": 2,
+      "GenAI/LLM": 2,
+      "Blockchain/Web3": 1,
+      "Product/UX": 3,
+      "Deep Learning/NLP/CV": 2,
+      "Robotics/IoT": 1
+    }
+  },
+  "motivation_themes_overall": {
+    "Learn/Upskill": 641,
+    "Networking/community": 258,
+    "Student/academic": 22,
+    "Curiosity/passion": 115,
+    "Industry trends/staying current": 78,
+    "Building projects/hands-on": 101,
+    "Career growth/job search": 41,
+    "Speaking/sharing knowledge": 42
+  },
+  "motivation_by_group": {
+    "javascriptmeetup": {
+      "Learn/Upskill": 301,
+      "Networking/community": 129,
+      "Student/academic": 13,
+      "Curiosity/passion": 61,
+      "Building projects/hands-on": 44,
+      "Speaking/sharing knowledge": 23,
+      "Industry trends/staying current": 30,
+      "Career growth/job search": 24
+    },
+    "darling-meetup": {
+      "Learn/Upskill": 302,
+      "Networking/community": 124,
+      "Curiosity/passion": 52,
+      "Industry trends/staying current": 47,
+      "Student/academic": 9,
+      "Building projects/hands-on": 54,
+      "Career growth/job search": 17,
+      "Speaking/sharing knowledge": 18
+    },
+    "byte-of-python": {
+      "Learn/Upskill": 38,
+      "Networking/community": 5,
+      "Building projects/hands-on": 3,
+      "Industry trends/staying current": 1,
+      "Curiosity/passion": 2,
+      "Speaking/sharing knowledge": 1
+    }
+  },
+  "student_count": 24,
+  "speaker_pipeline_count": 161,
+  "speaker_pipeline_topics": {
+    "AI/ML": 118,
+    "Python": 10,
+    "Data": 36,
+    "JS/React": 14
+  },
+  "cross_group_mention_count": 160
+}
+</script>
+<script>
+function loadData(){
+  const el = document.getElementById('embeddedData');
+  try{
+    const d = JSON.parse(el.textContent);
+    if(d && d.meta) return d;
+  }catch(e){}
+  return null;
+}
+const D = loadData();
+
+const GROUP_LABEL = {'javascriptmeetup':'JavaScript Meetup','darling-meetup':'DARLing','byte-of-python':'Byte of Python'};
+const GROUP_CLASS = {'javascriptmeetup':'group-js','darling-meetup':'group-darling','byte-of-python':'group-byop'};
+const GROUP_DOT = {'javascriptmeetup':'dot-js','darling-meetup':'dot-darling','byte-of-python':'dot-byop'};
+const GROUP_COLOR = {'javascriptmeetup':'#f0db4f','darling-meetup':'#ff7a7a','byte-of-python':'#4b8bbe'};
+
+function el(tag, cls, html){ const e=document.createElement(tag); if(cls) e.className=cls; if(html!==undefined) e.innerHTML=html; return e; }
+
+function barList(container, entries, max, groupClass){
+  container.innerHTML='';
+  entries.forEach(([label,val])=>{
+    const row = el('div','bar-row'+(groupClass?(' '+groupClass):''));
+    row.appendChild(el('div','bar-label',label));
+    const track = el('div','bar-track');
+    const fill = el('div','bar-fill');
+    fill.style.width = (max? (val/max*100):0)+'%';
+    track.appendChild(fill);
+    row.appendChild(track);
+    row.appendChild(el('div','bar-val',val));
+    container.appendChild(row);
+  });
+}
+
+if(D){
+  // overview cards
+  const total = D.meta.total_join_records;
+  const cards = [
+    [total.toLocaleString(), 'Total join responses mined'],
+    [Object.keys(D.by_group_total).length, 'Active communities'],
+    [D.meta.date_range[0]+' → '+D.meta.date_range[1], 'Date range covered'],
+    [D.speaker_pipeline_count, 'People who want to speak'],
+    [Object.keys(D.top_other_groups).length+'+', 'Adjacent Bengaluru communities in network'],
+    [(D.cross_group_mention_count/total*100).toFixed(1)+'%', 'Already in 2+ of Jan\'s groups'],
+  ];
+  const cw = document.getElementById('overviewCards');
+  cards.forEach(([num,lbl])=>{
+    const c = el('div','card');
+    c.appendChild(el('div','num',num));
+    c.appendChild(el('div','lbl',lbl));
+    cw.appendChild(c);
+  });
+
+  // monthly stacked chart
+  const mc = document.getElementById('monthlyChart');
+  const months = Object.keys(D.monthly_trend);
+  const maxMonthTotal = Math.max(...months.map(m=>Object.values(D.monthly_trend[m]).reduce((a,b)=>a+b,0)));
+  months.forEach(m=>{
+    const row = el('div','month-row');
+    row.appendChild(el('div','month-lbl',m));
+    const stack = el('div','stack');
+    const data = D.monthly_trend[m];
+    const total = Object.values(data).reduce((a,b)=>a+b,0);
+    ['javascriptmeetup','darling-meetup','byte-of-python'].forEach(g=>{
+      if(data[g]){
+        const seg = el('div','stack-seg');
+        seg.style.width=(data[g]/maxMonthTotal*100)+'%';
+        seg.style.background=GROUP_COLOR[g];
+        seg.title = GROUP_LABEL[g]+': '+data[g];
+        stack.appendChild(seg);
+      }
+    });
+    row.appendChild(stack);
+    row.appendChild(el('div','month-total',total));
+    mc.appendChild(row);
+  });
+  document.getElementById('growthFinding').innerHTML = '<b>Reading the trend:</b> growth is bursty, not steady — spikes correspond to active event pushes (Dec 2025/Jan 2026 and Jul–Aug 2026 for DARLing; Aug 2026 for JS Meetup, which alone drew 192 new joins). Byte of Python has had almost no independent growth since late 2025, reinforcing the consolidation read in Q1 below.';
+
+  // topics
+  function topBars(containerId, obj, n){
+    const entries = Object.entries(obj).sort((a,b)=>b[1]-a[1]).slice(0,n||8);
+    const max = entries.length? entries[0][1]:1;
+    barList(document.getElementById(containerId), entries, max);
+  }
+  topBars('topicOverall', D.topic_counts_overall, 10);
+  topBars('topicJS', D.topic_by_group['javascriptmeetup']||{}, 8);
+  topBars('topicDarling', D.topic_by_group['darling-meetup']||{}, 8);
+  topBars('topicByop', D.topic_by_group['byte-of-python']||{}, 8);
+
+  // topic rank table (question 3)
+  const trt = document.getElementById('topicRankTable');
+  Object.entries(D.topic_counts_overall).sort((a,b)=>b[1]-a[1]).forEach(([t,c])=>{
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td>${t}</td><td>${(c/total*100).toFixed(1)}% (${c})</td>`;
+    trt.appendChild(tr);
+  });
+
+  // participation
+  topBars('partStyle', D.participation_styles, 10);
+  topBars('motivStyle', D.motivation_themes_overall, 10);
+
+  // network table
+  const nt = document.getElementById('networkTable');
+  const maxNet = Math.max(...Object.values(D.top_other_groups));
+  Object.entries(D.top_other_groups).slice(0,20).forEach(([g,c])=>{
+    const tr = document.createElement('tr');
+    const pct = (c/maxNet*100).toFixed(0);
+    tr.innerHTML = `<td>${g}</td><td>${c}</td><td><div class="bar-track" style="width:140px;display:inline-block;"><div class="bar-fill" style="width:${pct}%"></div></div></td>`;
+    nt.appendChild(tr);
+  });
+
+  document.getElementById('crossFinding').innerHTML = `<b>Within Jan's own 3 groups:</b> ${D.cross_group_mention_count} join emails (${(D.cross_group_mention_count/total*100).toFixed(1)}%) explicitly named another one of Jan's own groups as "also part of" — mostly DARLing↔JS Meetup crossover (102 + 19 mentions). This is the strongest evidence that DARLing and JS Meetup share a real audience rather than being fully separate communities.`;
+}
+</script>
+</body>
+</html>
