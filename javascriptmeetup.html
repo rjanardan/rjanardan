@@ -106,8 +106,6 @@
   .cell .ph{ display:block; aspect-ratio:4/3; background:var(--grid-line); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
   .cell img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s ease; }
   .cell a.ph:hover img{ transform:scale(1.02); }
-  .cell.lead{ grid-column:span 2; grid-row:span 2; }
-  .cell.lead .ph{ aspect-ratio:auto; height:100%; }
   figcaption{ padding-top:8px; }
   figcaption .gt{ display:block; font-size:13.5px; font-weight:600; color:var(--text); line-height:1.35; }
   figcaption a .gt:hover{ color:var(--accent); }
@@ -122,16 +120,16 @@
   .footer-links{ display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); }
   .footer-note{ margin-top:var(--space-5); font-size:11.5px; color:var(--text-muted); max-width:600px; line-height:1.7; }
 
-  @media (max-width:760px){
+  @media (max-width:920px){
     .gallery{ grid-template-columns:repeat(2,1fr); }
-    .cell.lead{ grid-column:span 2; grid-row:span 1; }
-    .cell.lead .ph{ aspect-ratio:4/3; height:auto; }
     .era{ grid-template-columns:1fr; gap:var(--space-2); }
     header{ padding-top:var(--space-8); }
+    section{ padding:var(--space-7) 0; }
   }
-  @media (max-width:420px){
+  @media (max-width:560px){
     .gallery{ grid-template-columns:1fr; }
-    .cell.lead{ grid-column:span 1; }
+    .wrap, .wrap-wide{ padding:0 var(--space-4); }
+    section{ padding:var(--space-6) 0; }
   }
 </style>
 </head>
