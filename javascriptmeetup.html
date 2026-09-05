@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>JavaScript Meetup — Janardan Revuru</title>
-<meta name="description" content="JavaScript Meetup — Bangalore's long-running JS community. Talks, workshops, and networking for frontend and full-stack engineers, since 2015.">
+<meta name="description" content="JavaScript Meetup — Bengaluru's JavaScript community since 2016: 108 meetups, 18,700+ attendances, and a ten-year arc from Angular to agentic AI.">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
@@ -12,7 +12,7 @@
   :root{
     --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
     --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px;
-    --maxw: 880px;
+    --maxw: 900px; --maxw-wide: 1120px;
   }
   [data-theme="blueprint"]{
     --bg:#0a2540; --bg-elevated:#0e2f52; --grid-line: rgba(140,195,255,0.08);
@@ -37,13 +37,17 @@
   }
   *{ box-sizing:border-box; }
   html{ scroll-behavior:smooth; overflow-x:hidden; }
-  body{ margin:0; overflow-x:hidden; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.6; font-size:16px; }
+  body{ margin:0; overflow-x:hidden; background:var(--bg); color:var(--text); font-family:var(--font-body); line-height:1.62; font-size:16px; }
   a{ color:var(--accent); text-decoration:none; }
   a:hover{ text-decoration:underline; }
   a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
   .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 var(--space-5); }
+  .wrap-wide{ max-width:var(--maxw-wide); margin:0 auto; padding:0 var(--space-5); }
   h1,h2,h3{ font-family:var(--font-display); font-weight:600; margin:0; }
   .eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:var(--tracking-eyebrow); text-transform:uppercase; color:var(--accent); margin:0 0 var(--space-2); }
+  .crumb{ font-family:var(--font-mono); font-size:12px; letter-spacing:.02em; margin-bottom:var(--space-5); }
+  .crumb a{ color:var(--text-muted); }
+  .crumb a:hover{ color:var(--accent); }
 
   .site-menu{ position:fixed; right:max(var(--space-4), env(safe-area-inset-right)); bottom:max(var(--space-4), env(safe-area-inset-bottom)); z-index:60; }
   .site-menu-toggle{ width:52px; height:52px; border-radius:50%; border:1px solid var(--border-strong); background:var(--accent); color:var(--bg); cursor:pointer; display:flex; align-items:center; justify-content:center; box-shadow:0 6px 20px rgba(0,0,0,0.25); transition:transform .2s ease; }
@@ -52,7 +56,7 @@
   .site-menu-toggle .icon-close{ display:none; }
   .site-menu[data-open="true"] .icon-open{ display:none; }
   .site-menu[data-open="true"] .icon-close{ display:block; }
-  .site-menu-panel{ position:absolute; right:0; bottom:64px; width:240px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 12px 32px rgba(0,0,0,0.28); padding:var(--space-4); opacity:0; transform:translateY(8px); pointer-events:none; transition:all .18s ease; max-height:70vh; overflow-y:auto; }
+  .site-menu-panel{ position:absolute; right:0; bottom:64px; width:250px; background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius); box-shadow:0 12px 32px rgba(0,0,0,0.28); padding:var(--space-4); opacity:0; transform:translateY(8px); pointer-events:none; transition:all .18s ease; max-height:70vh; overflow-y:auto; }
   .site-menu[data-open="true"] .site-menu-panel{ opacity:1; transform:translateY(0); pointer-events:auto; }
   .site-menu-group + .site-menu-group{ margin-top:var(--space-4); padding-top:var(--space-4); border-top:1px solid var(--border); }
   .site-menu-heading{ font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase; color:var(--text-muted); margin-bottom:var(--space-2); }
@@ -65,8 +69,8 @@
   .theme-options button[aria-pressed="true"]{ background:var(--accent); color:var(--bg); font-weight:600; border-color:var(--accent); }
 
   header{ padding:var(--space-9) 0 var(--space-7); border-bottom:1px solid var(--border); }
-  .name{ font-size:clamp(28px,4.5vw,42px); line-height:1.1; margin-bottom:var(--space-2); }
-  .tagline{ font-size:clamp(15px,2vw,17px); color:var(--text-muted); max-width:600px; margin-bottom:var(--space-5); }
+  .name{ font-size:clamp(30px,5vw,46px); line-height:1.08; margin-bottom:var(--space-3); }
+  .tagline{ font-size:clamp(15px,2vw,17px); color:var(--text-muted); max-width:620px; margin:0 0 var(--space-5); }
   .cta-row{ display:flex; flex-wrap:wrap; gap:var(--space-3); }
   .btn{ display:inline-block; font-family:var(--font-mono); font-size:13px; text-transform:uppercase; letter-spacing:.04em; padding:12px 20px; border-radius:24px; border:1px solid var(--border-strong); color:var(--text); }
   .btn:hover{ text-decoration:none; background:var(--grid-line); }
@@ -75,53 +79,60 @@
 
   section{ padding:var(--space-8) 0; border-bottom:1px solid var(--border); }
   section:last-of-type{ border-bottom:none; }
-  h2.section-title{ font-size:clamp(20px,2.8vw,26px); margin-bottom:var(--space-2); }
-  .section-sub{ color:var(--text-muted); font-size:14px; max-width:600px; margin-bottom:var(--space-5); }
+  h2.section-title{ font-size:clamp(22px,3vw,28px); margin-bottom:var(--space-2); }
+  .section-sub{ color:var(--text-muted); font-size:14.5px; max-width:640px; margin:0 0 var(--space-5); }
 
-  .gallery{ display:grid; grid-template-columns:repeat(4,1fr); grid-template-rows:repeat(2,140px); gap:6px; }
-  .gallery .ph{ background:var(--grid-line); border:1px solid var(--border); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; overflow:hidden; font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; text-align:center; padding:var(--space-2); }
-  .gallery .ph img{ width:100%; height:100%; object-fit:cover; }
-  .gallery .ph.large{ grid-column:span 2; grid-row:span 2; }
-  @media (max-width:700px){ .gallery{ grid-template-columns:repeat(2,1fr); grid-template-rows:repeat(3,120px); } .gallery .ph.large{ grid-column:span 2; grid-row:span 1; } }
-  @media (max-width:420px){ .gallery{ grid-template-columns:1fr; grid-template-rows:180px repeat(4,110px); } .gallery .ph.large{ grid-column:span 1; grid-row:span 1; height:180px; } }
+  .stats-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:var(--space-3); }
+  .stat{ border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-4); background:var(--bg-elevated); }
+  .stat .num{ font-family:var(--font-display); font-weight:600; font-size:clamp(20px,2.6vw,26px); line-height:1.15; }
+  .stat .lab{ font-size:12.5px; color:var(--text-muted); margin-top:2px; }
 
-  .safe-space{ border:1px dashed var(--border-strong); border-radius:var(--radius); padding:var(--space-5); font-size:14.5px; color:var(--text); }
+  .era{ display:grid; grid-template-columns:120px 1fr; gap:var(--space-5); padding:var(--space-5) 0; border-top:1px solid var(--border); }
+  .era:first-of-type{ border-top:none; }
+  .era-side .era-count{ font-family:var(--font-mono); font-size:12px; letter-spacing:.04em; text-transform:uppercase; color:var(--accent); }
+  .era-body h3{ font-size:17px; margin-bottom:6px; }
+  .era-body p{ margin:0; color:var(--text); font-size:15px; }
+  .route-box{ margin-top:var(--space-5); border:1px dashed var(--border-strong); border-radius:var(--radius); padding:var(--space-4) var(--space-5); display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); align-items:center; font-family:var(--font-mono); font-size:13px; }
+  .route-box .lbl{ color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; font-size:10.5px; }
+  .hosts{ display:flex; flex-wrap:wrap; gap:var(--space-2); margin-top:var(--space-2); }
+  .chip{ border:1px solid var(--border); border-radius:999px; padding:5px 14px; font-size:13px; background:var(--bg-elevated); color:var(--text); }
+  .source-note{ font-size:12.5px; color:var(--text-muted); margin-top:var(--space-4); }
 
-  .logo-strip{ display:flex; flex-wrap:wrap; gap:var(--space-3); }
-  .logo-chip{ width:120px; height:52px; border:1px solid var(--border); border-radius:var(--radius); display:flex; align-items:center; justify-content:center; background:var(--bg-elevated); font-family:var(--font-mono); font-size:10px; color:var(--text-muted); text-align:center; padding:4px; overflow:hidden; }
-  .logo-chip img{ max-width:100%; max-height:100%; object-fit:contain; }
+  .gallery-year + .gallery-year{ margin-top:var(--space-7); }
+  .gallery-year h3{ font-size:19px; margin-bottom:var(--space-2); }
+  .gallery-year h3 .gal-sub{ font-family:var(--font-mono); font-size:11.5px; font-weight:400; color:var(--text-muted); text-transform:uppercase; letter-spacing:.05em; margin-left:var(--space-3); }
+  .gallery{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-3); }
+  .cell{ margin:0; }
+  .cell .ph{ display:block; aspect-ratio:4/3; background:var(--grid-line); border:1px solid var(--border); border-radius:var(--radius); overflow:hidden; }
+  .cell img{ width:100%; height:100%; object-fit:cover; display:block; transition:transform .25s ease; }
+  .cell a.ph:hover img{ transform:scale(1.02); }
+  .cell.lead{ grid-column:span 2; grid-row:span 2; }
+  .cell.lead .ph{ aspect-ratio:auto; height:100%; }
+  figcaption{ padding-top:8px; }
+  figcaption .gt{ display:block; font-size:13.5px; font-weight:600; color:var(--text); line-height:1.35; }
+  figcaption a .gt:hover{ color:var(--accent); }
+  figcaption .gd{ display:block; font-family:var(--font-mono); font-size:11px; color:var(--text-muted); margin-top:3px; text-transform:uppercase; letter-spacing:.03em; }
+  .gallery-note{ font-family:var(--font-mono); font-size:12px; color:var(--text-muted); margin-top:var(--space-5); }
 
-  .people-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(200px,1fr)); gap:var(--space-4); }
-  .people-card{ border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-4); background:var(--bg-elevated); text-align:center; }
-  .people-photo{ width:64px; height:64px; border-radius:50%; margin:0 auto var(--space-3); overflow:hidden; background:var(--grid-line); border:1px solid var(--border); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:9px; color:var(--text-muted); }
-  .people-photo img{ width:100%; height:100%; object-fit:cover; }
-  .people-name{ font-family:var(--font-display); font-weight:600; font-size:14.5px; margin-bottom:2px; }
-  .people-role{ font-family:var(--font-mono); font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:.03em; margin-bottom:6px; }
-  .people-topic{ font-size:13px; color:var(--text-muted); margin-bottom:8px; }
-  .people-link{ font-family:var(--font-mono); font-size:11.5px; }
+  .cta-banner{ border:1px dashed var(--border-strong); border-radius:var(--radius); padding:var(--space-6); display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-4); }
+  .cta-banner .cta-title{ font-family:var(--font-display); font-weight:600; font-size:19px; margin-bottom:4px; }
+  .cta-banner p{ color:var(--text-muted); font-size:14px; margin:0; max-width:460px; }
 
-  .events-list{ list-style:none; margin:0; padding:0; }
-  .events-list li{ display:flex; flex-wrap:wrap; justify-content:space-between; gap:var(--space-3); padding:var(--space-4) 0; border-top:1px solid var(--border); }
-  .events-list li:first-child{ border-top:none; }
-  .events-list .ev-date{ font-family:var(--font-mono); font-size:12px; color:var(--text-muted); min-width:110px; }
-  .events-list .ev-title{ font-weight:500; }
-
-  footer{ padding:var(--space-8) 0 var(--space-9); font-family:var(--font-mono); font-size:13px; }
+  footer{ padding:var(--space-7) 0 var(--space-9); font-family:var(--font-mono); font-size:13px; }
   .footer-links{ display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); }
+  .footer-note{ margin-top:var(--space-5); font-size:11.5px; color:var(--text-muted); max-width:600px; line-height:1.7; }
 
-  .cta-banner{
-    border:1px dashed var(--border-strong); border-radius:var(--radius); padding:var(--space-6);
-    display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:var(--space-4);
+  @media (max-width:760px){
+    .gallery{ grid-template-columns:repeat(2,1fr); }
+    .cell.lead{ grid-column:span 2; grid-row:span 1; }
+    .cell.lead .ph{ aspect-ratio:4/3; height:auto; }
+    .era{ grid-template-columns:1fr; gap:var(--space-2); }
+    header{ padding-top:var(--space-8); }
   }
-  .cta-banner + .cta-banner{ margin-top:var(--space-4); }
-  .cta-banner .cta-text .cta-title{ font-family:var(--font-display); font-weight:600; font-size:18px; margin-bottom:4px; }
-  .cta-banner .cta-text p{ color:var(--text-muted); font-size:13.5px; margin:0; max-width:440px; }
-
-  @media (max-width: 600px) {
-    .cta-banner{ flex-direction:column; align-items:flex-start; }
+  @media (max-width:420px){
+    .gallery{ grid-template-columns:1fr; }
+    .cell.lead{ grid-column:span 1; }
   }
-
-  @media (max-width:640px){ .site-menu-panel{ width:220px; } }
 </style>
 </head>
 <body>
@@ -131,10 +142,10 @@
     <div class="site-menu-group">
       <div class="site-menu-heading">Jump to section</div>
       <ul class="site-menu-links">
+        <li><a href="#summary">Ten years, five eras</a></li>
         <li><a href="#gallery">Gallery</a></li>
-        <li><a href="#speakers">Speakers</a></li>
-        <li><a href="#organizers">Organizers</a></li>
-        <li><a href="#events">Events</a></li>
+        <li><a href="#join">Join the group</a></li>
+        <li><a href="communities/meetups.html">Meetups dashboard</a></li>
         <li><a href="index.html">← Back to Homepage</a></li>
       </ul>
     </div>
@@ -154,148 +165,195 @@
 </div>
 
 <div class="wrap">
-
   <header>
-    <p class="eyebrow">JavaScript Meetup · Since 2015 · Co-founder</p>
+    <p class="eyebrow">Bengaluru · JavaScript community · Since Feb 2016</p>
     <h1 class="name">JavaScript Meetup</h1>
-    <p class="tagline">Bangalore's long-running JavaScript community — talks, workshops, and networking for frontend and full-stack engineers. 11+ years of monthly and quarterly meetups hosted across some of India's leading tech offices.</p>
+    <p class="tagline">A decade of JavaScript evenings in Bengaluru — framework deep dives, engineering practice, and now the AI-era of web development. Open to everyone, from first-timers to staff engineers.</p>
     <div class="cta-row">
-      <!-- Verify this matches your actual Meetup group URL -->
-      <a class="btn primary" href="https://www.meetup.com/javascriptmeetup/" target="_blank" rel="noopener">Visit on Meetup →</a>
-      <!-- TODO: replace with your actual YouTube channel URL -->
-      <a class="btn" href="https://www.youtube.com/@JavaScriptMeetup" target="_blank" rel="noopener">YouTube channel</a>
+      <a class="btn primary" href="https://www.meetup.com/javascriptmeetup/" target="_blank" rel="noopener">Join on Meetup →</a>
+      <a class="btn" href="https://www.meetup.com/javascriptmeetup/photos/" target="_blank" rel="noopener">Photos on Meetup</a>
     </div>
   </header>
 
-  <section id="gallery">
+  <section id="summary">
+    <h2 class="section-title">Ten years, five eras</h2>
+    <p class="section-sub">What the group has covered since the first session in February 2016 — a condensed history, not an exhaustive list.</p>
+    <div class="stats-row">
+      <div class="stat"><div class="num">108</div><div class="lab">meetups since Feb 2016</div></div> <div class="stat"><div class="num">18,704</div><div class="lab">documented attendances</div></div> <div class="stat"><div class="num">13,276</div><div class="lab">members</div></div> <div class="stat"><div class="num">4.7 ★</div><div class="lab">rating · 1,077 reviews</div></div> <div class="stat"><div class="num">345</div><div class="lab">photos across 47 albums</div></div>
+    </div>
+    <div style="margin-top:var(--space-6);"></div>
+    <div class="era">
+  <div class="era-side"><span class="era-count">21 meetups</span></div>
+  <div class="era-body"><h3>Foundations — 2016–17</h3><p>The first meetup, in February 2016, asked where JavaScript had come from and where it was going. Early years were framework years: AngularJS and Angular workshops, Node.js, Ember.js, functional programming, WebAssembly and browser extensions — hands-on evenings hosted at engineering offices across Bengaluru.</p></div>
+</div>
+<div class="era">
+  <div class="era-side"><span class="era-count">24 meetups</span></div>
+  <div class="era-body"><h3>Craft and scale — 2018–19</h3><p>The group moved into engineering-practice territory: web performance (including the Hotstar web player), security talks and workshops, AngularJS-to-Angular upgrades, React Native, testing frameworks, a Node.js game backend, and a first AI/ML session in early 2019.</p></div>
+</div>
+<div class="era">
+  <div class="era-side"><span class="era-count">30 meetups</span></div>
+  <div class="era-body"><h3>The online pivot — 2020–21</h3><p>When in-person gatherings stopped, the meetup went online — 27 of its events in this stretch were remote, and reach grew: a Web Performance Bootcamp drew 753 attendees, the largest crowd the group has seen. Workshops covered performance, security (an XSS game), mock interviews and CI/CD.</p></div>
+</div>
+<div class="era">
+  <div class="era-side"><span class="era-count">11 meetups</span></div>
+  <div class="era-body"><h3>Workshop years — 2022–23</h3><p>A quieter, more focused period: full-stack testing and GitOps workshops, web accessibility, security games, web components, microfrontends and mock API practice.</p></div>
+</div>
+<div class="era">
+  <div class="era-side"><span class="era-count">22 meetups</span></div>
+  <div class="era-body"><h3>The AI turn — 2024–26</h3><p>Generative AI moved to the centre. A 2024 session on GenAI for developers drew 302; Build with AI at Google’s Bengaluru office brought 577. Since then: LLM fine-tuning, Copilot and AI-augmented TDD, agentic AI, a six-part From Arrays to Tensors series on LLMs from first principles, plus Svelte, microfrontends and Roku’s streaming engineering.</p></div>
+</div>
+    <div class="route-box">
+      <span class="lbl">Community dashboards</span>
+      <a href="communities/meetups.html">← All communities &amp; meetups</a>
+      <a href="communities/meetups.html">Full event list, venues &amp; data →</a>
+      <span class="lbl" style="margin-left:auto;">back / forward</span>
+    </div>
+    <p class="source-note">Figures above are from the meetups dashboard snapshot (108 events, Feb 2016 – May 2026) and the group page as of Sep 2026. 4.7★ across 1,077 reviews · 13,276 members · Bengaluru, India.</p>
+  </section>
+
+  <section id="gallery" class="wrap-wide" style="display:block;">
     <h2 class="section-title">Gallery</h2>
-    <p class="section-sub">A look at past sessions — so you know what to expect before you show up.</p>
-    <div class="gallery">
-      <!-- Place image files at: images/javascriptmeetup/cover.jpg, gallery-1.jpg … gallery-4.jpg -->
-      <div class="ph large"><img src="images/javascriptmeetup/cover.jpg" alt="JavaScript Meetup event" onerror="this.style.display='none'; this.parentElement.textContent='Cover photo';"></div>
-      <div class="ph"><img src="images/javascriptmeetup/gallery-1.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
-      <div class="ph"><img src="images/javascriptmeetup/gallery-2.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
-      <div class="ph"><img src="images/javascriptmeetup/gallery-3.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
-      <div class="ph"><img src="images/javascriptmeetup/gallery-4.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Event photo';"></div>
-    </div>
+    <p class="section-sub">A selection of photos from past events, newest first. The full archive runs to 346 photos across 47 albums (2017–2025); captions link to the Meetup page for each event.</p>
+    <div class="gallery-year">
+  <h3>2025 <span class="gal-sub">4 albums · 49 photos</span></h3>
+  <div class="gallery">
+    <figure class="cell lead"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/305080451/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_35078154_01.jpg" alt="JS Meetup #95: Mastering web applications - large scale data, shared workers — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #95: Mastering web applications - large scale data, shared workers</span><span class="gd">Jan 2025 · 306 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/305080451/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_35078154_14.jpg" alt="JS Meetup #95: Mastering web applications - large scale data, shared workers — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #95: Mastering web applications - large scale data, shared workers</span><span class="gd">Jan 2025 · 306 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/306148629/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_35194437_01.jpg" alt="Build with AI - Models and Agents — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Build with AI - Models and Agents</span><span class="gd">Feb 2025 · 577 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/310154085/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_35521153_01.jpg" alt="JS Meetup #102: LLMs, GitHub Copilot and AI-Augmented TDD — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #102: LLMs, GitHub Copilot and AI-Augmented TDD</span><span class="gd">Aug 2025 · 253 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/311821730/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_35729852_01.jpg" alt="How does Roku make streaming experience best - by Roku engineering — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">How does Roku make streaming experience best - by Roku engineering</span><span class="gd">Dec 2025 · 206 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/311821730/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_35729852_14.jpg" alt="How does Roku make streaming experience best - by Roku engineering — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">How does Roku make streaming experience best - by Roku engineering</span><span class="gd">Dec 2025 · 206 attended</span></figcaption></figure>
+  </div>
+</div>
+<div class="gallery-year">
+  <h3>2024 <span class="gal-sub">5 albums · 52 photos</span></h3>
+  <div class="gallery">
+    <figure class="cell lead"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/298353310/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_34259964_01.jpg" alt="JS Meetup #86: Focus on frontend for web — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #86: Focus on frontend for web</span><span class="gd">Jan 2024 · 198 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/299566661/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_34446450_01.jpg" alt="JS Meetup #88: Generative AI for Developers — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #88: Generative AI for Developers</span><span class="gd">Mar 2024 · 302 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/300123921/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_34521377_01.jpg" alt="Monolith to Microfrontends and Temporal APIs — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Monolith to Microfrontends and Temporal APIs</span><span class="gd">Apr 2024 · 193 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/300123921/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_34521377_13.jpg" alt="Monolith to Microfrontends and Temporal APIs — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Monolith to Microfrontends and Temporal APIs</span><span class="gd">Apr 2024 · 193 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/301363137/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_34670064_01.jpg" alt="A.I., Blockchain and more — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">A.I., Blockchain and more</span><span class="gd">Jun 2024 · 180 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/301363137/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_34670064_17.jpg" alt="A.I., Blockchain and more — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">A.I., Blockchain and more</span><span class="gd">Jun 2024 · 180 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/302045665/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_34748659_01.jpg" alt="Web Development Meetup in Pune (in-person) — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Web Development Meetup in Pune (in-person)</span><span class="gd">Jul 2024 · 39 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/302045665/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_34748659_18.jpg" alt="Web Development Meetup in Pune (in-person) — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Web Development Meetup in Pune (in-person)</span><span class="gd">Jul 2024 · 39 attended</span></figcaption></figure>
+  </div>
+</div>
+<div class="gallery-year">
+  <h3>2023 <span class="gal-sub">2 albums · 24 photos</span></h3>
+  <div class="gallery">
+    <figure class="cell lead"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/294118294/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_33677610_01.jpg" alt="Web Security - The XSS Game | CSRF | SQL Injection — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Web Security - The XSS Game | CSRF | SQL Injection</span><span class="gd">Jun 2023 · 126 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/295467827/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_33915005_01.jpg" alt="JS Meetup #85: Web components, Mock APIs, Backend Integration, the Good Parts — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #85: Web components, Mock APIs, Backend Integration, the Good Parts</span><span class="gd">Sep 2023 · 255 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/295467827/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_33915005_19.jpg" alt="JS Meetup #85: Web components, Mock APIs, Backend Integration, the Good Parts — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #85: Web components, Mock APIs, Backend Integration, the Good Parts</span><span class="gd">Sep 2023 · 255 attended</span></figcaption></figure>
+  </div>
+</div>
+<div class="gallery-year">
+  <h3>2022 <span class="gal-sub">4 albums · 5 photos</span></h3>
+  <div class="gallery">
+    <figure class="cell lead"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/286539125/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_32503641_01.jpg" alt="Building a Full Stack Testing CI/CD Pipeline — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Building a Full Stack Testing CI/CD Pipeline</span><span class="gd">Jun 2022 · 76 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/287927464/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_32738265_01.jpg" alt="Full Stack Testing and GitOps Workshop — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Full Stack Testing and GitOps Workshop</span><span class="gd">Sep 2022 · 111 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/288895235/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_32767799_01.jpg" alt="Web Security - The XSS Game — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Web Security - The XSS Game</span><span class="gd">Sep 2022 · 23 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/289367801/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_32922585_01.jpg" alt="Web Accessibility For Developers — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Web Accessibility For Developers</span><span class="gd">Oct 2022 · 52 attended</span></figcaption></figure>
+  </div>
+</div>
+<div class="gallery-year">
+  <h3>2021 <span class="gal-sub">10 albums · 19 photos</span></h3>
+  <div class="gallery">
+    <figure class="cell lead"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/276621594/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31315340_01.jpg" alt="JavaScript Meetup - Web Performance Bootcamp — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup - Web Performance Bootcamp</span><span class="gd">Mar 2021 · 753 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/277236406/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31354435_01.jpg" alt="Web Performance Bootcamp - Part 2 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Web Performance Bootcamp - Part 2</span><span class="gd">Apr 2021 · 459 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/278748796/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31469442_01.jpg" alt="Mock Interview Drive — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Mock Interview Drive</span><span class="gd">Jun 2021 · 185 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/279380557/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31548866_01.jpg" alt="Concept Visualise - JavaScript Internals — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Concept Visualise - JavaScript Internals</span><span class="gd">Jul 2021 · 308 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/281003875/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31763099_01.jpg" alt="JavaScript Meetup - 2nd October 2021 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup - 2nd October 2021</span><span class="gd">Oct 2021 · 157 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/281002618/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31781015_01.jpg" alt="JavaScript Meetup - 9th October 2021 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup - 9th October 2021</span><span class="gd">Oct 2021 · 209 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/281477620/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31811210_01.jpg" alt="Web Performance - Lighthouse — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">Web Performance - Lighthouse</span><span class="gd">Oct 2021 · 178 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/281863654/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31867682_01.jpg" alt="November Talks - 2021 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">November Talks - 2021</span><span class="gd">Nov 2021 · 84 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/282059195/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31894621_01.jpg" alt="November Talks - 2021 - Week 2 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">November Talks - 2021 - Week 2</span><span class="gd">Nov 2021 · 29 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/282188333/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31913939_01.jpg" alt="November Talks - 2021, Week-3 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">November Talks - 2021, Week-3</span><span class="gd">Nov 2021 · 39 attended</span></figcaption></figure>
+  </div>
+</div>
+<div class="gallery-year">
+  <h3>2020 <span class="gal-sub">7 albums · 32 photos</span></h3>
+  <div class="gallery">
+    <figure class="cell lead"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/267200078/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30680037_01.jpg" alt="JavaScript Meetup #37 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup #37</span><span class="gd">Jan 2020 · 209 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/267200078/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30680037_13.jpg" alt="JavaScript Meetup #37 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup #37</span><span class="gd">Jan 2020 · 209 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/267934554/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30757991_01.jpg" alt="JavaScript Meetup #38 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup #38</span><span class="gd">Feb 2020 · 242 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/267934554/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30757991_10.jpg" alt="JavaScript Meetup #38 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup #38</span><span class="gd">Feb 2020 · 242 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/270191176/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30878982_01.jpg" alt="JavaScript Meetup #41 (online only) — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup #41 (online only)</span><span class="gd">May 2020 · 176 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/270992506/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30925161_01.jpg" alt="JavaScript Meetup #42 (online only) — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup #42 (online only)</span><span class="gd">Jun 2020 · 230 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/271273171/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30944463_01.jpg" alt="JavaScript Meetup #43 (online only) — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup #43 (online only)</span><span class="gd">Jun 2020 · 152 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/271766320/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30991993_01.jpg" alt="JavaScript Meetup #45 (online only) — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup #45 (online only)</span><span class="gd">Jul 2020 · 200 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/272575405/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_31016785_01.jpg" alt="JavaScript Meetup #47 (online only) — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JavaScript Meetup #47 (online only)</span><span class="gd">Aug 2020 · 406 attended</span></figcaption></figure>
+  </div>
+</div>
+<div class="gallery-year">
+  <h3>2019 <span class="gal-sub">5 albums · 51 photos</span></h3>
+  <div class="gallery">
+    <figure class="cell lead"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/259157975/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29815030_01.jpg" alt="JS Meetup #28: AI/ML - More than just basics by Siva Narayana — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #28: AI/ML - More than just basics by Siva Narayana</span><span class="gd">Mar 2019 · 152 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/259157975/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29815030_12.jpg" alt="JS Meetup #28: AI/ML - More than just basics by Siva Narayana — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #28: AI/ML - More than just basics by Siva Narayana</span><span class="gd">Mar 2019 · 152 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/260609477/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29926717_01.jpg" alt="JS Meetup #30: React Native - Redux State Management &amp; Gesture Support — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #30: React Native - Redux State Management &amp; Gesture Support</span><span class="gd">May 2019 · 176 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/260609477/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29926717_13.jpg" alt="JS Meetup #30: React Native - Redux State Management &amp; Gesture Support — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #30: React Native - Redux State Management &amp; Gesture Support</span><span class="gd">May 2019 · 176 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/260475093/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29926720_01.jpg" alt="JS Meetup #29: Building performant web application - A OYO ROOMS Case study — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #29: Building performant web application - A OYO ROOMS Case study</span><span class="gd">Apr 2019 · 229 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/261490051/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30055149_01.jpg" alt="JS Meetup #32: JavaScript Test Frameworks at Green Bubbles — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #32: JavaScript Test Frameworks at Green Bubbles</span><span class="gd">Jun 2019 · 152 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/261490051/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30055149_08.jpg" alt="JS Meetup #32: JavaScript Test Frameworks at Green Bubbles — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #32: JavaScript Test Frameworks at Green Bubbles</span><span class="gd">Jun 2019 · 152 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/266482357/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30600158_01.jpg" alt="PostCSS, NwJS, Microfrontends and Server-side JavaScript — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">PostCSS, NwJS, Microfrontends and Server-side JavaScript</span><span class="gd">Dec 2019 · 161 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/266482357/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_30600158_14.jpg" alt="PostCSS, NwJS, Microfrontends and Server-side JavaScript — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">PostCSS, NwJS, Microfrontends and Server-side JavaScript</span><span class="gd">Dec 2019 · 161 attended</span></figcaption></figure>
+  </div>
+</div>
+<div class="gallery-year">
+  <h3>2018 <span class="gal-sub">6 albums · 81 photos</span></h3>
+  <div class="gallery">
+    <figure class="cell lead"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/246187142/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_28501209_01.jpg" alt="JS Meetup #18: Developing Chrome Extensions - A workshop by Sachin Jain — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #18: Developing Chrome Extensions - A workshop by Sachin Jain</span><span class="gd">Jan 2018 · 141 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/252775912/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29109935_01.jpg" alt="JS Meetup #23: Game backend from scratch using NodeJS — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #23: Game backend from scratch using NodeJS</span><span class="gd">Jul 2018 · 324 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/252775912/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29109935_08.jpg" alt="JS Meetup #23: Game backend from scratch using NodeJS — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #23: Game backend from scratch using NodeJS</span><span class="gd">Jul 2018 · 324 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/254876182/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29320778_01.jpg" alt="JS Meetup #24: Upgrading from AngularJS to Angular — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #24: Upgrading from AngularJS to Angular</span><span class="gd">Sep 2018 · 86 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/254876182/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29320778_08.jpg" alt="JS Meetup #24: Upgrading from AngularJS to Angular — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #24: Upgrading from AngularJS to Angular</span><span class="gd">Sep 2018 · 86 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/254876281/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29329832_01.jpg" alt="JS Meetup #25: Performance Metrics For Modern Apps &amp; Introduction to Ionic — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #25: Performance Metrics For Modern Apps &amp; Introduction to Ionic</span><span class="gd">Oct 2018 · 156 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/254876281/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29329832_14.jpg" alt="JS Meetup #25: Performance Metrics For Modern Apps &amp; Introduction to Ionic — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #25: Performance Metrics For Modern Apps &amp; Introduction to Ionic</span><span class="gd">Oct 2018 · 156 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/255908459/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29449702_01.jpg" alt="JS Meetup #26: Web Security for Developers - Talk &amp; Workshop by Jaap Karan Singh — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #26: Web Security for Developers - Talk &amp; Workshop by Jaap Karan Singh</span><span class="gd">Nov 2018 · 178 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/255908459/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29449702_18.jpg" alt="JS Meetup #26: Web Security for Developers - Talk &amp; Workshop by Jaap Karan Singh — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #26: Web Security for Developers - Talk &amp; Workshop by Jaap Karan Singh</span><span class="gd">Nov 2018 · 178 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/256845137/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29525098_01.jpg" alt="JS Meetup #27: Building for performance; Web Player - A Hotstar Case study — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #27: Building for performance; Web Player - A Hotstar Case study</span><span class="gd">Dec 2018 · 166 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/256845137/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_29525098_09.jpg" alt="JS Meetup #27: Building for performance; Web Player - A Hotstar Case study — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #27: Building for performance; Web Player - A Hotstar Case study</span><span class="gd">Dec 2018 · 166 attended</span></figcaption></figure>
+  </div>
+</div>
+<div class="gallery-year">
+  <h3>2017 <span class="gal-sub">4 albums · 33 photos</span></h3>
+  <div class="gallery">
+    <figure class="cell lead"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/241971399/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_28096240_01.jpg" alt="JS Meetup #14: Functional Programming in JavaScript — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #14: Functional Programming in JavaScript</span><span class="gd">Aug 2017 · 270 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/242865584/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_28165170_01.jpg" alt="JS Meetup #15: Webassembly and Object oriented JavaScript using ES6 — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #15: Webassembly and Object oriented JavaScript using ES6</span><span class="gd">Sep 2017 · 233 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/243409064/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_28272119_01.jpg" alt="JS Meetup #16: Developing an app using Angular 4.0 (a workshop) — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #16: Developing an app using Angular 4.0 (a workshop)</span><span class="gd">Oct 2017 · 275 attended</span></figcaption></figure>
+    <figure class="cell"><a class="ph" href="https://www.meetup.com/javascriptmeetup/events/244614752/" target="_blank" rel="noopener"><img src="images/javascriptmeetup/gallery/jm_28346044_01.jpg" alt="JS Meetup #17: Developing an app using Ember.js (a workshop) — JavaScript Meetup" loading="lazy"></a><figcaption><span class="gt">JS Meetup #17: Developing an app using Ember.js (a workshop)</span><span class="gd">Nov 2017 · 104 attended</span></figcaption></figure>
+  </div>
+</div>
+    <p class="gallery-note">Photos by members and organizers of JavaScript Meetup, published on the group’s Meetup photo albums. Originals archived locally; this selection is web-optimized for this page.</p>
   </section>
 
-  <section id="safe-space">
-    <h2 class="section-title">First time here?</h2>
-    <div class="safe-space">Most attendees at any given session are first-timers, and that's the norm, not the exception — you won't be the only new face in the room. Sessions are casual and beginner-friendly: no prior speaking or "insider" experience needed to join in, ask questions, or just listen. We aim for a respectful, welcoming space for everyone, including those attending solo for the first time.</div>
-  </section>
-
-  <section id="hosted-by">
-    <h2 class="section-title">Hosted by</h2>
-    <div class="logo-strip">
-      <!-- Place logo files at: images/logos/[company].png -->
-      <div class="logo-chip"><img src="images/logos/google.png" alt="Google" onerror="this.style.display='none'; this.parentElement.textContent='Google';"></div>
-      <div class="logo-chip"><img src="images/logos/microsoft.png" alt="Microsoft" onerror="this.style.display='none'; this.parentElement.textContent='Microsoft';"></div>
-      <div class="logo-chip"><img src="images/logos/navi.png" alt="Navi" onerror="this.style.display='none'; this.parentElement.textContent='Navi';"></div>
-      <div class="logo-chip"><img src="images/logos/brillio.png" alt="Brillio" onerror="this.style.display='none'; this.parentElement.textContent='Brillio';"></div>
-      <div class="logo-chip"><img src="images/logos/dell.png" alt="Dell" onerror="this.style.display='none'; this.parentElement.textContent='Dell';"></div>
-      <div class="logo-chip"><img src="images/logos/hpe.png" alt="HPE" onerror="this.style.display='none'; this.parentElement.textContent='HPE';"></div>
-      <div class="logo-chip"><img src="images/logos/nutanix.png" alt="Nutanix" onerror="this.style.display='none'; this.parentElement.textContent='Nutanix';"></div>
-      <div class="logo-chip"><img src="images/logos/ibm.png" alt="IBM" onerror="this.style.display='none'; this.parentElement.textContent='IBM';"></div>
-      <div class="logo-chip"><img src="images/logos/geekyants.png" alt="GeekyAnts" onerror="this.style.display='none'; this.parentElement.textContent='GeekyAnts';"></div>
-      <div class="logo-chip"><img src="images/logos/roku.png" alt="Roku" onerror="this.style.display='none'; this.parentElement.textContent='Roku';"></div>
-    </div>
-  </section>
-
-  <section id="speakers">
-    <h2 class="section-title">Speaker highlights</h2>
-    <div class="people-grid">
-      <!-- TODO: fill in real past speakers; duplicate this card for each -->
-      <div class="people-card">
-        <div class="people-photo"><img src="images/javascriptmeetup/speaker-1.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Photo';"></div>
-        <div class="people-name">[Speaker Name]</div>
-        <div class="people-role">Speaker</div>
-        <div class="people-topic">[Talk topic]</div>
-        <a class="people-link" href="https://linkedin.com/in/PLACEHOLDER" target="_blank" rel="noopener">LinkedIn →</a>
-      </div>
-      <div class="people-card">
-        <div class="people-photo"><img src="images/javascriptmeetup/speaker-2.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Photo';"></div>
-        <div class="people-name">[Speaker Name]</div>
-        <div class="people-role">Speaker</div>
-        <div class="people-topic">[Talk topic]</div>
-        <a class="people-link" href="https://linkedin.com/in/PLACEHOLDER" target="_blank" rel="noopener">LinkedIn →</a>
-      </div>
-      <div class="people-card">
-        <div class="people-photo"><img src="images/javascriptmeetup/speaker-3.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Photo';"></div>
-        <div class="people-name">[Speaker Name]</div>
-        <div class="people-role">Speaker</div>
-        <div class="people-topic">[Talk topic]</div>
-        <a class="people-link" href="https://linkedin.com/in/PLACEHOLDER" target="_blank" rel="noopener">LinkedIn →</a>
-      </div>
-    </div>
-  </section>
-
-  <section id="organizers">
-    <h2 class="section-title">Organizers &amp; Volunteers</h2>
-    <div class="people-grid">
-      <!-- TODO: fill in real organizers/volunteers; duplicate this card for each -->
-      <div class="people-card">
-        <div class="people-photo"><img src="images/javascriptmeetup/organizer-1.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Photo';"></div>
-        <div class="people-name">Janardan Revuru</div>
-        <div class="people-role">Co-founder</div>
-        <div class="people-topic">Since 2015</div>
-        <a class="people-link" href="https://linkedin.com/in/rjanardan" target="_blank" rel="noopener">LinkedIn →</a>
-      </div>
-      <div class="people-card">
-        <div class="people-photo"><img src="images/javascriptmeetup/organizer-2.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Photo';"></div>
-        <div class="people-name">[Volunteer Name]</div>
-        <div class="people-role">Volunteer</div>
-        <div class="people-topic">[Role/focus]</div>
-        <a class="people-link" href="https://linkedin.com/in/PLACEHOLDER" target="_blank" rel="noopener">LinkedIn →</a>
-      </div>
-      <div class="people-card">
-        <div class="people-photo"><img src="images/javascriptmeetup/organizer-3.jpg" alt="" onerror="this.style.display='none'; this.parentElement.textContent='Photo';"></div>
-        <div class="people-name">[Volunteer Name]</div>
-        <div class="people-role">Volunteer</div>
-        <div class="people-topic">[Role/focus]</div>
-        <a class="people-link" href="https://linkedin.com/in/PLACEHOLDER" target="_blank" rel="noopener">LinkedIn →</a>
-      </div>
-    </div>
-  </section>
-
-  <section id="events">
-    <h2 class="section-title">Events</h2>
-    <ul class="events-list">
-      <!-- TODO: replace with real dates/titles; link to individual event pages once created from event-template.html -->
-      <li><span class="ev-date">[Month Year]</span><span class="ev-title">[Upcoming event title]</span><a href="#">Details →</a></li>
-      <li><span class="ev-date">[Month Year]</span><span class="ev-title">[Past event title]</span><a href="#">Details →</a></li>
-    </ul>
-  </section>
-
-  <section id="speak-sponsor">
-    <h2 class="section-title">Speak, Sponsor, or Host</h2>
-    <p class="section-sub">Open calls for our upcoming community events.</p>
+  <section id="join" class="wrap">
     <div class="cta-banner">
       <div class="cta-text">
-        <div class="cta-title">Call for Speakers</div>
-        <p>Have something worth sharing on AI, data science, or JavaScript/web engineering? We're lining up speakers for upcoming meetups.</p>
+        <div class="cta-title">Join 13,276 members</div>
+        <p>The next session is announced on Meetup. Talks, workshops and discussion — come for the topic, stay for the people.</p>
       </div>
-      <!-- TODO: replace with your actual CFP form or mailto -->
-      <a class="btn primary" href="https://tinyurl.com/submit-talk" target="_blank" rel="noopener">Submit a talk</a>
+      <a class="btn primary" href="https://www.meetup.com/javascriptmeetup/" target="_blank" rel="noopener">Join the group →</a>
     </div>
+    <div style="height:var(--space-4);"></div>
     <div class="cta-banner">
       <div class="cta-text">
-        <div class="cta-title">Call for Venue &amp; Sponsors</div>
-        <p>Can host or sponsor a meetup — space, food, or swag? We're always looking for partners across Bangalore.</p>
+        <div class="cta-title">Speak, sponsor or host</div>
+        <p>Over the years the group has been hosted by engineering teams at Dell EMC, IG Group, Morgan Stanley, Citrix, Thoughtworks, GeekyAnts, Microsoft Reactor, Akamai, Google, Nokia, Roku and Brillio — among others. Got a topic or a space?</p>
       </div>
-      <!-- TODO: replace with your actual sponsorship form or mailto -->
-      <a class="btn primary" href="https://tinyurl.com/venue-support" target="_blank" rel="noopener">Get in touch</a>
+      <div class="hosts" style="margin-top:0; max-width:420px;"><span class="chip">Dell EMC</span> <span class="chip">IG Group</span> <span class="chip">Morgan Stanley</span> <span class="chip">Citrix</span> <span class="chip">Microsoft Reactor</span> <span class="chip">Thoughtworks</span> <span class="chip">GeekyAnts</span> <span class="chip">Thermo Fisher Scientific</span> <span class="chip">Akamai</span> <span class="chip">Google</span> <span class="chip">Roku</span> <span class="chip">Nokia</span> <span class="chip">Brillio</span></div>
     </div>
   </section>
 
   <footer>
     <div class="footer-links">
       <a href="index.html">← Back to Homepage</a>
+      <a href="communities/meetups.html">Meetups dashboard ←</a>
+      <a href="communities/meetups.html">→ Event history &amp; dashboards</a>
       <a href="janardan-profile.html">Full Profile</a>
       <a href="mailto:janardan.revuru@gmail.com">Email</a>
     </div>
+    <p class="footer-note">This page condenses the community history kept in the meetups dashboard — visit it for the per-event detail. Page assembled Sep 2026 from Meetup group data and photo albums.</p>
   </footer>
-
 </div>
 
 <script>
@@ -312,7 +370,6 @@
       try { localStorage.setItem('jr-theme', name); } catch(e) {}
     }
     buttons.forEach(function(btn){ btn.addEventListener('click', function(){ setTheme(btn.getAttribute('data-theme-btn')); }); });
-
     var menu = document.getElementById('siteMenu');
     var toggle = document.getElementById('siteMenuToggle');
     function openMenu(){ menu.setAttribute('data-open','true'); toggle.setAttribute('aria-expanded','true'); }

@@ -33,6 +33,7 @@
   .group-head h2{margin:0; font-size:1.25rem;}
   .dot{width:10px; height:10px; border-radius:50%; display:inline-block; margin-right:8px;}
   .group-meta{color:var(--sub); font-size:0.85rem; margin-bottom:16px;}
+  .group-page-link{margin:-4px 0 12px; font-size:0.82rem;}
   .metrics-row{display:grid; grid-template-columns:repeat(auto-fit,minmax(150px,1fr)); gap:12px; margin-bottom:18px;}
   .metric{background:var(--card); border:1px solid var(--line); border-radius:10px; padding:12px 14px;}
   .metric .v{font-size:1.3rem; font-weight:700;}
@@ -167,6 +168,7 @@ function render(data){
     <div class="group-block card" data-slug="${slug}" style="border-top:4px solid ${color};">
       <div class="group-head">
         <h2><span class="dot" style="background:${color};"></span>${esc(g.name)}</h2>
+        ${slug==='javascriptmeetup' ? '<p class="group-page-link"><a href="../javascriptmeetup.html">Photo gallery &amp; community page →</a></p>' : ''}
       </div>
       <div class="group-meta">${esc(g.location)} · <a href="${esc(g.url)}" target="_blank" rel="noopener">${esc(g.url)}</a></div>
 
