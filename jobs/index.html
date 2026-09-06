@@ -9,9 +9,10 @@
     --paper:#f7f5f1; --card:#ffffff; --line:#e6e2da; --line2:#d8d3c9;
     --ink:#26231d; --muted:#7a746a; --faint:#b3ada1;
     --accent:#2f66d0;
-    --c-saved:#64748b; --c-applied:#2563eb; --c-screening:#0f766e;
-    --c-interviewing:#b45309; --c-offer:#15803d; --c-rejected:#b91c1c;
-    --c-withdrawn:#57534e; --c-ghosted:#7e22ce; --c-researching:#0369a1;
+    --c-researching:#0369a1; --c-saved:#64748b; --c-yet-to-apply:#7c3aed;
+    --c-applied:#2563eb; --c-follow-up:#ca8a04; --c-action-needed:#ea580c;
+    --c-interviewing:#0891b2; --c-offer:#15803d; --c-rejected:#b91c1c;
+    --c-withdrawn:#57534e; --c-ghosted:#7e22ce;
   }
   *{box-sizing:border-box}
   html,body{margin:0;padding:0}
@@ -20,7 +21,7 @@
     font:15px/1.5 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Inter,sans-serif;
     -webkit-font-smoothing:antialiased;
   }
-  .wrap{max-width:1120px;margin:0 auto;padding:26px 22px 60px}
+  .wrap{max-width:1180px;margin:0 auto;padding:26px 22px 60px}
 
   /* header */
   header.top{display:flex;justify-content:space-between;align-items:flex-start;gap:16px;flex-wrap:wrap;margin-bottom:16px}
@@ -53,17 +54,18 @@
   .chip.ghost{margin-left:auto;background:transparent;border-color:transparent}
   .chip.ghost:hover{color:#b91c1c}
   .dot{width:8px;height:8px;border-radius:50%;display:inline-block;margin-right:7px}
-  .dot-saved{background:var(--c-saved)} .dot-applied{background:var(--c-applied)}
-  .dot-screening{background:var(--c-screening)} .dot-interviewing{background:var(--c-interviewing)}
-  .dot-offer{background:var(--c-offer)} .dot-rejected{background:var(--c-rejected)}
-  .dot-withdrawn{background:var(--c-withdrawn)} .dot-ghosted{background:var(--c-ghosted)}
-  .dot-researching{background:var(--c-researching)}
+  .dot-researching{background:var(--c-researching)} .dot-saved{background:var(--c-saved)}
+  .dot-yet-to-apply{background:var(--c-yet-to-apply)} .dot-applied{background:var(--c-applied)}
+  .dot-follow-up{background:var(--c-follow-up)} .dot-action-needed{background:var(--c-action-needed)}
+  .dot-interviewing{background:var(--c-interviewing)} .dot-offer{background:var(--c-offer)}
+  .dot-rejected{background:var(--c-rejected)} .dot-withdrawn{background:var(--c-withdrawn)}
+  .dot-ghosted{background:var(--c-ghosted)}
 
   /* filters */
   .filters{display:flex;gap:10px;align-items:center;padding:10px 12px;margin-bottom:14px;flex-wrap:wrap}
   #searchInput{flex:1;min-width:220px}
   .filters select{min-width:150px}
-  input[type=text],input[type=search],input[type=url],input[type=password],select,textarea{
+  input[type=text],input[type=search],input[type=url],input[type=password],input[type=date],select,textarea{
     font:inherit;font-size:14px;padding:7px 10px;border:1px solid var(--line2);
     border-radius:8px;background:#fff;color:var(--ink);outline:none;
   }
@@ -83,7 +85,7 @@
   /* table */
   .table-card{overflow:hidden}
   .table-wrap{overflow-x:auto}
-  table{border-collapse:collapse;width:100%;min-width:1060px}
+  table{border-collapse:collapse;width:100%;min-width:1180px}
   thead th{
     font-size:11.5px;text-transform:uppercase;letter-spacing:.6px;color:var(--faint);
     text-align:left;padding:10px 12px;border-bottom:1px solid var(--line);
@@ -97,13 +99,15 @@
   .chev{display:inline-block;width:12px;color:var(--faint);font-size:11px;transition:transform .12s}
   .app-row.open .chev{transform:rotate(90deg)}
   .c-name .name{font-weight:600;font-size:14.5px}
-  .c-desc{color:var(--muted);font-size:13px;max-width:260px}
+  .c-desc{color:var(--muted);font-size:13px;max-width:230px}
   .c-funding{font-size:13px}
   .muted{color:var(--faint)}
   .small{font-size:12px}
-  .c-comments{max-width:230px}
-  .snippet{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:230px}
+  .c-comments{max-width:210px}
+  .snippet{color:var(--muted);font-size:13px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;max-width:210px}
   .c-upd{white-space:nowrap;color:var(--muted);font-size:13px}
+  .c-followup{white-space:nowrap;font-size:13px}
+  .followup-due{color:#b91c1c;font-weight:700}
   .c-act{white-space:nowrap;text-align:right}
   .icon-btn{
     font:inherit;border:0;background:transparent;cursor:pointer;color:var(--faint);
@@ -113,17 +117,20 @@
 
   .status-select{font:inherit;font-size:13px;padding:4px 7px;border-radius:8px;border:1px solid var(--line2);cursor:pointer;max-width:150px}
   .pill{display:inline-block;padding:2px 10px;border-radius:999px;font-size:12px;border:1px solid transparent;font-weight:600}
+  .st-researching{background:#e6f2fb;color:#0b5c8f;border-color:#bfdcf2}
   .st-saved{background:#f1f5f9;color:#475569;border-color:#d3dce6}
+  .st-yet-to-apply{background:#f0ebfd;color:#6d28d9;border-color:#dccdf7}
   .st-applied{background:#e8f0fe;color:#1a56c4;border-color:#c5d9f8}
-  .st-screening{background:#e0f2ef;color:#0b6b62;border-color:#b7e0da}
-  .st-interviewing{background:#fdf0e0;color:#a85a0a;border-color:#f5dcb8}
+  .st-follow-up{background:#fdf3d0;color:#92600a;border-color:#f3e0a0}
+  .st-action-needed{background:#fde3d3;color:#b1450c;border-color:#f6c7a4}
+  .st-interviewing{background:#e0f4f8;color:#0a6b82;border-color:#b8e2ea}
   .st-offer{background:#e4f5e8;color:#1d7a3a;border-color:#bfe4c9}
   .st-rejected{background:#fdeaea;color:#b91c1c;border-color:#f6cccc}
   .st-withdrawn{background:#f2f0ed;color:#57534e;border-color:#ddd9d2}
   .st-ghosted{background:#f4eafd;color:#7e22ce;border-color:#e3ccf8}
-  .st-researching{background:#e6f2fb;color:#0b5c8f;border-color:#bfdcf2}
-  .status-select.st-saved,.status-select.st-applied,.status-select.st-screening,.status-select.st-interviewing,
-  .status-select.st-offer,.status-select.st-rejected,.status-select.st-withdrawn,.status-select.st-ghosted,.status-select.st-researching{border-width:1px}
+  .status-select.st-researching,.status-select.st-saved,.status-select.st-yet-to-apply,.status-select.st-applied,
+  .status-select.st-follow-up,.status-select.st-action-needed,.status-select.st-interviewing,.status-select.st-offer,
+  .status-select.st-rejected,.status-select.st-withdrawn,.status-select.st-ghosted{border-width:1px}
   .pill.neutral{background:#f1f0ec;color:var(--muted);border-color:var(--line2)}
 
   /* list message */
@@ -166,7 +173,7 @@
   <header class="top">
     <div>
       <h1>Job tracker</h1>
-      <p class="sub" id="subline">Startup applications — status, notes, follow-ups</p>
+      <p class="sub" id="subline">Job &amp; startup applications — status, notes, follow-ups</p>
     </div>
     <div class="top-actions">
       <span class="save-note" id="saveNote"></span>
@@ -211,6 +218,9 @@
         <div class="fld"><label for="fDesc">Short description</label><textarea id="fDesc" rows="2" placeholder="What the company does, one line"></textarea></div>
         <div class="fld"><label for="fFunding">Funding status</label><input type="text" id="fFunding" list="fundingList" placeholder="e.g. Series B ($40M, 2024)"></div>
         <div class="fld"><label for="fStatus">Application status</label><select id="fStatus"></select></div>
+        <div class="fld"><label for="fUrl">Job posting URL</label><input type="url" id="fUrl" placeholder="https://…"></div>
+        <div class="fld"><label for="fContact">Recruiter / referral contact</label><input type="text" id="fContact" placeholder="e.g. Priya (LinkedIn), referred by Krishna"></div>
+        <div class="fld"><label for="fFollowUp">Next follow-up date</label><input type="date" id="fFollowUp"></div>
         <div class="fld full"><label for="fNote">First comment (optional)</label><textarea id="fNote" rows="2" placeholder="e.g. referred by …, applied on their site"></textarea></div>
       </div>
       <div class="form-actions">
@@ -226,14 +236,14 @@
     <div class="table-wrap">
       <table>
         <colgroup>
-          <col style="width:13%"><col style="width:20%"><col style="width:16%">
-          <col style="width:13%"><col style="width:11%"><col style="width:15%">
-          <col style="width:7%"><col style="width:2%">
+          <col style="width:12%"><col style="width:16%"><col style="width:12%">
+          <col style="width:11%"><col style="width:11%"><col style="width:9%">
+          <col style="width:13%"><col style="width:7%"><col style="width:2%">
         </colgroup>
         <thead>
           <tr>
             <th>Startup name</th><th>Short description</th><th>Funding</th><th>Job title</th>
-            <th>Application status</th><th>Comments / Notes</th><th>Updated</th><th></th>
+            <th>Application status</th><th>Follow-up</th><th>Comments / Notes</th><th>Updated</th><th></th>
           </tr>
         </thead>
         <tbody id="tbody"></tbody>
@@ -249,7 +259,8 @@
 (function(){
 'use strict';
 
-var STATUSES=['Researching','Saved','Applied','Screening','Interviewing','Offer','Rejected','Withdrawn','Ghosted'];
+var STATUSES=['Researching','Saved','Yet to apply','Applied','Follow-up','Action-Needed','Interviewing','Offer','Rejected','Withdrawn','Ghosted'];
+var TERMINAL=['Rejected','Withdrawn','Ghosted','Offer'];
 var FUNDING=['Unknown','Bootstrapped','Pre-seed','Seed','Series A','Series B','Series C','Series D+'];
 var KEY='jobTracker.v2'; // v2: seeds your real company list on first run; funding is free text
 var SK='jobTracker.sync'; // sync config lives under its own key, never inside backups
@@ -260,6 +271,7 @@ function newId(){return (window.crypto&&crypto.randomUUID)?crypto.randomUUID():'
 function iso(){return new Date().toISOString();}
 function cls(st){return 'st-'+st.toLowerCase().replace(/\s+/g,'-');}
 function fmt(s){var d=new Date(s);if(isNaN(d))return '';return d.toLocaleString(undefined,{month:'short',day:'numeric',hour:'numeric',minute:'2-digit'});}
+function fmtDate(s){var d=new Date(s+'T00:00:00');if(isNaN(d))return s||'';return d.toLocaleDateString(undefined,{month:'short',day:'numeric',year:'numeric'});}
 function rel(s){
   var d=new Date(s);if(isNaN(d))return '';
   var sec=(Date.now()-d.getTime())/1000;
@@ -281,6 +293,9 @@ function normalizeApp(a){
     funding:String(a.funding||'').trim().replace(/^Unknown$/i,''),
     role:String(a.role||a.jobTitle||a.job_title||''),
     status:STATUSES.indexOf(a.status)>-1?a.status:'Saved',
+    url:String(a.url||a.jobUrl||a.link||'').trim(),
+    contact:String(a.contact||a.recruiter||a.referral||'').trim(),
+    followUp:String(a.followUp||a.followUpDate||a.nextFollowUp||'').trim(),
     createdAt:a.createdAt||iso(),
     updatedAt:a.updatedAt||a.createdAt||iso(),
     comments:comments.map(function(c){return {id:String(c.id||newId()),at:c.at||c.createdAt||iso(),text:String(c.text||c.note||'')};}),
@@ -350,7 +365,7 @@ function visible(){
   var list=data.apps.filter(function(a){
     if(statusFilter&&a.status!==statusFilter)return false;
     if(q){
-      var hay=(a.name+' '+a.role+' '+a.funding+' '+a.description+' '+a.comments.map(function(c){return c.text;}).join(' ')).toLowerCase();
+      var hay=(a.name+' '+a.role+' '+a.funding+' '+a.description+' '+a.contact+' '+a.comments.map(function(c){return c.text;}).join(' ')).toLowerCase();
       if(hay.indexOf(q)===-1)return false;
     }
     return true;
@@ -366,6 +381,14 @@ function pill(st){
   var has=STATUSES.indexOf(st)>-1;
   return '<span class="pill '+(has?cls(st):'neutral')+'">'+esc(st||'—')+'</span>';
 }
+function followUpCell(a){
+  if(!a.followUp)return '<span class="muted">—</span>';
+  var d=new Date(a.followUp+'T00:00:00');
+  if(isNaN(d))return esc(a.followUp);
+  var today=new Date();today.setHours(0,0,0,0);
+  var overdue=d<=today&&TERMINAL.indexOf(a.status)===-1;
+  return '<span'+(overdue?' class="followup-due" title="Follow up — due"':'')+'>'+esc(d.toLocaleDateString(undefined,{month:'short',day:'numeric'}))+'</span>';
+}
 
 function rowHtml(a){
   var last=a.comments.length?a.comments[a.comments.length-1]:null;
@@ -375,6 +398,7 @@ function rowHtml(a){
     +'<td class="c-funding">'+(a.funding?esc(a.funding):'<span class="muted">—</span>')+'</td>'
     +'<td class="c-role">'+(a.role?esc(a.role):'<span class="muted">—</span>')+'</td>'
     +'<td><select class="status-select '+cls(a.status)+'" title="Update status">'+statusOptions(a.status)+'</select></td>'
+    +'<td class="c-followup">'+followUpCell(a)+'</td>'
     +'<td class="c-comments">'+(last?'<div class="snippet" title="'+esc(last.text)+'">'+esc(last.text)+'</div>':'<span class="muted">—</span>')+'</td>'
     +'<td class="c-upd" title="'+esc(fmt(a.updatedAt))+'">'+rel(a.updatedAt)+'</td>'
     +'<td class="c-act"><button class="icon-btn" data-del="'+esc(a.id)+'" title="Delete application">✕</button></td>'
@@ -395,12 +419,15 @@ function detailHtml(a){
       +'<span class="muted">→</span>'+pill(h.to)+'<time>'+esc(fmt(h.at))+'</time></li>';
   }).join('')||'<li><span class="muted small">No status changes logged yet.</span></li>';
 
-  return '<tr class="row-detail" data-id="'+esc(a.id)+'"><td colspan="8"><div class="detail-inner">'
+  return '<tr class="row-detail" data-id="'+esc(a.id)+'"><td colspan="9"><div class="detail-inner">'
     +'<div class="dfields">'
     +'<div class="fld"><label>Startup name</label><input type="text" data-field="name" value="'+esc(a.name)+'"></div>'
     +'<div class="fld"><label>Job title</label><input type="text" data-field="role" value="'+esc(a.role)+'"></div>'
     +'<div class="fld"><label>Funding status</label><input type="text" data-field="funding" list="fundingList" placeholder="e.g. Series B ($40M, 2024)" value="'+esc(a.funding)+'"></div>'
     +'<div class="fld"><label>Status</label><div class="static-row">'+pill(a.status)+'<span class="muted small">added '+esc(fmt(a.createdAt))+'</span></div></div>'
+    +'<div class="fld"><label>Job posting URL</label><input type="url" data-field="url" placeholder="https://…" value="'+esc(a.url)+'"></div>'
+    +'<div class="fld"><label>Recruiter / referral contact</label><input type="text" data-field="contact" placeholder="e.g. referred by Krishna" value="'+esc(a.contact)+'"></div>'
+    +'<div class="fld"><label>Next follow-up date</label><input type="date" data-field="followUp" value="'+esc(a.followUp)+'"></div>'
     +'<div class="fld full"><label>Short description</label><textarea data-field="description" rows="2">'+esc(a.description)+'</textarea></div>'
     +'</div>'
     +'<div>'
@@ -471,7 +498,7 @@ function changeStatus(id,val){
 }
 function setField(id,field,val){
   var a=byId(id);if(!a)return;
-  if(field==='name'||field==='role')val=val.trim();
+  if(field==='name'||field==='role'||field==='contact')val=val.trim();
   a[field]=val;data.seeded=false;
   save();render();
 }
@@ -519,6 +546,9 @@ $id('addForm').onsubmit=function(e){
     funding:$id('fFunding').value,
     role:$id('fRole').value.trim(),
     status:$id('fStatus').value,
+    url:$id('fUrl').value.trim(),
+    contact:$id('fContact').value.trim(),
+    followUp:$id('fFollowUp').value,
     comments:note?[{text:note}]:[]
   });
   data.apps.push(app);data.seeded=false;

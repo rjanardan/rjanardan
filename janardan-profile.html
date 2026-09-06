@@ -1,458 +1,250 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="ledger">
+<html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Janardan Revuru — Director of Engineering</title>
-<meta name="description" content="Janardan Revuru — Director of Engineering, AI Transformation Leader, PhD Researcher (Multi-Agent Systems). Engineering leader who has built teams from scratch across both startups and global enterprises.">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Janardan Revuru: Engineering Leader | AI adoption at Enterprise Scale | AI Research Scholar</title>
 <style>
   :root{
-    --space-1: 4px; --space-2: 8px; --space-3: 12px; --space-4: 16px;
-    --space-5: 24px; --space-6: 32px; --space-7: 48px; --space-8: 64px; --space-9: 96px;
-    --maxw: 880px;
+    --ink:#1a1f2b;
+    --muted:#5b6472;
+    --accent:#1f3a5f;       /* deep executive navy */
+    --rule:#d9dee6;
+    --soft:#f4f6f9;
+    --maxw:760px;
   }
-
-  /* ---------- Theme: Blueprint ---------- */
-  [data-theme="blueprint"]{
-    --bg:#0a2540; --bg-elevated:#0e2f52; --grid-line: rgba(140,195,255,0.08);
-    --text:#eaf2ff; --text-muted:#93b3da; --accent:#5ec8f8; --accent-2:#ffcf6b;
-    --border: rgba(94,200,248,0.32); --border-strong: rgba(94,200,248,0.6);
-    --font-display:'Space Grotesk', sans-serif; --font-body:'IBM Plex Sans', sans-serif; --font-mono:'JetBrains Mono', monospace;
-    --radius:2px; --tracking-eyebrow: 0.14em;
-  }
-  /* ---------- Theme: Terminal ---------- */
-  [data-theme="studio"]{
-    --bg:#ffffff; --bg-elevated:#f6f6f4; --grid-line: transparent;
-    --text:#1a1a18; --text-muted:#68675f; --accent:#146b5c; --accent-2:#b5482a;
-    --border: rgba(0,0,0,0.14); --border-strong: rgba(0,0,0,0.3);
-    --font-display:'Space Grotesk', sans-serif; --font-body:'IBM Plex Sans', sans-serif; --font-mono:'JetBrains Mono', monospace;
-    --radius:4px; --tracking-eyebrow: 0.1em;
-  }
-  /* ---------- Theme: Ledger ---------- */
-  [data-theme="ledger"]{
-    --bg:#f7f4ec; --bg-elevated:#ffffff; --grid-line: rgba(43,58,103,0.07);
-    --text:#242938; --text-muted:#5d6274; --accent:#2b3a67; --accent-2:#8a6a34;
-    --border: rgba(43,58,103,0.22); --border-strong: rgba(43,58,103,0.45);
-    --font-display:'Source Serif 4', serif; --font-body:'Source Serif 4', serif; --font-mono:'JetBrains Mono', monospace;
-    --radius:2px; --tracking-eyebrow: 0.1em;
-  }
-
-  *{ box-sizing:border-box; }
-  html{ scroll-behavior:smooth; }
-  html{ overflow-x:hidden; }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
   body{
-    margin:0; overflow-x:hidden; background:var(--bg); color:var(--text);
-    font-family:var(--font-body); line-height:1.6; font-size:16px;
-    transition:background .35s ease, color .35s ease;
+    font-family:"Segoe UI",Roboto,Helvetica,Arial,system-ui,sans-serif;
+    color:var(--ink);
+    background:#eef1f5;
+    font-size:10.5pt;
+    line-height:1.5;
+    -webkit-font-smoothing:antialiased;
+  }
+  .sheet{
+    max-width:var(--maxw);
+    margin:18px auto;
+    background:#fff;
+    padding:18mm 16mm;
+    box-shadow:0 2px 14px rgba(20,30,50,.12);
   }
 
-  a{ color:var(--accent); text-decoration:none; }
-  a:hover{ text-decoration:underline; }
-  a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+  /* Header */
+  header{border-bottom:2px solid var(--accent);padding-bottom:10px;margin-bottom:14px;}
+  h1{font-size:23pt;letter-spacing:.3px;margin:0 0 2px;color:var(--ink);font-weight:700;}
+  .title-line{font-size:11.5pt;color:var(--accent);font-weight:600;margin:0 0 8px;}
+  .target-tag{
+    display:inline-block;font-size:10pt;font-weight:700;color:#fff;
+    background:var(--accent);padding:3px 10px;border-radius:3px;margin:0 0 9px;
+  }
+  .contact{font-size:9pt;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px;}
+  .contact span{white-space:nowrap;}
 
-  .wrap{ max-width:var(--maxw); margin:0 auto; padding:0 var(--space-5); }
+  /* Section headings: match TXT casing, no trailing period, hairline rule */
+  h2{
+    font-size:11.5pt;letter-spacing:.4px;
+    color:var(--accent);margin:16px 0 7px;padding-bottom:3px;
+    border-bottom:1px solid var(--rule);font-weight:700;
+  }
+  h2:first-of-type{margin-top:8px;}
 
-  h1,h2,h3{ font-family:var(--font-display); font-weight:600; margin:0; }
-  .eyebrow{
-    font-family:var(--font-mono); font-size:11px; letter-spacing:var(--tracking-eyebrow);
-    text-transform:uppercase; color:var(--accent); margin:0 0 var(--space-2);
+  p{margin:0 0 8px;}
+  ul{margin:4px 0 8px;padding-left:16px;}
+  li{margin:2px 0;}
+
+  .summary{text-align:justify;}
+
+  /* Group labels inside a section ("## " in TXT) */
+  .group-block{margin:0 0 7px;page-break-inside:avoid;}
+  .group{
+    font-size:10.2pt;font-weight:700;color:var(--ink);
+    margin:9px 0 3px;letter-spacing:.2px;
+  }
+  .group-block .group:first-child{margin-top:4px;}
+  .group-block ul{margin-top:3px;}
+
+  .skills{display:flex;flex-wrap:wrap;gap:6px;}
+  .skills span{
+    background:var(--soft);border:1px solid var(--rule);border-radius:3px;
+    padding:2px 8px;font-size:9pt;color:var(--ink);
   }
 
-  /* ---------- Fixed bottom-right menu ---------- */
-  .site-menu{ position:fixed; right:max(var(--space-4), env(safe-area-inset-right)); bottom:max(var(--space-4), env(safe-area-inset-bottom)); z-index:60; }
-  .site-menu-toggle{
-    width:52px; height:52px; border-radius:50%; border:1px solid var(--border-strong);
-    background:var(--accent); color:var(--bg); cursor:pointer;
-    display:flex; align-items:center; justify-content:center;
-    box-shadow:0 6px 20px rgba(0,0,0,0.25); transition:transform .2s ease;
+  .edu-item{margin:6px 0;}
+  .edu-item .deg{font-weight:700;}
+  .edu-item .sub{color:var(--muted);font-size:9.2pt;}
+
+  /* Education 2x2 borderless grid */
+  .edu-grid{
+    width:100%;border-collapse:collapse;margin:4px 0 8px;
   }
-  .site-menu-toggle:hover{ transform:scale(1.05); }
-  .site-menu-toggle svg{ width:20px; height:20px; }
-  .site-menu-toggle .icon-close{ display:none; }
-  .site-menu[data-open="true"] .icon-open{ display:none; }
-  .site-menu[data-open="true"] .icon-close{ display:block; }
-
-  .site-menu-panel{
-    position:absolute; right:0; bottom:64px; width:260px;
-    background:var(--bg-elevated); border:1px solid var(--border); border-radius:var(--radius);
-    box-shadow:0 12px 32px rgba(0,0,0,0.28); padding:var(--space-4);
-    opacity:0; transform:translateY(8px); pointer-events:none; transition:all .18s ease;
+  .edu-grid td{
+    width:50%;vertical-align:top;padding:8px 12px 8px 0;
   }
-  .site-menu[data-open="true"] .site-menu-panel{ opacity:1; transform:translateY(0); pointer-events:auto; }
+  .edu-grid td + td{padding-left:12px;}
+  .edu-grid .deg{font-weight:700;font-size:10pt;}
+  .edu-grid .sub{color:var(--muted);font-size:9.2pt;margin-top:1px;}
 
-  .site-menu-group + .site-menu-group{ margin-top:var(--space-4); padding-top:var(--space-4); border-top:1px solid var(--border); }
-  .site-menu-heading{
-    font-family:var(--font-mono); font-size:10.5px; letter-spacing:.08em; text-transform:uppercase;
-    color:var(--text-muted); margin-bottom:var(--space-2);
-  }
-  .site-menu-links{ list-style:none; margin:0; padding:0; }
-  .site-menu-links li a{
-    display:block; padding:10px 6px; min-height:22px; border-radius:4px; font-size:13.5px; color:var(--text);
-    text-decoration:none;
-  }
-  .site-menu-links li a:hover{ background:var(--grid-line); color:var(--accent); text-decoration:none; }
+  a{color:var(--accent);text-decoration:none;}
 
-  .theme-options{ display:flex; gap:6px; }
-  .theme-options button{
-    flex:1; font-family:var(--font-mono); font-size:11px; letter-spacing:.02em; text-transform:uppercase;
-    background:transparent; border:1px solid var(--border); color:var(--text-muted); cursor:pointer;
-    padding:12px 4px; min-height:20px; border-radius:16px; transition:all .2s ease;
-  }
-  .theme-options button:hover{ color:var(--text); }
-  .theme-options button[aria-pressed="true"]{ background:var(--accent); color:var(--bg); font-weight:600; border-color:var(--accent); }
-
-  /* ---------- Header / Hero ---------- */
-  header{ padding:var(--space-7) 0 var(--space-5); border-bottom:1px solid var(--border); }
-  .name{ font-size:clamp(32px,5vw,52px); line-height:1.05; margin-bottom:var(--space-2); }
-  .tagline{ font-size:clamp(15px,2vw,18px); color:var(--text-muted); max-width:640px; margin-bottom:var(--space-4); }
-  .contact-row{ display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); font-family:var(--font-mono); font-size:13px; color:var(--text-muted); }
-  .contact-row a{ color:var(--text); }
-  .contact-row span.sep{ color:var(--border-strong); }
-
-  /* ---------- Sections ---------- */
-  section{ padding:var(--space-6) 0; border-bottom:1px solid var(--border); }
-  section:last-of-type{ border-bottom:none; }
-  h2.section-title{ font-size:clamp(22px,3vw,28px); margin-bottom:var(--space-4); }
-
-  .summary p{ max-width:680px; color:var(--text); font-size:16px; }
-
-  /* Experience */
-  .job{ display:grid; grid-template-columns:150px 1fr; gap:var(--space-5); padding:var(--space-4) 0; border-top:1px solid var(--border); }
-  .job:first-of-type{ border-top:none; }
-  .job-period{ font-family:var(--font-mono); font-size:12px; color:var(--accent); }
-  .job-title{ font-family:var(--font-display); font-size:18px; font-weight:600; margin-bottom:2px; }
-  .job-org{ color:var(--text-muted); font-size:14px; margin-bottom:var(--space-3); }
-  .job ul{ margin:0; padding-left:18px; color:var(--text); font-size:14.5px; }
-  .job li{ margin-bottom:4px; }
-
-  /* Grid cards: patents, certs, affiliations */
-  .card-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(240px,1fr)); gap:var(--space-4); }
-  .card{ border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-4); background:var(--bg-elevated); }
-  .card .card-title{ font-family:var(--font-display); font-weight:600; font-size:14.5px; margin-bottom:6px; }
-  .card .card-meta{ font-family:var(--font-mono); font-size:11.5px; color:var(--text-muted); }
-
-  /* Simple list sections */
-  .simple-list{ list-style:none; margin:0; padding:0; }
-  .simple-list li{
-    display:flex; justify-content:space-between; gap:var(--space-4);
-    padding:var(--space-3) 0; border-top:1px solid var(--border); font-size:14.5px;
-  }
-  .simple-list li:first-child{ border-top:none; }
-  .simple-list .meta{ font-family:var(--font-mono); font-size:12px; color:var(--text-muted); white-space:nowrap; }
-
-  /* Community stats */
-  .stat-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(140px,1fr)); gap:var(--space-4); margin-bottom:var(--space-4); }
-  .stat{ border:1px solid var(--border); border-radius:var(--radius); padding:var(--space-4); text-align:center; }
-  .stat .num{ font-family:var(--font-display); font-size:28px; font-weight:700; color:var(--accent); }
-  .stat .label{ font-family:var(--font-mono); font-size:11px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; margin-top:4px; }
-
-  /* Skills */
-  .tags{ display:flex; flex-wrap:wrap; gap:var(--space-2); }
-  .tag{
-    font-family:var(--font-mono); font-size:12px; padding:6px 12px; border:1px solid var(--border);
-    border-radius:20px; color:var(--text-muted);
+  /* Footer teaser: visually distinct (HTML-only add-on) */
+  .teaser{
+    margin-top:16px;padding-top:12px;border-top:2px solid var(--accent);
+    font-size:9.8pt;line-height:1.55;color:var(--ink);text-align:justify;
   }
 
-  /* ---------- Title block footer (signature element, present across all themes) ---------- */
-  footer{ padding:var(--space-6) 0 var(--space-7); }
-  .titleblock{
-    border:1px solid var(--border-strong); border-radius:var(--radius);
-    font-family:var(--font-mono); font-size:12px;
-  }
-  .titleblock-row{ display:grid; grid-template-columns:1fr 1fr 1fr; border-top:1px solid var(--border); }
-  .titleblock-row:first-child{ border-top:none; }
-  .titleblock-cell{ padding:var(--space-3) var(--space-4); border-left:1px solid var(--border); }
-  .titleblock-cell:first-child{ border-left:none; }
-  .titleblock-cell .k{ color:var(--text-muted); text-transform:uppercase; letter-spacing:.06em; font-size:10px; margin-bottom:3px; }
-  .titleblock-cell .v{ color:var(--text); }
-  .footer-links{ margin-top:var(--space-5); display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); font-family:var(--font-mono); font-size:13px; }
-
-  @media (max-width:640px){
-    .job{ grid-template-columns:1fr; gap:var(--space-2); }
-    .titleblock-row{ grid-template-columns:1fr; }
-    .titleblock-cell{ border-left:none; border-top:1px solid var(--border); }
-    .titleblock-cell:first-child{ border-top:none; }
-    .site-menu-panel{ width:220px; }
+  /* Print: A4, no shadows, tight margins */
+  @page{ size:A4; margin:14mm 14mm; }
+  @media print{
+    body{background:#fff;font-size:10pt;}
+    .sheet{margin:0;box-shadow:none;max-width:none;padding:0;}
+    h2{page-break-after:avoid;}
+    a{color:var(--ink);}
   }
 </style>
 </head>
 <body>
-
-<div class="site-menu" id="siteMenu" data-open="false">
-  <div class="site-menu-panel" role="menu" aria-label="Page menu">
-    <div class="site-menu-group">
-      <div class="site-menu-heading">Jump to section</div>
-      <ul class="site-menu-links">
-        <li><a href="#summary">Summary</a></li>
-        <li><a href="#experience">Experience</a></li>
-        <li><a href="#patents">Patents</a></li>
-        <li><a href="#education">Education</a></li>
-        <li><a href="#community">Community</a></li>
-        <li><a href="#affiliations">Affiliations</a></li>
-        <li><a href="#certifications">Certifications</a></li>
-        <li><a href="#skills">Skills</a></li>
-      </ul>
-    </div>
-    <div class="site-menu-group">
-      <div class="site-menu-heading">Theme</div>
-      <div class="theme-options" role="group" aria-label="Choose visual theme">
-        <button type="button" data-theme-btn="ledger" aria-pressed="true">Ledger</button>
-        <button type="button" data-theme-btn="studio" aria-pressed="false">Studio</button>
-        <button type="button" data-theme-btn="blueprint" aria-pressed="false">Blueprint</button>
-      </div>
-    </div>
-  </div>
-  <button type="button" class="site-menu-toggle" id="siteMenuToggle" aria-expanded="false" aria-controls="siteMenu" aria-label="Open page menu">
-    <svg class="icon-open" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="4" y1="7" x2="20" y2="7"/><line x1="4" y1="12" x2="20" y2="12"/><line x1="4" y1="17" x2="14" y2="17"/></svg>
-    <svg class="icon-close" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><line x1="6" y1="6" x2="18" y2="18"/><line x1="18" y1="6" x2="6" y2="18"/></svg>
-  </button>
-</div>
-
-<div class="wrap">
+<div class="sheet">
 
   <header>
-    <p class="eyebrow">Director of Engineering · AI Transformation · PhD Research Scholar</p>
-    <h1 class="name">Janardan Revuru</h1>
-    <p class="tagline">Scaling global distributed engineering teams and applying AI, from coding assistants to agentic workflows, at enterprise scale. Built and led engineering orgs across Dell, HPE, Avaya, and Motorola — now building toward VP/Director of Engineering and Head of AI Engineering roles at startups and GCCs.</p>
-    <div class="contact-row">
-      <span>Bengaluru, India</span><span class="sep">/</span>
-      <a href="mailto:janardan.revuru@gmail.com">janardan.revuru@gmail.com</a><span class="sep">/</span>
-      <a href="tel:+918050780608">+91 80507 80608</a><span class="sep">/</span>
-      <a href="https://linkedin.com/in/rjanardan" target="_blank" rel="noopener">linkedin.com/in/rjanardan</a>
+    <h1>Janardan Revuru</h1>
+    <div class="title-line">Engineering Leader · AI adoption at Enterprise Scale · Teams Built 2→100 · Multi-Agent AI Research</div>
+    <div class="contact">
+      <span>Bengaluru, India 560100</span>
+      <span>+91 8050780608</span>
+      <span>janardan.revuru@gmail.com</span>
+      <span>LinkedIn: <a href="https://linkedin.com/in/rjanardan">linkedin.com/in/rjanardan</a></span>
+      <span>Portfolio: <a href="https://janalogy.com">https://janalogy.com</a></span>
     </div>
   </header>
 
-  <section id="summary">
-    <h2 class="section-title">Summary</h2>
-    <div class="summary">
-      <p>Director of Engineering with experience setting up and scaling R&amp;D teams of 100–120 people. As AI champion, led the shift from AI-assisted coding to agentic AI workflows across a multi-geography engineering org (~600 people), driving 30% higher people engagement and 3x productivity. Leading transformation through new methodologies — secure software development, scaled Agile, spec-driven development — and flexible across fast-paced startups and large MNCs. Academic and research mindset: M.Tech in Data Science &amp; AI, currently pursuing a PhD in AI (agent-to-agent communication architectures). Co-inventor on 3 granted patents and 1 published application. Built tech communities totaling 22,000+ members across India, with 100+ events hosted at companies including Google, Microsoft, Navi, Brillio, Dell, HPE, Nutanix, IBM, GeekyAnts, and Roku.</p>
-    </div>
-  </section>
+  <h2>Professional Summary and Experience</h2>
+  <div class="target-tag">Seeking: Engineering leadership roles at AI-first startups and AI platform companies serving enterprises</div>
 
-  <section id="experience">
-    <h2 class="section-title">Experience</h2>
-
-    <div class="job">
-      <div class="job-period">Aug 2021 – Present</div>
-      <div>
-        <div class="job-title">Director of Engineering</div>
-        <div class="job-org">Dell Technologies, Bangalore</div>
-        <ul>
-          <li>Graduated from Dell's LEAD program — top 2% of leaders company-wide</li>
-          <li>Site leader for manageability teams (~100–120 engineers)</li>
-          <li>Led AI adoption from coding assistants to agentic AI workflows using spec-driven development and an AI harness, across the entire business unit (~600 engineers)</li>
-          <li>Introduced a knowledge bundle and evaluation methods for better AI grounding (AI-native software engineering)</li>
-          <li>Modernized the tech stack from Google Web Toolkit to Angular in the Data Protection domain</li>
-          <li>Transformation leader for the entire portfolio (~1,000–1,200 engineers); scaled Agile coach</li>
-          <li>Rockstar Manager (top team engagement scores) for 5 consecutive years</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="job">
-      <div class="job-period">Dec 2016 – Jul 2021</div>
-      <div>
-        <div class="job-title">Senior Manager, Software Engineering</div>
-        <div class="job-org">Dell EMC, Bangalore</div>
-        <ul>
-          <li>Web-based application development and integration for the PowerProtectDD appliance (backup &amp; recovery)</li>
-          <li>Owned appliance supportability and serviceability</li>
-          <li>Built a team from 2 to 80 members in India</li>
-          <li>Modernized the tech stack; delivered features end-to-end with full ownership across a cross-geography "one team" culture</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="job">
-      <div class="job-period">Nov 2007 – Dec 2016</div>
-      <div>
-        <div class="job-title">Engineering Manager</div>
-        <div class="job-org">Nortel, Avaya, HPE — Bangalore</div>
-        <ul>
-          <li>Engineering of networking, storage, and server products; management software for telecom and datacom</li>
-          <li>Worked across all phases of software development, in both waterfall and Agile/Scrum projects</li>
-        </ul>
-      </div>
-    </div>
-
-    <div class="job">
-      <div class="job-period">Jan 1997 – Nov 2007</div>
-      <div>
-        <div class="job-title">Software Engineer → Technical Lead</div>
-        <div class="job-org">Wipro, Amber Networks, Siemens, Tasman Networks, Motorola — Bangalore</div>
-        <ul>
-          <li>Network management software using Java and web technologies</li>
-          <li>Designed and developed Location Update and Lawful Interception features for 2.5G GSM networks</li>
-          <li>Built element manager software for routers</li>
-        </ul>
-      </div>
-    </div>
-  </section>
-
-  <section id="patents">
-    <h2 class="section-title">Patents</h2>
-    <div class="card-grid">
-      <div class="card">
-        <div class="card-title">Systems and Methods for Temporary Access with Adaptive Trust Levels for Authentication and Authorization</div>
-        <div class="card-meta">#20220337596 · Issued 20 Oct 2022</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Parameter-Based Adaptive Scheduling of Jobs</div>
-        <div class="card-meta">#20240354154 · Issued 24 Oct 2024</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Systems and Methods for Temporary Access with Adaptive Trust Levels for Authentication and Authorization (Extension)</div>
-        <div class="card-meta">#20240244058 · Issued 08 Apr 2025</div>
-      </div>
-      <div class="card">
-        <div class="card-title">Suggesting and Validating User Interface Elements in Accordance with a Design System</div>
-        <div class="card-meta">US20260203081A1 · Filed 16 Jul 2026</div>
-      </div>
-    </div>
-  </section>
-
-  <section id="education">
-    <h2 class="section-title">Education</h2>
-    <ul class="simple-list">
-      <li><span>Ph.D., Artificial Intelligence — REVA University, Bengaluru<br><span style="color:var(--text-muted); font-size:13px;">Research in multi-agent systems communication architectures; design, development and evaluation of a semantic layer for intent, efficiency and security.</span></span><span class="meta">Exp. Jun 2028</span></li>
-      <li><span>M.Tech, Data Science — Birla Institute of Technology, Pilani<br><span style="color:var(--text-muted); font-size:13px;">Project: Sustainability through Small Generative Models</span></span><span class="meta">Jun 2024</span></li>
-      <li><span>B.E., Computer Science — Vijayanagar Engineering College, Karnataka</span><span class="meta">—</span></li>
-      <li><span>MBA, Marketing — IGNOU, Bengaluru</span><span class="meta">Jun 2010</span></li>
+  <div class="group-block">
+    <div class="group">Agentic AI and AI-native delivery</div>
+    <ul>
+      <li>Prototyping and building agentic AI systems — multi-agent coordination, tool use, and agent-to-agent communication architectures (PhD research, REVA University)</li>
+      <li>Leading adoption of agentic AI: moved ~600 engineers from AI-assisted coding to agentic-AI workflows using spec-driven development and an AI harness; ~3x productivity, +30% engagement (Dell Technologies)</li>
+      <li>Driving AI-assisted coding and productivity improvement across the SDLC in next-gen product development (Dell Technologies)</li>
+      <li>Introduced knowledge-bundle grounding and LLM evaluation methods into AI-native software engineering (Dell Technologies)</li>
     </ul>
-  </section>
+  </div>
 
-  <section id="community">
-    <h2 class="section-title">Community Engagement</h2>
-    <div class="stat-row">
-      <div class="stat"><div class="num">22K+</div><div class="label">Members</div></div>
-      <div class="stat"><div class="num">100+</div><div class="label">Events hosted</div></div>
-      <div class="stat"><div class="num">3</div><div class="label">Communities founded</div></div>
-    </div>
-    <ul class="simple-list">
-      <li><span>JavaScript Meetup — co-founder and organizer</span><span class="meta">Since 2015</span></li>
-      <li><span>DARLing — Data Science, AI, Research and Learning Meetup — founder</span><span class="meta">Since 2025</span></li>
-      <li><span>Byte of Python — founder</span><span class="meta">Since 2025</span></li>
+  <div class="group-block">
+    <div class="group">Engineering leadership and org building</div>
+    <ul>
+      <li>Built engineering teams from the ground up, 2→100 engineers, with global reporting and one-team culture across geographies (Dell Technologies, Dell EMC)</li>
+      <li>Manage managers, senior tech leads, and architects; hire and coach niche hardware, file-system, and security talent (Dell Technologies)</li>
+      <li>Graduated from the LEAD program — top 2% of Dell Technologies leaders (Dell Technologies)</li>
+      <li>Top-decile team engagement scores for 5 consecutive years (Dell Technologies)</li>
     </ul>
-    <p style="color:var(--text-muted); font-size:13.5px; margin-top:var(--space-4);">Events hosted at Google, Microsoft, Navi, Brillio, Dell, HPE, Nutanix, IBM, GeekyAnts, and Roku.</p>
-  </section>
+  </div>
 
-  <section id="affiliations">
-    <h2 class="section-title">Affiliations &amp; Advisory Roles</h2>
-    <ul class="simple-list">
-      <li><span>Academic Council — Madanapalle Institute of Technology &amp; Science</span><span class="meta">Since 2025</span></li>
-      <li><span>Board of Studies — Kishkindha University</span><span class="meta">Since 2024</span></li>
-      <li><span>Association for Computing Machinery (ACM), Member</span><span class="meta">Since 2024</span></li>
-      <li><span>Community Leader — Google</span><span class="meta">Since 2020</span></li>
-      <li><span><a href="https://www.opensourceindia.in/advisors/" target="_blank" rel="noopener">Open Source India Conference</a></span><span class="meta">Since 2011</span></li>
-      <li><span>Technical Director — Huawei HarmonyOS Platform</span><span class="meta">Till 2021</span></li>
-      <li><span>Web Technologies Advisory Group — Microsoft</span><span class="meta">Till 2018</span></li>
+  <div class="group-block">
+    <div class="group">Enterprise product engineering and Customer Experience</div>
+    <ul>
+      <li>Building enterprise management software for networking, servers, and storage — the management plane across GUI, REST APIs, security, serviceability, and observability (Dell Technologies)</li>
+      <li>Owned user experience for enterprise-scale next-gen products; co-inventor on 3 granted UX patents (Dell Technologies)</li>
+      <li>Modernized the web technology stack from GWT to Angular in the Data Protection domain (Dell Technologies)</li>
+      <li>Delivered appliance supportability and serviceability for the PowerProtectDD backup and recovery appliance (Dell EMC)</li>
+      <li>Customer experience and sustenance for EMEA region for a secure-router product (Nortel/Avaya)</li>
+      <li>Early career: network management software, GSM 2.5G features (location update, lawful interception), and router element-manager software (Wipro, Amber Networks, Siemens, Tasman Networks, Motorola)</li>
     </ul>
-  </section>
+  </div>
 
-  <section id="certifications">
-    <h2 class="section-title">Certifications &amp; Awards</h2>
-    <div class="tags">
-      <span class="tag">PMP</span>
-      <span class="tag">Certified Scrum Master</span>
-      <span class="tag">SAFe Agilist</span>
-      <span class="tag">Six Sigma — Green Belt</span>
-      <span class="tag">Certified Financial Manager</span>
-      <span class="tag">Game Changer Award — Agile Transformation</span>
-      <span class="tag">Rockstar Manager — 5 years</span>
-    </div>
-  </section>
+  <div class="group-block">
+    <div class="group">Transformation and delivery discipline</div>
+    <ul>
+      <li>Leading transformations in the org — delivery methodology and AI-native ways of working (Dell Technologies, HPE, Motorola)</li>
+      <li>Transformation leader for the entire portfolio of 1,000–1,200 engineers; scaled-Agile coach (Dell Technologies)</li>
+    </ul>
+  </div>
 
-  <section id="skills">
-    <h2 class="section-title">Skills</h2>
-    <div class="tags">
-      <span class="tag">Engineering Leadership</span>
-      <span class="tag">AI Transformation</span>
-      <span class="tag">Director-level Strategy</span>
-      <span class="tag">Speaker, Author &amp; Advisor</span>
-      <span class="tag">PhD Research Scholar</span>
-      <span class="tag">Org Design &amp; Team Build-out</span>
-      <span class="tag">Startup Environments</span>
-      <span class="tag">Community Building</span>
-    </div>
-  </section>
+  <h2>Industry and Academic Engagement</h2>
+  <p class="summary">Developed multiple tech communities (meetups) that aggregate to 22K members across India and beyond. Conducted 100+ events over the last 11 years at companies including Google, Microsoft, Navi, Brillio, Dell, HPE, Nutanix, IBM, GeekyAnts, and Roku.</p>
+  <p class="summary">Academic and research mindset with an M.Tech in Data Science &amp; AI from BITS Pilani; currently pursuing a part-time PhD in AI (agent to agent communication architectures). Official mentor to employees pursuing M.Tech from BITS Pilani. Authoring the book "Mastering TypeScript" for BPB publications.</p>
 
-  <footer>
-    <div class="titleblock">
-      <div class="titleblock-row">
-        <div class="titleblock-cell"><div class="k">Name</div><div class="v">Janardan Revuru</div></div>
-        <div class="titleblock-cell"><div class="k">Title</div><div class="v">Director of Engineering</div></div>
-        <div class="titleblock-cell"><div class="k">Location</div><div class="v">Bengaluru, India</div></div>
-      </div>
-      <div class="titleblock-row">
-        <div class="titleblock-cell"><div class="k">Scale</div><div class="v">100–1,200 eng. scope</div></div>
-        <div class="titleblock-cell"><div class="k">Rev.</div><div class="v">2026.08</div></div>
-        <div class="titleblock-cell"><div class="k">Status</div><div class="v">Open to VP / Director / Head of AI Eng.</div></div>
-      </div>
-    </div>
-    <div class="footer-links">
-      <a href="mailto:janardan.revuru@gmail.com">Email</a>
-      <a href="https://linkedin.com/in/rjanardan" target="_blank" rel="noopener">LinkedIn</a>
-      <a href="https://publish.obsidian.md/janardan" target="_blank" rel="noopener">Notes &amp; Writing (Obsidian Publish)</a>
-      <!-- TODO: replace with your actual meetup group URLs -->
-      <a href="#" target="_blank" rel="noopener">JavaScript Meetup</a>
-      <a href="#" target="_blank" rel="noopener">DARLing Community</a>
-    </div>
+  <h2>Skills</h2>
+  <div class="skills">
+    <span>Engineering leadership</span>
+    <span>Team seeding &amp; scaling</span>
+    <span>AI-native delivery</span>
+    <span>Enterprise infrastructure (server/storage/networking)</span>
+    <span>Scaled Agile &amp; architecture review</span>
+    <span>Community &amp; talent attraction</span>
+  </div>
+
+  <h2>Education</h2>
+  <table class="edu-grid">
+    <tr>
+      <td>
+        <div class="deg">Ph.D. Artificial Intelligence</div>
+        <div class="sub">REVA University Bengaluru, India</div>
+        <div class="sub">Expected in June 2028 (part-time, working professional)</div>
+        <div class="sub">Research in the field of Multi-agent systems knowledge and communication architectures</div>
+      </td>
+      <td>
+        <div class="deg">M.Tech Data Science</div>
+        <div class="sub">Birla Institute of Technology and Science (BITS), Pilani, June 2024</div>
+        <div class="sub">Project: Sustainability through Small Generative Models</div>
+      </td>
+    </tr>
+    <tr>
+      <td>
+        <div class="deg">B.E. Computer Science</div>
+        <div class="sub">Vijayanagar Engineering College Karnataka</div>
+      </td>
+      <td>
+        <div class="deg">MBA Marketing</div>
+        <div class="sub">I.G.N.O.U Bengaluru, India</div>
+      </td>
+    </tr>
+  </table>
+
+  <h2>Certifications and Awards</h2>
+  <ul>
+    <li>Project Management Professional (PMP)</li>
+    <li>Certified Scrum Master</li>
+    <li>SAFe Agilist</li>
+    <li>Six Sigma - Green Belt</li>
+    <li>Certified Financial Manager</li>
+    <li>Game Changer award for Agile Transformation</li>
+    <li>Top-decile team engagement scores for 5 consecutive years</li>
+  </ul>
+
+  <h2>Community Engagement</h2>
+  <ul>
+    <li>Founder and organizer of Tech communities with total 22K members; hosted 100+ events</li>
+    <li>JavaScript Meetup (since 2015)</li>
+    <li>Data science, Artificial intelligence, Research and Learning (DARLing) Meetup (since 2025)</li>
+    <li>Byte of Python (since 2025)</li>
+  </ul>
+
+  <h2>Affiliations and Advisory Roles</h2>
+  <ul>
+    <li>Academic Council - Madanapalle Institute of Technology &amp; Science (since 2025)</li>
+    <li>Board of Studies - Kishkindha University (since 2024)</li>
+    <li>Association of Computer Machinery (ACM) member (since 2024)</li>
+    <li>Community leader - Google (since 2020)</li>
+    <li>Open Source India conference (since 2011)</li>
+    <li>Technical Director - Huawei HarmonyOS Platform (till 2021)</li>
+    <li>Web Technologies Advisory Group - Microsoft (till 2018)</li>
+  </ul>
+
+  <h2>Patents (with co-inventors)</h2>
+  <ul>
+    <li>SYSTEMS AND METHODS FOR TEMPORARY ACCESS WITH ADAPTIVE TRUST LEVELS FOR AUTHENTICATION AND AUTHORIZATION; #20220337596; Issued: 20 Oct 2022</li>
+    <li>PARAMETER-BASED ADAPTIVE SCHEDULING OF JOBS; #20240354154; Issued: 24 Oct 2024</li>
+    <li>SYSTEMS AND METHODS FOR TEMPORARY ACCESS WITH ADAPTIVE TRUST LEVELS FOR AUTHENTICATION AND AUTHORIZATION (EXTN); #20240244058; 08 Apr 2025</li>
+    <li>SUGGESTING AND VALIDATING USER INTERFACE ELEMENTS IN ACCORDANCE WITH A DESIGN SYSTEM; US20260203081A1; Filed 16 Jul 2026</li>
+  </ul>
+
+  <footer class="teaser">
+    For more than 10 years I have built and scaled engineering teams from the ground up, growing an infrastructure management software org from 2 to 80 engineers and leading the shift to agentic-AI workflows across about 600, tripling productivity. Seeding teams that deliver and lead with AI-native engineering and a culture of experimentation. I bring that blend to both: an execution leader with a researcher's mindset, still hands-on in my PhD work on multi-agent systems.
   </footer>
 
 </div>
-
-<script>
-  (function(){
-    var root = document.documentElement;
-    var buttons = document.querySelectorAll('[data-theme-btn]');
-    var saved = null;
-    try { saved = localStorage.getItem('jr-theme'); } catch(e) {}
-    var validThemes = ['ledger','studio','blueprint'];
-    if (saved && validThemes.indexOf(saved) !== -1) { setTheme(saved); }
-
-    function setTheme(name){
-      root.setAttribute('data-theme', name);
-      buttons.forEach(function(b){
-        b.setAttribute('aria-pressed', b.getAttribute('data-theme-btn') === name ? 'true' : 'false');
-      });
-      try { localStorage.setItem('jr-theme', name); } catch(e) {}
-    }
-
-    buttons.forEach(function(btn){
-      btn.addEventListener('click', function(){
-        setTheme(btn.getAttribute('data-theme-btn'));
-      });
-    });
-
-    // Fixed bottom-right menu: open/close, section links, click-outside, escape key
-    var menu = document.getElementById('siteMenu');
-    var toggle = document.getElementById('siteMenuToggle');
-
-    function openMenu(){ menu.setAttribute('data-open','true'); toggle.setAttribute('aria-expanded','true'); }
-    function closeMenu(){ menu.setAttribute('data-open','false'); toggle.setAttribute('aria-expanded','false'); }
-    function isOpen(){ return menu.getAttribute('data-open') === 'true'; }
-
-    toggle.addEventListener('click', function(e){
-      e.stopPropagation();
-      isOpen() ? closeMenu() : openMenu();
-    });
-
-    menu.querySelectorAll('.site-menu-links a').forEach(function(link){
-      link.addEventListener('click', closeMenu);
-    });
-
-    document.addEventListener('click', function(e){
-      if (isOpen() && !menu.contains(e.target)) closeMenu();
-    });
-
-    document.addEventListener('keydown', function(e){
-      if (e.key === 'Escape' && isOpen()) closeMenu();
-    });
-  })();
-</script>
-
 </body>
 </html>
