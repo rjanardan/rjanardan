@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="signal">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Theme Lab — Janardan Revuru (design preview, not the live page)</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=IBM+Plex+Sans:wght@400;500;600&family=JetBrains+Mono:wght@400;500;600;700&family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600;9..144,700&family=Source+Serif+4:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+
+/* ============================================================
+   THEME LAB — shared structure, six visual identities
+   ============================================================ */
+:root{
+  --space-1:4px; --space-2:8px; --space-3:12px; --space-4:16px;
+  --space-5:24px; --space-6:32px; --space-7:48px; --space-8:64px; --space-9:96px;
+  --maxw:960px; --radius:3px; --radius-card:3px; --tracking-eyebrow:0.14em;
+}
+
+/* ---------- theme tokens ---------- */
+[data-theme="ledger"]{
+  --bg:#f7f4ec; --bg-elevated:#ffffff;
+  --text:#242938; --text-muted:#5d6274; --accent:#2b3a67;
+  --border:rgba(43,58,103,0.22); --border-strong:rgba(43,58,103,0.45);
+  --font-display:'Source Serif 4',serif; --font-body:'Source Serif 4',serif; --font-mono:'JetBrains Mono',monospace;
+  --radius:2px; --radius-card:2px; --tracking-eyebrow:0.1em;
+}
+[data-theme="signal"]{
+  --bg:#FBFAF6; --bg-elevated:#FFFFFF;
+  --text:#1A1712; --text-muted:#6F675A; --accent:#C53A1B;
+  --border:rgba(26,23,18,0.16); --border-strong:rgba(26,23,18,0.45);
+  --font-display:'Space Grotesk',sans-serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  --radius:3px; --radius-card:3px; --tracking-eyebrow:0.18em;
+}
+[data-theme="blueprint"]{
+  --bg:#EFF4FA; --bg-elevated:rgba(255,255,255,0.85);
+  --text:#10304F; --text-muted:#46607A; --accent:#1059A8; --accent-2:#C96A1B;
+  --border:rgba(16,48,79,0.22); --border-strong:rgba(16,48,79,0.5);
+  --font-display:'IBM Plex Sans',sans-serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  --radius:2px; --radius-card:2px; --tracking-eyebrow:0.16em;
+}
+[data-theme="terminal"]{
+  --bg:#0A0D11; --bg-elevated:#10151C;
+  --text:#D9E1E8; --text-muted:#8B98A5; --accent:#4ADE80;
+  --border:rgba(217,225,232,0.13); --border-strong:rgba(217,225,232,0.34);
+  --font-display:'JetBrains Mono',monospace; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  --radius:6px; --radius-card:6px; --tracking-eyebrow:0.14em;
+}
+[data-theme="onyx"]{
+  --bg:#0E0F12; --bg-elevated:#17181D;
+  --text:#ECE8E0; --text-muted:#A19A8D; --accent:#C9A96A;
+  --border:rgba(236,232,224,0.12); --border-strong:rgba(236,232,224,0.3);
+  --font-display:'Fraunces',serif; --font-body:'IBM Plex Sans',sans-serif; --font-mono:'JetBrains Mono',monospace;
+  --radius:0px; --radius-card:0px; --tracking-eyebrow:0.2em;
+}
+[data-theme="preprint"]{
+  --bg:#FFFFFF; --bg-elevated:#F7F7F5;
+  --text:#16181C; --text-muted:#55585F; --accent:#1B3FA8;
+  --border:rgba(22,24,28,0.16); --border-strong:rgba(22,24,28,0.42);
+  --font-display:'Source Serif 4',serif; --font-body:'Source Serif 4',serif; --font-mono:'JetBrains Mono',monospace;
+  --maxw:920px; --radius:0px; --radius-card:0px; --tracking-eyebrow:0.12em;
+}
+
+/* ---------- base ---------- */
+*{ box-sizing:border-box; }
+html{ scroll-behavior:smooth; overflow-x:hidden; }
+body{
+  margin:0; overflow-x:hidden; background:var(--bg); color:var(--text);
+  font-family:var(--font-body); line-height:1.65; font-size:16px;
+  transition:background .35s ease, color .35s ease;
+}
+a{ color:var(--accent); text-decoration:none; }
+a:hover{ text-decoration:underline; }
+a:focus-visible, button:focus-visible{ outline:2px solid var(--accent); outline-offset:3px; }
+::selection{ background:var(--accent); color:var(--bg); }
+.wrap{ max-width:var(--maxw); margin:0 auto; padding:0 var(--space-5); }
+h1,h2,h3{ font-family:var(--font-display); font-weight:600; margin:0; }
+section{ scroll-margin-top:56px; }
+
+/* ---------- top theme picker ---------- */
+.topbar{ position:sticky; top:0; z-index:90; background:color-mix(in srgb, var(--bg) 88%, transparent); backdrop-filter:blur(10px); -webkit-backdrop-filter:blur(10px); border-bottom:1px solid var(--border); }
+.topbar-inner{ max-width:var(--maxw); margin:0 auto; padding:7px var(--space-5); display:flex; align-items:center; gap:14px; }
+.topbar-label{ font-family:var(--font-mono); font-size:9.5px; text-transform:uppercase; letter-spacing:.14em; color:var(--text-muted); white-space:nowrap; }
+.theme-options{ display:flex; align-items:center; gap:4px; overflow-x:auto; scrollbar-width:none; }
+.theme-options::-webkit-scrollbar{ display:none; }
+.theme-options button{
+  display:flex; align-items:center; gap:7px; white-space:nowrap;
+  font-family:var(--font-mono); font-size:10.5px; letter-spacing:.03em; text-transform:uppercase;
+  background:transparent; border:1px solid transparent; color:var(--text-muted); cursor:pointer;
+  padding:6px 10px; min-height:26px; border-radius:999px; transition:color .15s ease, border-color .15s ease, background .15s ease;
+}
+.theme-options button:hover{ color:var(--text); border-color:var(--border); }
+.theme-options button[aria-pressed="true"]{ color:var(--text); border-color:var(--border-strong); background:color-mix(in srgb, var(--accent) 10%, transparent); }
+.theme-options .dot{ width:8px; height:8px; border-radius:50%; flex-shrink:0; }
+.dot-ledger{ background:#2b3a67; } .dot-signal{ background:#C53A1B; }
+.dot-blueprint{ background:#1059A8; } .dot-terminal{ background:#4ADE80; }
+.dot-onyx{ background:#C9A96A; } .dot-preprint{ background:#1B3FA8; }
+
+/* ---------- header ---------- */
+header{ padding:var(--space-7) 0 var(--space-5); border-bottom:1px solid var(--border); }
+.header-row{ display:flex; align-items:center; gap:var(--space-6); margin-bottom:var(--space-4); }
+.headshot{ width:118px; height:118px; border-radius:50%; overflow:hidden; flex-shrink:0; border:1px solid var(--border-strong); background:color-mix(in srgb, var(--text) 5%, transparent); display:flex; align-items:center; justify-content:center; font-family:var(--font-mono); font-size:10px; color:var(--text-muted); }
+.headshot img{ width:100%; height:100%; object-fit:cover; }
+@media (max-width:560px){
+  .header-row{ flex-direction:column; align-items:flex-start; gap:var(--space-4); }
+  .headshot{ width:96px; height:96px; }
+}
+.eyebrow{ font-family:var(--font-mono); font-size:11px; letter-spacing:var(--tracking-eyebrow); text-transform:uppercase; color:var(--accent); margin:0 0 var(--space-2); }
+.name{ font-size:clamp(34px,5vw,54px); line-height:1.04; letter-spacing:-0.01em; margin-bottom:var(--space-2); }
+.tagline{ font-size:clamp(15px,2vw,18px); color:var(--text-muted); max-width:660px; margin-bottom:var(--space-4); }
+.contact-row{ display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); font-family:var(--font-mono); font-size:13px; color:var(--text-muted); }
+.contact-row a{ color:var(--text); }
+.contact-row span.sep{ color:var(--border-strong); }
+.cta-row{ display:flex; flex-wrap:wrap; gap:var(--space-3); margin-top:var(--space-4); }
+.btn{ display:inline-block; font-family:var(--font-mono); font-size:12.5px; text-transform:uppercase; letter-spacing:.05em; padding:11px 18px; border-radius:999px; border:1px solid var(--border-strong); color:var(--text); }
+.btn:hover{ text-decoration:none; background:color-mix(in srgb, var(--text) 6%, transparent); }
+.btn.primary{ background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:600; }
+.btn.primary:hover{ opacity:.9; background:var(--accent); }
+
+/* ---------- sections ---------- */
+section{ padding:var(--space-6) 0; border-bottom:1px solid var(--border); }
+section:last-of-type{ border-bottom:none; }
+h2.section-title{ font-size:clamp(22px,3vw,28px); margin-bottom:var(--space-2); }
+.section-sub{ color:var(--text-muted); font-size:14.5px; max-width:640px; margin-bottom:var(--space-4); }
+
+/* ---------- cards ---------- */
+.pillar-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:var(--space-4); }
+.pillar-card{ border:1px solid var(--border); border-radius:var(--radius-card); padding:var(--space-5); background:var(--bg-elevated); display:flex; flex-direction:column; gap:var(--space-2); transition:border-color .2s ease, transform .2s ease; }
+.pillar-card:hover{ border-color:var(--border-strong); }
+.pillar-card .pillar-title{ font-family:var(--font-display); font-weight:600; font-size:16px; }
+.pillar-card .pillar-desc{ color:var(--text-muted); font-size:13.5px; flex:1; }
+.pillar-card .pillar-link{ font-family:var(--font-mono); font-size:11.5px; text-transform:uppercase; letter-spacing:.05em; }
+
+/* ---------- metrics ---------- */
+.stat-row{ display:grid; grid-template-columns:repeat(4,1fr); gap:var(--space-4); margin-bottom:var(--space-4); }
+.stat-row-2{ display:grid; grid-template-columns:repeat(2,1fr); gap:var(--space-4); margin-bottom:var(--space-4); }
+.stat{ border:1px solid var(--border); border-radius:var(--radius-card); padding:var(--space-4); text-align:center; background:var(--bg-elevated); }
+.stat .num{ font-family:var(--font-display); font-size:28px; font-weight:700; color:var(--accent); }
+.stat .label{ font-family:var(--font-mono); font-size:10.5px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.07em; margin-top:4px; }
+
+/* ---------- companies ---------- */
+.company-wall{ display:grid; grid-template-columns:1.6fr 1fr; gap:var(--space-5); margin-top:var(--space-4); }
+.company-bucket{ border:1px solid var(--border); border-radius:var(--radius-card); padding:var(--space-5); background:var(--bg-elevated); }
+.bucket-title{ font-family:var(--font-mono); font-size:11px; color:var(--accent); text-transform:uppercase; letter-spacing:.1em; margin-bottom:var(--space-4); border-bottom:1px solid var(--border); padding-bottom:var(--space-2); }
+.logo-strip{ display:flex; flex-wrap:wrap; align-items:center; gap:var(--space-5) var(--space-7); }
+.logo-item{ height:28px; transition:transform .2s ease; display:flex; align-items:center; position:relative; }
+.logo-item:hover{ transform:scale(1.06); }
+.logo-item img{ height:100%; width:auto; max-width:110px; object-fit:contain; }
+.logo-item::after{ content:attr(data-title); position:absolute; bottom:100%; left:50%; transform:translateX(-50%) translateY(-8px); background:var(--text); color:var(--bg); padding:5px 9px; font-family:var(--font-mono); font-size:10px; white-space:nowrap; border-radius:3px; opacity:0; pointer-events:none; transition:all .15s ease; box-shadow:0 4px 12px rgba(0,0,0,0.15); z-index:10; }
+.logo-item:hover::after{ opacity:1; transform:translateX(-50%) translateY(-4px); }
+
+/* ---------- communities ---------- */
+.community-grid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:var(--space-5); }
+.community-card{ border:1px solid var(--border); border-radius:var(--radius-card); overflow:hidden; background:var(--bg-elevated); }
+.community-logo{ aspect-ratio:2/1; background:var(--bg-elevated); border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:center; padding:var(--space-2); font-family:var(--font-mono); font-size:10px; color:var(--text-muted); text-transform:uppercase; letter-spacing:.04em; }
+.community-logo img{ max-width:88%; max-height:88%; object-fit:contain; }
+.community-body{ padding:var(--space-4); }
+.community-body .c-title{ font-family:var(--font-display); font-weight:600; font-size:16px; margin-bottom:4px; }
+.community-body .c-meta{ font-family:var(--font-mono); font-size:10.5px; color:var(--accent); margin-bottom:8px; text-transform:uppercase; letter-spacing:.06em; }
+.community-body p{ font-size:13.5px; color:var(--text-muted); margin:0 0 var(--space-3); }
+.c-members{ font-family:var(--font-mono); font-size:12px; font-weight:600; color:var(--accent); margin-bottom:var(--space-3); }
+.community-body a{ display:inline-block; font-size:13.5px; }
+.community-body a + br + a{ margin-top:6px; }
+
+/* ---------- list + footer ---------- */
+.simple-list{ list-style:none; margin:0; padding:0; }
+.simple-list li{ display:flex; justify-content:space-between; gap:var(--space-4); padding:var(--space-3) 0; border-top:1px solid var(--border); font-size:14.5px; }
+.simple-list li:first-child{ border-top:none; }
+.simple-list .meta{ font-family:var(--font-mono); font-size:12px; color:var(--text-muted); white-space:nowrap; }
+footer{ padding:var(--space-6) 0 var(--space-7); }
+.titleblock{ border:1px solid var(--border-strong); border-radius:var(--radius-card); font-family:var(--font-mono); font-size:12px; }
+.titleblock-row{ display:grid; grid-template-columns:1fr 1fr 1fr; border-top:1px solid var(--border); }
+.titleblock-row:first-child{ border-top:none; }
+.titleblock-cell{ padding:var(--space-3) var(--space-4); border-left:1px solid var(--border); }
+.titleblock-cell:first-child{ border-left:none; }
+.titleblock-cell .k{ color:var(--text-muted); text-transform:uppercase; letter-spacing:.07em; font-size:10px; margin-bottom:3px; }
+.titleblock-cell .v{ color:var(--text); }
+.footer-links{ margin-top:var(--space-5); display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); font-family:var(--font-mono); font-size:13px; }
+
+/* ============================================================
+   PER-THEME CHARACTER
+   ============================================================ */
+
+/* --- Signal: editorial print, numbered sections, red full-stop --- */
+[data-theme="signal"]{ --maxw:980px; }
+[data-theme="signal"] .wrap{ counter-reset:sec; }
+[data-theme="signal"] .name::after{ content:"."; color:var(--accent); }
+[data-theme="signal"] .eyebrow::before{ content:"— "; opacity:.7; }
+[data-theme="signal"] h2.section-title{ counter-increment:sec; display:flex; align-items:baseline; gap:14px; }
+[data-theme="signal"] h2.section-title::before{ content:counter(sec,decimal-leading-zero); font-family:var(--font-mono); font-size:12px; font-weight:500; color:var(--accent); letter-spacing:.08em; }
+[data-theme="signal"] .btn{ border-radius:2px; }
+[data-theme="signal"] .headshot{ border-radius:50%; }
+[data-theme="signal"] .stat .num{ letter-spacing:-0.02em; }
+[data-theme="signal"] header{ border-bottom:2px solid var(--text); }
+
+/* --- Blueprint: light drafting sheet, hairline grid, corner ticks --- */
+[data-theme="blueprint"] body{
+  background-color:#EFF4FA;
+  background-image:
+    linear-gradient(rgba(16,48,79,0.05) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16,48,79,0.05) 1px, transparent 1px),
+    linear-gradient(rgba(16,48,79,0.028) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(16,48,79,0.028) 1px, transparent 1px);
+  background-size:128px 128px, 128px 128px, 32px 32px, 32px 32px;
+}
+[data-theme="blueprint"] .eyebrow{ letter-spacing:.22em; }
+[data-theme="blueprint"] .eyebrow::before{ content:"▤ "; }
+[data-theme="blueprint"] .name{ text-transform:uppercase; letter-spacing:.04em; font-weight:600; }
+[data-theme="blueprint"] h2.section-title{ text-transform:uppercase; letter-spacing:.05em; font-size:clamp(18px,2.4vw,24px); padding-bottom:10px; border-bottom:1px solid var(--border); }
+[data-theme="blueprint"] .btn{ border-radius:2px; letter-spacing:.1em; }
+[data-theme="blueprint"] .headshot{ border-radius:4px; border:2px solid rgba(255,255,255,0.9); }
+[data-theme="blueprint"] .pillar-card, [data-theme="blueprint"] .stat, [data-theme="blueprint"] .company-bucket{ position:relative; }
+[data-theme="blueprint"] .pillar-card::before, [data-theme="blueprint"] .stat::before, [data-theme="blueprint"] .company-bucket::before{
+  content:""; position:absolute; top:-1px; left:-1px; width:10px; height:10px;
+  border-top:2px solid var(--accent); border-left:2px solid var(--accent); border-radius:2px 0 0 0;
+}
+[data-theme="blueprint"] .pillar-card::after, [data-theme="blueprint"] .stat::after, [data-theme="blueprint"] .company-bucket::after{
+  content:""; position:absolute; bottom:-1px; right:-1px; width:10px; height:10px;
+  border-bottom:2px solid var(--accent); border-right:2px solid var(--accent); border-radius:0 0 2px 0;
+}
+[data-theme="blueprint"] .stat .num{ font-size:30px; }
+[data-theme="blueprint"] .titleblock{ border-width:2px; }
+[data-theme="blueprint"] .contact-row span.sep{ content:""; }
+[data-theme="blueprint"] .btn.primary{ color:#fff; }
+
+/* --- Terminal: console on dark, prompt marks, blinking cursor --- */
+[data-theme="terminal"] .eyebrow::before{ content:"❯ "; color:var(--accent); }
+[data-theme="terminal"] .eyebrow{ letter-spacing:.08em; }
+[data-theme="terminal"] .name{ font-weight:600; letter-spacing:-0.02em; }
+[data-theme="terminal"] .name::after{
+  content:"▋"; color:var(--accent); margin-left:6px; animation:blink 1.15s steps(2,start) infinite;
+}
+@keyframes blink{ to{ visibility:hidden; } }
+@media (prefers-reduced-motion:reduce){ [data-theme="terminal"] .name::after{ animation:none; visibility:visible; } }
+[data-theme="terminal"] .btn{ border-radius:8px; letter-spacing:.04em; }
+[data-theme="terminal"] .stat .num{ font-family:var(--font-mono); letter-spacing:-0.03em; }
+[data-theme="terminal"] .c-meta::before, [data-theme="terminal"] .bucket-title::before{ content:"# "; opacity:.6; }
+[data-theme="terminal"] .logo-item, [data-theme="terminal"] .community-logo{ background:#fff; }
+[data-theme="terminal"] .logo-item{ height:auto; padding:6px 9px; border-radius:5px; }
+[data-theme="terminal"] .logo-item img{ height:20px; }
+[data-theme="terminal"] .community-logo{ background:#fff; }
+[data-theme="terminal"] .pillar-card, [data-theme="terminal"] .stat{ background:var(--bg-elevated); }
+[data-theme="terminal"] .btn.primary{ color:#0A0D11; }
+
+/* --- Onyx: dark executive, serif + champagne hairline --- */
+[data-theme="onyx"] .eyebrow{ letter-spacing:.24em; }
+[data-theme="onyx"] .eyebrow::before{ content:"· "; font-weight:700; }
+[data-theme="onyx"] .name{ font-weight:500; letter-spacing:0; }
+[data-theme="onyx"] h2.section-title{ font-weight:500; letter-spacing:.01em; }
+[data-theme="onyx"] h2.section-title::after{ content:""; display:block; width:44px; height:1px; background:var(--accent); margin-top:10px; }
+[data-theme="onyx"] .btn{ border-radius:999px; letter-spacing:.09em; font-size:11.5px; }
+[data-theme="onyx"] .stat .num{ font-weight:500; color:var(--text); }
+[data-theme="onyx"] .logo-item, [data-theme="onyx"] .community-logo{ background:#fff; }
+[data-theme="onyx"] .logo-item{ height:auto; padding:6px 9px; border-radius:3px; }
+[data-theme="onyx"] .logo-item img{ height:20px; }
+[data-theme="onyx"] .community-logo{ background:#fff; }
+[data-theme="onyx"] .titleblock{ background:var(--bg-elevated); }
+[data-theme="onyx"] .btn.primary{ color:#0E0F12; }
+
+/* --- Preprint: academic paper, numbered headings, blue citations --- */
+[data-theme="preprint"] body{ line-height:1.72; }
+[data-theme="preprint"] .wrap{ counter-reset:sec; }
+[data-theme="preprint"] .eyebrow{ text-transform:none; letter-spacing:.02em; font-size:12.5px; }
+[data-theme="preprint"] .eyebrow::before{ content:"[ "; }
+[data-theme="preprint"] .eyebrow::after{ content:" ]"; }
+[data-theme="preprint"] h2.section-title{ counter-increment:sec; font-size:clamp(19px,2.5vw,24px); font-weight:600; }
+[data-theme="preprint"] h2.section-title::before{ content:counter(sec) ".  "; color:var(--accent); font-variant-numeric:tabular-nums; }
+[data-theme="preprint"] .section-sub{ font-size:14px; }
+[data-theme="preprint"] .btn{ border-radius:0; font-size:11px; letter-spacing:.08em; }
+[data-theme="preprint"] .btn.primary{ background:var(--text); border-color:var(--text); color:#fff; }
+[data-theme="preprint"] .stat{ text-align:left; border-width:1px 0 0 0; padding:var(--space-3) 0 0; background:transparent; border-radius:0; }
+[data-theme="preprint"] .stat-row, [data-theme="preprint"] .stat-row-2{ border-bottom:1px solid var(--border); padding-bottom:var(--space-4); }
+[data-theme="preprint"] .stat .num{ font-size:24px; color:var(--text); }
+[data-theme="preprint"] .stat .label{ letter-spacing:.05em; }
+[data-theme="preprint"] .pillar-card, [data-theme="preprint"] .company-bucket, [data-theme="preprint"] .community-card{ border-radius:0; }
+[data-theme="preprint"] .community-logo{ border-radius:0; }
+[data-theme="preprint"] a{ text-decoration:none; }
+[data-theme="preprint"] a:hover{ text-decoration:underline; }
+[data-theme="preprint"] header{ border-bottom:1px solid var(--border); }
+[data-theme="preprint"] .titleblock{ font-size:11.5px; }
+[data-theme="preprint"] .headshot{ border-radius:50%; }
+
+/* ---------- responsive ---------- */
+@media (max-width:768px){
+  .stat-row{ grid-template-columns:repeat(2,1fr); }
+  .stat-row-2{ grid-template-columns:repeat(2,1fr); }
+  .company-wall{ grid-template-columns:1fr; gap:var(--space-4); }
+}
+@media (max-width:640px){
+  .titleblock-row{ grid-template-columns:1fr; }
+  .titleblock-cell{ border-left:none; border-top:1px solid var(--border); }
+  .titleblock-cell:first-child{ border-top:none; }
+}
+@media (max-width:480px){
+  .stat-row{ grid-template-columns:1fr; }
+  .stat-row-2{ grid-template-columns:1fr; }
+}
+</style>
+</head>
+<body>
+<div class="topbar" role="region" aria-label="Theme selector">
+  <div class="topbar-inner">
+    <span class="topbar-label">Theme</span>
+    <div class="theme-options" role="group" aria-label="Choose a visual theme">
+      <button type="button" data-theme-btn="signal" aria-pressed="true"><i class="dot dot-signal" aria-hidden="true"></i>Signal</button>
+      <button type="button" data-theme-btn="ledger" aria-pressed="false"><i class="dot dot-ledger" aria-hidden="true"></i>Ledger</button>
+      <button type="button" data-theme-btn="blueprint" aria-pressed="false"><i class="dot dot-blueprint" aria-hidden="true"></i>Blueprint</button>
+      <button type="button" data-theme-btn="terminal" aria-pressed="false"><i class="dot dot-terminal" aria-hidden="true"></i>Terminal</button>
+      <button type="button" data-theme-btn="onyx" aria-pressed="false"><i class="dot dot-onyx" aria-hidden="true"></i>Onyx</button>
+      <button type="button" data-theme-btn="preprint" aria-pressed="false"><i class="dot dot-preprint" aria-hidden="true"></i>Preprint</button>
+    </div>
+  </div>
+</div>
+
+<div class="wrap">
+278|
+279|  <header>
+280|    <div class="header-row">
+281|      <!-- Place photo at: images/profile/headshot.jpg -->
+282|      <div class="headshot">
+283|        <img src="images/profile/headshot.jpg" alt="Janardan Revuru" onerror="this.style.display='none'; this.parentElement.textContent='Photo';">
+284|      </div>
+285|      <div class="header-text">
+286|        <p class="eyebrow">Engineering Leader· AI Adoption at Enterprise Scale · Multi-Agent AI Research</p>
+287|        <h1 class="name">Janardan Revuru</h1>
+288|      </div>
+289|    </div>
+290|    <p class="tagline">Engineering leader experienced in Enterprise Infrastructure Management Software (Network, Storage, Servers), scaling global development teams, and leading Agentic AI adoption with a Research mindset.</p>
+291|    <div class="contact-row">
+292|      <span>Bengaluru, India</span><span class="sep">/</span>
+293|      <a href="mailto:janardan.revuru@gmail.com">janardan.revuru@gmail.com</a><span class="sep">/</span>
+294|      <a href="https://linkedin.com/in/rjanardan" target="_blank" rel="noopener">linkedin.com/in/rjanardan</a>
+295|    </div>
+296|    <div class="cta-row">
+297|      <a class="btn primary" href="janardan-profile.html">Full Profile &amp; Resume</a>
+298|      <a class="btn" href="#communities">Industry &amp; Communities</a>
+299|      <a class="btn" href="https://publish.obsidian.md/janardan" target="_blank" rel="noopener">Research Blog</a>
+300|    </div>
+301|  </header>
+302|
+303|  <section id="metrics">
+304|    <div class="stat-row">
+305|      <div class="stat">
+306|        <div class="num">3x</div>
+307|        <div class="label">Org Transformations</div>
+308|      </div>
+309|      <div class="stat">
+310|        <div class="num">2x</div>
+311|        <div class="label">Zero-to-Ship Team Ramps</div>
+312|      </div>
+313|      <div class="stat">
+314|        <div class="num">Top 2%</div>
+315|        <div class="label">Dell Leadership Select</div>
+316|      </div>
+317|      <div class="stat">
+318|        <div class="num">5x</div>
+319|        <div class="label">People Engagement Award</div>
+320|      </div>
+321|    </div>
+322|    <div class="stat-row-2">
+323|      <div class="stat">
+324|        <div class="num">3 + 1</div>
+325|        <div class="label">US Patents</div>
+326|      </div>
+327|      <div class="stat">
+328|        <div class="num">22K+</div>
+329|        <div class="label">Community Members</div>
+330|      </div>
+331|    </div>
+332|  </section>
+333|
+334|  <section id="career-pedigree">
+335|    <h2 class="section-title">Scale &amp; Execution Pedigree</h2>
+336|    <p class="section-sub">A career spanning large-scale global enterprise systems and early-stage engineering startups.</p>
+337|    
+338|    <div class="company-wall">
+339|      <!-- MNC Bucket -->
+340|      <div class="company-bucket">
+341|        <div class="bucket-title">Global Enterprises &amp; MNCs</div>
+342|        <div class="logo-strip">
+343|          <div class="logo-item" data-title="Dell Technologies"><img src="images/logos/dell.svg" alt="Dell Technologies"></div>
+344|          <div class="logo-item" data-title="Hewlett Packard Enterprise"><img src="images/logos/hpe.svg" alt="HPE"></div>
+345|          <div class="logo-item" data-title="Motorola Solutions"><img src="images/logos/motorola.svg" alt="Motorola"></div>
+346|          <div class="logo-item" data-title="Avaya"><img src="images/logos/avaya.svg" alt="Avaya"></div>
+347|          <div class="logo-item" data-title="Nortel Networks"><img src="images/logos/nortel.svg" alt="Nortel"></div>
+348|          <div class="logo-item" data-title="Wipro"><img src="images/logos/wipro.svg" alt="Wipro"></div>
+349|          <div class="logo-item" data-title="Siemens"><img src="images/logos/siemens.svg" alt="Siemens"></div>
+350|        </div>
+351|      </div>
+352|      
+353|      <!-- Startups Bucket -->
+354|      <div class="company-bucket">
+355|        <div class="bucket-title">Startups &amp; Growth Tech</div>
+356|        <div class="logo-strip">
+357|          <div class="logo-item" data-title="Amber Networks (Acquired by Nokia)"><img src="images/logos/amber.png" alt="Amber Networks"></div>
+358|          <div class="logo-item" data-title="Tasman Networks (Acquired by Nortel)"><img src="images/logos/tasman.png" alt="Tasman Networks"></div>
+359|        </div>
+360|      </div>
+361|    </div>
+362|  </section>
+363|
+364|  <section id="playbook">
+365|    <h2 class="section-title">Leadership &amp; Strategy Playbook</h2>
+366|    <p class="section-sub">My core pillars for building high-performing organizations and driving technological transformation.</p>
+367|    <div class="pillar-grid">
+368|      <div class="pillar-card">
+369|        <div class="pillar-title">AI-Native Engineering Transformation</div>
+370|        <div class="pillar-desc">Pioneered transition from AI coding assistants to agentic AI workflows across a 600-engineer business unit at Dell, yielding 3x productivity and 30% higher team engagement. Researching multi-agent system communication architectures (Ph.D. Candidate in AI).</div>
+371|      </div>
+372|      <div class="pillar-card">
+373|        <div class="pillar-title">Organizational Scaling &amp; Culture</div>
+374|        <div class="pillar-desc">Built teams in India with complete ownership of manageability software for Enterprise products. As India manageability site lead, grew team to 100 engineers. Graduated from Dell's flagship LEAD program. Earned Rockstar Manager for 5 consecutive years with exceptional team engagement scores.</div>
+375|      </div>
+376|      <div class="pillar-card">
+377|        <div class="pillar-title">Portfolio Transformation &amp; Modernization</div>
+378|        <div class="pillar-desc">Led Agile/Scaled Scrum transformation for a portfolio (~1200 engineers). Standardized secure, spec-driven engineering methodologies and directed the modernization of legacy technologies (e.g., GWT to Angular).</div>
+379|      </div>
+380|      <div class="pillar-card">
+381|        <div class="pillar-title">Startup Bootstrapping &amp; Delivery</div>
+382|        <div class="pillar-desc">Formed the element manager engineering team from scratch at Tasman Networks. Architected the embedded web server and delivered v1.0 of the product from India, establishing the technical foundation that later scaled through Nortel and Avaya acquisitions.</div>
+383|      </div>
+384|    </div>
+385|  </section>
+386|
+387|  <section id="pillars">
+388|    <h2 class="section-title">Profile &amp; Credentials</h2>
+389|    <p class="section-sub">Detailed experience, technical patents, and resume portfolio.</p>
+390|    <div class="pillar-grid">
+391|      <div class="pillar-card">
+392|        <div class="pillar-title">Full Profile &amp; Resume</div>
+393|        <div class="pillar-desc">Complete career history, experience, education, certifications, and skills.</div>
+394|        <a class="pillar-link" href="janardan-profile.html">View profile →</a>
+395|      </div>
+396|      <div class="pillar-card">
+397|        <div class="pillar-title">Patents</div>
+398|        <div class="pillar-desc">3 granted patents and 1 published application in adaptive authentication and job scheduling.</div>
+399|        <a class="pillar-link" href="https://patents.justia.com/inventor/janardan-revuru" target="_blank" rel="noopener">View patents →</a>
+400|      </div>
+401|    </div>
+402|  </section>
+403|
+404|  <section id="insights">
+405|    <h2 class="section-title">Insights, Research &amp; Advisory</h2>
+406|    <p class="section-sub">Research publications, technology essays, and academic advisory roles.</p>
+407|    <div class="pillar-grid">
+408|      <div class="pillar-card">
+409|        <div class="pillar-title">Research Blog (Obsidian)</div>
+410|        <div class="pillar-desc">Working notes from PhD research — agent-to-agent communication and structured knowledge grounding.</div>
+411|        <a class="pillar-link" href="https://publish.obsidian.md/janardan" target="_blank" rel="noopener">Read notes →</a>
+412|      </div>
+413|      <div class="pillar-card">
+414|        <div class="pillar-title">Open Source For You</div>
+415|        <div class="pillar-desc">Published articles on open source technology and engineering practice.</div>
+416|        <a class="pillar-link" href="https://www.opensourceforu.com/author/janardan-revuru/" target="_blank" rel="noopener">Read articles →</a>
+417|      </div>
+418|      <div class="pillar-card">
+419|        <div class="pillar-title">Medium — Janalogy</div>
+420|        <div class="pillar-desc">Essays on engineering leadership, AI transformation, and team scaling.</div>
+421|        <!-- TODO: replace with your actual Medium profile URL -->
+422|        <a class="pillar-link" href="https://medium.com/@janalogy" target="_blank" rel="noopener">Read on Medium →</a>
+423|      </div>
+424|      <div class="pillar-card">
+425|        <div class="pillar-title">Advisory &amp; Conferences</div>
+426|        <div class="pillar-desc">Open Source India Conference contributor since 2011; academic council and board-of-studies roles.</div>
+427|        <a class="pillar-link" href="janardan-profile.html#affiliations">View affiliations →</a>
+428|      </div>
+429|    </div>
+430|  </section>
+431|
+432|  <section id="communities">
+433|    <h2 class="section-title">Industry and Communities Connect</h2>
+434|    <p class="section-sub">As part of giving back to community, I organize meetups to cover latest topics in tech and connect people. Over the years, by sheer magic of componding these groups evolved. 22,000+ members, 100+ events hosted at companies including Google, Microsoft, Navi, Brillio, Dell, HPE, Nutanix, IBM, GeekyAnts, and Roku.</p>
+435|    <div class="community-grid">
+436|      <div class="community-card">
+437|        <div class="community-logo">
+438|          <!-- Place logo file at: images/javascriptmeetup/logo.png -->
+439|          <img src="images/javascriptmeetup/logo.png" alt="JavaScript Meetup logo" onerror="this.style.display='none'; this.parentElement.textContent='Logo';">
+440|        </div>
+441|        <div class="community-body">
+442|          <div class="c-title">JavaScript Meetup</div>
+443|          <div class="c-meta">Since 2015 · Co-founder</div>
+444|          <p>Bangalore's long-running JS community — talks, workshops, and networking for frontend and full-stack engineers.</p>
+445|          <div class="c-members">Join 13,050+ members</div>
+446|          <a href="javascriptmeetup.html">About community →</a><br>
+447|          <a href="https://www.meetup.com/javascriptmeetup/" target="_blank" rel="noopener">Join community at meetup.com →</a>
+448|        </div>
+449|      </div>
+450|      <div class="community-card">
+451|        <div class="community-logo">
+452|          <!-- Place logo file at: images/darling-meetup/logo.png -->
+453|          <img src="images/darling-meetup/logo.png" alt="DARLing logo" onerror="this.style.display='none'; this.parentElement.textContent='Logo';">
+454|        </div>
+455|        <div class="community-body">
+456|          <div class="c-title">DARLing Meetup</div>
+457|          <div class="c-meta">Since 2025 · Founder</div>
+458|          <p>Data Science, AI, Research and Learning — a research-driven AI community relaunched from an earlier ODSC group.</p>
+459|          <div class="c-members">Join 4,833+ members</div>
+460|          <a href="darling-meetup.html">About community →</a><br>
+461|          <a href="https://www.meetup.com/darling-meetup/" target="_blank" rel="noopener">Join community at meetup.com →</a>
+462|        </div>
+463|      </div>
+464|      <div class="community-card">
+465|        <div class="community-logo">
+466|          <!-- Place logo file at: images/byte-of-python/logo.png -->
+467|          <img src="images/byte-of-python/logo.png" alt="Byte of Python logo" onerror="this.style.display='none'; this.parentElement.textContent='Logo';">
+468|        </div>
+469|        <div class="community-body">
+470|          <div class="c-title">Byte of Python Meetup</div>
+471|          <div class="c-meta">Since 2025 · Founder</div>
+472|          <p>A community for Python practitioners — from fundamentals to applied data science and AI tooling.</p>
+473|          <div class="c-members">Join 4,771+ members</div>
+474|          <a href="byte-of-python.html">About community →</a><br>
+475|          <a href="https://www.meetup.com/byte-of-python/" target="_blank" rel="noopener">Join community at meetup.com →</a>
+476|        </div>
+477|      </div>
+478|    </div>
+479|  </section>
+480|
+481|  <section id="universities">
+482|    <h2 class="section-title">Universities I Work With</h2>
+483|    <p class="section-sub">Academic affiliations, advisory roles, and ongoing research.</p>
+484|    <ul class="simple-list">
+485|      <li><span>REVA University — Ph.D. candidate, Artificial Intelligence</span><span class="meta">Since Dec 2025</span></li>
+486|      <li><span>Birla Institute of Technology &amp; Science, Pilani — M.Tech, Data Science</span><span class="meta">Completed Jun 2024</span></li>
+487|      <li><span>Madanapalle Institute of Technology &amp; Science — Academic Council Member</span><span class="meta">Since 2025</span></li>
+488|      <li><span>Kishkindha University — Board of Studies Member</span><span class="meta">Since 2024</span></li>
+489|    </ul>
+490|  </section>
+491|
+492|  <footer>
+493|    <div class="titleblock">
+494|      <div class="titleblock-row">
+495|        <div class="titleblock-cell"><div class="k">Name</div><div class="v">Janardan Revuru</div></div>
+496|        <div class="titleblock-cell"><div class="k">Page</div><div class="v">Homepage / Hub</div></div>
+497|        <div class="titleblock-cell"><div class="k">Location</div><div class="v">Bengaluru, India</div></div>
+498|      </div>
+499|      <div class="titleblock-row">
+500|        <div class="titleblock-cell"><div class="k">Rev.</div><div class="v">2026.08</div></div>
+501|        <div class="titleblock-cell"><div class="k">Profile</div><div class="v"><a href="janardan-profile.html">janardan-profile.html</a></div></div>
+502|        <div class="titleblock-cell"><div class="k">Status</div><div class="v">Open to Director/Engineering Leader/Head of AI Engg.</div></div>
+503|      </div>
+504|    </div>
+505|    <div class="footer-links">
+506|      <a href="mailto:janardan.revuru@gmail.com">Email</a>
+507|      <a href="https://linkedin.com/in/rjanardan" target="_blank" rel="noopener">LinkedIn</a>
+508|      <a href="janardan-profile.html">Full Profile</a>
+509|      <a href="https://publish.obsidian.md/janardan" target="_blank" rel="noopener">Research Blog</a>
+510|    </div>
+511|  </footer>
+512|
+513|</div>
+514|
+515|<script>
+516|  (function(){
+517|    var root = document.documentElement;
+518|    var buttons = document.querySelectorAll('[data-theme-btn]');
+519|    var saved = null;
+520|    try { saved = localStorage.getItem('jr-theme'); } catch(e) {}
+521|    var validThemes = ['ledger','studio','blueprint'];
+522|    if (saved && validThemes.indexOf(saved) !== -1) { setTheme(saved); }
+523|
+524|    function setTheme(name){
+525|      root.setAttribute('data-theme', name);
+526|      buttons.forEach(function(b){
+527|        b.setAttribute('aria-pressed', b.getAttribute('data-theme-btn') === name ? 'true' : 'false');
+528|      });
+529|      try { localStorage.setItem('jr-theme', name); } catch(e) {}
+530|    }
+531|
+532|    buttons.forEach(function(btn){
+533|      btn.addEventListener('click', function(){
+534|        setTheme(btn.getAttribute('data-theme-btn'));
+535|      });
+536|    });
+537|
+538|    var menu = document.getElementById('siteMenu');
+539|    var toggle = document.getElementById('siteMenuToggle');
+540|
+541|    function openMenu(){ menu.setAttribute('data-open','true'); toggle.setAttribute('aria-expanded','true'); }
+542|    function closeMenu(){ menu.setAttribute('data-open','false'); toggle.setAttribute('aria-expanded','false'); }
+543|    function isOpen(){ return menu.getAttribute('data-open') === 'true'; }
+544|
+545|    toggle.addEventListener('click', function(e){
+546|      e.stopPropagation();
+547|      isOpen() ? closeMenu() : openMenu();
+548|    });
+549|
+550|    menu.querySelectorAll('.site-menu-links a').forEach(function(link){
+551|      link.addEventListener('click', closeMenu);
+552|    });
+553|
+554|    document.addEventListener('click', function(e){
+555|      if (isOpen() && !menu.contains(e.target)) closeMenu();
+556|    });
+557|
+558|    document.addEventListener('keydown', function(e){
+559|      if (e.key === 'Escape' && isOpen()) closeMenu();
+560|    });
+561|  })();
+562|</script>
+563|
+564|
+
+<script>
+(function(){
+  var root = document.documentElement;
+  var buttons = document.querySelectorAll('[data-theme-btn]');
+  var valid = ['ledger','signal','blueprint','terminal','onyx','preprint'];
+  var saved = null;
+  try { saved = localStorage.getItem('jr-lab-theme'); } catch(e) {}
+  if (saved && valid.indexOf(saved) !== -1) { root.setAttribute('data-theme', saved); }
+  function setTheme(name){
+    root.setAttribute('data-theme', name);
+    buttons.forEach(function(b){
+      b.setAttribute('aria-pressed', b.getAttribute('data-theme-btn') === name ? 'true' : 'false');
+    });
+    try { localStorage.setItem('jr-lab-theme', name); } catch(e) {}
+  }
+  buttons.forEach(function(btn){
+    btn.addEventListener('click', function(){
+      setTheme(btn.getAttribute('data-theme-btn'));
+    });
+  });
+})();
+</script>
+
+</body>
+</html>

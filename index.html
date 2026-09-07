@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en" data-theme="ledger">
+<html lang="en" data-theme="spec">
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -242,9 +242,270 @@
     .site-menu-panel{ width:220px; }
     .cta-banner{ flex-direction:column; align-items:flex-start; }
   }
+
+  /* ============================================================
+     THEME LAB v2 — five new design systems (local preview only)
+     Existing ledger / studio / blueprint remain available above.
+     ============================================================ */
+
+  /* ---------- top theme picker ---------- */
+  .theme-nav{
+    position:sticky; top:0; z-index:80;
+    background:var(--bg);
+    background:color-mix(in srgb, var(--bg) 78%, transparent);
+    backdrop-filter:blur(12px); -webkit-backdrop-filter:blur(12px);
+    border-bottom:1px solid var(--border);
+  }
+  .theme-nav-inner{
+    max-width:var(--maxw); margin:0 auto; padding:8px var(--space-5);
+    display:flex; align-items:center; gap:6px; overflow-x:auto;
+    scrollbar-width:none; white-space:nowrap;
+  }
+  .theme-nav-inner::-webkit-scrollbar{ display:none; }
+  .theme-nav-label{
+    font-family:var(--font-mono); font-size:10px; letter-spacing:.14em;
+    text-transform:uppercase; color:var(--text-muted); margin-right:6px; flex-shrink:0;
+  }
+  .theme-nav button{
+    appearance:none; font-family:var(--font-mono); font-size:11px;
+    letter-spacing:.06em; text-transform:uppercase; cursor:pointer;
+    color:var(--text-muted); background:transparent; border:1px solid transparent;
+    padding:6px 11px; border-radius:999px; transition:all .18s ease; flex-shrink:0;
+  }
+  .theme-nav button:hover{ color:var(--text); border-color:var(--border); }
+  .theme-nav button[aria-pressed="true"]{
+    background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:600;
+  }
+  html{ scroll-padding-top:64px; }
+
+  /* ============ SIGNAL — editorial print (vermilion on paper) ============ */
+  [data-theme="signal"]{
+    --bg:#fcfbf9; --bg-elevated:#ffffff; --grid-line:rgba(26,23,19,0.06);
+    --text:#1a1713; --text-muted:#6b6559; --accent:#c9341e; --accent-2:#1a1713;
+    --border:rgba(26,23,19,0.18); --border-strong:rgba(26,23,19,0.5);
+    --font-display:'Fraunces', serif; --font-body:'IBM Plex Sans', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+    --radius:2px; --tracking-eyebrow:0.1em;
+  }
+  [data-theme="signal"] .wrap{ counter-reset:sec; }
+  [data-theme="signal"] h2.section-title{
+    font-size:clamp(24px,3.2vw,31px); font-weight:600; letter-spacing:-0.01em;
+    counter-increment:sec;
+  }
+  [data-theme="signal"] h2.section-title::before{
+    content:counter(sec,decimal-leading-zero) "\2002\2002";
+    font-family:var(--font-mono); font-size:13px; font-weight:500;
+    color:var(--accent); letter-spacing:.1em; margin-right:.2em;
+  }
+  [data-theme="signal"] .btn{ border-radius:2px; }
+  [data-theme="signal"] header{ border-bottom-color:var(--border-strong); }
+  [data-theme="signal"] .name{ font-weight:600; letter-spacing:-0.015em; }
+  [data-theme="signal"] ::selection{ background:var(--accent); color:#fff; }
+
+  /* ============ DRAFTING — light blueprint table ============ */
+  [data-theme="drafting"]{
+    --bg:#eef3f8; --bg-elevated:#ffffff; --grid-line:rgba(20,101,201,0.06);
+    --text:#1e2f44; --text-muted:#5a6b80; --accent:#1465c9; --accent-2:#e8630c;
+    --border:rgba(30,47,68,0.2); --border-strong:rgba(30,47,68,0.5);
+    --font-display:'IBM Plex Sans', sans-serif; --font-body:'IBM Plex Sans', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+    --radius:2px; --tracking-eyebrow:0.16em;
+  }
+  [data-theme="drafting"] body{
+    background-color:var(--bg);
+    background-image:
+      linear-gradient(rgba(20,101,201,0.045) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(20,101,201,0.045) 1px, transparent 1px);
+    background-size:32px 32px;
+  }
+  [data-theme="drafting"] h2.section-title{
+    font-family:var(--font-mono); font-size:15px; font-weight:600;
+    letter-spacing:.14em; text-transform:uppercase; color:var(--text);
+  }
+  [data-theme="drafting"] h2.section-title::before{
+    content:""; display:inline-block; width:8px; height:8px;
+    background:var(--accent-2); margin-right:10px; vertical-align:1px;
+  }
+  [data-theme="drafting"] .name{ font-weight:700; letter-spacing:-0.015em; }
+  [data-theme="drafting"] .eyebrow{ color:var(--accent); }
+  [data-theme="drafting"] .btn{ border-radius:2px; }
+  [data-theme="drafting"] .stat{ background:var(--bg-elevated); }
+
+  /* ============ SPEC — engineering specification sheet ============ */
+  [data-theme="spec"]{
+    --bg:#ffffff; --bg-elevated:#f6f8fb; --grid-line:rgba(79,70,229,0.06);
+    --text:#101828; --text-muted:#5c6b82; --accent:#4f46e5; --accent-2:#0e7490;
+    --border:rgba(16,24,40,0.16); --border-strong:rgba(16,24,40,0.45);
+    --font-display:'IBM Plex Sans', sans-serif; --font-body:'IBM Plex Sans', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+    --radius:0px; --tracking-eyebrow:0.08em;
+  }
+  [data-theme="spec"] .wrap{ counter-reset:sec; }
+  [data-theme="spec"] h2.section-title{
+    font-size:clamp(20px,2.6vw,26px); font-weight:650;
+    counter-increment:sec;
+  }
+  [data-theme="spec"] h2.section-title::before{
+    content:counter(sec,decimal-leading-zero) "\2002";
+    font-family:var(--font-mono); font-size:15px; font-weight:600;
+    color:var(--accent); letter-spacing:.04em; margin-right:.35em;
+  }
+  [data-theme="spec"] .eyebrow{ color:var(--accent); }
+  [data-theme="spec"] .btn{ border-radius:0; }
+  [data-theme="spec"] .stat{ border-radius:0; }
+  [data-theme="spec"] .pillar-card{ border-radius:0; }
+  [data-theme="spec"] .num{ font-family:var(--font-mono); font-weight:600; }
+  [data-theme="spec"] .pillar-card{ box-shadow:none; }
+
+  /* ============ ONYX — graphite + brass (dark) ============ */
+  [data-theme="onyx"]{
+    --bg:#0f1216; --bg-elevated:#181d24; --grid-line:rgba(255,255,255,0.05);
+    --text:#e6e9ec; --text-muted:#99a2ac; --accent:#d9a441; --accent-2:#7fb3e0;
+    --border:rgba(230,233,236,0.14); --border-strong:rgba(230,233,236,0.4);
+    --font-display:'Space Grotesk', sans-serif; --font-body:'IBM Plex Sans', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+    --radius:8px; --tracking-eyebrow:0.16em;
+  }
+  [data-theme="onyx"] .eyebrow{ color:var(--accent); }
+  [data-theme="onyx"] .name{ letter-spacing:-0.01em; }
+  [data-theme="onyx"] .community-logo{ background:var(--bg-elevated); }
+  [data-theme="onyx"] ::selection{ background:var(--accent); color:#0f1216; }
+
+  /* ============ SWISS — international typographic style ============ */
+  [data-theme="swiss"]{
+    --bg:#ffffff; --bg-elevated:#ffffff; --grid-line:rgba(0,0,0,0.06);
+    --text:#0a0a0a; --text-muted:#4d4d4d; --accent:#0a0a0a; --accent-2:#e10600;
+    --border:rgba(10,10,10,0.9); --border-strong:#0a0a0a;
+    --font-display:'Space Grotesk', sans-serif; --font-body:'IBM Plex Sans', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+    --radius:0px; --tracking-eyebrow:0.14em;
+  }
+  [data-theme="swiss"] .wrap{ counter-reset:sec; }
+  [data-theme="swiss"] h2.section-title{
+    font-size:clamp(19px,2.7vw,27px); font-weight:700; text-transform:uppercase;
+    letter-spacing:0.01em; counter-increment:sec;
+  }
+  [data-theme="swiss"] h2.section-title::before{
+    content:counter(sec,decimal-leading-zero) "\2002";
+    font-family:var(--font-mono); font-size:13px; font-weight:600;
+    color:var(--accent-2); letter-spacing:.02em; margin-right:.45em;
+  }
+  [data-theme="swiss"] .eyebrow{ color:var(--accent-2); }
+  [data-theme="swiss"] .name{
+    text-transform:uppercase; font-weight:700; letter-spacing:-0.015em;
+  }
+  [data-theme="swiss"] header{ border-bottom:2px solid var(--text); }
+  [data-theme="swiss"] section{ border-bottom:1px solid var(--border); }
+  [data-theme="swiss"] .btn{ border-radius:0; border-width:2px; }
+  [data-theme="swiss"] .btn.primary{ background:var(--text); }
+  [data-theme="swiss"] .stat, [data-theme="swiss"] .pillar-card,
+  [data-theme="swiss"] .company-bucket, [data-theme="swiss"] .community-card,
+  [data-theme="swiss"] .titleblock{ border-radius:0; }
+  [data-theme="swiss"] .stat .num{ color:var(--text); }
+  [data-theme="swiss"] ::selection{ background:var(--accent-2); color:#fff; }
+
+  /* ============ TERMINAL — dark console (ported from theme-lab) ============ */
+  [data-theme="terminal"]{
+    --bg:#0A0D11; --bg-elevated:#10151C; --grid-line:rgba(217,225,232,0.06);
+    --text:#D9E1E8; --text-muted:#8B98A5; --accent:#4ADE80; --accent-2:#8B98A5;
+    --border:rgba(217,225,232,0.13); --border-strong:rgba(217,225,232,0.34);
+    --font-display:'JetBrains Mono', monospace; --font-body:'IBM Plex Sans', sans-serif;
+    --font-mono:'JetBrains Mono', monospace;
+    --radius:6px; --tracking-eyebrow:0.14em;
+  }
+  [data-theme="terminal"] .eyebrow::before{ content:"\276F "; color:var(--accent); }
+  [data-theme="terminal"] .eyebrow{ letter-spacing:.08em; }
+  [data-theme="terminal"] .name{ font-weight:600; letter-spacing:-0.02em; }
+  [data-theme="terminal"] .name::after{
+    content:"\258B"; color:var(--accent); margin-left:6px;
+    animation:jr-blink 1.15s steps(2,start) infinite;
+  }
+  @keyframes jr-blink{ to{ visibility:hidden; } }
+  @media (prefers-reduced-motion: reduce){
+    [data-theme="terminal"] .name::after{ animation:none; }
+  }
+  [data-theme="terminal"] .btn{ border-radius:8px; letter-spacing:.04em; }
+  [data-theme="terminal"] .btn.primary{ color:#0A0D11; }
+  [data-theme="terminal"] .stat .num{ font-family:var(--font-mono); letter-spacing:-0.03em; }
+  [data-theme="terminal"] .pillar-card, [data-theme="terminal"] .stat{ background:var(--bg-elevated); }
+  [data-theme="terminal"] .c-meta::before, [data-theme="terminal"] .bucket-title::before{ content:"# "; opacity:.6; }
+  [data-theme="terminal"] .logo-item{ background:#fff; height:auto; padding:6px 9px; border-radius:5px; }
+  [data-theme="terminal"] .logo-item img{ height:20px; }
+  [data-theme="terminal"] .community-logo{ background:#fff; }
+  [data-theme="terminal"] ::selection{ background:var(--accent); color:#0A0D11; }
+
+  /* ============ PREPRINT — academic paper (ported from theme-lab) ============ */
+  [data-theme="preprint"]{
+    --bg:#FFFFFF; --bg-elevated:#F7F7F5; --grid-line:rgba(22,24,28,0.05);
+    --text:#16181C; --text-muted:#55585F; --accent:#1B3FA8; --accent-2:#16181C;
+    --border:rgba(22,24,28,0.16); --border-strong:rgba(22,24,28,0.42);
+    --font-display:'Source Serif 4', serif; --font-body:'Source Serif 4', serif;
+    --font-mono:'JetBrains Mono', monospace;
+    --maxw:920px; --radius:0px; --tracking-eyebrow:0.12em;
+  }
+  [data-theme="preprint"] body{ line-height:1.72; }
+  [data-theme="preprint"] .wrap{ counter-reset:sec; }
+  [data-theme="preprint"] .eyebrow{ text-transform:none; letter-spacing:.02em; font-size:12.5px; }
+  [data-theme="preprint"] .eyebrow::before{ content:"[ "; }
+  [data-theme="preprint"] .eyebrow::after{ content:" ]"; }
+  [data-theme="preprint"] h2.section-title{
+    counter-increment:sec; font-size:clamp(19px,2.5vw,24px); font-weight:600;
+  }
+  [data-theme="preprint"] h2.section-title::before{
+    content:counter(sec) ".  "; color:var(--accent); font-variant-numeric:tabular-nums;
+  }
+  [data-theme="preprint"] .section-sub{ font-size:14px; }
+  [data-theme="preprint"] .btn{ border-radius:0; font-size:11px; letter-spacing:.08em; }
+  [data-theme="preprint"] .btn.primary{ background:var(--text); border-color:var(--text); color:#fff; }
+  [data-theme="preprint"] .stat{
+    text-align:left; border-width:1px 0 0 0; padding:var(--space-3) 0 0;
+    background:transparent; border-radius:0;
+  }
+  [data-theme="preprint"] .stat-row, [data-theme="preprint"] .stat-row-2{
+    border-bottom:1px solid var(--border); padding-bottom:var(--space-4);
+  }
+  [data-theme="preprint"] .stat .num{ font-size:24px; color:var(--text); }
+  [data-theme="preprint"] .stat .label{ letter-spacing:.05em; }
+  [data-theme="preprint"] .pillar-card, [data-theme="preprint"] .company-bucket,
+  [data-theme="preprint"] .community-card, [data-theme="preprint"] .community-logo,
+  [data-theme="preprint"] .titleblock{ border-radius:0; }
+  [data-theme="preprint"] header{ border-bottom:1px solid var(--border); }
+  [data-theme="preprint"] .titleblock{ font-size:11.5px; }
+
+  /* ---------- picker polish: per-theme color dots ---------- */
+  .theme-nav button::before{
+    content:""; display:inline-block; width:7px; height:7px; border-radius:50%;
+    margin-right:6px; vertical-align:1px; background:currentColor; opacity:.55;
+  }
+  .theme-nav button[aria-pressed="true"]::before{ background:currentColor !important; opacity:1; box-shadow:0 0 0 1px color-mix(in srgb, var(--bg) 60%, transparent); }
+  [data-theme-btn="spec"]::before{ background:#4f46e5 !important; }
+  [data-theme-btn="signal"]::before{ background:#c9341e !important; }
+  [data-theme-btn="drafting"]::before{ background:#1465c9 !important; }
+  [data-theme-btn="preprint"]::before{ background:#1B3FA8 !important; }
+  [data-theme-btn="swiss"]::before{ background:#e10600 !important; }
+  [data-theme-btn="onyx"]::before{ background:#d9a441 !important; }
+  [data-theme-btn="terminal"]::before{ background:#4ADE80 !important; }
+  [data-theme-btn="ledger"]::before{ background:#2b3a67 !important; }
+  [data-theme-btn="studio"]::before{ background:#146b5c !important; }
+  [data-theme-btn="blueprint"]::before{ background:#5ec8f8 !important; }
 </style>
 </head>
 <body>
+<div class="theme-nav" aria-label="Visual theme picker">
+  <div class="theme-nav-inner" role="group" aria-label="Choose visual theme">
+    <span class="theme-nav-label">Theme</span>
+    <button type="button" data-theme-btn="spec" aria-pressed="true">Spec</button>
+    <button type="button" data-theme-btn="signal" aria-pressed="false">Signal</button>
+    <button type="button" data-theme-btn="drafting" aria-pressed="false">Drafting</button>
+    <button type="button" data-theme-btn="preprint" aria-pressed="false">Preprint</button>
+    <button type="button" data-theme-btn="swiss" aria-pressed="false">Swiss</button>
+    <button type="button" data-theme-btn="onyx" aria-pressed="false">Onyx</button>
+    <button type="button" data-theme-btn="terminal" aria-pressed="false">Terminal</button>
+    <button type="button" data-theme-btn="ledger" aria-pressed="false">Ledger</button>
+    <button type="button" data-theme-btn="studio" aria-pressed="false">Studio</button>
+    <button type="button" data-theme-btn="blueprint" aria-pressed="false">Blueprint</button>
+  </div>
+</div>
 
 <div class="site-menu" id="siteMenu" data-open="false">
   <div class="site-menu-panel" role="menu" aria-label="Page menu">
@@ -258,14 +519,6 @@
         <li><a href="#communities">Industry &amp; Communities</a></li>
         <li><a href="#universities">Universities</a></li>
       </ul>
-    </div>
-    <div class="site-menu-group">
-      <div class="site-menu-heading">Theme</div>
-      <div class="theme-options" role="group" aria-label="Choose visual theme">
-        <button type="button" data-theme-btn="ledger" aria-pressed="true">Ledger</button>
-        <button type="button" data-theme-btn="studio" aria-pressed="false">Studio</button>
-        <button type="button" data-theme-btn="blueprint" aria-pressed="false">Blueprint</button>
-      </div>
     </div>
   </div>
   <button type="button" class="site-menu-toggle" id="siteMenuToggle" aria-expanded="false" aria-controls="siteMenu" aria-label="Open page menu">
@@ -518,7 +771,7 @@
     var buttons = document.querySelectorAll('[data-theme-btn]');
     var saved = null;
     try { saved = localStorage.getItem('jr-theme'); } catch(e) {}
-    var validThemes = ['ledger','studio','blueprint'];
+    var validThemes = ['spec','signal','drafting','preprint','swiss','onyx','terminal','ledger','studio','blueprint'];
     if (saved && validThemes.indexOf(saved) !== -1) { setTheme(saved); }
 
     function setTheme(name){
