@@ -39,7 +39,8 @@
     display:inline-block;font-size:10pt;font-weight:700;color:#fff;
     background:var(--accent);padding:3px 10px;border-radius:3px;margin:0 0 9px;
   }
-  .contact{font-size:9pt;color:var(--muted);display:flex;flex-wrap:wrap;gap:4px 14px;}
+  .contact{font-size:9pt;color:var(--muted);display:flex;flex-direction:column;gap:2px;}
+  .contact .row{display:flex;justify-content:space-between;align-items:baseline;gap:14px;}
   .contact span{white-space:nowrap;}
 
   /* Section headings: match TXT casing, no trailing period, hairline rule */
@@ -64,6 +65,14 @@
   }
   .group-block .group:first-child{margin-top:4px;}
   .group-block ul{margin-top:3px;}
+
+  /* Career timeline: one row per company-role inside Professional Summary */
+  .timeline{margin:0 0 4px;}
+  .tl-row{display:flex;align-items:baseline;gap:7px;padding:2px 0;font-size:10pt;}
+  .tl-co{font-weight:700;white-space:nowrap;}
+  .tl-role{color:var(--muted);}
+  .tl-role::before{content:"\2014  ";color:var(--muted);}
+  .tl-dates{margin-left:auto;color:var(--muted);font-size:9.2pt;white-space:nowrap;}
 
   .skills{display:flex;flex-wrap:wrap;gap:6px;}
   .skills span{
@@ -111,11 +120,15 @@
     <h1>Janardan Revuru</h1>
     <div class="title-line">Engineering Leader · AI adoption at Enterprise Scale · Teams Built 2→100 · Multi-Agent AI Research</div>
     <div class="contact">
-      <span>Bengaluru, India 560100</span>
-      <span>+91 8050780608</span>
-      <span>janardan.revuru@gmail.com</span>
-      <span>LinkedIn: <a href="https://linkedin.com/in/rjanardan">linkedin.com/in/rjanardan</a></span>
-      <span>Portfolio: <a href="https://janalogy.com">https://janalogy.com</a></span>
+      <div class="row">
+        <span>Bengaluru, India 560100</span>
+        <span>+91 8050780608</span>
+        <span>janardan.revuru@gmail.com</span>
+      </div>
+      <div class="row">
+        <span>LinkedIn: <a href="https://linkedin.com/in/rjanardan">linkedin.com/in/rjanardan</a></span>
+        <span>Portfolio: <a href="https://janalogy.com">https://janalogy.com</a></span>
+      </div>
     </div>
   </header>
 
@@ -160,6 +173,19 @@
       <li>Leading transformations in the org — delivery methodology and AI-native ways of working (Dell Technologies, HPE, Motorola)</li>
       <li>Transformation leader for the entire portfolio of 1,000–1,200 engineers; scaled-Agile coach (Dell Technologies)</li>
     </ul>
+  </div>
+
+  <h2>Career History</h2>
+  <div class="timeline">
+    <div class="tl-row"><span class="tl-co">Dell Technologies</span><span class="tl-role">Director of Engineering</span><span class="tl-dates">Aug 2021 – Present</span></div>
+    <div class="tl-row"><span class="tl-co">Dell Technologies</span><span class="tl-role">Senior Manager</span><span class="tl-dates">Dec 2016 – Jul 2021</span></div>
+    <div class="tl-row"><span class="tl-co">Hewlett Packard Enterprise</span><span class="tl-role">Engineering Manager</span><span class="tl-dates">Mar 2011 – Dec 2016</span></div>
+    <div class="tl-row"><span class="tl-co">Nortel (acquired by Avaya)</span><span class="tl-role">Customer Experience and Sustenance</span><span class="tl-dates">Nov 2007 – Feb 2011</span></div>
+    <div class="tl-row"><span class="tl-co">Motorola</span><span class="tl-role">Engineering Manager</span><span class="tl-dates">Aug 2005 – Nov 2007</span></div>
+    <div class="tl-row"><span class="tl-co">Tasman Networks (acquired by Nortel)</span><span class="tl-role">Technical Architect / Manager</span><span class="tl-dates">Nov 2003 – Aug 2005</span></div>
+    <div class="tl-row"><span class="tl-co">Siemens Technology India</span><span class="tl-role">Technical Leader</span><span class="tl-dates">2001 – 2003</span></div>
+    <div class="tl-row"><span class="tl-co">Amber Networks (acquired by Nokia)</span><span class="tl-role">Software Engineer</span><span class="tl-dates">Aug 2000 – Aug 2001</span></div>
+    <div class="tl-row"><span class="tl-co">Wipro</span><span class="tl-role">Software Engineer</span><span class="tl-dates">Nov 1996 – Feb 2000</span></div>
   </div>
 
   <h2>Industry and Academic Engagement</h2>
@@ -242,7 +268,7 @@
   </ul>
 
   <footer class="teaser">
-    For more than 10 years I have built and scaled engineering teams from the ground up, growing an infrastructure management software org from 2 to 80 engineers and leading the shift to agentic-AI workflows across about 600, tripling productivity. Seeding teams that deliver and lead with AI-native engineering and a culture of experimentation. I bring that blend to both: an execution leader with a researcher's mindset, still hands-on in my PhD work on multi-agent systems.
+    For more than 20 years I have built and scaled engineering teams from the ground up, growing an infrastructure management software org from 2 to 100 engineers and leading the shift to agentic-AI workflows across about 600, tripling productivity. Seeding teams that deliver and lead with AI-native engineering and a culture of experimentation. I bring that blend to both: an execution leader with a researcher's mindset, still hands-on in my PhD work on multi-agent systems.
   </footer>
 
 </div>
