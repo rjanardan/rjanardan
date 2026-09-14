@@ -46,7 +46,7 @@
   .pane.right{background:#efede8}
 
   /* preview stage */
-  #stageWrap{flex:1 1 auto;display:flex;align-items:center;justify-content:center;min-height:0;padding:18px;overflow:hidden}
+  #stageWrap{flex:1 1 auto;display:flex;align-items:center;justify-content:center;min-height:0;padding:18px;overflow:hidden;--fit:card}
   .stage{position:relative}
   .stage .card{position:absolute;top:0;left:0}
   .rail{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding:8px 12px;background:var(--panel);
@@ -60,45 +60,47 @@
   /* ── card ───────────────────────────────────────────────── */
   .card{width:var(--cw);height:var(--ch);background:#fff;color:#191817;overflow:hidden;
     display:flex;flex-direction:column;padding:calc(var(--ch) * .075) calc(var(--cw) * .07);
-    font-size:calc(var(--ch) * .032);line-height:1.45;box-shadow:var(--shadow)}
-  .card h1{font-size:1.72em;line-height:1.16;letter-spacing:-.015em;margin:0 0 .62em;font-weight:650}
+    font-size:var(--fs, 34.56px);line-height:1.45;box-shadow:var(--shadow)}
+  .card h1{font-size:calc(var(--hs, 34.56px) * 1.72);line-height:1.16;letter-spacing:-.015em;margin:0 0 .62em;font-weight:650}
   .card p{margin:0 0 .62em}
   .card ul,.card ol{margin:0 0 .62em;padding-left:1.25em}
   .card li{margin:.24em 0}
   .card li::marker{color:var(--accent)}
-  .card h2{font-size:1.18em;margin:.7em 0 .34em;font-weight:620}
+  .card h2{font-size:1.15em;margin:.7em 0 .34em;font-weight:620}
   .card h3{font-size:1.02em;margin:.62em 0 .3em;font-weight:620;color:#3b3a37}
   .card a{color:var(--accent);text-decoration:none;border-bottom:.06em solid rgba(138,75,42,.35)}
   .card strong{font-weight:670}
   .card em{font-style:italic}
   .card blockquote{margin:0 0 .62em;padding-left:.9em;border-left:.18em solid var(--rule);color:#4a4844}
-  .card code{font-family:var(--mono);font-size:.86em;background:var(--code);padding:.1em .34em;border-radius:3px}
+  .card code{font-family:var(--mono);font-size:.90em;background:var(--code);padding:.1em .34em;border-radius:3px}
   .card pre{background:var(--code);border:1px solid var(--rule);border-radius:6px;padding:.7em .85em;
     overflow:auto;margin:0 0 .62em;max-height:46%}
-  .card pre code{background:none;padding:0;font-size:.8em;line-height:1.5}
+  .card pre code{background:none;padding:0;font-size:.84em;line-height:1.5}
+  /* when the fence IS the card, let it use more room than the 46% cap allows */
+  .card .body > pre:only-child{max-height:60%}
   .card img{max-width:100%;max-height:38%;object-fit:contain;border-radius:5px;display:block;margin:.2em 0 .62em}
   .card hr{border:0;border-top:1px solid var(--rule);margin:.8em 0}
   .card .body{flex:1 1 auto;min-height:0;overflow:hidden}
-  .card .foot{flex:0 0 auto;font-size:.58em;color:var(--muted);display:flex;justify-content:space-between;
+  .card .foot{flex:0 0 auto;font-size:.72em;color:var(--muted);display:flex;justify-content:space-between;
     padding-top:.8em;letter-spacing:.04em}
   /* title + closing cards */
   .card[data-kind="title"]{justify-content:center}
-  .card[data-kind="title"] h1{font-size:2.5em;line-height:1.1;margin-bottom:.5em}
-  .card[data-kind="title"] .byline{font-size:.82em;color:var(--muted);display:flex;gap:.9em;flex-wrap:wrap}
-  .card[data-kind="title"] .preamble{font-size:.78em;color:#4a4844;margin-bottom:1.4em;max-width:44em}
+  .card[data-kind="title"] h1{font-size:calc(var(--hs, 34.56px) * 2.5);line-height:1.1;margin-bottom:.5em}
+  .card[data-kind="title"] .byline{font-size:.92em;color:var(--muted);display:flex;gap:.9em;flex-wrap:wrap}
+  .card[data-kind="title"] .preamble{font-size:.92em;color:#4a4844;margin-bottom:1.4em;max-width:44em}
   /* content cards carry their `#` heading, with a short accent rule under it */
   .card[data-kind="content"] h1::after{content:"";display:block;width:2.4em;height:2px;border-radius:2px;
     background:var(--accent);opacity:.5;margin:.42em 0 0}
   .card[data-kind="closing"]{justify-content:center;text-align:center;align-items:center}
-  .card[data-kind="closing"] h1{font-size:2.1em;margin-bottom:.4em}
+  .card[data-kind="closing"] h1{font-size:calc(var(--hs, 34.56px) * 2.1);margin-bottom:.4em}
   .card[data-kind="closing"] .body{flex:0 0 auto}
   .card[data-kind="closing"] .body>*{margin-left:auto;margin-right:auto}
   .card .mermaid-src{background:var(--code);border:1px solid var(--rule);border-radius:6px;padding:.7em;
-    font-family:var(--mono);font-size:.78em;white-space:pre-wrap}
-  .card .mermaid-note{font-size:.62em;color:var(--muted);margin:.3em 0 0}
+    font-family:var(--mono);font-size:.82em;white-space:pre-wrap}
+  .card .mermaid-note{font-size:.74em;color:var(--muted);margin:.3em 0 0}
   .card .diagram{margin:.15em 0 .85em}
   .card .diagram svg{display:block;margin:0 auto;width:100%;height:auto;max-width:100% !important;
-    max-height:16em}
+    max-height:calc(var(--ch) * .512)}
 
   /* ── slideshow ──────────────────────────────────────────── */
   #show{position:fixed;inset:0;background:#0f0f10;display:none;align-items:center;justify-content:center;z-index:60}
@@ -130,8 +132,15 @@
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
   }
   @media (max-width:900px){
-    main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+    main{grid-template-columns:1fr;grid-template-rows:minmax(0,34%) minmax(0,66%)}
     .pane.left{border-right:0;border-bottom:1px solid var(--rule)}
+    /* A phone reads the card at phone width, so fit by width and let the pane
+       scroll: shrinking a 1080 px card into a 380 px pane is what made body
+       copy unreadable. 'safe' centring keeps the top reachable when it scrolls. */
+    #stageWrap{--fit:width;padding:10px;overflow:auto;overscroll-behavior:contain;
+      align-items:center;align-items:safe center;justify-content:safe center}
+    .rail{padding:6px 8px}
+    .rail button{padding:4px 7px}
   }
 </style>
 </head>
@@ -236,10 +245,14 @@ Delete this last heading, or set `closing: none` in the frontmatter to drop the 
    Markdown Cards — single file, no build step, no dependencies.
    Parser: frontmatter → title card → one card per `#` block.
    ───────────────────────────────────────────────────────────── */
+// fs: reading text (body, lists, code, footers) as a fraction of card WIDTH — the
+// card is consumed fitted to a phone's width, so this is what sets legibility.
+// hs: the display heading (h1) as a fraction of card HEIGHT, held at its
+// original size in every geometry.
 const GEOM = {
-  '16:9': { w:1920, h:1080, label:'16:9 landscape · 1920 × 1080 px' },
-  '1:1' : { w:1080, h:1080, label:'1:1 square · 1080 × 1080 px' },
-  '4:5' : { w:1080, h:1350, label:'4:5 portrait · 1080 × 1350 px' }
+  '16:9': { w:1920, h:1080, fs:.018, hs:.032, label:'16:9 landscape · 1920 × 1080 px' },
+  '1:1' : { w:1080, h:1080, fs:.040, hs:.032, label:'1:1 square · 1080 × 1080 px' },
+  '4:5' : { w:1080, h:1350, fs:.040, hs:.032, label:'4:5 portrait · 1080 × 1350 px' }
 };
 const LS_KEY = 'janalogy.mdcards.v1';
 const $ = s => document.querySelector(s);
@@ -399,6 +412,8 @@ function cardEl(kind, inner, foot){
   el.dataset.kind = kind;
   el.style.setProperty('--cw', g.w + 'px');
   el.style.setProperty('--ch', g.h + 'px');
+  el.style.setProperty('--fs', g.fs * g.w + 'px');
+  el.style.setProperty('--hs', g.hs * g.h + 'px');
   el.innerHTML = inner;
   if (foot) el.insertAdjacentHTML('beforeend', foot);
   return el;
@@ -478,8 +493,10 @@ function showCard(i, scrollRail = true){
   stage.replaceChildren(el);
   const g = GEOM[state.geometry];
   const wrap = $('#stageWrap');
-  const avail = Math.max(120, wrap.clientWidth - 36), availH = Math.max(120, wrap.clientHeight - 36);
-  const s = Math.min(avail / g.w, availH / g.h);
+  const pad = parseFloat(getComputedStyle(wrap).paddingLeft) || 18;
+  const avail = Math.max(120, wrap.clientWidth - pad * 2), availH = Math.max(120, wrap.clientHeight - pad * 2);
+  const byWidth = getComputedStyle(wrap).getPropertyValue('--fit').trim() === 'width';
+  const s = byWidth ? avail / g.w : Math.min(avail / g.w, availH / g.h);
   stage.style.width = g.w * s + 'px';
   stage.style.height = g.h * s + 'px';
   el.style.transformOrigin = '0 0';
@@ -745,6 +762,37 @@ async function runSelftest(){
   ok('1:1 geometry applied', getComputedStyle(cards[0]).getPropertyValue('--cw').trim() === '1080px', getComputedStyle(cards[0]).getPropertyValue('--cw').trim());
   $('#geoSeg button[data-geo="4:5"]').click();
   ok('4:5 geometry applied', getComputedStyle(cards[0]).getPropertyValue('--ch').trim() === '1350px');
+  $('#geoSeg button[data-geo="16:9"]').click();
+  // Reading type is anchored to card WIDTH (the card is consumed fitted to a
+  // phone's width); the display heading is anchored to card HEIGHT.
+  const typeProbe = geo => {
+    $('#geoSeg button[data-geo="' + geo + '"]').click();
+    const c = cards[0], h = c.querySelector('h1'), cs = getComputedStyle(c);
+    return { fs: parseFloat(cs.fontSize), h1: parseFloat(getComputedStyle(h).fontSize),
+             cw: parseFloat(cs.getPropertyValue('--cw')), ch: parseFloat(cs.getPropertyValue('--ch')) };
+  };
+  const t16 = typeProbe('16:9'), t11 = typeProbe('1:1'), t45 = typeProbe('4:5');
+  ok('1:1 reading text clears 4% of card width', t11.fs / t11.cw >= .0395,
+     (t11.fs / t11.cw * 100).toFixed(1) + '% × ' + t11.cw + 'px = ' + t11.fs + 'px');
+  ok('4:5 reading text matches 1:1', Math.abs(t45.fs - t11.fs) < .5, t45.fs + 'px vs ' + t11.fs + 'px');
+  ok('16:9 reading text unchanged', Math.abs(t16.fs / t16.ch - .032) < .0005, t16.fs + 'px');
+  ok('display heading holds its height share in every geometry',
+     Math.abs(t11.h1 / t11.ch - t45.h1 / t45.ch) < .0005 && Math.abs(t16.h1 / t16.ch - t11.h1 / t11.ch) < .0005,
+     '16:9 ' + (t16.h1 / t16.ch * 100).toFixed(2) + '% · 1:1 ' + (t11.h1 / t11.ch * 100).toFixed(2) +
+     '% · 4:5 ' + (t45.h1 / t45.ch * 100).toFixed(2) + '% of card height');
+  {
+    const probe = cardEl('content', '<h1>Heading</h1><h2>Sub</h2><h3>Run-in</h3><p>Body text.</p>',
+                         '<div class="foot"><span>1</span><span>1 / 2</span></div>');
+    probe.style.position = 'absolute'; probe.style.left = '-20000px'; probe.style.top = '0';
+    document.body.appendChild(probe);
+    const px = s => parseFloat(getComputedStyle(probe.querySelector(s)).fontSize);
+    const body = parseFloat(getComputedStyle(probe).fontSize), h1 = px('h1'), h2 = px('h2'), h3 = px('h3');
+    ok('run-in headings sit above body text', h1 > h2 && h2 > h3 && h3 >= body,
+       'h1 ' + h1.toFixed(1) + ' · h2 ' + h2.toFixed(1) + ' · h3 ' + h3.toFixed(1) + ' · body ' + body.toFixed(1) + 'px');
+    ok('footer clears 2.7% of card width', px('.foot') / 1080 >= .027,
+       (px('.foot') / 1080 * 100).toFixed(2) + '% × 1080px = ' + px('.foot').toFixed(1) + 'px');
+    probe.remove();
+  }
   $('#geoSeg button[data-geo="16:9"]').click();
   mdEl.setSelectionRange(0,0);
   ok('caret at top → title card', caretCard() === 0, String(caretCard()));

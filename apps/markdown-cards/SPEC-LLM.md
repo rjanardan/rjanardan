@@ -5,7 +5,7 @@ renders without editing. Written to be pasted into a model's context: hand the
 model this file plus the topic, and it returns a deck that drops straight into
 the Markdown pane.
 
-Measured against the build of 2026-09-14 (782 lines) by reading the parser and
+Measured against the build of 2026-09-14 (828 lines) by reading the parser and
 measuring rendered cards in headless Chrome. Every number in **Fit budgets** is a
 measurement, not an estimate; re-measure if the tool's CSS changes.
 
@@ -131,31 +131,41 @@ Emit none of these. They render as literal text or lose structure, with no error
 
 ## 8. Fit budgets
 
-Type scale: body text is 3.2% of the card height (34.56 px on a 1080-tall card,
-43.2 px on a 1350-tall card) at 1.45 line height. Card padding is 7.5% of height
-and 7% of width.
+Type scale: reading text — body, bullets, quotes, code, footers — is **4% of the
+card width** at 1:1 and 4:5 (43.2 px) and 1.8% at 16:9 (34.56 px), at 1.45 line
+height, because a square or portrait card is consumed fitted to a phone's width.
+The `h1` is **3.2% of the card height** × 1.72 em (59.4 px on a 1080-tall card,
+74.3 px on a 1350-tall card) and keeps its original size in every geometry. Card
+padding is 7.5% of height and 7% of width.
 
-| Geometry | Card | Text column | Body box | ≈ lines | ≈ chars/line |
-|---|---|---|---|---|---|
-| 16:9 landscape | 1920 × 1080 | 1651 px | 740 px | 14–15 | ~90 |
-| 1:1 square | 1080 × 1080 | ~928 px | 740 px | 14–15 | ~52 |
-| 4:5 portrait | 1080 × 1350 | ~928 px | 926 px | 14–15 | ~42 |
+| Geometry | Card | Text column | Body box | Line height | ≈ body lines | ≈ chars/line |
+|---|---|---|---|---|---|---|
+| 16:9 landscape | 1920 × 1080 | 1651 px | 729 px | 50.1 px | 14 | ~90 |
+| 1:1 square | 1080 × 1080 | ~928 px | 715 px | 62.6 px | 11 | ~40 |
+| 4:5 portrait | 1080 × 1350 | ~928 px | 912 px | 62.6 px | 14 | ~40 |
 
-The line budget is the same in every geometry (the type scales with the card),
-so **the aspect ratio decides how much text fits, not the number of lines.**
+1:1 and 4:5 set the same reading size at the same width, so **the aspect ratio
+decides how much text fits, not the prose style**: 4:5 is 25% taller and holds
+about 25% more lines. 16:9 keeps the smaller type it has always had.
+
+Measured capacity (headless Chrome, this build):
+
+| Geometry | one-line bullets | ~100-character bullets | code lines |
+|---|---|---|---|
+| 16:9 | 12 | 6 | 7 |
+| 1:1 | 9 | 5 | 5 |
+| 4:5 | 12 | 6 | 7 |
 
 Working rules:
 
-- Budget about **13 rendered lines** per card to leave headroom.
+- Budget **10 rendered lines** per card at 1:1, and **13** at 4:5 or 16:9.
 - Every bullet also costs about a third of a line in margins.
-- Measured at 1:1 with 65-character bullets: **6 bullets fit; 7 overflow by 41 px,
-  8 by 149 px, 9 by 258 px.** Same counts at 4:5. At 16:9, 9 such bullets fit.
-- Comfortable patterns at 1:1 and 4:5: four bullets of up to ~110 characters, or
-  six bullets of up to ~55 characters, or four bullets plus a short quote.
-- **Code blocks: keep to 5 lines or fewer.** The code box is capped at 46% of the
-  body box and scrolls past that; the overflow is *not printed*. Measured: a
-  6-line block already exceeds the cap by 11 px, 9 lines by 161 px, 12 lines by
-  312 px. Keep code lines under ~60 characters to avoid horizontal scrolling.
+- Comfortable patterns at 1:1: four bullets of up to ~110 characters, or six of up
+  to ~55 characters, or three bullets plus a short quote.
+- **Code blocks: keep to 5 lines or fewer at 1:1, 7 at 4:5 and 16:9.** The code box
+  is capped at 46% of the body box — 60% when the fence is the card's only content —
+  and scrolls past that; the overflow is *not printed*. Keep code lines under
+  ~60 characters to avoid horizontal scrolling.
 - Sub-headings cost about two lines each.
 - Images take up to 38% of the card height; budget about eight lines of text for one.
 - Overflow is silent. Nothing warns you; the text is simply cut off in the PDF.
@@ -190,14 +200,15 @@ Working rules:
    HTML, no autolink.
 5. Every `*` or `_` emphasis marker is preceded by a space or `(`.
 6. Every statistic has a source and a date in the same bullet.
-7. No card exceeds ~13 rendered lines; no code block exceeds 5 lines.
+7. No card exceeds ~10 rendered lines at 1:1 (13 at 4:5 and 16:9); no code block
+   exceeds 5 lines at 1:1.
 8. The deck ends with the closing card's single line — not with a call to action.
 9. Output contains no commentary and no outer code fence.
 
 ## 11. Worked example
 
-`examples/llms-txt-carousel.md` is a measured 6-card square deck: it fits at 1:1
-with no overflow in any card, and exports as a 6-page, 810 × 810 pt PDF.
+`examples/llms-txt-carousel.md` is a measured 8-card square deck: it fits at 1:1
+and 4:5 with no overflow in any card, and exports as an 8-page, 810 × 810 pt PDF.
 
 ```
 ---

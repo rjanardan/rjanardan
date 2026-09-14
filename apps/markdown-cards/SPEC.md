@@ -291,8 +291,17 @@ card. Forced export is the path that satisfies LinkedIn, because it guarantees u
 within the file.
 
 Typography is declared in `em` against a root size, so the same card content lays out proportionally at
-all three profiles rather than reflowing differently. Type sizes follow the site's book conventions:
-body ~15 px at 1080 px width, headings modest, code 12.5 px equivalent.
+all three profiles rather than reflowing differently. Two anchors set that root, and they are not the
+same measure:
+
+- **Reading text** — body, bullets, quotes, code, footers — is a fraction of card **width**: 1.8 % at
+  16:9 (34.56 px), 4 % at 1:1 and 4:5 (43.2 px). A square or portrait card is consumed fitted to a
+  phone's width, so width — not height — decides whether it can be read.
+- The **`h1`** is a fraction of card **height** (3.2 % × 1.72 em), so it keeps its original size in
+  every profile instead of growing when the reading ramp does.
+
+Measured on a 390 px phone, at 1:1: body text 14.8 px and heading 20.4 px, against 7.5 px and 12.8 px
+before the anchors were split.
 
 ---
 
@@ -420,6 +429,7 @@ thoughts. This is the only place in the app where notes are not immediately card
 | Renderer | one, unchanged | preview = slideshow = PDF is a structural property, not a hope |
 | Time to interactive | < 1 s on an M1, < 2.5 s on a mid-range phone | braindump means the caret is ready before the thought finishes |
 | localStorage document | warn past 512 KB | shared origin budget is ~5 MB with the other apps |
+| Reading text at phone width | ≥ 4 % of card width (≥ 14 px on a 360–414 px phone) | square and portrait cards are read fitted to a phone's width, so this is the size that decides legibility |
 | No build step | required | the app is edited and deployed as source; a bundler would make the deliverable unmaintainable by one person |
 
 Vanilla ES modules, no framework. A framework's re-render model is a liability for the sync behaviour in
@@ -455,6 +465,9 @@ with `pypdf`.
 | A18 | Portability | a fixture deck using only frontmatter, `---`, bullets and code fences renders equivalently under Marp |
 | A19 | Bookends carry no footer | title card and closing card contain no footer node; every content card does; the last content card's footer reads `n / n` |
 | A20 | Bookends carry no furniture | the title card contains no kicker, eyebrow or label node; its first child is the `h1` |
+| A21 | Reading type fits a phone | at 1:1 and 4:5 the reading size is ≥ 4 % of card width, so a card fitted to a 390 px viewport renders body text at ≥ 14 px; the `h1` keeps its height-relative share (8 % for a title, 5.5 % for a card heading) in all three profiles |
+| A22 | Fence-only body uses more of the card | a card whose body is a single code fence is capped at 60 % of the body box, not 46 % |
+| A23 | Phone preview fits by width | below 900 px the stage fits the card to the pane width and the pane scrolls, so a 1:1 card renders 370 px wide on a 390 px viewport instead of shrinking to fit the pane height |
 
 A16–A17 are the security gate; A18 is the exit gate. A19 records the closing-card decision: both
 bookends — title and closing — carry no footer, so no page number refers to a card that is not a page

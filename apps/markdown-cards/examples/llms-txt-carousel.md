@@ -18,6 +18,8 @@ One file asks machines to leave. The other hands them a map. Twenty-eight percen
 - Jeremy Howard proposed `/llms.txt` in September 2024 to give agents "concise, expert-level information gathered in a single, accessible location."
 - A curated index for inference, not a rule set for crawling. The H1 is the only required section; H2 sections hold link lists, and an `Optional` section marks what an agent may skip.
 
+# What the file looks like
+
 ```
 # Acme Docs
 > Short summary of the project
@@ -28,15 +30,17 @@ One file asks machines to leave. The other hands them a map. Twenty-eight percen
 
 # What actually fetches it
 
-- Ahrefs, June 2026: 137,210 domains. 28% publish an `llms.txt`; 97% of those files got zero requests in May.
-- Of the fetches that did happen, 96% were bots: audit tools ~21%, coding agents 10%, AI retrieval bots ~1%.
-- Not one request went to an `/llms.txt` path that 404s. Bots never go looking.
+- Ahrefs, June 2026: 137,210 domains. 28% publish an `llms.txt`; 97% got zero requests in May.
+- Of the fetches that did happen, 96% were bots — audit tools ~21%, coding agents 10%, AI retrieval bots ~1%. Not one request went to a path that 404s; bots never go looking.
 - Google's AI optimization guide: Search ignores the file, and shipping one neither helps nor hurts rankings.
 
 # Where AEO fits
 
 - Answer engine optimization is the umbrella: making a brand the answer, not just a result. llms.txt is one lever under it — and not a citation lever.
 - It is plumbing for agents that already want you: Chrome's Lighthouse audits it as part of its agentic browsing checks, Mintlify generates it, and OpenAI, Anthropic and Gemini publish their own.
+
+# Why citations miss the file
+
 - SE Ranking checked 300,000 domains: no relationship between publishing one and being cited.
 - A self-declared summary is unverifiable. Citation comes from pages a system can check, not a file it must trust.
 
