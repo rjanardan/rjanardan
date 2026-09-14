@@ -1,11 +1,11 @@
-# Markdown Cards — specification
+# md2slides — specification
 
-Draft v0.1 · 2026-09-13 · Licence: MIT (decided)
+Draft v0.1 · 2026-09-13 · renamed md2slides 2026-09-14 · Licence: MIT (decided)
 
 A single-file, browser-hosted app that turns frictionless Markdown notes into cards, shows them as a
 slideshow, and exports the same source as `.md` and as page-exact PDF.
 
-Hosted at `https://janalogy.com/apps/markdown-cards/` — no install, no account, no server.
+Hosted at `https://janalogy.com/apps/md2slides/` — no install, no account, no server.
 Storage is the visitor's own browser. Nothing is uploaded anywhere.
 
 ---
@@ -113,17 +113,21 @@ janalogy.com  ──►  GitHub Pages, user-site repo `rjanardan` (custom domain
                    └── apps/
                        ├── soc-dashboard.html        (existing)
                        ├── system-design-path.html   (existing)
+                       ├── md2slides/
+                       │   ├── index.html            the app          → /apps/md2slides/
+                       │   ├── SPEC.md               this document
+                       │   ├── SPEC-LLM.md           deck-writing rules for an LLM
+                       │   └── examples/             worked decks
                        └── markdown-cards/
-                           ├── index.html            the app          → /apps/markdown-cards/
-                           ├── vendor/mermaid.min.js pinned, lazy
-                           └── SPEC.md               this document
+                           └── index.html            redirect stub   → /apps/md2slides/
 ```
 
 The custom domain is served only by the user-site repo, so the app must live inside it. A separate
-project repository would serve at `rjanardan.github.io/markdown-cards/` and never under `janalogy.com`.
-The folder form (`…/markdown-cards/index.html`) is chosen over the flat form
-(`…/markdown-cards.html`) because the vendored Mermaid file has to sit somewhere, and because assets
-and tests can then live beside the app. URL: `https://janalogy.com/apps/markdown-cards/`.
+project repository would serve at `rjanardan.github.io/md2slides/` and never under `janalogy.com`.
+The folder form (`…/md2slides/index.html`) is chosen over the flat form (`…/md2slides.html`) because
+the spec, the deck-writing rules and the example decks sit beside the app and tests can join them.
+URL: `https://janalogy.com/apps/md2slides/`. The previous path, `/apps/markdown-cards/`, keeps a
+two-line redirect page, so links already shared resolve instead of 404ing.
 
 Consequences of having no server:
 
@@ -161,6 +165,8 @@ Rules, applied because this is a shared origin:
 
 - Writes are debounced (~400 ms) and whole-document, never per-field key sprawl.
 - The key is versioned. A `schema` bump migrates on read and writes back under the same key.
+- The key name still reads `mdcards`, not `md2slides`. It is deliberately unchanged: a deploy that
+  renamed it would silently hide every deck saved under the old name.
 - The app never seeds sample content containing a person's name, date or venue. First run creates one
   empty deck with a placeholder title card. Nothing personal ships in the file.
 - If `JSON.parse` fails, the app does **not** overwrite. It moves the unreadable string to
@@ -500,12 +506,13 @@ slideshow over a parser that splits on the wrong character is a rewrite.
 
 Not answered by the brief; each needs the owner's call before or during P1.
 
-1. **Folder or flat file.** This spec assumes `apps/markdown-cards/index.html` because Mermaid needs a
-   sibling. Dropping vendored Mermaid allows the flat `apps/markdown-cards.html`, matching
-   `soc-dashboard.html` and `system-design-path.html`.
-2. **Name.** `markdown-cards` is descriptive and matches the site's naming. Probed 2026-09-13:
-   `deckmd`, `mddeck`, `notecards-md`, `cardmine` and `slidecake` are all unclaimed on npm and on this
-   GitHub account, so any of them is free if a shorter name is preferred.
+1. **Folder or flat file.** Settled in the rename: `apps/md2slides/index.html` plus its spec and
+   examples. The flat `apps/md2slides.html` remains possible (it would match `soc-dashboard.html` and
+   `system-design-path.html`), at the cost of losing the sibling documents.
+2. **Name.** Decided 2026-09-14: **md2slides**. The folder was renamed from `markdown-cards`, and
+   `/apps/markdown-cards/` keeps a redirect stub so the old link still resolves. Earlier candidates
+   (`deckmd`, `mddeck`, `notecards-md`, `cardmine`, `slidecake`) were all unclaimed on npm and on this
+   GitHub account, and were not taken.
 3. **Mermaid delivery.** Vendored sibling file (recommended: offline, no third party, pinned),
    inlined (5.4 MiB HTML, rejected), or pinned CDN (smallest repo, needs network, adds a third-party
    runtime dependency).

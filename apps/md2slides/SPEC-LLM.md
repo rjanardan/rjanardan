@@ -1,6 +1,6 @@
 # Deck authoring spec — for LLM writers
 
-Rules for writing card decks that the tool at `apps/markdown-cards/index.html`
+Rules for writing card decks that the tool at `apps/md2slides/index.html`
 renders without editing. Written to be pasted into a model's context: hand the
 model this file plus the topic, and it returns a deck that drops straight into
 the Markdown pane.
@@ -9,7 +9,7 @@ Measured against the build of 2026-09-14 (828 lines) by reading the parser and
 measuring rendered cards in headless Chrome. Every number in **Fit budgets** is a
 measurement, not an estimate; re-measure if the tool's CSS changes.
 
-Tool name in the UI: *Markdown Cards*. The user calls it md2slides.
+Tool name in the UI: *md2slides* (renamed from *Markdown Cards*, 2026-09-14).
 
 ---
 
