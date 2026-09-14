@@ -1,0 +1,780 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Markdown Cards — local preview</title>
+<meta name="description" content="Type Markdown on the left, see cards on the right. Every first-level heading opens a new card. Slideshow and PDF export built in.">
+<style>
+  :root{
+    --bg:#f7f6f3; --panel:#ffffff; --ink:#1c1b19; --muted:#6b6862; --rule:#e0ddd6;
+    --accent:#8a4b2a; --accent-soft:#f3e9e2; --code:#f2f1ee; --shadow:0 1px 2px rgba(0,0,0,.06),0 8px 24px rgba(0,0,0,.06);
+    --body:15px; --mono:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace;
+  }
+  *{box-sizing:border-box}
+  html,body{height:100%}
+  body{margin:0;background:var(--bg);color:var(--ink);
+    font:var(--body)/1.6 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    -webkit-font-smoothing:antialiased;display:flex;flex-direction:column;overflow:hidden}
+
+  /* ── header ─────────────────────────────────────────────── */
+  header{display:flex;align-items:center;gap:14px;padding:8px 14px;background:var(--panel);
+    border-bottom:1px solid var(--rule);flex:0 0 auto;flex-wrap:wrap}
+  .brand{font-weight:600;letter-spacing:-.01em;white-space:nowrap}
+  .brand small{font-weight:400;color:var(--muted);margin-left:6px}
+  .seg{display:inline-flex;border:1px solid var(--rule);border-radius:7px;overflow:hidden;background:var(--panel)}
+  .seg button{border:0;background:transparent;padding:5px 10px;font:inherit;font-size:13px;color:var(--muted);cursor:pointer}
+  .seg button[aria-pressed="true"]{background:var(--accent-soft);color:var(--accent);font-weight:600}
+  .spacer{flex:1 1 auto}
+  button.act{border:1px solid var(--rule);background:var(--panel);border-radius:7px;padding:5px 12px;
+    font:inherit;font-size:13px;cursor:pointer;color:var(--ink)}
+  button.act:hover{border-color:var(--accent);color:var(--accent)}
+  button.act.primary{background:var(--accent);border-color:var(--accent);color:#fff}
+  button.act.primary:hover{opacity:.9;color:#fff}
+  .meta{font-size:12.5px;color:var(--muted);white-space:nowrap}
+
+  /* ── split ──────────────────────────────────────────────── */
+  main{flex:1 1 auto;display:grid;grid-template-columns:minmax(320px,1fr) minmax(420px,1.15fr);
+    min-height:0;gap:0}
+  .pane{min-height:0;display:flex;flex-direction:column;min-width:0}
+  .pane.left{border-right:1px solid var(--rule)}
+  .pane-head{display:flex;align-items:center;gap:10px;padding:6px 12px;border-bottom:1px solid var(--rule);
+    font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);flex:0 0 auto}
+  .pane-head .spacer{flex:1}
+  #md{flex:1 1 auto;width:100%;border:0;outline:0;resize:none;background:var(--panel);color:var(--ink);
+    font:13px/1.66 var(--mono);padding:16px 18px;tab-size:2}
+  .pane.right{background:#efede8}
+
+  /* preview stage */
+  #stageWrap{flex:1 1 auto;display:flex;align-items:center;justify-content:center;min-height:0;padding:18px;overflow:hidden}
+  .stage{position:relative}
+  .stage .card{position:absolute;top:0;left:0}
+  .rail{flex:0 0 auto;display:flex;gap:6px;overflow-x:auto;padding:8px 12px;background:var(--panel);
+    border-top:1px solid var(--rule)}
+  .rail button{flex:0 0 auto;border:1px solid var(--rule);background:var(--panel);border-radius:6px;
+    padding:5px 9px;font:inherit;font-size:12.5px;color:var(--muted);cursor:pointer;max-width:180px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+  .rail button[aria-current="true"]{border-color:var(--accent);color:var(--accent);background:var(--accent-soft);font-weight:600}
+  .rail button .n{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:5px;font-weight:400}
+
+  /* ── card ───────────────────────────────────────────────── */
+  .card{width:var(--cw);height:var(--ch);background:#fff;color:#191817;overflow:hidden;
+    display:flex;flex-direction:column;padding:calc(var(--ch) * .075) calc(var(--cw) * .07);
+    font-size:calc(var(--ch) * .032);line-height:1.45;box-shadow:var(--shadow)}
+  .card h1{font-size:1.72em;line-height:1.16;letter-spacing:-.015em;margin:0 0 .62em;font-weight:650}
+  .card p{margin:0 0 .62em}
+  .card ul,.card ol{margin:0 0 .62em;padding-left:1.25em}
+  .card li{margin:.24em 0}
+  .card li::marker{color:var(--accent)}
+  .card h2{font-size:1.18em;margin:.7em 0 .34em;font-weight:620}
+  .card h3{font-size:1.02em;margin:.62em 0 .3em;font-weight:620;color:#3b3a37}
+  .card a{color:var(--accent);text-decoration:none;border-bottom:.06em solid rgba(138,75,42,.35)}
+  .card strong{font-weight:670}
+  .card em{font-style:italic}
+  .card blockquote{margin:0 0 .62em;padding-left:.9em;border-left:.18em solid var(--rule);color:#4a4844}
+  .card code{font-family:var(--mono);font-size:.86em;background:var(--code);padding:.1em .34em;border-radius:3px}
+  .card pre{background:var(--code);border:1px solid var(--rule);border-radius:6px;padding:.7em .85em;
+    overflow:auto;margin:0 0 .62em;max-height:46%}
+  .card pre code{background:none;padding:0;font-size:.8em;line-height:1.5}
+  .card img{max-width:100%;max-height:38%;object-fit:contain;border-radius:5px;display:block;margin:.2em 0 .62em}
+  .card hr{border:0;border-top:1px solid var(--rule);margin:.8em 0}
+  .card .body{flex:1 1 auto;min-height:0;overflow:hidden}
+  .card .foot{flex:0 0 auto;font-size:.58em;color:var(--muted);display:flex;justify-content:space-between;
+    padding-top:.8em;letter-spacing:.04em}
+  /* title + closing cards */
+  .card[data-kind="title"]{justify-content:center}
+  .card[data-kind="title"] h1{font-size:2.5em;line-height:1.1;margin-bottom:.5em}
+  .card[data-kind="title"] .byline{font-size:.82em;color:var(--muted);display:flex;gap:.9em;flex-wrap:wrap}
+  .card[data-kind="title"] .preamble{font-size:.78em;color:#4a4844;margin-bottom:1.4em;max-width:44em}
+  /* content cards carry their `#` heading, with a short accent rule under it */
+  .card[data-kind="content"] h1::after{content:"";display:block;width:2.4em;height:2px;border-radius:2px;
+    background:var(--accent);opacity:.5;margin:.42em 0 0}
+  .card[data-kind="closing"]{justify-content:center;text-align:center;align-items:center}
+  .card[data-kind="closing"] h1{font-size:2.1em;margin-bottom:.4em}
+  .card[data-kind="closing"] .body{flex:0 0 auto}
+  .card[data-kind="closing"] .body>*{margin-left:auto;margin-right:auto}
+  .card .mermaid-src{background:var(--code);border:1px solid var(--rule);border-radius:6px;padding:.7em;
+    font-family:var(--mono);font-size:.78em;white-space:pre-wrap}
+  .card .mermaid-note{font-size:.62em;color:var(--muted);margin:.3em 0 0}
+  .card .diagram{margin:.15em 0 .85em}
+  .card .diagram svg{display:block;margin:0 auto;width:100%;height:auto;max-width:100% !important;
+    max-height:16em}
+
+  /* ── slideshow ──────────────────────────────────────────── */
+  #show{position:fixed;inset:0;background:#0f0f10;display:none;align-items:center;justify-content:center;z-index:60}
+  #show.on{display:flex}
+  #showStage{position:relative}
+  #showHud{position:fixed;bottom:16px;left:0;right:0;display:flex;justify-content:center;gap:14px;
+    align-items:center;color:#cfcbc4;font-size:13px;z-index:61}
+  #showHud button{background:rgba(255,255,255,.1);border:1px solid rgba(255,255,255,.22);color:#f0ede8;
+    border-radius:6px;padding:5px 11px;font:inherit;font-size:13px;cursor:pointer}
+  #showHud button:hover{background:rgba(255,255,255,.2)}
+  .kbd{border:1px solid rgba(255,255,255,.3);border-radius:4px;padding:0 5px;font-family:var(--mono);font-size:11.5px}
+
+  /* toast */
+  #toast{position:fixed;left:50%;transform:translateX(-50%);bottom:22px;background:#26251f;color:#f6f3ee;
+    padding:9px 15px;border-radius:8px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .18s;z-index:80;max-width:70vw}
+  #toast.on{opacity:1}
+
+  /* print-only deck: exact page boxes, one card per page */
+  #print-root{display:none}
+  /* mermaid measures text, so it needs a laid-out parent: give #print-root
+     geometry off-screen rather than display:none, only while rendering */
+  #print-root.measuring{display:block;position:absolute;left:-200000px;top:0;width:2000px;opacity:0;pointer-events:none}
+  @media print{
+    html,body{overflow:visible;background:#fff}
+    body>*:not(#print-root){display:none !important}
+    #print-root{display:block !important}
+    #print-root .card{box-shadow:none;break-after:page;break-inside:avoid;page-break-after:always}
+    #print-root .card:last-child{break-after:auto;page-break-after:auto}
+    *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
+  }
+  @media (max-width:900px){
+    main{grid-template-columns:1fr;grid-template-rows:1fr 1fr}
+    .pane.left{border-right:0;border-bottom:1px solid var(--rule)}
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <div class="brand">Markdown Cards <small>local preview</small></div>
+  <span class="seg" id="geoSeg" role="group" aria-label="Card geometry">
+    <button data-geo="16:9" aria-pressed="true">16:9</button>
+    <button data-geo="1:1" aria-pressed="false">1:1</button>
+    <button data-geo="4:5" aria-pressed="false">4:5</button>
+  </span>
+  <span class="meta" id="hud">— cards</span>
+  <span class="spacer"></span>
+  <span class="meta" id="saveState">saved</span>
+  <button class="act" id="btnSlide">Slideshow</button>
+  <button class="act" id="btnMd">Export .md</button>
+  <button class="act primary" id="btnPdf">Export PDF</button>
+</header>
+
+<main>
+  <section class="pane left">
+    <div class="pane-head">
+      <span>Markdown</span>
+      <span class="spacer"></span>
+      <span id="caretInfo">line 1</span>
+      <button class="act" id="btnCard" style="padding:2px 9px">+ Card</button>
+    </div>
+    <textarea id="md" spellcheck="true" aria-label="Markdown input"></textarea>
+  </section>
+
+  <section class="pane right">
+    <div class="pane-head">
+      <span>Card preview</span>
+      <span class="spacer"></span>
+      <span id="geomLabel">16:9 landscape · 1920 × 1080 px</span>
+    </div>
+    <div id="stageWrap"><div class="stage" id="stage"></div></div>
+    <div class="rail" id="rail"></div>
+  </section>
+</main>
+
+<!-- every card lives here; the active one is moved into the stage -->
+<div id="deck" style="display:none"></div>
+<div id="print-root"></div>
+
+<div id="show" aria-hidden="true">
+  <div id="showStage"></div>
+  <div id="showHud">
+    <button id="showPrev">‹</button>
+    <span id="showCount">1 / 1</span>
+    <button id="showNext">›</button>
+    <span class="kbd">←</span><span class="kbd">→</span> move
+    <span class="kbd">Esc</span> exit
+  </div>
+</div>
+<div id="toast" role="status" aria-live="polite"></div>
+
+<script type="text/plain" id="starter">
+---
+title: Untitled deck
+geometry: 16:9
+closing: auto
+---
+
+This pane is plain Markdown. Text above the first heading becomes the subtitle on the title card. Nothing here is saved to a server.
+
+# A heading opens a card
+- Every first-level heading starts a new card
+- The preview follows the caret, so typing here switches the card
+- Bullets, numbers, code and images all render
+1. Ordered lists work
+2. Like this
+
+# What the cards carry
+- **Bold**, *italic*, `inline code`, and [a link](https://example.com)
+- Images with `![alt](url)` — or paste one straight from the clipboard
+- A fenced block renders as code
+- A mermaid fence renders as a diagram
+
+```
+flowchart is below
+```
+
+# A diagram, rendered
+```mermaid
+flowchart LR
+  A[Note] --> B[H1 splits] --> C[Card] --> D[PDF]
+```
+
+# Export
+- **Export .md** writes the file back out, unchanged
+- **Export PDF** prints one card per page at the exact card size
+- 1:1 and 4:5 are the carousel profiles
+
+# Thank you
+Delete this last heading, or set `closing: none` in the frontmatter to drop the closing styling.
+</script>
+
+<script>
+/* ─────────────────────────────────────────────────────────────
+   Markdown Cards — single file, no build step, no dependencies.
+   Parser: frontmatter → title card → one card per `#` block.
+   ───────────────────────────────────────────────────────────── */
+const GEOM = {
+  '16:9': { w:1920, h:1080, label:'16:9 landscape · 1920 × 1080 px' },
+  '1:1' : { w:1080, h:1080, label:'1:1 square · 1080 × 1080 px' },
+  '4:5' : { w:1080, h:1350, label:'4:5 portrait · 1080 × 1350 px' }
+};
+const LS_KEY = 'janalogy.mdcards.v1';
+const $ = s => document.querySelector(s);
+
+const mdEl = $('#md'), stage = $('#stage'), deck = $('#deck'), rail = $('#rail'),
+      printRoot = $('#print-root'), toastEl = $('#toast');
+
+let state = { geometry:'16:9' };
+let cards = [];            // card elements, document order
+let cardTitles = [];
+let active = 0;
+let paging = false;
+const svgCache = new Map(); // mermaid source → rendered svg
+
+/* ── storage ──────────────────────────────────────────────── */
+function load(){
+  let raw = null;
+  try { raw = localStorage.getItem(LS_KEY); } catch(e){}
+  if (raw){
+    try {
+      const d = JSON.parse(raw);
+      if (d && typeof d.md === 'string'){
+        state.geometry = GEOM[d.geometry] ? d.geometry : '16:9';
+        return d.md;
+      }
+    } catch(e){ toast('Saved deck was unreadable — starting fresh. Export before closing.', 6000); }
+  }
+  return $('#starter').textContent.replace(/^\n/,'');
+}
+let saveTimer = null;
+function save(){
+  clearTimeout(saveTimer);
+  $('#saveState').textContent = 'saving…';
+  saveTimer = setTimeout(() => {
+    try {
+      localStorage.setItem(LS_KEY, JSON.stringify({ v:1, md: mdEl.value, geometry: state.geometry, at: Date.now() }));
+      $('#saveState').textContent = 'saved';
+    } catch(e){
+      $('#saveState').textContent = 'not saved';
+      toast('Browser storage is full or blocked. Use Export .md — that file is the durable copy.', 7000);
+    }
+  }, 250);
+}
+function toast(msg, ms=3200){
+  toastEl.textContent = msg; toastEl.classList.add('on');
+  clearTimeout(toast._t); toast._t = setTimeout(() => toastEl.classList.remove('on'), ms);
+}
+
+/* ── markdown ─────────────────────────────────────────────── */
+const esc = s => s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+
+function inline(src){
+  const codes = [];
+  // protect inline code first so emphasis never reaches inside it
+  let s = src.replace(/`([^`]+)`/g, (m,c) => {
+    codes.push('<code>' + esc(c) + '</code>');
+    return '\u0000' + (codes.length-1) + '\u0000';
+  });
+  s = esc(s);
+  s = s.replace(/!\[([^\]]*)\]\(([^)\s]+)(?:\s+&quot;([^&]*)&quot;)?\)/g,
+        (m,a,u,t) => `<img src="${u}" alt="${a}"${t?` title="${t}"`:''}>`);
+  s = s.replace(/\[([^\]]+)\]\(([^)\s]+)\)/g, (m,txt,u) =>
+        /^(https?:|mailto:|\/|#)/i.test(u) ? `<a href="${u}" target="_blank" rel="noopener">${txt}</a>` : txt);
+  s = s.replace(/\*\*([^*]+)\*\*/g,'<strong>$1</strong>')
+       .replace(/(^|[\s(])\*([^*\n]+)\*/g,'$1<em>$2</em>')
+       .replace(/(^|[\s(])_([^_\n]+)_/g,'$1<em>$2</em>')
+       .replace(/~~([^~]+)~~/g,'<del>$1</del>');
+  return s.replace(/\u0000(\d+)\u0000/g, (m,i) => codes[+i]);
+}
+
+function blocks(lines){
+  const out = [];
+  let para = [], list = null, fence = null, code = [];
+
+  const flushPara = () => { if (para.length){ out.push({t:'p', v:para.join(' ')}); para=[]; } };
+  const flushList = () => { if (list){ out.push(list); list=null; } };
+  const flushAll = () => { flushPara(); flushList(); };
+
+  for (const raw of lines){
+    const line = raw.replace(/\s+$/,'');
+    const f = line.match(/^\s*```+\s*(\S*)\s*$/);
+    if (fence === null && f){ flushAll(); fence = f[1] || 'text'; code = []; continue; }
+    if (fence !== null){
+      if (/^\s*```+\s*$/.test(line)){ out.push({t: fence==='mermaid' ? 'mermaid' : 'code', lang:fence, v:code.join('\n')}); fence = null; }
+      else code.push(raw);
+      continue;
+    }
+    if (!line.trim()){ flushAll(); continue; }
+    const h = line.match(/^(#{1,6})\s+(.*)$/);
+    if (h){ flushAll(); out.push({t:'h'+h[1].length, v:h[2]}); continue; }
+    if (/^\s*([-*+]|\d+[.)])\s+/.test(line)){
+      const ordered = /^\s*\d+[.)]\s+/.test(line);
+      const v = line.replace(/^\s*(?:[-*+]|\d+[.)])\s+/,'');
+      if (!list || list.ordered !== ordered){ flushPara(); flushList(); list = {t:'ul', ordered, items:[]}; }
+      list.items.push(v);
+      continue;
+    }
+    if (/^\s*(---|\*\*\*|___)\s*$/.test(line)){ flushAll(); out.push({t:'hr'}); continue; }
+    if (/^\s*>\s?/.test(line)){ flushAll(); out.push({t:'quote', v:line.replace(/^\s*>\s?/,'')}); continue; }
+    flushList();
+    para.push(line.trim());
+  }
+  flushAll();
+  return out;
+}
+
+function renderBlocks(bs){
+  return bs.map(b => {
+    switch(b.t){
+      case 'h1': return `<h1>${inline(b.v)}</h1>`;
+      case 'h2': return `<h2>${inline(b.v)}</h2>`;
+      case 'h3': case 'h4': case 'h5': case 'h6': return `<h3>${inline(b.v)}</h3>`;
+      case 'p': return `<p>${inline(b.v)}</p>`;
+      case 'quote': return `<blockquote>${inline(b.v)}</blockquote>`;
+      case 'hr': return '<hr>';
+      case 'ul': return b.ordered
+        ? `<ol>${b.items.map(i=>`<li>${inline(i)}</li>`).join('')}</ol>`
+        : `<ul>${b.items.map(i=>`<li>${inline(i)}</li>`).join('')}</ul>`;
+      case 'code': return `<pre><code>${esc(b.v)}</code></pre>`;
+      case 'mermaid': return `<pre class="mermaid-src" data-src="${esc(b.v)}">${esc(b.v)}</pre>`;
+      default: return '';
+    }
+  }).join('');
+}
+
+/* frontmatter: leading --- … --- block, key: value */
+function parseDeck(src){
+  const lines = src.split('\n');
+  const fm = {};
+  let body = lines, i = 0;
+  if (/^\s*---\s*$/.test(lines[0] || '')){
+    for (i = 1; i < lines.length; i++){
+      if (/^\s*---\s*$/.test(lines[i])) break;
+      const m = lines[i].match(/^\s*([A-Za-z_-][\w-]*)\s*:\s*(.*)$/);
+      if (m) fm[m[1].toLowerCase()] = m[2].replace(/^["']|["']$/g,'').trim();
+    }
+    body = lines.slice(i + 1);
+  }
+  const chunks = [];       // preamble + one chunk per `#`
+  let cur = { title:null, lines:[] }, fence = null;
+  chunks.push(cur);
+  for (const raw of body){
+    const line = raw;
+    const f = line.match(/^\s*```+/);
+    if (f) fence = fence === null ? true : null;
+    const h1 = fence === null && /^#\s+\S/.test(line);
+    if (h1){ cur = { title: line.replace(/^#\s+/,'').trim(), lines: [] }; chunks.push(cur); }
+    else cur.lines.push(line);
+  }
+  return { fm, preamble: chunks[0], slides: chunks.slice(1) };
+}
+
+function cardEl(kind, inner, foot){
+  const g = GEOM[state.geometry];
+  const el = document.createElement('div');
+  el.className = 'card';
+  el.dataset.kind = kind;
+  el.style.setProperty('--cw', g.w + 'px');
+  el.style.setProperty('--ch', g.h + 'px');
+  el.innerHTML = inner;
+  if (foot) el.insertAdjacentHTML('beforeend', foot);
+  return el;
+}
+
+function build(){
+  const { fm, preamble, slides } = parseDeck(mdEl.value);
+  const g = GEOM[state.geometry];
+  deck.replaceChildren();
+  cards = []; cardTitles = [];
+
+  // card 1 — title, generated from frontmatter
+  const byline = [fm.author, fm.date, fm.venue].filter(Boolean)
+    .map(v => `<span>${esc(v)}</span>`).join('<span style="opacity:.45">·</span>');
+  const pre = blocks(preamble.lines);
+  cards.push(cardEl('title', `
+    <h1>${fm.title ? esc(fm.title) : '<span style="opacity:.35">Untitled deck</span>'}</h1>
+    ${byline ? `<div class="byline">${byline}</div>` : ''}
+    <div style="height:1.1em"></div>
+    <div class="preamble">${renderBlocks(pre)}</div>
+  `));
+  cardTitles.push(fm.title || 'Untitled deck');
+
+  // one card per `#` block. A closing card is a bookend: like the title card it carries
+  // no footer, so page numbers count title + content cards (title is 1, content 2..n).
+  const closingMode = (fm.closing || 'auto').toLowerCase();
+  const last = slides.length - 1;
+  const closingOn = closingMode !== 'none' && last >= 0;
+  const pageTotal = 1 + (closingOn ? last : slides.length);
+  slides.forEach((s, idx) => {
+    const isClosing = closingOn && idx === last;
+    const body = renderBlocks(blocks(s.lines));
+    const foot = isClosing ? '' : `<div class="foot"><span>${esc(fm.title || 'Untitled deck')}</span><span>${idx + 2} / ${pageTotal}</span></div>`;
+    cards.push(cardEl(isClosing ? 'closing' : 'content', `
+      <h1>${inline(s.title)}</h1>
+      <div class="body">${body}</div>
+    `, foot));
+    cardTitles.push(s.title);
+  });
+
+  cards.forEach(c => deck.appendChild(c));
+  cards.forEach((c, i) => c.dataset.index = i);
+
+  rail.replaceChildren();
+  cards.forEach((c, i) => {
+    const b = document.createElement('button');
+    b.innerHTML = `<span class="n">${i+1}</span>${esc(cardTitles[i] || '')}`;
+    b.title = cardTitles[i] || '';
+    b.onclick = () => { jumpToCard(i); };
+    if (i === active) b.setAttribute('aria-current','true');
+    rail.appendChild(b);
+  });
+
+  $('#hud').textContent = `${cards.length} card${cards.length===1?'':'s'} · ${cardTitles.length - 1} headings`;
+  $('#geomLabel').textContent = g.label;
+  showCard(Math.min(active, cards.length - 1), false);
+}
+
+/* caret line → card. Lines before the first `#` belong to the title card. */
+function caretCard(){
+  const pos = mdEl.value.slice(0, mdEl.selectionStart).split('\n').length;
+  const lines = mdEl.value.split('\n');
+  let idx = 0, cur = 0, fence = null;
+  for (let n = 0; n < lines.length && n < pos; n++){
+    const line = lines[n];
+    if (/^\s*```+/.test(line)) fence = fence === null ? true : null;
+    if (fence === null && /^#\s+\S/.test(line)) cur++;
+  }
+  idx = cur;
+  return Math.min(idx, cards.length - 1);
+}
+
+function showCard(i, scrollRail = true){
+  if (!cards.length) return;
+  active = Math.max(0, Math.min(i, cards.length - 1));
+  const el = cards[active];
+  stage.replaceChildren(el);
+  const g = GEOM[state.geometry];
+  const wrap = $('#stageWrap');
+  const avail = Math.max(120, wrap.clientWidth - 36), availH = Math.max(120, wrap.clientHeight - 36);
+  const s = Math.min(avail / g.w, availH / g.h);
+  stage.style.width = g.w * s + 'px';
+  stage.style.height = g.h * s + 'px';
+  el.style.transformOrigin = '0 0';
+  el.style.transform = `scale(${s})`;
+  [...rail.children].forEach((b, k) => k === active ? b.setAttribute('aria-current','true') : b.removeAttribute('aria-current'));
+  if (scrollRail && rail.children[active]) rail.children[active].scrollIntoView({ block:'nearest', inline:'nearest' });
+  renderMermaid(el);
+}
+
+function fitShow(){
+  const g = GEOM[state.geometry];
+  const el = cards[active]; if (!el) return;
+  const s = Math.min(innerWidth / g.w, (innerHeight - 80) / g.h);
+  const st = $('#showStage');
+  st.replaceChildren(el);
+  st.style.width = g.w * s + 'px'; st.style.height = g.h * s + 'px';
+  el.style.transformOrigin = '0 0'; el.style.transform = `scale(${s})`;
+  $('#showCount').textContent = `${active + 1} / ${cards.length}`;
+  renderMermaid(el);
+}
+
+function jumpToCard(i){
+  const el = cards[i]; if (!el) return;
+  const titles = cardTitles;
+  // move the caret to that card's heading so editor and preview agree
+  const lines = mdEl.value.split('\n');
+  let seen = -1, target = 0, fence = null;
+  if (/^\s*---\s*$/.test(lines[0] || '')){
+    let j = 1; while (j < lines.length && !/^\s*---\s*$/.test(lines[j])) j++;
+    target = j + 1;
+  }
+  for (let n = 0; n < lines.length; n++){
+    if (/^\s*```+/.test(lines[n])) fence = fence === null ? true : null;
+    if (fence === null && /^#\s+\S/.test(lines[n])){ seen++; if (seen === i - 1){ target = n; break; } }
+  }
+  if (i > 0){
+    let off = 0; for (let n = 0; n < target; n++) off += lines[n].length + 1;
+    mdEl.focus(); mdEl.setSelectionRange(off, off + Math.min(lines[target].length, 40));
+    const lh = 13 * 1.66;
+    mdEl.scrollTop = Math.max(0, (target - 4) * lh);
+  }
+  showCard(i);
+}
+
+/* ── mermaid ──────────────────────────────────────────────── */
+let mermaidReady = null;
+function getMermaid(){
+  if (mermaidReady) return mermaidReady;
+  mermaidReady = (async () => {
+    const mod = await import('https://cdn.jsdelivr.net/npm/mermaid@11/dist/mermaid.esm.min.mjs');
+    const m = mod.default;
+    m.initialize({ startOnLoad:false, securityLevel:'strict', theme:'neutral',
+      fontFamily:'-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif' });
+    return m;
+  })();
+  return mermaidReady;
+}
+let mmSeq = 0;
+/* A rendered diagram replaces its fence entirely — a code-block box around a
+   diagram reads as an error, and mermaid's natural size is small on a card
+   this wide, so the box scales it up (§7.2). */
+function insertDiagram(pre, svgHtml){
+  const d = document.createElement('div');
+  d.className = 'diagram';
+  d.innerHTML = svgHtml;
+  pre.replaceWith(d);
+}
+async function renderMermaid(scope){
+  if (!scope) return;
+  const targets = [...scope.querySelectorAll('pre.mermaid-src:not([data-done])')];
+  if (!targets.length) return;
+  targets.forEach(t => t.setAttribute('data-done','1'));
+  // one at a time, awaited: mermaid renders into a shared scratch node, so
+  // concurrent calls on a multi-diagram deck would collide
+  for (const t of targets){
+    const src = t.getAttribute('data-src') || t.textContent;
+    if (svgCache.has(src)){ insertDiagram(t, svgCache.get(src)); continue; }
+    try {
+      const m = await getMermaid();
+      const { svg } = await m.render('mm' + (++mmSeq), src);
+      svgCache.set(src, svg);
+      insertDiagram(t, svg);
+    } catch(err){
+      t.insertAdjacentHTML('afterend', `<div class="mermaid-note">Diagram not rendered (${esc(String(err.message || err).slice(0,90))}) — the source stays visible. Mermaid loads from the CDN on first use, so this needs a connection once.</div>`);
+      t.removeAttribute('data-done');
+      t.style.display = '';
+    }
+  }
+}
+
+/* ── slideshow ────────────────────────────────────────────── */
+function slideshow(on){
+  $('#show').classList.toggle('on', on);
+  $('#show').setAttribute('aria-hidden', on ? 'false' : 'true');
+  if (on){ if (document.fullscreenEnabled) document.documentElement.requestFullscreen?.().catch(()=>{}); fitShow(); }
+  else { document.exitFullscreen?.().catch(()=>{}); stage.replaceChildren(cards[active]); showCard(active); }
+}
+
+/* ── exports ──────────────────────────────────────────────── */
+function exportMd(){
+  const blob = new Blob([mdEl.value], { type:'text/markdown;charset=utf-8' });
+  const a = document.createElement('a');
+  a.href = URL.createObjectURL(blob);
+  a.download = (cardTitles[0] || 'deck').replace(/[^\w -]+/g,'').trim().replace(/\s+/g,'-').toLowerCase() || 'deck';
+  a.download += '.md';
+  a.click(); URL.revokeObjectURL(a.href);
+  toast('Exported .md — the canonical file, unchanged.');
+}
+
+async function exportPdf(){
+  const g = await preparePrint();
+  toast(`Preparing ${cards.length} cards at ${g.label} — choose “Save as PDF” and set margins to None.`, 7000);
+  setTimeout(() => window.print(), 120);
+}
+
+/* Builds the print document: an exact @page box from the active geometry and
+   one card per page. Kept separate so the pagination can be driven and checked
+   headlessly, which is what §10 of the spec asks for. */
+async function preparePrint(){
+  const g = GEOM[state.geometry];
+  $('#pageStyle')?.remove();
+  const st = document.createElement('style');
+  st.id = 'pageStyle';
+  st.textContent = `@page{size:${g.w}px ${g.h}px;margin:0}`;
+  document.head.appendChild(st);
+
+  paging = true;
+  // move the real cards in so rendered diagrams print as vector.
+  // #print-root is display:none on screen, so hand it layout while mermaid measures.
+  printRoot.classList.add('measuring');
+  printRoot.replaceChildren(...cards);
+  await renderMermaid(printRoot);
+  cards.forEach(c => { c.style.transform = 'none'; });
+  printRoot.classList.remove('measuring');
+  return g;
+}
+window.addEventListener('afterprint', () => {
+  if (!paging) return;
+  paging = false;
+  showCard(active, false);
+  if ($('#show').classList.contains('on')) fitShow();
+});
+
+/* ── input wiring ─────────────────────────────────────────── */
+let rebuildTimer = null;
+function scheduleBuild(){ clearTimeout(rebuildTimer); rebuildTimer = setTimeout(() => { build(); save(); }, 130); }
+
+mdEl.addEventListener('input', () => {
+  save();
+  const nextIndex = caretCard();
+  clearTimeout(rebuildTimer);
+  rebuildTimer = setTimeout(() => { build(); if (nextIndex !== active) showCard(nextIndex); }, 130);
+});
+mdEl.addEventListener('click', () => { const i = caretCard(); if (i !== active) showCard(i); });
+mdEl.addEventListener('keyup', e => {
+  if (['ArrowUp','ArrowDown','ArrowLeft','ArrowRight','PageUp','PageDown','Home','End'].includes(e.key)){
+    const i = caretCard(); if (i !== active) showCard(i);
+  }
+  const pos = mdEl.value.slice(0, mdEl.selectionStart).split('\n').length;
+  $('#caretInfo').textContent = 'line ' + pos;
+});
+addEventListener('resize', () => { showCard(active, false); if ($('#show').classList.contains('on')) fitShow(); });
+
+// paste or drop an image → inline it, so capture never needs a file dialog
+function insertAtCaret(text){
+  const s = mdEl.selectionStart, e = mdEl.selectionEnd;
+  mdEl.value = mdEl.value.slice(0, s) + text + mdEl.value.slice(e);
+  mdEl.selectionStart = mdEl.selectionEnd = s + text.length;
+  scheduleBuild();
+}
+mdEl.addEventListener('paste', ev => {
+  const items = [...(ev.clipboardData?.items || [])];
+  const img = items.find(i => i.type.startsWith('image/'));
+  if (!img) return;
+  ev.preventDefault();
+  const file = img.getAsFile();
+  const fr = new FileReader();
+  fr.onload = () => insertAtCaret(`![pasted image](${fr.result})\n`);
+  fr.readAsDataURL(file);
+});
+['dragover','drop'].forEach(t => mdEl.addEventListener(t, ev => {
+  ev.preventDefault();
+  if (t !== 'drop') return;
+  const f = [...(ev.dataTransfer?.files || [])].find(x => x.type.startsWith('image/'));
+  if (!f) return;
+  const fr = new FileReader();
+  fr.onload = () => insertAtCaret(`![${f.name.replace(/\.[^.]+$/,'')}](${fr.result})\n`);
+  fr.readAsDataURL(f);
+}));
+
+$('#geoSeg').addEventListener('click', ev => {
+  const b = ev.target.closest('button'); if (!b) return;
+  state.geometry = b.dataset.geo;
+  [...ev.currentTarget.children].forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
+  build(); save();
+});
+$('#btnSlide').onclick = () => slideshow(true);
+$('#showPrev').onclick = () => { active = (active - 1 + cards.length) % cards.length; fitShow(); };
+$('#showNext').onclick = () => { active = (active + 1) % cards.length; fitShow(); };
+$('#show').addEventListener('click', ev => { if (ev.target.id === 'show') slideshow(false); });
+$('#btnMd').onclick = exportMd;
+$('#btnPdf').onclick = exportPdf;
+$('#btnCard').onclick = () => {
+  mdEl.value = mdEl.value.replace(/\s*$/,'') + '\n\n# New card\n- \n';
+  const end = mdEl.value.length;
+  mdEl.focus(); mdEl.setSelectionRange(end, end);
+  scheduleBuild();
+};
+
+addEventListener('keydown', e => {
+  const inShow = $('#show').classList.contains('on');
+  if (e.key === 'Escape' && inShow){ slideshow(false); return; }
+  if (e.key === 'F5') return;
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'p'){ e.preventDefault(); exportPdf(); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's'){ e.preventDefault(); exportMd(); return; }
+  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'e'){ e.preventDefault(); $('#show').classList.contains('on') ? slideshow(false) : slideshow(true); return; }
+  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && !inShow){ e.preventDefault(); $('#btnCard').click(); return; }
+  if (inShow){
+    if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown'){
+      e.preventDefault(); active = (active + 1) % cards.length; fitShow(); }
+    if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp'){
+      e.preventDefault(); active = (active - 1 + cards.length) % cards.length; fitShow(); }
+  }
+});
+document.addEventListener('fullscreenchange', () => { if ($('#show').classList.contains('on')) fitShow(); });
+
+/* ── go ───────────────────────────────────────────────────── */
+mdEl.value = load();
+[...$('#geoSeg').children].forEach(b => b.setAttribute('aria-pressed', b.dataset.geo === state.geometry ? 'true' : 'false'));
+build();
+
+/* Acceptance harness — open the file with #selftest to run it headlessly.
+   Exists so §10 of the spec can be checked without a human clicking. */
+async function runSelftest(){
+  const R = []; const ok = (n,c,d='') => R.push((c?'PASS':'FAIL') + ' ' + n + (d ? ' — ' + d : ''));
+  try {
+  const h1 = (mdEl.value.match(/^#\s+\S/gm) || []).length;
+  ok('cards = 1 title + one per H1', cards.length === h1 + 1, cards.length + ' vs ' + (h1+1));
+  ok('title card from frontmatter', cards[0].textContent.includes(cardTitles[0]), cardTitles[0]);
+  ok('last card styled as closing', cards[cards.length-1].dataset.kind === 'closing');
+  // bookends carry no footer, so numbering counts title + content cards only
+  const _p = parseDeck(mdEl.value);
+  const _closingOn = (_p.fm.closing || 'auto').toLowerCase() !== 'none' && _p.slides.length > 0;
+  const _foots = cards.filter(c => c.querySelector('.foot'));
+  const _total = _closingOn ? cards.length - 1 : cards.length;
+  ok('footer on every card but the two bookends', _foots.length === (_closingOn ? cards.length - 2 : cards.length - 1),
+     _foots.length + ' footers / ' + cards.length + ' cards' + (_closingOn ? ', closing on' : ', closing off'));
+  ok('closing card carries no footer',
+     !(cards[cards.length-1].dataset.kind === 'closing' && cards[cards.length-1].querySelector('.foot')));
+  ok('page numbers count title + content only', (() => {
+    const nums = _foots.map(c => c.querySelector('.foot').lastElementChild.textContent.trim());
+    return nums.length === (_closingOn ? _total - 1 : _total) && nums.every((t, i) => t === (i + 2) + ' / ' + _total);
+  })(), _foots.map(c => c.querySelector('.foot').lastElementChild.textContent.trim()).join(' | ') + ' — expect n / ' + _total);
+  ok('every card shows its heading', cards.slice(1).every((c, i) => {
+    const h = c.querySelector('h1'); return !!h && h.textContent.trim() === cardTitles[i+1].trim();
+  }), cards.slice(1).map(c => c.querySelector('h1') ? c.querySelector('h1').textContent.trim() : 'MISSING').join(' | '));
+  ok('inline markdown rendered', !!document.querySelector('.card strong') && !!document.querySelector('.card code'));
+  ok('ordered + bullet lists rendered', !!document.querySelector('.card ul') && !!document.querySelector('.card ol'));
+  ok('code fence rendered', !!document.querySelector('.card pre > code'));
+  const mm = cards.find(c => c.querySelector('pre.mermaid-src'));
+  ok('mermaid fence detected', !!mm);
+  $('#geoSeg button[data-geo="1:1"]').click();
+  ok('1:1 geometry applied', getComputedStyle(cards[0]).getPropertyValue('--cw').trim() === '1080px', getComputedStyle(cards[0]).getPropertyValue('--cw').trim());
+  $('#geoSeg button[data-geo="4:5"]').click();
+  ok('4:5 geometry applied', getComputedStyle(cards[0]).getPropertyValue('--ch').trim() === '1350px');
+  $('#geoSeg button[data-geo="16:9"]').click();
+  mdEl.setSelectionRange(0,0);
+  ok('caret at top → title card', caretCard() === 0, String(caretCard()));
+  mdEl.setSelectionRange(mdEl.value.length, mdEl.value.length);
+  ok('caret at end → last card', caretCard() === cards.length - 1, String(caretCard()));
+  showCard(0); jumpToCard(2);
+  ok('rail jump selects that card', active === 2 && mdEl.value.slice(mdEl.selectionStart, mdEl.selectionStart+1) === '#', mdEl.value.slice(mdEl.selectionStart, mdEl.selectionStart+12));
+  localStorage.removeItem(LS_KEY); save();
+  await new Promise(r => setTimeout(r, 500));
+  let stored = null; try { stored = JSON.parse(localStorage.getItem(LS_KEY) || 'null'); } catch(e){}
+  ok('localStorage round-trip', !!stored && stored.md === mdEl.value);
+  // re-find after the geometry clicks above, which rebuild every card element
+  const mmIdx = cards.findIndex(c => c.querySelector('pre.mermaid-src'));
+  if (mmIdx >= 0){ showCard(mmIdx); await new Promise(r => setTimeout(r, 6000)); }
+  ok('mermaid rendered to svg', mmIdx >= 0 && !!cards[mmIdx].querySelector('svg'),
+     mmIdx >= 0 ? [...cards[mmIdx].querySelectorAll('svg')].length + ' svg' : 'no fence');
+  slideshow(true); ok('slideshow on', $('#show').classList.contains('on'));
+  slideshow(false); ok('slideshow off', !$('#show').classList.contains('on'));
+  ok('.md source re-parses to the same deck', (() => {
+    const p = parseDeck(mdEl.value);
+    return p.slides.length === cards.length - 1 && p.slides.map(s => s.title).join(' | ') === cardTitles.slice(1).join(' | ');
+  })(), (() => { const p = parseDeck(mdEl.value); return p.slides.length + ' slides / ' + (cards.length - 1) + ' cards'; })());
+  } catch(e){ ok('harness ran to the end', false, String((e && e.message) || e) + ' @ ' + String((e && e.stack) || '').split('\n')[1]); }
+  const fails = R.filter(x => x.startsWith('FAIL')).length;
+  document.title = 'SELFTEST ' + fails + ' fail / ' + R.length;
+  const box = document.createElement('pre'); box.id = 'selftest-out'; box.textContent = R.join('\n');
+  box.style.cssText = 'position:fixed;inset:auto 0 0 0;max-height:45vh;overflow:auto;background:#111;color:#e8e4de;font:12px ui-monospace;z-index:999;padding:8px;margin:0';
+  document.body.appendChild(box);
+}
+if (location.hash.includes('selftest')) setTimeout(runSelftest, 400);
+</script>
+</body>
+</html>
