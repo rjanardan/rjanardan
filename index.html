@@ -98,7 +98,7 @@
   header{ padding:var(--space-7) 0 var(--space-5); border-bottom:1px solid var(--border); }
   .header-row{ display:flex; align-items:center; gap:var(--space-6); margin-bottom:var(--space-4); }
   .headshot{
-    width:120px; height:120px; border-radius:50%; overflow:hidden; flex-shrink:0;
+    width:140px; height:140px; border-radius:50%; overflow:hidden; flex-shrink:0;
     border:1px solid var(--border-strong); background:var(--grid-line);
     display:flex; align-items:center; justify-content:center;
     font-family:var(--font-mono); font-size:10px; color:var(--text-muted); text-align:center;
@@ -107,14 +107,15 @@
   .header-text .name{ margin-bottom:0; }
   @media (max-width:560px){
     .header-row{ flex-direction:column; align-items:flex-start; gap:var(--space-4); }
-    .headshot{ width:96px; height:96px; }
+    .headshot{ width:112px; height:112px; }
   }
   .name{ font-size:clamp(32px,5vw,52px); line-height:1.05; margin-bottom:var(--space-2); }
-  .tagline{ font-size:clamp(15px,2vw,18px); color:var(--text-muted); max-width:660px; margin-bottom:var(--space-4); }
+  .tagline{ font-size:clamp(15px,2vw,18px); color:var(--text-muted); max-width:none; margin-bottom:var(--space-4); }
   .contact-row{ display:flex; flex-wrap:wrap; gap:var(--space-2) var(--space-5); font-family:var(--font-mono); font-size:13px; color:var(--text-muted); }
   .contact-row a{ color:var(--text); }
   .contact-row span.sep{ color:var(--border-strong); }
-  .cta-row{ display:flex; flex-wrap:wrap; gap:var(--space-3); margin-top:var(--space-4); }
+  .cta-row{ display:grid; grid-template-columns:repeat(auto-fit,minmax(230px,1fr)); gap:var(--space-4); margin-top:var(--space-4); }
+  .cta-row .btn{ text-align:center; justify-content:center; }
   .btn{
     display:inline-block; font-family:var(--font-mono); font-size:13px; text-transform:uppercase; letter-spacing:.04em;
     padding:12px 20px; border-radius:24px; border:1px solid var(--border-strong); color:var(--text);
@@ -275,6 +276,28 @@
   .theme-nav button:hover{ color:var(--text); border-color:var(--border); }
   .theme-nav button[aria-pressed="true"]{
     background:var(--accent); color:var(--bg); border-color:var(--accent); font-weight:600;
+  }
+  /* Collapsed by default: only the label shows; the palette reveals on hover/focus */
+  .theme-nav-inner .theme-nav-label{
+    cursor:pointer; padding:6px 11px; border:1px solid var(--border); border-radius:999px;
+    transition:all .18s ease;
+  }
+  .theme-nav-inner:hover .theme-nav-label,
+  .theme-nav-inner:focus-within .theme-nav-label{
+    background:var(--accent); color:var(--bg); border-color:var(--accent);
+  }
+  .theme-nav-inner button{
+    max-width:0; opacity:0; overflow:hidden; padding-left:0; padding-right:0; border-width:0;
+    transition:max-width .28s ease, opacity .2s ease, padding .28s ease, border-width .28s ease;
+    pointer-events:none;
+  }
+  .theme-nav-inner:hover button,
+  .theme-nav-inner:focus-within button{
+    max-width:160px; opacity:1; padding-left:11px; padding-right:11px; border-width:1px;
+    pointer-events:auto;
+  }
+  @media (hover:none){
+    .theme-nav-inner button{ max-width:160px; opacity:1; padding-left:11px; padding-right:11px; border-width:1px; pointer-events:auto; }
   }
   html{ scroll-padding-top:64px; }
 
@@ -620,19 +643,23 @@
     <div class="pillar-grid">
       <div class="pillar-card">
         <div class="pillar-title">AI-Native Engineering Transformation</div>
-        <div class="pillar-desc">Pioneered transition from AI coding assistants to agentic AI workflows across a 600-engineer business unit at Dell, yielding 3x productivity and 30% higher team engagement. Researching multi-agent system communication architectures (Ph.D. Candidate in AI).</div>
+        <div class="pillar-desc">As official AI champion for a 600-engineer business unit at Dell, drove agentic AI from coding assistants to production adoption: worked with IT to fine-tune code models to a million-line codebase, evaluated per-team code-generation effectiveness, and migrated the toolchain as model quality improved, yielding 3x productivity and 30% higher engagement. Built on the org's AI harness and LLM architecture documentation to create knowledge bundles for grounded, non-hallucinating answers.</div>
+      </div>
+      <div class="pillar-card">
+        <div class="pillar-title">User Experience &amp; Interface for Enterprise Products</div>
+        <div class="pillar-desc">Led the engineering side of UX/UI for four version-1 enterprise products across HPE and Dell: simplifying underlying complexity, one design system across the portfolio, and API-first compliance (OpenAPI, Redfish). At Dell, responsible for system management of a distributed Kubernetes-based data protection product, and used AI to pull GUI delivery in by 6 months, enabling early customer demos and timely product decisions.</div>
       </div>
       <div class="pillar-card">
         <div class="pillar-title">Organizational Scaling &amp; Culture</div>
-        <div class="pillar-desc">Built teams in India with complete ownership of manageability software for Enterprise products. As India manageability site lead, grew team to 100 engineers. Graduated from Dell's flagship LEAD program. Earned Rockstar Manager for 5 consecutive years with exceptional team engagement scores.</div>
+        <div class="pillar-desc">Built and scaled engineering teams in India with complete ownership of manageability software for enterprise products; grew the site to 100 engineers. Graduated from Dell's flagship LEAD program. Earned top-decile team engagement for 5 consecutive years.</div>
       </div>
       <div class="pillar-card">
-        <div class="pillar-title">Portfolio Transformation &amp; Modernization</div>
-        <div class="pillar-desc">Led Agile/Scaled Scrum transformation for a portfolio (~1200 engineers). Standardized secure, spec-driven engineering methodologies and directed the modernization of legacy technologies (e.g., GWT to Angular).</div>
+        <div class="pillar-title">Agile Transformation</div>
+        <div class="pillar-desc">Led Dell's Agile transformation three times: waterfall to Agile Scrum (VersionOne, SAFe), then Scaled Scrum with Scrum@Scale, and then across the Infrastructure Solutions Group. Wrote the tutorial decks, certified 100% of employees and leaders in Scrum, and ran portfolio-level executive Scrum events. Recognized with the Senior Vice President's Game Changer award.</div>
       </div>
       <div class="pillar-card">
-        <div class="pillar-title">Startup Bootstrapping &amp; Delivery</div>
-        <div class="pillar-desc">Formed the element manager engineering team from scratch at Tasman Networks. Architected the embedded web server and delivered v1.0 of the product from India, establishing the technical foundation that later scaled through Nortel and Avaya acquisitions.</div>
+        <div class="pillar-title">AI-Research</div>
+        <div class="pillar-desc">Ph.D. candidate in AI researching multi-agent systems communication architectures. M.Tech in Data Science (BITS Pilani): project on Sustainability through Small Generative Models.</div>
       </div>
     </div>
   </section>
@@ -644,12 +671,12 @@
       <div class="pillar-card">
         <div class="pillar-title">Full Profile &amp; Resume</div>
         <div class="pillar-desc">Complete career history, experience, education, certifications, and skills.</div>
-        <a class="pillar-link" href="janardan-profile.html">View profile →</a>
+        <a class="pillar-link" href="janardan-profile.html"> View profile</a>
       </div>
       <div class="pillar-card">
         <div class="pillar-title">Patents</div>
         <div class="pillar-desc">3 granted patents and 1 published application in adaptive authentication and job scheduling.</div>
-        <a class="pillar-link" href="https://patents.justia.com/inventor/janardan-revuru" target="_blank" rel="noopener">View patents →</a>
+        <a class="pillar-link" href="https://patents.justia.com/inventor/janardan-revuru" target="_blank" rel="noopener"> View patents</a>
       </div>
     </div>
 
@@ -681,7 +708,7 @@
       </div>
     </div>
 
-    <h3 style="margin-top:var(--space-6);">Research areas <span style="color:var(--text-muted);font-weight:400;font-size:14px;">— PhD in progress</span></h3>
+    <h3 style="margin-top:var(--space-6);">Research areas <span style="color:var(--text-muted);font-weight:400;font-size:14px;">PhD in progress</span></h3>
     <div class="pillar-grid">
       <div class="pillar-card">
         <div class="pillar-title">Neuro-symbolic AI</div>
@@ -700,24 +727,24 @@
     <div class="pillar-grid">
       <div class="pillar-card">
         <div class="pillar-title">Research Blog (Obsidian)</div>
-        <div class="pillar-desc">Working notes from PhD research — agent-to-agent communication and structured knowledge grounding.</div>
-        <a class="pillar-link" href="https://publish.obsidian.md/janardan" target="_blank" rel="noopener">Read notes →</a>
+        <div class="pillar-desc">Working notes from PhD research on agent-to-agent communication and structured knowledge grounding.</div>
+        <a class="pillar-link" href="https://publish.obsidian.md/janardan" target="_blank" rel="noopener"> Read notes</a>
       </div>
       <div class="pillar-card">
         <div class="pillar-title">Open Source For You</div>
         <div class="pillar-desc">Published articles on open source technology and engineering practice.</div>
-        <a class="pillar-link" href="https://www.opensourceforu.com/author/janardan-revuru/" target="_blank" rel="noopener">Read articles →</a>
+        <a class="pillar-link" href="https://www.opensourceforu.com/author/janardan-revuru/" target="_blank" rel="noopener"> Read articles</a>
       </div>
       <div class="pillar-card">
-        <div class="pillar-title">Medium — Janalogy</div>
+        <div class="pillar-title">Medium, Janalogy</div>
         <div class="pillar-desc">Essays on engineering leadership, AI transformation, and team scaling.</div>
         <!-- TODO: replace with your actual Medium profile URL -->
-        <a class="pillar-link" href="https://medium.com/@janalogy" target="_blank" rel="noopener">Read on Medium →</a>
+        <a class="pillar-link" href="https://medium.com/@janalogy" target="_blank" rel="noopener"> Read on Medium</a>
       </div>
       <div class="pillar-card">
         <div class="pillar-title">Advisory &amp; Conferences</div>
         <div class="pillar-desc">Open Source India Conference contributor since 2011; academic council and board-of-studies roles.</div>
-        <a class="pillar-link" href="janardan-profile.html#affiliations">View affiliations →</a>
+        <a class="pillar-link" href="janardan-profile.html#affiliations"> View affiliations</a>
       </div>
     </div>
   </section>
@@ -734,10 +761,10 @@
         <div class="community-body">
           <div class="c-title">JavaScript Meetup</div>
           <div class="c-meta">Since 2015 · Co-founder</div>
-          <p>Bangalore's long-running JS community — talks, workshops, and networking for frontend and full-stack engineers.</p>
+          <p>Bangalore's long-running JS community: talks, workshops, and networking for frontend and full-stack engineers.</p>
           <div class="c-members">Join 13,050+ members</div>
-          <a href="javascriptmeetup.html">About community →</a><br>
-          <a href="https://www.meetup.com/javascriptmeetup/" target="_blank" rel="noopener">Join community at meetup.com →</a>
+          <a href="javascriptmeetup.html"> About community</a><br>
+          <a href="https://www.meetup.com/javascriptmeetup/" target="_blank" rel="noopener"> Join community at meetup.com</a>
         </div>
       </div>
       <div class="community-card">
@@ -748,10 +775,10 @@
         <div class="community-body">
           <div class="c-title">DARLing Meetup</div>
           <div class="c-meta">Since 2025 · Founder</div>
-          <p>Data Science, AI, Research and Learning — a research-driven AI community relaunched from an earlier ODSC group.</p>
+          <p>Data Science, AI, Research and Learning, a research-driven AI community relaunched from an earlier ODSC group.</p>
           <div class="c-members">Join 4,833+ members</div>
-          <a href="darling-meetup.html">About community →</a><br>
-          <a href="https://www.meetup.com/darling-meetup/" target="_blank" rel="noopener">Join community at meetup.com →</a>
+          <a href="darling-meetup.html"> About community</a><br>
+          <a href="https://www.meetup.com/darling-meetup/" target="_blank" rel="noopener"> Join community at meetup.com</a>
         </div>
       </div>
       <div class="community-card">
@@ -762,10 +789,10 @@
         <div class="community-body">
           <div class="c-title">Byte of Python Meetup</div>
           <div class="c-meta">Since 2025 · Founder</div>
-          <p>A community for Python practitioners — from fundamentals to applied data science and AI tooling.</p>
+          <p>A community for Python practitioners, from fundamentals to applied data science and AI tooling.</p>
           <div class="c-members">Join 4,771+ members</div>
-          <a href="byte-of-python.html">About community →</a><br>
-          <a href="https://www.meetup.com/byte-of-python/" target="_blank" rel="noopener">Join community at meetup.com →</a>
+          <a href="byte-of-python.html"> About community</a><br>
+          <a href="https://www.meetup.com/byte-of-python/" target="_blank" rel="noopener"> Join community at meetup.com</a>
         </div>
       </div>
     </div>
@@ -775,10 +802,10 @@
     <h2 class="section-title">Universities I Work With</h2>
     <p class="section-sub">Academic affiliations, advisory roles, and ongoing research.</p>
     <ul class="simple-list">
-      <li><span>REVA University — Ph.D. candidate, Artificial Intelligence</span><span class="meta">Since Dec 2025</span></li>
-      <li><span>Birla Institute of Technology &amp; Science, Pilani — M.Tech, Data Science</span><span class="meta">Completed Jun 2024</span></li>
-      <li><span>Madanapalle Institute of Technology &amp; Science — Academic Council Member</span><span class="meta">Since 2025</span></li>
-      <li><span>Kishkindha University — Board of Studies Member</span><span class="meta">Since 2024</span></li>
+      <li><span>REVA University, Ph.D. candidate, Artificial Intelligence</span><span class="meta">Since Dec 2025</span></li>
+      <li><span>Birla Institute of Technology &amp; Science, Pilani, M.Tech, Data Science</span><span class="meta">Completed Jun 2024</span></li>
+      <li><span>Madanapalle Institute of Technology &amp; Science, Academic Council Member</span><span class="meta">Since 2025</span></li>
+      <li><span>Kishkindha University, Board of Studies Member</span><span class="meta">Since 2024</span></li>
     </ul>
   </section>
 
