@@ -280,9 +280,11 @@ A remote image is a normal Markdown image: `![alt text](https://…)`. It loads 
 
 # Images — local files
 
-Reference a file by relative path, same syntax. Drop `logo.png` in the `examples/images/` folder and open this deck there.
+Relative image paths resolve against the running app, not the deck file: a local file must sit under the app's `images/` folder (or beside `index.html`). This one is `images/logo.png`.
 
 ![Local image placeholder](images/logo.png)
+
+For a fully portable local image — one that lives inside the deck, works offline and in the exported PDF — paste or drop the file straight into the editor; the app inlines it as a `data:` URI.
 
 # A diagram, sequence
 
