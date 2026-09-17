@@ -38,6 +38,9 @@
   /* ── split ──────────────────────────────────────────────── */
   main{flex:1 1 auto;display:grid;grid-template-columns:minmax(320px,1fr) minmax(420px,1.15fr);
     min-height:0;gap:0}
+  /* slides-only view (press v): hide the Markdown pane, cards fill the window */
+  body.slides-only main{grid-template-columns:1fr}
+  body.slides-only .pane.left{display:none}
   .pane{min-height:0;display:flex;flex-direction:column;min-width:0}
   .pane.left{border-right:1px solid var(--rule)}
   .pane-head{display:flex;align-items:center;gap:10px;padding:6px 12px;border-bottom:1px solid var(--rule);
@@ -163,6 +166,7 @@
   <span class="meta" id="hud">— cards</span>
   <span class="spacer"></span>
   <span class="meta" id="saveState">saved</span>
+  <span class="meta" title="Keyboard shortcuts">f full · v slides · ← → cards</span>
   <button class="act" id="btnSlide">Slideshow</button>
   <button class="act" id="btnMd">Export .md</button>
   <button class="act" id="btnOpen" title="Load a .md / .txt file into the editor">Open .md…</button>
@@ -905,19 +909,42 @@ $('#exSel').addEventListener('change', ev => {
   ev.target.value = ''; // reset beside-button chip back to the prompt
 });
 
+/* ── keyboard shortcuts (v2) ──────────────────────────────── */
+function toggleFullscreen(){
+  if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  else if (document.fullscreenEnabled) document.documentElement.requestFullscreen().catch(()=>{});
+}
+function toggleSlidesOnly(){
+  const on = document.body.classList.toggle('slides-only');
+  if (on && document.activeElement === mdEl) mdEl.blur(); // arrows then flip cards, not text
+  toast(on ? 'Slides-only view — press v to bring the editor back.' : 'Editor shown — press v to hide it.', 2600);
+  showCard(active, false);
+}
 addEventListener('keydown', e => {
   const inShow = $('#show').classList.contains('on');
+  const meta = e.metaKey || e.ctrlKey || e.altKey;
   if (e.key === 'Escape' && inShow){ slideshow(false); return; }
   if (e.key === 'F5') return;
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'p'){ e.preventDefault(); exportPdf(); return; }
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 's'){ e.preventDefault(); exportMd(); return; }
-  if ((e.metaKey || e.ctrlKey) && e.key.toLowerCase() === 'e'){ e.preventDefault(); $('#show').classList.contains('on') ? slideshow(false) : slideshow(true); return; }
-  if (e.key === 'Enter' && (e.metaKey || e.ctrlKey) && !inShow){ e.preventDefault(); $('#btnCard').click(); return; }
+  if (meta){
+    const k = e.key.toLowerCase();
+    if (k === 'p'){ e.preventDefault(); exportPdf(); return; }
+    if (k === 's'){ e.preventDefault(); exportMd(); return; }
+    if (k === 'e'){ e.preventDefault(); slideshow(!inShow); return; }
+    if (e.key === 'Enter'){ if (!inShow){ e.preventDefault(); $('#btnCard').click(); } return; }
+  }
   if (inShow){
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown'){
-      e.preventDefault(); active = (active + 1) % cards.length; fitShow(); }
+      e.preventDefault(); active = (active + 1) % cards.length; fitShow(); return; }
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp'){
-      e.preventDefault(); active = (active - 1 + cards.length) % cards.length; fitShow(); }
+      e.preventDefault(); active = (active - 1 + cards.length) % cards.length; fitShow(); return; }
+  }
+  // plain-key shortcuts never fire while the cursor is in the Markdown editor
+  const typing = document.activeElement === mdEl || e.target === mdEl;
+  if (!meta && !typing){
+    if (e.key === 'f' || e.key === 'F'){ e.preventDefault(); toggleFullscreen(); return; }
+    if (e.key === 'v' || e.key === 'V'){ e.preventDefault(); toggleSlidesOnly(); return; }
+    if (e.key === 'ArrowRight'){ e.preventDefault(); active = (active + 1) % cards.length; showCard(active); return; }
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); active = (active - 1 + cards.length) % cards.length; showCard(active); return; }
   }
 });
 document.addEventListener('fullscreenchange', () => { if ($('#show').classList.contains('on')) fitShow(); });
@@ -1026,6 +1053,22 @@ async function runSelftest(){
      mmIdx >= 0 ? [...cards[mmIdx].querySelectorAll('svg')].length + ' svg' : 'no fence');
   slideshow(true); ok('slideshow on', $('#show').classList.contains('on'));
   slideshow(false); ok('slideshow off', !$('#show').classList.contains('on'));
+  // v2: keyboard shortcuts
+  ok('v toggles slides-only view (body class round-trips)', (() => {
+    toggleSlidesOnly(); const on = document.body.classList.contains('slides-only');
+    toggleSlidesOnly(); const off = !document.body.classList.contains('slides-only');
+    return on && off;
+  })());
+  ok('shortcut handlers present', typeof toggleFullscreen === 'function' && typeof toggleSlidesOnly === 'function');
+  ok('arrow keys navigate cards when focus is not in the editor', (() => {
+    if (document.activeElement && document.activeElement.blur) document.activeElement.blur();
+    const before = active;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+    if (active !== (before + 1) % cards.length) return false;
+    const b2 = active;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
+    return active === (b2 - 1 + cards.length) % cards.length;
+  })());
   ok('.md source re-parses to the same deck', (() => {
     const p = parseDeck(mdEl.value);
     return p.slides.length === cards.length - 1 && p.slides.map(s => s.title).join(' | ') === cardTitles.slice(1).join(' | ');
