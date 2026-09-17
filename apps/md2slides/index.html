@@ -962,13 +962,22 @@ function searchRows(q){
   q = q.trim().toLowerCase();
   const rows = [];
   if (!q) return rows;
-  const { slides } = parseDeck(mdEl.value);
-  slides.forEach((s, i) => blocks(s.lines).forEach(b => {
-    if (b.t === 'ul') b.items.forEach(t => {
-      const clean = t.replace(/[*_`]/g, '');
-      if (clean.toLowerCase().includes(q)) rows.push({ card: i + 1, text: clean });
+  const { fm, preamble, slides } = parseDeck(mdEl.value);
+  const push = (card, kind, text) => {
+    const clean = String(text || '').replace(/[*_`]/g, '').replace(/\s+/g, ' ').trim();
+    if (clean && clean.toLowerCase().includes(q)) rows.push({ card, kind, text: clean });
+  };
+  // the whole presentation: title card (title + preamble) …
+  if (fm.title) push(0, 'title', fm.title);
+  blocks(preamble.lines).forEach(b => { if (b.t === 'p') push(0, 'text', b.v); });
+  // …then each content slide: its heading, bullets and paragraphs
+  slides.forEach((s, i) => {
+    push(i + 1, 'title', s.title);
+    blocks(s.lines).forEach(b => {
+      if (b.t === 'ul') b.items.forEach(t => push(i + 1, 'bullet', t));
+      else if (b.t === 'p') push(i + 1, 'text', b.v);
     });
-  }));
+  });
   return rows.slice(0, 60);
 }
 function paintSel(){ [...$('#qList').children].forEach((el, k) => el.classList.toggle('sel', k === qIdx)); }
@@ -1242,8 +1251,27 @@ async function runSelftest(){
   ok('slash search lists matching bullets with slide numbers', (() => {
     openSearch();
     const qr = $('#qr'); qr.value = 'card'; qr.dispatchEvent(new Event('input'));
-    const ok = qRows.length > 0 && qRows.every(r => r.card >= 1 && typeof r.text === 'string' && r.text.toLowerCase().includes('card'));
+    const ok = qRows.length > 0 && qRows.every(r => r.card >= 0 && typeof r.text === 'string' && r.text.toLowerCase().includes('card'));
     closeSearch();
+    return ok;
+  })());
+  ok('search covers titles, bullets and paragraphs with correct slide numbers', (() => {
+    const prev = mdEl.value;
+    mdEl.value = ['---','title: Test Deck','closing: auto','---','',
+      'Alpha preamble sentence.','',
+      '# Alpha','- Beta bullet one','- Gamma bullet','',
+      '# Gamma','Some body paragraph with Epsilon.','- Epsilon bullet here'].join('\n');
+    build();
+    const has = (q, card, kind) => searchRows(q).some(r => r.card === card && r.kind === kind);
+    const ok =
+      has('alpha', 1, 'title') &&            // slide heading text on slide 1
+      has('alpha', 0, 'text') &&             // preamble paragraph on the title card (0)
+      has('beta', 1, 'bullet') &&            // bullet on slide 1
+      has('gamma', 2, 'title') &&            // heading on slide 2
+      has('epsilon', 2, 'bullet') &&         // bullet on slide 2
+      has('epsilon', 2, 'text') &&           // body paragraph on slide 2
+      has('test deck', 0, 'title');          // frontmatter title on card 0
+    mdEl.value = prev; build();
     return ok;
   })());
   ok('slash opens search only in slideshow mode', (() => {
