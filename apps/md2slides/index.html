@@ -36,13 +36,16 @@
   .meta{font-size:12.5px;color:var(--muted);white-space:nowrap}
 
   /* ── split ──────────────────────────────────────────────── */
-  main{flex:1 1 auto;display:grid;grid-template-columns:minmax(320px,1fr) minmax(420px,1.15fr);
-    min-height:0;gap:0}
-  /* slides-only view (press v): hide the Markdown pane, cards fill the window */
-  body.slides-only main{grid-template-columns:1fr}
-  body.slides-only .pane.left{display:none}
+  main{flex:1 1 auto;display:flex;align-items:stretch;min-height:0;gap:0}
+  /* slides-only view (press v): hide the Markdown pane and splitter, cards fill the window */
+  body.slides-only .pane.left,body.slides-only .splitter{display:none}
   .pane{min-height:0;display:flex;flex-direction:column;min-width:0}
-  .pane.left{border-right:1px solid var(--rule)}
+  .pane.left{flex:0 0 var(--split,38%);border-right:1px solid var(--rule)}
+  .pane.right{flex:1 1 auto}
+  .splitter{flex:0 0 9px;cursor:col-resize;position:relative;background:transparent}
+  .splitter::after{content:"";position:absolute;left:50%;top:0;bottom:0;width:2px;background:var(--rule);transform:translateX(-50%)}
+  .splitter:hover::after,.splitter.dragging::after{background:var(--accent)}
+  body.split-dragging{cursor:col-resize;user-select:none}
   .pane-head{display:flex;align-items:center;gap:10px;padding:6px 12px;border-bottom:1px solid var(--rule);
     font-size:12px;text-transform:uppercase;letter-spacing:.07em;color:var(--muted);flex:0 0 auto}
   .pane-head .spacer{flex:1}
@@ -160,8 +163,10 @@
     *{-webkit-print-color-adjust:exact !important;print-color-adjust:exact !important}
   }
   @media (max-width:900px){
-    main{grid-template-columns:1fr;grid-template-rows:minmax(0,34%) minmax(0,66%)}
-    .pane.left{border-right:0;border-bottom:1px solid var(--rule)}
+    main{display:grid;grid-template-columns:1fr;grid-template-rows:minmax(0,34%) minmax(0,66%)}
+    .pane.left{border-right:0;border-bottom:1px solid var(--rule);flex:auto}
+    .pane.right{flex:auto}
+    .splitter{display:none}
     /* A phone reads the card at phone width, so fit by width and let the pane
        scroll: shrinking a 1080 px card into a 380 px pane is what made body
        copy unreadable. 'safe' centring keeps the top reachable when it scrolls. */
@@ -208,6 +213,8 @@
     </div>
     <textarea id="md" spellcheck="true" aria-label="Markdown input"></textarea>
   </section>
+
+  <div class="splitter" role="separator" aria-orientation="vertical" aria-label="Drag to resize the panes" title="Drag to resize the preview pane"></div>
 
   <section class="pane right">
     <div class="pane-head">
@@ -985,7 +992,11 @@ function updateSearch(){
   paintSel();
 }
 function jumpSearch(k){
-  if (qRows[k]){ closeSearch(); active = Math.max(0, Math.min(qRows[k].card, cards.length - 1)); showCard(active); }
+  if (qRows[k]){
+    closeSearch();
+    active = Math.max(0, Math.min(qRows[k].card, cards.length - 1));
+    if ($('#show').classList.contains('on')) fitShow(); else showCard(active);
+  }
 }
 function openSearch(){
   $('#search').hidden = false;
@@ -1037,6 +1048,7 @@ addEventListener('keydown', e => {
       }, 500);
       return;
     }
+    if (e.key === '/'){ e.preventDefault(); openSearch(); return; }
     return; // swallow other keys while presenting
   }
   // plain-key shortcuts never fire while typing in the Markdown editor
@@ -1047,7 +1059,6 @@ addEventListener('keydown', e => {
     if (e.key === 'v' || e.key === 'V'){ e.preventDefault(); toggleSlidesOnly(); return; }
     if (e.key === 's'){ e.preventDefault(); slideshow(true); return; }
     if (e.key === 'S'){ e.preventDefault(); active = 0; slideshow(true); return; }
-    if (e.key === '/'){ e.preventDefault(); openSearch(); return; }
     if (e.key === 'ArrowRight'){ e.preventDefault(); active = (active + 1) % cards.length; showCard(active); return; }
     if (e.key === 'ArrowLeft'){ e.preventDefault(); active = (active - 1 + cards.length) % cards.length; showCard(active); return; }
   }
@@ -1056,6 +1067,34 @@ document.addEventListener('fullscreenchange', () => {
   if ($('#show').classList.contains('on')) fitShow();
   if (!document.fullscreenElement) document.body.classList.remove('zen'); // Esc out of fullscreen also leaves zen
 });
+
+/* ── resizable panes: drag the divider to grow/shrink the preview ── */
+(function(){
+  const splitter = document.querySelector('.splitter');
+  if (!splitter) return;
+  const main = document.querySelector('main');
+  const STORE = 'janalogy.mdcards.split'; // separate from the deck key
+  const setSplit = pct => document.documentElement.style.setProperty('--split', Math.max(20, Math.min(72, pct)) + '%');
+  try { const s = localStorage.getItem(STORE); if (s) document.documentElement.style.setProperty('--split', s); } catch(e){}
+  let drag = false;
+  splitter.addEventListener('mousedown', e => {
+    if (e.button !== 0) return;
+    drag = true; document.body.classList.add('split-dragging'); splitter.classList.add('dragging');
+    e.preventDefault();
+  });
+  addEventListener('mousemove', e => {
+    if (!drag) return;
+    const r = main.getBoundingClientRect();
+    setSplit((e.clientX - r.left) / r.width * 100);
+    showCard(active, false);                    // rescale the preview to the new width
+    if ($('#show').classList.contains('on')) fitShow();
+  });
+  addEventListener('mouseup', () => {
+    if (!drag) return;
+    drag = false; document.body.classList.remove('split-dragging'); splitter.classList.remove('dragging');
+    try { localStorage.setItem(STORE, document.documentElement.style.getPropertyValue('--split')); } catch(e){}
+  });
+})();
 
 /* ── go ───────────────────────────────────────────────────── */
 mdEl.value = load();
@@ -1206,6 +1245,20 @@ async function runSelftest(){
     const ok = qRows.length > 0 && qRows.every(r => r.card >= 1 && typeof r.text === 'string' && r.text.toLowerCase().includes('card'));
     closeSearch();
     return ok;
+  })());
+  ok('slash opens search only in slideshow mode', (() => {
+    openSearch(); closeSearch();
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: '/' }));
+    const notInEdit = $('#search').hidden;                 // '/' in editor must do nothing
+    slideshow(true);
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: '/' }));
+    const inShow = !$('#search').hidden;                   // '/' in slideshow opens it
+    closeSearch(); slideshow(false);
+    return notInEdit && inShow;
+  })());
+  ok('pane splitter is present and draggable', (() => {
+    const s = document.querySelector('.splitter');
+    return !!s && getComputedStyle(s).cursor === 'col-resize';
   })());
   ok('.md source re-parses to the same deck', (() => {
     const p = parseDeck(mdEl.value);
