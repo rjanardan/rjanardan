@@ -254,7 +254,8 @@ const GEOM = {
   '1:1' : { w:1080, h:1080, fs:.040, hs:.032, label:'1:1 square · 1080 × 1080 px' },
   '4:5' : { w:1080, h:1350, fs:.040, hs:.032, label:'4:5 portrait · 1080 × 1350 px' }
 };
-const LS_KEY = 'janalogy.mdcards.v1'; // key unchanged by the 2026-09-14 rename: saved decks survive it
+const LS_KEY_V1 = 'janalogy.mdcards.v1'; // v1 snapshot (frozen)
+const MAIN_LS_KEY = 'janalogy.mdcards.v2'; // main app storage (main, separate from v1)
 const $ = s => document.querySelector(s);
 
 const mdEl = $('#md'), stage = $('#stage'), deck = $('#deck'), rail = $('#rail'),
@@ -270,7 +271,7 @@ const svgCache = new Map(); // mermaid source → rendered svg
 /* ── storage ──────────────────────────────────────────────── */
 function load(){
   let raw = null;
-  try { raw = localStorage.getItem(LS_KEY); } catch(e){}
+  try { raw = localStorage.getItem(MAIN_LS_KEY); } catch(e){}
   if (raw){
     try {
       const d = JSON.parse(raw);
