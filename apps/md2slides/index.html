@@ -128,6 +128,24 @@
     padding:9px 15px;border-radius:8px;font-size:13.5px;opacity:0;pointer-events:none;transition:opacity .18s;z-index:80;max-width:70vw}
   #toast.on{opacity:1}
 
+  /* zen mode (z): both panes, chrome hidden, full screen */
+  body.zen header{display:none}
+
+  /* slideshow digit input (e.g. typing "23" jumps to slide 23) */
+  #gotoNum{position:fixed;top:22%;left:50%;transform:translateX(-50%);min-width:64px;text-align:center;
+    font-size:46px;font-weight:700;color:#fff;background:rgba(0,0,0,.6);border:1px solid rgba(255,255,255,.25);
+    padding:4px 22px;border-radius:12px;z-index:66;letter-spacing:.05em}
+
+  /* bullet search ("/") */
+  #search{position:fixed;top:14px;left:50%;transform:translateX(-50%);width:min(600px,94vw);background:#fff;
+    border:1px solid var(--rule);border-radius:10px;box-shadow:0 10px 34px rgba(0,0,0,.28);z-index:70;overflow:hidden}
+  #search input{width:100%;border:0;outline:0;padding:11px 14px;font:14px var(--mono);color:var(--ink)}
+  #qList{max-height:62vh;overflow:auto;border-top:1px solid var(--rule)}
+  #qList .qr{padding:7px 14px;font-size:13.5px;cursor:pointer;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;color:var(--ink)}
+  #qList .qr b{color:var(--accent);font-weight:700}
+  #qList .qr .n{color:var(--muted);font-variant-numeric:tabular-nums;margin-right:9px}
+  #qList .qr.sel{background:var(--accent-soft)}
+
   /* print-only deck: exact page boxes, one card per page */
   #print-root{display:none}
   /* mermaid measures text, so it needs a laid-out parent: give #print-root
@@ -166,7 +184,7 @@
   <span class="meta" id="hud">— cards</span>
   <span class="spacer"></span>
   <span class="meta" id="saveState">saved</span>
-  <span class="meta" title="Keyboard shortcuts">f full · v slides · ← → cards</span>
+  <span class="meta" title="z zen (both panes full screen) · v slides-only · s slideshow · S from first · / search · ← → cards · digits jump in slideshow">z zen · v slides · s show · / search</span>
   <button class="act" id="btnSlide">Slideshow</button>
   <button class="act" id="btnMd">Export .md</button>
   <button class="act" id="btnOpen" title="Load a .md / .txt file into the editor">Open .md…</button>
@@ -208,6 +226,7 @@
 
 <div id="show" aria-hidden="true">
   <div id="showStage"></div>
+  <div id="gotoNum" hidden></div>
   <div id="showHud">
     <button id="showPrev">‹</button>
     <span id="showCount">1 / 1</span>
@@ -217,6 +236,10 @@
   </div>
 </div>
 <div id="toast" role="status" aria-live="polite"></div>
+<div id="search" hidden>
+  <input id="qr" placeholder="Search bullets — type to filter, ↑↓ to pick, Enter to jump" autocomplete="off" spellcheck="false" aria-label="Search bullets">
+  <div id="qList"></div>
+</div>
 
 <script type="text/plain" id="starter">
 ---
@@ -917,14 +940,77 @@ function toggleFullscreen(){
 function toggleSlidesOnly(){
   const on = document.body.classList.toggle('slides-only');
   if (on && document.activeElement === mdEl) mdEl.blur(); // arrows then flip cards, not text
-  toast(on ? 'Slides-only view — press v to bring the editor back.' : 'Editor shown — press v to hide it.', 2600);
+  toast(on ? 'Slides-only view — press v to bring the editor back.' : 'Editor shown — press v to hide it.', 2400);
   showCard(active, false);
 }
+function toggleZen(){
+  const on = document.body.classList.toggle('zen');
+  if (on){ if (document.fullscreenEnabled) document.documentElement.requestFullscreen().catch(()=>{}); }
+  else if (document.fullscreenElement) document.exitFullscreen().catch(()=>{});
+  toast(on ? 'Zen — both panes, chrome hidden. Press z to return.' : 'Zen off.', 2200);
+}
+/* bullet search ("/") — list every bullet with its slide number, filter as you type */
+let qRows = [], qIdx = -1;
+function searchRows(q){
+  q = q.trim().toLowerCase();
+  const rows = [];
+  if (!q) return rows;
+  const { slides } = parseDeck(mdEl.value);
+  slides.forEach((s, i) => blocks(s.lines).forEach(b => {
+    if (b.t === 'ul') b.items.forEach(t => {
+      const clean = t.replace(/[*_`]/g, '');
+      if (clean.toLowerCase().includes(q)) rows.push({ card: i + 1, text: clean });
+    });
+  }));
+  return rows.slice(0, 60);
+}
+function paintSel(){ [...$('#qList').children].forEach((el, k) => el.classList.toggle('sel', k === qIdx)); }
+function updateSearch(){
+  const qr = $('#qr');
+  qRows = searchRows(qr.value);
+  qIdx = qRows.length ? 0 : -1;
+  const list = $('#qList');
+  const q = qr.value.trim().toLowerCase();
+  list.replaceChildren(...qRows.map((r, k) => {
+    const d = document.createElement('div');
+    d.className = 'qr' + (k === qIdx ? ' sel' : '');
+    d.title = 'Go to slide ' + r.card;
+    const i = q ? r.text.toLowerCase().indexOf(q) : -1;
+    d.innerHTML = `<span class="n">${r.card}</span>` +
+      (i >= 0 ? r.text.slice(0, i) + '<b>' + r.text.slice(i, i + q.length) + '</b>' + r.text.slice(i + q.length) : r.text);
+    d.onmousedown = ev => { ev.preventDefault(); jumpSearch(k); };
+    d.onmouseover = () => { qIdx = k; paintSel(); };
+    return d;
+  }));
+  paintSel();
+}
+function jumpSearch(k){
+  if (qRows[k]){ closeSearch(); active = Math.max(0, Math.min(qRows[k].card, cards.length - 1)); showCard(active); }
+}
+function openSearch(){
+  $('#search').hidden = false;
+  const qr = $('#qr'); qr.value = ''; updateSearch(); qr.focus();
+}
+function closeSearch(){ $('#search').hidden = true; }
+$('#qr').addEventListener('input', updateSearch);
+/* slideshow digit jump: buffer digits, apply 500 ms after the last press */
+let gotoBuf = '', gotoTimer = null;
+function clearGoto(){ gotoBuf = ''; clearTimeout(gotoTimer); $('#gotoNum').hidden = true; }
+
 addEventListener('keydown', e => {
   const inShow = $('#show').classList.contains('on');
   const meta = e.metaKey || e.ctrlKey || e.altKey;
-  if (e.key === 'Escape' && inShow){ slideshow(false); return; }
+  const searchOpen = !$('#search').hidden;
   if (e.key === 'F5') return;
+  if (e.key === 'Escape' && inShow){ slideshow(false); clearGoto(); return; }
+  // while the search box is up, own the nav keys and treat everything as typing
+  if (searchOpen){
+    if (e.key === 'ArrowDown'){ e.preventDefault(); if (qRows.length){ qIdx = (qIdx + 1) % qRows.length; paintSel(); } return; }
+    if (e.key === 'ArrowUp'){ e.preventDefault(); if (qRows.length){ qIdx = (qIdx - 1 + qRows.length) % qRows.length; paintSel(); } return; }
+    if (e.key === 'Enter'){ e.preventDefault(); if (qIdx >= 0) jumpSearch(qIdx); return; }
+    if (e.key === 'Escape'){ e.preventDefault(); closeSearch(); return; }
+    return; // any other key goes to the search input
+  }
   if (meta){
     const k = e.key.toLowerCase();
     if (k === 'p'){ e.preventDefault(); exportPdf(); return; }
@@ -932,22 +1018,44 @@ addEventListener('keydown', e => {
     if (k === 'e'){ e.preventDefault(); slideshow(!inShow); return; }
     if (e.key === 'Enter'){ if (!inShow){ e.preventDefault(); $('#btnCard').click(); } return; }
   }
+  // slideshow-only: nav keys, then digit input (1, 23, 234 → jump)
   if (inShow){
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown'){
       e.preventDefault(); active = (active + 1) % cards.length; fitShow(); return; }
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp'){
       e.preventDefault(); active = (active - 1 + cards.length) % cards.length; fitShow(); return; }
+    if (e.key >= '0' && e.key <= '9'){
+      e.preventDefault();
+      if (gotoBuf.length === 0) $('#gotoNum').hidden = false;
+      gotoBuf += e.key;
+      $('#gotoNum').textContent = gotoBuf;
+      clearTimeout(gotoTimer);
+      gotoTimer = setTimeout(() => {
+        const t = parseInt(gotoBuf, 10) - 1;
+        clearGoto();
+        if (t >= 0 && t < cards.length){ active = t; fitShow(); }
+      }, 500);
+      return;
+    }
+    return; // swallow other keys while presenting
   }
-  // plain-key shortcuts never fire while the cursor is in the Markdown editor
+  // plain-key shortcuts never fire while typing in the Markdown editor
   const typing = document.activeElement === mdEl || e.target === mdEl;
   if (!meta && !typing){
     if (e.key === 'f' || e.key === 'F'){ e.preventDefault(); toggleFullscreen(); return; }
+    if (e.key === 'z' || e.key === 'Z'){ e.preventDefault(); toggleZen(); return; }
     if (e.key === 'v' || e.key === 'V'){ e.preventDefault(); toggleSlidesOnly(); return; }
+    if (e.key === 's'){ e.preventDefault(); slideshow(true); return; }
+    if (e.key === 'S'){ e.preventDefault(); active = 0; slideshow(true); return; }
+    if (e.key === '/'){ e.preventDefault(); openSearch(); return; }
     if (e.key === 'ArrowRight'){ e.preventDefault(); active = (active + 1) % cards.length; showCard(active); return; }
     if (e.key === 'ArrowLeft'){ e.preventDefault(); active = (active - 1 + cards.length) % cards.length; showCard(active); return; }
   }
 });
-document.addEventListener('fullscreenchange', () => { if ($('#show').classList.contains('on')) fitShow(); });
+document.addEventListener('fullscreenchange', () => {
+  if ($('#show').classList.contains('on')) fitShow();
+  if (!document.fullscreenElement) document.body.classList.remove('zen'); // Esc out of fullscreen also leaves zen
+});
 
 /* ── go ───────────────────────────────────────────────────── */
 mdEl.value = load();
@@ -1053,6 +1161,14 @@ async function runSelftest(){
      mmIdx >= 0 ? [...cards[mmIdx].querySelectorAll('svg')].length + ' svg' : 'no fence');
   slideshow(true); ok('slideshow on', $('#show').classList.contains('on'));
   slideshow(false); ok('slideshow off', !$('#show').classList.contains('on'));
+  // v2: slideshow digit jump — type "2", the number shows, then jumps after 500 ms
+  slideshow(true);
+  window.dispatchEvent(new KeyboardEvent('keydown', { key: '2' }));
+  await new Promise(r => setTimeout(r, 40));
+  ok('digit input shows the buffered number', !$('#gotoNum').hidden && $('#gotoNum').textContent === '2', 'screen="' + $('#gotoNum').textContent + '"');
+  await new Promise(r => setTimeout(r, 600));
+  ok('digit jump lands on that slide', active === 1 && $('#gotoNum').hidden, 'active=' + active);
+  slideshow(false);
   // v2: keyboard shortcuts
   ok('v toggles slides-only view (body class round-trips)', (() => {
     toggleSlidesOnly(); const on = document.body.classList.contains('slides-only');
@@ -1068,6 +1184,28 @@ async function runSelftest(){
     const b2 = active;
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
     return active === (b2 - 1 + cards.length) % cards.length;
+  })());
+  ok('z toggles zen (body class round-trips)', (() => {
+    toggleZen(); const a = document.body.classList.contains('zen');
+    toggleZen(); return a && !document.body.classList.contains('zen');
+  })());
+  ok('s enters slideshow, capital S starts from the first slide', (() => {
+    active = 2;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 's' }));
+    const onNow = $('#show').classList.contains('on');
+    slideshow(false);
+    active = 3;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'S' }));
+    const fromFirst = $('#show').classList.contains('on') && active === 0;
+    slideshow(false);
+    return onNow && fromFirst;
+  })());
+  ok('slash search lists matching bullets with slide numbers', (() => {
+    openSearch();
+    const qr = $('#qr'); qr.value = 'card'; qr.dispatchEvent(new Event('input'));
+    const ok = qRows.length > 0 && qRows.every(r => r.card >= 1 && typeof r.text === 'string' && r.text.toLowerCase().includes('card'));
+    closeSearch();
+    return ok;
   })());
   ok('.md source re-parses to the same deck', (() => {
     const p = parseDeck(mdEl.value);
