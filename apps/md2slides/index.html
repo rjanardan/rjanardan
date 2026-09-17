@@ -902,9 +902,9 @@ $('#geoSeg').addEventListener('click', ev => {
   build(); save();
 });
 $('#btnSlide').onclick = () => slideshow(true);
-$('#showPrev').onclick = () => { active = (active - 1 + cards.length) % cards.length; fitShow(); };
-$('#showNext').onclick = () => { active = (active + 1) % cards.length; fitShow(); };
-$('#show').addEventListener('click', ev => { if (ev.target.id === 'show') slideshow(false); });
+$('#showPrev').onclick = () => { stepSlide(-1); fitShow(); };
+$('#showNext').onclick = () => { stepSlide(1); fitShow(); };
+$('#show').addEventListener('click', ev => { if (ev.target.id === 'show' && !$('#show').dataset.swiped) slideshow(false); });
 $('#btnMd').onclick = exportMd;
 $('#btnPdf').onclick = exportPdf;
 $('#btnCard').onclick = () => {
@@ -1016,6 +1016,12 @@ $('#qr').addEventListener('input', updateSearch);
 /* slideshow digit jump: buffer digits, apply 500 ms after the last press */
 let gotoBuf = '', gotoTimer = null;
 function clearGoto(){ gotoBuf = ''; clearTimeout(gotoTimer); $('#gotoNum').hidden = true; }
+/* no-wrap slide stepping: stop at the first/last instead of circling back */
+function stepSlide(d){
+  const i = active + d;
+  if (i < 0 || i >= cards.length) return;
+  active = i;
+}
 
 addEventListener('keydown', e => {
   const inShow = $('#show').classList.contains('on');
@@ -1041,9 +1047,9 @@ addEventListener('keydown', e => {
   // slideshow-only: nav keys, then digit input (1, 23, 234 → jump)
   if (inShow){
     if (e.key === 'ArrowRight' || e.key === 'ArrowDown' || e.key === ' ' || e.key === 'PageDown'){
-      e.preventDefault(); active = (active + 1) % cards.length; fitShow(); return; }
+      e.preventDefault(); stepSlide(1); fitShow(); return; }
     if (e.key === 'ArrowLeft' || e.key === 'ArrowUp' || e.key === 'PageUp'){
-      e.preventDefault(); active = (active - 1 + cards.length) % cards.length; fitShow(); return; }
+      e.preventDefault(); stepSlide(-1); fitShow(); return; }
     if (e.key >= '0' && e.key <= '9'){
       e.preventDefault();
       if (gotoBuf.length === 0) $('#gotoNum').hidden = false;
@@ -1068,8 +1074,8 @@ addEventListener('keydown', e => {
     if (e.key === 'v' || e.key === 'V'){ e.preventDefault(); toggleSlidesOnly(); return; }
     if (e.key === 's'){ e.preventDefault(); slideshow(true); return; }
     if (e.key === 'S'){ e.preventDefault(); active = 0; slideshow(true); return; }
-    if (e.key === 'ArrowRight'){ e.preventDefault(); active = (active + 1) % cards.length; showCard(active); return; }
-    if (e.key === 'ArrowLeft'){ e.preventDefault(); active = (active - 1 + cards.length) % cards.length; showCard(active); return; }
+    if (e.key === 'ArrowRight'){ e.preventDefault(); stepSlide(1); showCard(active); return; }
+    if (e.key === 'ArrowLeft'){ e.preventDefault(); stepSlide(-1); showCard(active); return; }
   }
 });
 document.addEventListener('fullscreenchange', () => {
@@ -1103,6 +1109,30 @@ document.addEventListener('fullscreenchange', () => {
     drag = false; document.body.classList.remove('split-dragging'); splitter.classList.remove('dragging');
     try { localStorage.setItem(STORE, document.documentElement.style.getPropertyValue('--split')); } catch(e){}
   });
+})();
+
+/* ── mobile swipe: left/right on the preview or slideshow steps slides ── */
+(function(){
+  const SWIPE = 46;
+  function bind(el){
+    if (!el) return;
+    let x = 0, y = 0;
+    el.addEventListener('touchstart', e => {
+      const t = e.changedTouches[0]; x = t.clientX; y = t.clientY;
+    }, { passive: true });
+    el.addEventListener('touchend', e => {
+      const t = e.changedTouches[0];
+      const dx = t.clientX - x, dy = t.clientY - y;
+      if (Math.abs(dx) < SWIPE || Math.abs(dx) <= Math.abs(dy)) return; // a tap or a vertical scroll
+      el.dataset.swiped = '1';                   // don't treat the swipe as a tap-to-exit click
+      clearTimeout(el._sw);
+      el._sw = setTimeout(() => { delete el.dataset.swiped; }, 350);
+      (dx < 0 ? stepSlide(1) : stepSlide(-1));
+      if ($('#show').classList.contains('on')) fitShow();
+    }, { passive: true });
+  }
+  bind($('#stageWrap'));
+  bind($('#show'));
 })();
 
 /* ── go ───────────────────────────────────────────────────── */
@@ -1232,6 +1262,17 @@ async function runSelftest(){
     const b2 = active;
     window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft', bubbles: true }));
     return active === (b2 - 1 + cards.length) % cards.length;
+  })());
+  ok('slideshow nav clamps at the first and last slide (no wrap)', (() => {
+    slideshow(true);
+    active = cards.length - 1;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight' }));
+    const atLast = active === cards.length - 1;
+    active = 0;
+    window.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowLeft' }));
+    const atFirst = active === 0;
+    slideshow(false);
+    return atLast && atFirst;
   })());
   ok('z toggles zen (body class round-trips)', (() => {
     toggleZen(); const a = document.body.classList.contains('zen');
