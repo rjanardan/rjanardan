@@ -1,5 +1,5 @@
 ---
-title: Open Source in AI Era
+title: Relevance of Open Source in AI Era
 author: Janardan Revuru
 date: 19 Sep 2026
 venue: VIT Vellore Campus
@@ -9,6 +9,13 @@ closing: auto
 
 # Next 40-45 mins
 ## What this talk covers
+- Richard Stallman's FSF
+- Project Hongmeng (HarmonyOS)
+- UID/Aadhaar project
+- Open Source AI
+- Companies and their posture
+- First job skills
+- Q&A
 
 ## What this does not cover
 - Mindset
@@ -18,130 +25,61 @@ closing: auto
 - Professional growth
 - Community engagement
 
-# What is Free Software?
+# Richard Stallman's Free Software Foundation
 
 “Free software” means software that respects users' freedom and community. Roughly, it means that the users have the freedom to run, copy, distribute, study, change and improve the software. 
 
-source: https://www.gnu.org/philosophy/free-sw.en.html
+source: [original GNU Home](https://www.gnu.org/philosophy/free-sw.en.html)
 
-# Two stories
-## Richart Stallman 
+# Project Hongmeng (HarmonyOS)
+- US Sanctions 2019
+- Huawei was placed on a trade restriction list
+- Project Hongmeng started 2012
+- Android OS + Google Mobile Service (GMS)
+- HarmonyOS + HMS was a step ahead
+- HarmonyOS NEXT
+- Limited to China market
 
-## Linux Torvalds
-
+# UIDAI/Aadhaar project
+- Open core + purpose built
+- MOSIP (Modular Open Source Identity Plaform)
+- Open sourced to the world
+- Morocco, Sri Lanka, Philippines, Ethiopia
 
 # Open Source AI
+
+True open source: NVIDIA Nemetron 3 model - weights, data, training recipe
+
 ## Open weights
+- LLama
+- DeepSeek
 
 ## Open data
+- ImageNet
+- WikiData
+- Github
 
-## Open Source
+# Companies and their posture
+- Microsoft
+- Google
+- Meta
+- IBM
+- Apple
+- Amazon/AWS
+- Dell/HPE
 
-## Open Tooling
+# First job skills
+- Understanding a large/big project
+- Tool use, CI/CD deployment, testing
+- Something of real use
+- Opportunity to work on latest
+- Opportunity to listen and learn from others
+- Connect with new members
+- Asynchronous communication
+- Global team members
+- Merit based progression
+- Public recognition and verifiable
 
+# Connect
+@rjanardan
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-Welcome to The Open Source Talk (TOST)
-
-Thinking window
-- dimensions
-  introduction to open source
-  - two stories
-    - richard stallman
-    - linus torvalds
-  open source in the context of AI
-  - open weights and open data
-  how can your open source project skills help you professionally
-
-
-
-
-
-
-
-Text above the first heading is the subtitle on the title card. Below it: every feature the app ships, on one scannable deck.
-
-# Text basics
-
-- **Bold**, *italic*, `code`, and ~~struck~~ all render on a card
-- [Inline links](https://llmstxt.org/) stay clickable in the preview and the exported PDF
-- Bullets and ordered lists both work
-
-1. First ordered item
-2. Second ordered item
-3. Third ordered item
-
-> A blockquote, then a horizontal rule below it.
-
----
-
-# A code fence
-
-```py
-def greet(name):
-    # a fenced block renders as code, kept verbatim
-    return f"hello {name}"
-```
-
-# Diagram — flowchart
-
-```mermaid
-flowchart LR
-  A[Markdown] --> B[Parser] --> C[H1 opens a card] --> D[Export]
-```
-
-# Diagram — sequence
-
-```mermaid
-sequenceDiagram
-  participant U as User
-  participant A as App
-  U->>A: type Markdown
-  A-->>U: cards update
-  U->>A: export PDF
-```
-
-# Diagram — state
-
-```mermaid
-stateDiagram-v2
-  [*] --> Editing
-  Editing --> Preview: build()
-  Preview --> Export: PDF
-  Export --> [*]
-```
-
-# Images — remote
-
-A remote image loads straight from its URL.
-
-![Remote image](https://picsum.photos/640/400)
