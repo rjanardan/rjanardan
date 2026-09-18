@@ -1,12 +1,24 @@
 # md2slides — specification
 
-Draft v0.1 · 2026-09-13 · renamed md2slides 2026-09-14 · Licence: MIT (decided)
+Draft v0.1 · 2026-09-13 · renamed md2slides 2026-09-14 · **v2 shipped 2026-09-17** · Licence: MIT (decided)
 
 A single-file, browser-hosted app that turns frictionless Markdown notes into cards, shows them as a
 slideshow, and exports the same source as `.md` and as page-exact PDF.
 
 Hosted at `https://janalogy.com/apps/md2slides/` — no install, no account, no server.
 Storage is the visitor's own browser. Nothing is uploaded anywhere.
+
+**v2 shipped 2026-09-17.** This document is the design target; the shipped build is `index.html`
+(1556 lines). Since the rename the build added: a header with an **Examples ▾ menu** and an
+*Open .md…* button; the superset **"All features"** default starter deck plus a **Markdown tutorial**
+deck; a **two-column slide** (exactly two `##` under one `#` — fence-aware); a **resizable pane
+divider**; the keyboard set (`z` zen · `v` slides-only · `s` slideshow from current · `S` from first ·
+`/` slideshow search · digits jump 1–999); **mobile swipe** navigation; **no-wrap** navigation at the
+ends; and full-text search that also indexes code fences and diagram source. Storage is the **single
+live key `janalogy.mdcards.v2`** (`{ v, md, geometry, at }`, debounced 250 ms), reading `…v1` once as
+a one-time migration, plus the divider width in `janalogy.mdcards.split`. The aspirational sections
+below — a multi-deck library, the IndexedDB asset store, braindump mode, the one-click raster PDF,
+CodeMirror — are roadmap for a later version, not this build.
 
 ---
 
@@ -143,6 +155,12 @@ Two storage tiers, because localStorage has a hard per-origin budget shared with
 `janalogy.com` and images would blow through it.
 
 ### 4.1 Decks and settings — localStorage
+
+**Shipped reality (2026-09-17):** the live app keeps **one** JSON document under
+`janalogy.mdcards.v2` — `{ v:1, md, geometry, at }` — debounced 250 ms on every edit.
+It reads `janalogy.mdcards.v1` once as a one-time migration, then writes only v2. The
+pane-divider width sits separately in `janalogy.mdcards.split`. The sketch below (a
+multi-deck library plus a `…settings.v1` key) is roadmap, not this build.
 
 ```
 key  janalogy.mdcards.v1            one JSON document, the whole library
@@ -300,9 +318,10 @@ Typography is declared in `em` against a root size, so the same card content lay
 all three profiles rather than reflowing differently. Two anchors set that root, and they are not the
 same measure:
 
-- **Reading text** — body, bullets, quotes, code, footers — is a fraction of card **width**: 1.8 % at
-  16:9 (34.56 px), 4 % at 1:1 and 4:5 (43.2 px). A square or portrait card is consumed fitted to a
-  phone's width, so width — not height — decides whether it can be read.
+- **Reading text** — body, bullets, quotes, code, footers — is a fraction of card **width**:
+  **2.25 % at 16:9 and 4 % at 1:1 and 4:5, all 43.2 px.** v2 (2026-09-17) raised 16:9 from
+  1.8 % (34.56 px) so slides read at the same size as the carousels. A square or portrait card is
+  consumed fitted to a phone's width, so width — not height — decides whether it can be read.
 - The **`h1`** is a fraction of card **height** (3.2 % × 1.72 em), so it keeps its original size in
   every profile instead of growing when the reading ramp does.
 
@@ -401,6 +420,11 @@ since LinkedIn rejects a PDF with mixed page sizes.
 
 ### 8.1 Synchronisation, the part that carries the product
 
+The two panes are separated by a **draggable divider** — the preview pane resizes (clamped 20–72 %,
+remembered in `janalogy.mdcards.split`, hidden below 900 px). The toolbar carries an **Examples ▾**
+menu (All features, Markdown tutorial, capabilities, llms.txt carousel, starter — embedded, so they
+load offline) and an **Open .md…** button.
+
 - Typing a new `#` heading creates a card immediately and switches the preview to it, before the author
   types the title. Perceived as instant: the preview shows an empty styled card with the caret in place.
 - Moving the caret into an existing card switches the preview to that card within one frame.
@@ -410,11 +434,15 @@ since LinkedIn rejects a PDF with mixed page sizes.
 
 ### 8.2 Slideshow
 
-`F` or the Slideshow button enters fullscreen with one card filling the viewport at the profile's aspect
-ratio; `←`/`→` and `Space` move; `Esc` exits; `S` is the speaker aid that shows the next card's title
-only. The card shown in slideshow is the same DOM node the preview renders — not a re-render with a
-different font stack. This is the property that makes preview, slideshow and PDF agree, and it is tested
-(§10).
+The Slideshow button — or `s` — enters fullscreen with one card filling the viewport at the profile's
+aspect ratio; `S` starts from the first slide. `←`/`→`, `Space`, `PageUp/Down` and the ‹ / › buttons move
+and **never wrap** past the first or last slide. Digit keys buffer the number shown on screen and jump
+to that slide after 500 ms. `/` opens a **live search** over every title, bullet, paragraph, code fence
+and diagram, with slide numbers, navigated by `↑`/`↓`/`Enter`. `z` toggles zen (both panes, chrome
+hidden, full screen), `v` toggles slides-only, `f` plain fullscreen; swipe left/right on touch screens
+navigates. `Esc` exits. The card shown in slideshow is the same DOM node the preview renders — not a
+re-render with a different font stack. This is the property that makes preview, slideshow and PDF
+agree, and it is tested (§10).
 
 ### 8.3 Braindump mode
 
@@ -474,6 +502,11 @@ with `pypdf`.
 | A21 | Reading type fits a phone | at 1:1 and 4:5 the reading size is ≥ 4 % of card width, so a card fitted to a 390 px viewport renders body text at ≥ 14 px; the `h1` keeps its height-relative share (8 % for a title, 5.5 % for a card heading) in all three profiles |
 | A22 | Fence-only body uses more of the card | a card whose body is a single code fence is capped at 60 % of the body box, not 46 % |
 | A23 | Phone preview fits by width | below 900 px the stage fits the card to the pane width and the pane scrolls, so a 1:1 card renders 370 px wide on a 390 px viewport instead of shrinking to fit the pane height |
+| A24 | Two-column slide | a card with two `##` renders 2 columns (`.cols`); one `##`, or `##` inside a code fence, renders as a normal card |
+| A25 | Full-deck slide search | `/` in slideshow lists matching titles, bullets, paragraphs, code fences and Mermaid source with their slide numbers; `/` in edit mode does nothing |
+| A26 | Resizable panes | dragging the divider changes `--split` (clamped 20–72 %) and persists to `janalogy.mdcards.split`; the divider is hidden below 900 px |
+| A27 | No-wrap navigation | `←`/`→`, `Space`, PageUp/Down, the ‹ / › buttons and swipe stop at the first and last slide instead of circling |
+| A28 | Default deck | a fresh load with no saved state opens the superset "All features" starter (10 cards, zero overflow) |
 
 A16–A17 are the security gate; A18 is the exit gate. A19 records the closing-card decision: both
 bookends — title and closing — carry no footer, so no page number refers to a card that is not a page
@@ -513,17 +546,18 @@ Not answered by the brief; each needs the owner's call before or during P1.
    `/apps/markdown-cards/` keeps a redirect stub so the old link still resolves. Earlier candidates
    (`deckmd`, `mddeck`, `notecards-md`, `cardmine`, `slidecake`) were all unclaimed on npm and on this
    GitHub account, and were not taken.
-3. **Mermaid delivery.** Vendored sibling file (recommended: offline, no third party, pinned),
-   inlined (5.4 MiB HTML, rejected), or pinned CDN (smallest repo, needs network, adds a third-party
-   runtime dependency).
+3. **Mermaid delivery.** Shipped in v2: pinned CDN (`cdn.jsdelivr.net/npm/mermaid@11`, loaded by
+   runtime `import()` lazily on the first diagram). A vendored sibling file (offline, no third party)
+   and inlining (rejected, ~5.4 MiB HTML) remain open if offline support is ever wanted.
 4. **Editor.** Plain textarea with a highlight overlay (P1, zero dependencies) and/or vendored
    CodeMirror 5 (393 KB, Markdown highlighting, folding). The brief's examples are all handled by a
    textarea; CodeMirror is comfort, not capability.
 5. **Images.** IndexedDB with `img://` references (recommended, keeps the document small) versus data
    URLs inline (self-contained `.md`, bloats the shared localStorage budget).
 6. **Path B raster PDF.** Ship as an option, or wait until someone actually refuses the dialog.
-7. **`##` split.** Currently: no. A sub-heading inside a card is the common case, and a deck that splits
-   on two levels is harder to keep uniform for carousel export.
+7. **`##` split.** Partially shipped (v2): two `##` under one `#` render as a two-column grid
+   (`twoCols()`, fence-aware); three or more `##` stay a normal card. Multi-level `#` splitting is
+   still not offered.
 8. **LaTeX.** Not in v1. KaTeX adds ~300 KB for content no requirement asks for.
 
 ---

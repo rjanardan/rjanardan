@@ -5,11 +5,14 @@ renders without editing. Written to be pasted into a model's context: hand the
 model this file plus the topic, and it returns a deck that drops straight into
 the Markdown pane.
 
-Measured against the build of 2026-09-14 (828 lines) by reading the parser and
+Measured against the v2 build of 2026-09-17 (1556 lines) by reading the parser and
 measuring rendered cards in headless Chrome. Every number in **Fit budgets** is a
 measurement, not an estimate; re-measure if the tool's CSS changes.
 
-Tool name in the UI: *md2slides* (renamed from *Markdown Cards*, 2026-09-14).
+Tool name in the UI: *md2slides*. v2 (2026-09-17) adds two authoring-relevant
+features: a **two-column slide** under a single `#` heading (exactly two `##`
+sub-headings), and a full-deck **search** (`/` in slideshow) that finds titles,
+bullets, paragraphs, code fences and diagram source.
 
 ---
 
@@ -79,6 +82,9 @@ Rules that follow from the parser:
 - `##` and `###` inside a card render as card sub-headings. `####` and deeper all
   render at the `###` size.
 - Indented `#` (e.g. `  # x`) does **not** start a card; only a `#` at column 1 does.
+- A card whose body contains **exactly two `##` sub-headings** renders as a
+  two-column grid; the `#` heading stays full-width above it. A third `##` (or a
+  `##` inside a code fence) disables the split and the card renders normally.
 
 ## 5. Block syntax the tool understands
 
@@ -93,6 +99,7 @@ Rules that follow from the parser:
 | ` ```mermaid ` | Diagram | Rendered in the preview and the PDF; needs network on first use, otherwise shows as code |
 | `---`, `***`, `___` | Horizontal rule | A bare `---` in the body is a rule, not frontmatter |
 | blank line | Paragraph break | — |
+| two `##` under one `#` | Two-column grid | Need exactly two; `##` inside a code fence are ignored (fence-aware) |
 
 **Line breaks are not preserved.** Consecutive non-blank lines are joined into a
 single paragraph with spaces, so do not hand-wrap paragraphs. One paragraph per
@@ -127,42 +134,50 @@ Emit none of these. They render as literal text or lose structure, with no error
 | Autolinks `<https://x>` | Escaped and shown literally |
 | Backslash escapes | The backslash is shown |
 | Trailing two-space line break | Ignored |
-| `<!-- card: 4:5 -->` per-card geometry | Not implemented; ignored |
+| `<!-- card: 4:5 -->` per-card geometry | Not implemented; the comment is escaped and printed as visible text on the card |
 
 ## 8. Fit budgets
 
 Type scale: reading text — body, bullets, quotes, code, footers — is **4% of the
-card width** at 1:1 and 4:5 (43.2 px) and 1.8% at 16:9 (34.56 px), at 1.45 line
-height, because a square or portrait card is consumed fitted to a phone's width.
-The `h1` is **3.2% of the card height** × 1.72 em (59.4 px on a 1080-tall card,
-74.3 px on a 1350-tall card) and keeps its original size in every geometry. Card
-padding is 7.5% of height and 7% of width.
+card width** at 1:1 and 4:5, and **2.25% of the card width at 16:9**, which lands on
+the same 43.2 px in every profile (v2 raised 16:9 from 34.56 px so slides read at
+the same size as the carousels). Line height 1.45. The `h1` is **3.2% of the card
+height** × 1.72 em (59.4 px on a 1080-tall card, 74.3 px on a 1350-tall card) and
+keeps its original size in every geometry, so it stays well above the reading text.
+Card padding is 7.5% of height and 7% of width.
 
 | Geometry | Card | Text column | Body box | Line height | ≈ body lines | ≈ chars/line |
 |---|---|---|---|---|---|---|
-| 16:9 landscape | 1920 × 1080 | 1651 px | 729 px | 50.1 px | 14 | ~90 |
+| 16:9 landscape | 1920 × 1080 | 1651 px | 729 px | 62.6 px | 11 | ~90 |
 | 1:1 square | 1080 × 1080 | ~928 px | 715 px | 62.6 px | 11 | ~40 |
 | 4:5 portrait | 1080 × 1350 | ~928 px | 912 px | 62.6 px | 14 | ~40 |
 
 1:1 and 4:5 set the same reading size at the same width, so **the aspect ratio
 decides how much text fits, not the prose style**: 4:5 is 25% taller and holds
-about 25% more lines. 16:9 keeps the smaller type it has always had.
+about 25% more lines. v2 (2026-09-17) raised 16:9 to the same 43.2 px physical
+size, so 16:9 now holds about as many lines as a 1:1 square rather than the 14
+lines it held at the old 34.56 px type.
 
 Measured capacity (headless Chrome, this build):
 
 | Geometry | one-line bullets | ~100-character bullets | code lines |
 |---|---|---|---|
-| 16:9 | 12 | 6 | 7 |
+| 16:9 | ~10 | ~5 | ~6 |
 | 1:1 | 9 | 5 | 5 |
 | 4:5 | 12 | 6 | 7 |
 
+The 16:9 column was re-derived on 2026-09-17 from the new 62.6 px line height
+(729 px body box → ~11 lines); it was previously measured at the old 34.56 px type.
+The 1:1 and 4:5 columns still match the 43.2 px type they have always used.
+Re-measure exact counts if you are authoring to the limit.
+
 Working rules:
 
-- Budget **10 rendered lines** per card at 1:1, and **13** at 4:5 or 16:9.
+- Budget **10 rendered lines** per card at 1:1, **13** at 4:5, and **~11** at 16:9.
 - Every bullet also costs about a third of a line in margins.
 - Comfortable patterns at 1:1: four bullets of up to ~110 characters, or six of up
   to ~55 characters, or three bullets plus a short quote.
-- **Code blocks: keep to 5 lines or fewer at 1:1, 7 at 4:5 and 16:9.** The code box
+- **Code blocks: keep to 5 lines or fewer at 1:1, 7 at 4:5, ~6 at 16:9.** The code box
   is capped at 46% of the body box — 60% when the fence is the card's only content —
   and scrolls past that; the overflow is *not printed*. Keep code lines under
   ~60 characters to avoid horizontal scrolling.
@@ -182,6 +197,10 @@ Working rules:
 - Stats: always name the source and the date inside the same bullet — "Ahrefs,
   June 2026: 137,210 domains." A number without a source is not usable.
 - Quotes: at most one `>` per card, and keep it under one line.
+- Two-column cards (two `##` + bullets) pair best at ~3 short bullets per column.
+- Name things precisely — the `/` slideshow search indexes titles, bullets,
+  paragraphs **and** the text inside code fences and diagrams, so a distinctive
+  word makes a card findable.
 - Closing card: one line, up to ~90 characters. No bullets. It is centred and
   carries no footer.
 - No filler openings, no marketing adjectives, no rhetorical questions as
@@ -227,6 +246,10 @@ One file asks machines to leave. The other hands them a map. Twenty-eight percen
 - Its whole job is subtraction. It was never a way to be seen, and nobody pretended otherwise.
 ```
 
+Other worked decks ship in `examples/`: `capabilities.md` (images, three diagram
+types, a two-column slide) and `markdown-tutorial.md` (a beginner Markdown course).
+The default starter deck on a fresh load is the superset "every feature in one deck".
+
 ## 12. Limits of this build
 
 - `geometry:` in frontmatter does nothing; the toolbar chooses the export profile.
@@ -234,6 +257,10 @@ One file asks machines to leave. The other hands them a map. Twenty-eight percen
 - `closing:` accepts `auto` or `none` only; free text after `closing:` is ignored.
 - No table support, no nested lists, no footnotes, no citation notes.
 - Overflow is silent in both the preview and the PDF.
+- Two-column slides need exactly two `##` and none inside a code fence; a third
+  `##` disables the split.
+- The `/` search opens only in slideshow mode and reads the current editor text
+  only — not a filesystem search, and it does not see decks on disk.
 - Mermaid needs network access on first render; offline the fence stays visible as
   code with a note.
 - The title card carries no kicker, eyebrow or label. The title heading is the first
