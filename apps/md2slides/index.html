@@ -195,6 +195,7 @@
   <button class="act" id="btnOpen" title="Load a .md / .txt file into the editor">Open .md…</button>
   <select class="act" id="exSel" aria-label="Load an example deck" title="Load an example deck">
     <option value="">Examples ▾</option>
+    <option value="all">All features</option>
     <option value="starter">Starter deck</option>
     <option value="capabilities">Capabilities (v2)</option>
     <option value="llms">llms.txt carousel</option>
@@ -250,51 +251,95 @@
 
 <script type="text/plain" id="starter">
 ---
-title: Untitled deck
+title: md2slides — every feature in one deck
+author: Janardan
+date: Sep 2026
+venue: janalogy.com/apps/md2slides
 geometry: 16:9
 closing: auto
 ---
 
-This pane is plain Markdown. Text above the first heading becomes the subtitle on the title card. Nothing here is saved to a server.
+Text above the first heading is the subtitle on the title card. Below it: every feature the app ships, on one scannable deck.
 
-# A heading opens a card
-- Every first-level heading starts a new card
-- The preview follows the caret, so typing here switches the card
-- Bullets, numbers, code and images all render
-1. Ordered lists work
-2. Like this
+# Text basics
 
-# What the cards carry
-- **Bold**, *italic*, `inline code`, and [a link](https://example.com)
-- Images with `![alt](url)` — or paste one straight from the clipboard
-- A fenced block renders as code
-- A mermaid fence renders as a diagram
+- **Bold**, *italic*, `code`, and ~~struck~~ all render on a card
+- [Inline links](https://llmstxt.org/) stay clickable in the preview and the exported PDF
+- Bullets and ordered lists both work
 
+1. First ordered item
+2. Second ordered item
+3. Third ordered item
+
+> A blockquote, then a horizontal rule below it.
+
+---
+
+# A code fence
+
+```py
+def greet(name):
+    # a fenced block renders as code, kept verbatim
+    return f"hello {name}"
 ```
-flowchart is below
-```
 
-# A diagram, rendered
+# Diagram — flowchart
+
 ```mermaid
 flowchart LR
-  A[Note] --> B[H1 splits] --> C[Card] --> D[PDF]
+  A[Markdown] --> B[Parser] --> C[H1 opens a card] --> D[Export]
 ```
 
+# Diagram — sequence
+
+```mermaid
+sequenceDiagram
+  participant U as User
+  participant A as App
+  U->>A: type Markdown
+  A-->>U: cards update
+  U->>A: export PDF
+```
+
+# Diagram — state
+
+```mermaid
+stateDiagram-v2
+  [*] --> Editing
+  Editing --> Preview: build()
+  Preview --> Export: PDF
+  Export --> [*]
+```
+
+# Images — remote
+
+A remote image loads straight from its URL.
+
+![Remote image](https://picsum.photos/640/400)
+
+# Images — local
+
+A local image lives in the app's `images/` folder. Relative paths resolve against the app, not the deck file.
+
+![Local logo](images/logo.png)
+
 # One heading, two columns
-Add exactly two `##` sub-headings under one `#` heading and the card splits in two.
+
+Under one `#` heading, add exactly two `##` sub-headings and the card splits into two columns. Lead text above stays above the grid.
+
 ## Left column
-- A fact, a number, a short line
+
+- Plan the deck
+- Write the spine
 
 ## Right column
-- The contrast, or the follow-up
 
-# Export
-- **Export .md** writes the file back out, unchanged
-- **Export PDF** prints one card per page at the exact card size
-- 1:1 and 4:5 are the carousel profiles
+- Extend and revise
+- Export to PDF
 
-# Thank you
-Delete this last heading, or set `closing: none` in the frontmatter to drop the closing styling.
+# The closing card
+
+The last `#` becomes a centered bookend with no footer. Press `/` in slideshow mode to search every card here.
 </script>
 
 <script type="text/plain" id="ex-capabilities">
@@ -934,8 +979,8 @@ $('#btnOpen').onclick = () => $('#fileOpen').click();
 $('#exSel').addEventListener('change', ev => {
   const id = ev.target.value;
   if (!id) return;
-  const el = id === 'starter' ? $('#starter') : document.getElementById('ex-' + id);
-  if (el && el.textContent) ingest(el.textContent, 'example: ' + id);
+  const el = (id === 'starter' || id === 'all') ? $('#starter') : document.getElementById('ex-' + id);
+  if (el && el.textContent) ingest(el.textContent, 'example: ' + (id === 'all' ? 'all features' : id));
   ev.target.value = ''; // reset beside-button chip back to the prompt
 });
 
