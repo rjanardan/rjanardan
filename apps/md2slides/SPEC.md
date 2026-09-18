@@ -232,7 +232,7 @@ author: Author name                        # optional
 date: YYYY-MM-DD                           # optional
 venue: Venue or event name                 # optional
 geometry: 16:9                             # optional; 16:9 | 1:1 | 4:5
-closing: auto                              # optional; auto | none | free text
+closing: auto                              # optional; auto (default) | none
 ---
 ```
 
@@ -253,9 +253,11 @@ The first card is generated from frontmatter, never typed by hand. Then:
 Every `#` heading starts a card. The document text before the first `#` is the title card's optional
 subtitle line. `##` and deeper do not split cards; they render as sub-headings inside one.
 
-The last `#` block is the closing card when `closing` is not `none`; with `closing: auto` the app
-generates it from frontmatter plus any `links:` list, so the author does not retype what is already
-written once at the top. This is the decided default.
+The last `#` block is the closing card whenever `closing` is not `none` — its default is `auto`, so a
+deck gets the closer with no declaration. `auto` renders that block centred with a larger heading and
+**no footer**, as the deck's bookend. `none` makes the last `#` an ordinary content card that is
+numbered and carries a footer. Any other value behaves as `auto`. Write one short, centred line for the
+closer — the deck ends there.
 
 Both bookends are furniture-free. Neither the title card nor the closing card carries a footer, and
 the title card carries no eyebrow or kicker label either — its first element is the title heading. The

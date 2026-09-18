@@ -56,7 +56,7 @@ then `key: value` lines, then a closing `---` line.
 |---|---|---|
 | `title` | Title card heading; also the footer's left label on every content card | Falls back to `Untitled deck` |
 | `author`, `date`, `venue` | Byline on the title card, joined with `·` | Omitted if absent |
-| `closing` | `auto` (default) → the last `#` block becomes a centred closing card. `none` → no closing card; the last `#` block is an ordinary content card | Any other value behaves as `auto` |
+| `closing` | `auto` → the last `#` block is a centred **closing card** (larger heading, no footer). `none` → no closing card; the last `#` block is an ordinary content card with a footer | `auto` is the **default**, so a deck gets the closing card even if `closing` is omitted. Any other value (e.g. `yes` or a blank) behaves as `auto` |
 | `geometry` | **Parsed but ignored in this build.** The toolbar's 16:9 / 1:1 / 4:5 control decides the export size | Do not rely on it; tell the human which profile to pick |
 
 Key syntax is one line only: `key: value`. Values are plain text; surrounding
@@ -85,6 +85,10 @@ Rules that follow from the parser:
 - A card whose body contains **exactly two `##` sub-headings** renders as a
   two-column grid; the `#` heading stays full-width above it. A third `##` (or a
   `##` inside a code fence) disables the split and the card renders normally.
+- The **closing card** is the deck's bookend: centred text, a larger heading and **no
+  footer** (`data-kind="closing"`). It is automatic (the `closing` default is
+  `auto`); set `closing: none` to drop it and let the last `#` become an ordinary
+  numbered card. Write one short centred line for it — the deck ends there.
 
 ## 5. Block syntax the tool understands
 
