@@ -1,0 +1,284 @@
+#+TITLE: journal-hermes-macmini.org — life log reconstructed from Hermes conversations
+#+FILETAGS: :hermes:journal:reconstruction:
+#+STARTUP: overview
+#+OPTIONS: ^:nil
+
+Reconstructed only from Hermes conversations on the Mac mini (~/.hermes/state.db),
+2026-08-22 11:10 to 2026-09-13 00:21 IST. 143 sessions, 1,529 of the author's own non-cron messages.
+
+Source rules applied. No web search and no external sources were used. Pre-existing Emacs org-files and
+journals were deliberately NOT read, so content here may overlap or conflict with the existing
+org-files/journal and org-files/notes trees; those remain authoritative for anything typed directly into
+Emacs. Earlier sessions also wrote AI-generated journal entries into Emacs during this window; those are
+referenced here as activity, never copied.
+
+Scope. This record covers three weeks, beginning the day Hermes was installed. It contains no earlier
+history. Treat it as one dimension of a wider life log, not a complete one.
+
+Times are IST. Bullets carrying a time were taken from message timestamps; bullets marked Morning,
+Afternoon, Evening or Late are grouped from the surrounding activity where no precise time is evidenced.
+Session identifiers are given where they anchor a workstream.
+
+* 2026
+  2026 — the year this record covers, from 22 August, the day Hermes was installed on the Mac mini. The three weeks that follow are a transition period worked in public and in code: an engineering leader moving out of a large vendor, building an AI-first body of work to be judged on, and instrumenting his own life with Emacs org-mode, benchmarks and knowledge bundles. Recurring threads: local and small models on an 8 GB machine, agentic AI systems built to enterprise shape on open source, knowledge representation and OKF, the portfolio and resume repositioning, the Bengaluru JavaScript Meetup, and the multi-agent semantics research that is simultaneously thesis, company idea and portfolio.
+** August
+   August 2026 — installed Hermes on 22 August and rebuilt the working environment around it: local model selection and a scored ten-task benchmark, the first org-mode journal and diary configuration, the move off Google Drive onto GitHub for configuration and org files, the mobile agenda exporter, a book on organising with org-mode, a company-naming exercise around the PhD domain, ten job applications in one afternoon, and the self-assessment that creative exploration keeps displacing planned work.
+*** W34
+    Week 34 — installation week. Hermes arrives, local models are chosen and benchmarked, the first journal files are written, and the decision is taken to move the Emacs and org setup onto GitHub.
+**** 22 August 2026 (Saturday)
+     - 09:00: Hermes installed on the Mac mini M1 (8 GB) — the first day of this record
+     - 11:10: Asked for a recommendation between local LM Studio and Ollama models; deleted what would not run on this machine, took qwen3:4b as the local default (session 20260822_111002_fe23dc)
+     - 11:25: Set up a ten-task benchmark across local models, scored against ideal answers — the tasks chosen were his own real work: org-file summarising, calendar review, investment-email digests, arXiv trends, WhatsApp notes, diary generation
+     - 11:29: Commissioned the results as an interactive HTML page framed as a design of experiments — hypothesis, execution, results, analysis, next questions — for publication and personal branding
+     - 11:33: Set a standing style rule: no AI slop, and never "AI-bot researcher"; added to memory and soul (msg id 94)
+     - 11:35: Added GPT 5.6 Terra Medium to the comparison, then Grok 4.6 Med, Nemotron 3 Ultra free and DeepSeek V4 Flash as keys became available
+     - 11:36: Set a second standing rule: headings never end with a period (msg id 129)
+     - 12:24: Fixed the model hierarchy: local models for work they can do at nine out of ten, subscription frontier models inside monthly limits, accuracy first (msg id 473)
+     - 13:20: Researched which models, MCP servers and tools suit PDF operations and blog generation; produced hermes-models-mcp-tools.html
+     - 16:55: Requested an author-integrity footnote on the article naming the models used to produce it (msg id 946)
+     - 17:41: Set up GitHub for janalogy.com and began a portfolio section, weighing naming options (session 20260822_173946_46063d)
+     - 17:46: Drafted a LinkedIn post from raw thoughts about Hermes, local models and cost
+     - 18:03: Committed the JSON data alongside the study page so the results table would populate on the published site (id 1369)
+     - Afternoon — Iterated on the study page layout — column widths, left blank space, bullets all numbered "01", section numbering (ids 1084, 1179, 1314)
+
+**** 23 August 2026 (Sunday)
+     - 14:51: Asked for a journal written for Emacs org-mode, wanting goals and activities listed in chronological order first (session 20260823_145043_fab6a7)
+     - 15:02: Specified the format: one file per day in the notes folder, naming convention matching deft
+     - 15:04: Corrected the installation date — Hermes went in on 22 August, not 23
+     - 15:06: Recorded a family birthday on this day; later made generic as "family birthday" before any public use (msg id 1489)
+     - 15:08: Asked how to preview org files from the Hermes pane; answer was that only web content renders there
+     - 18:24: Tested the WhatsApp channel — the first non-desktop surface
+
+*** W35
+    Week 35 — configuration week. Emacs becomes the instrument: journaling, capture templates, TODO states, the mobile agenda exporter, the Google Drive de-duplication, and the first books. Also the week of ten job applications and the company-naming exercise.
+**** 24 August 2026 (Monday)
+     - 00:56: Declared Hermes the intended "home shell to the OS and Internet"; inventoried the fleet — Mac mini M1 8 GB, SKULL SAINTS Linux Mint mini PC, Lenovo Yoga Ultra 9, Lenovo AMD Ryzen 7 (session 20260824_005032_ecc2d3)
+     - 01:04: Began migrating the Hermes configuration to the SKULL Linux Mint box at 192.168.1.18, requiring a merge rather than an overwrite
+     - 01:20: Abandoned the SSH route and moved the config export by file transfer instead
+     - 01:28: Checked that API keys had carried across in the migration — the actual point of the exercise
+
+**** 26 August 2026 (Wednesday)
+     - 02:15: Asked which Emacs package renders markdown read views
+
+**** 28 August 2026 (Friday)
+     - 12:30: Wrote a zsh script to scan the LAN range 192.168.1.2 to 20, since the router reassigns addresses
+     - 20:48: System design learning: publisher, topic, partition, consumer, broker, and where Flink sits
+     - 21:24: Hit a recurring deft startup error and began diagnosing it
+     - 23:34: Decided to move off Google Drive org-files and onto GitHub: emacs-config for the Emacs setup, emacs-files for org content, mapped to a local directory (id 2029)
+     - 23:45: Diagnosed the Google Drive duplicate-folder problem — an "org-files (2)" directory created by local copy behaviour — and stopped offline copy to end the duplication
+
+**** 29 August 2026 (Saturday)
+     - 00:09: Turned to system design interview preparation; read his own System Design book and queried a heuristic in it (session 20260829_000931_b1b7f5)
+     - 00:41: Commissioned a responsive two-page book layout with page-flip behaviour, chapter tabs and mobile single-page mode
+     - 01:11: Added keyboard navigation and specified the reading experience in detail: no scrollbars, content flowing across pages, two-page spread on wide screens
+     - 08:48: Rejected the chopped-content version, asked for card view with per-card scroll and removal of Previous and Next buttons
+     - 09:08: Worked through a conflicting-requirements clarification himself, restating what small t and capital T should each do (id 3006)
+     - 09:16: Cloned the my-working-files repository to begin job application work (session 20260829_091604_84da08)
+     - 09:18: Committed and pushed the book version as good (id 3288)
+     - 09:20: Added zoom, numeric page jump and shift-number chapter jump
+     - 10:00: Refined keyboard input: wait for a complete number for half a second, support two and three digit jumps, distinguish shifted keys
+     - 10:23: Asked how the DIKW hierarchy maps onto Kafka and Flink
+     - 10:50: Asked why a control path is called a control path
+     - 12:38: Saved a UX-and-sound article to the journal queue — the one non-technical read in this record
+     - 15:17: Researched the company Emergent and its founders
+     - 16:01: Compared frontier and near-frontier model plans and pricing for API access (session 20260829_155801_2381ca)
+     - 19:15: Edited the resume for a wider GCC and startup audience; renamed the Director/Senior Engineering Leader variant and normalised GCC references
+     - 19:32: Added "Ready to join immediately" and pushed the resume pair to GitHub
+     - 23:33: Found Mermaid compelling enough to commission a full field guide on its diagram types (id 4805)
+
+**** 30 August 2026 (Sunday)
+     - 07:48: Set out to start a company in his PhD thesis area — multi-agent communication architectures, semantic layer, knowledge graphs, ontologies — and asked for one-word names with global, non-premium domains checked live (session 20260830_074425_55f3b4)
+     - 08:19: Relaxed to two or three words after domain scarcity, and explained the reason from experience: the JavaScript Meetup name now under-describes a community that moved past JavaScript (id 3733)
+     - 10:01: Mapped the Emacs journaling workflow — how to add an entry, and how to capture a chronological hourly record with end-of-day and end-of-week reflection (session 20260823_145043_fab6a7)
+     - 10:09: Asked to have the org configuration extended for real journaling use, with tasks captured into TODO.org
+     - 10:09: Brought a belief in to be attacked: that knowledge graphs are past their moment and embeddings are the better direction — against a thesis that is about the semantic layer (session 20260830_100923_bc7135)
+     - 10:14: Asked how org journaling and the Emacs diary differ and whether they overlap
+     - 10:36: Learned how to view the datetree
+     - 10:44: Spotted a corrupted journal filename and asked whether it was misconfiguration
+     - 10:56: Requested a 2026 literature update with problem, scope, hypothesis, experiment, results, limitations and a trust assessment for each paper (id 4221)
+     - 11:04: Found duplicate entries on the same day messing up the datetree; asked for the extra newline removed everywhere and word completion disabled entirely (id 4241)
+     - 11:24: Weighed human-readable date headings against sortable ISO dates for LLM processing; kept the human format as-is (id 4287)
+     - 12:37: Asked for a keystroke to clear a deft filename in one go
+     - 14:17: Asked for company names drawn from Columbus and from scientists instead
+     - 14:29: Found senselattice.com available and asked what a lattice is and how it fits the mission (id 4436)
+     - 16:18: Asked how to split windows vertically
+     - 16:29: Hit a missing pdflatex on the 8 GB machine while exporting to LaTeX
+     - 16:40: Requested a Job capture template with properties drawer and status keywords
+     - 17:32: Asked for all chats of the day to be reviewed and written into the day's org journal, then committed locally (id 4521)
+     - 17:35: Added the application batch to the journal: ten jobs applied between 15:50 and 17:30 (id 4542)
+     - 17:37: Asked for the local-model cost and effectiveness experiment to be recorded, with the honest conclusion that local models were slow and DeepSeek V4 Flash was the most effective and cheapest option (id 4560)
+     - 20:18: The self-assessment of the record: distracted by creative thoughts, not achieving planned items, unorganised by preference for exploratory work — followed by a request for a planning system, half-hourly day slots, durations and a daily template "for someone as unorganized as me" (id 4572)
+     - 20:33: Committed and pushed the resulting book on organising with Emacs org-mode and diary
+     - 22:56: Ordered every personal name and event removed from the book before it went online — specific replacements for a recruiter, a family birthday and a community event (id 4739)
+     - 23:33: Commissioned the Mermaid field guide and updated the index page
+
+*** W36
+    Week 36 — convergence week. The job tracker ships, the meetup archive is rebuilt around ten years of photos, and the small-models and knowledge-formats experiments produce the record's strongest published results.
+**** 31 August 2026 (Monday)
+     - 00:26: Scheduled TODOs were not appearing in the agenda view; traced the cause and extended the agenda file set (id 4951)
+     - 00:30: Asked how to add a time to a scheduled date
+     - 07:13: Clarified active versus inactive timestamps
+     - 07:30: Added a PROJ state to the TODO sequence for larger workflows, asking where the change belonged rather than having it made (id 5007)
+     - 07:34: Asked how to give a task a duration so it blocks time in the agenda
+     - 07:37: Reported a MeshDefend office visit blocked at 11:00 to 13:00 and the agenda still rendering a 12:00 slot (id 5019)
+     - 07:47: Commissioned the mobile agenda skill: agenda for two days back and three forward exported to a static page at org/today.html, to be run manually in the morning when on the move (id 5029)
+     - 07:51: Chose to keep both the raw and edited agenda exports for later diffing, to measure efficiency (id 5033)
+     - 08:08: Mobile review: time field too wide, tasks misaligned against timeslots, and a check that mattered — the view is primarily for a Samsung Galaxy S26 during the day (id 5603)
+     - 08:19: Reported that items present in timeslots were not appearing in the day view at all (id 5671)
+     - 23:37: Asked for even the GUI sessions to be listed
+
+** September
+   September 2026 — the month the work became a system. A Ramayana ontology explorer, the Hermes architecture page, the job application tracker with GitHub sync, a ten-year meetup photo archive, the AI model lifecycle explorer with nine parallel authoring runs, the portfolio and ten-theme rebuild, the small-models benchmark with a measured context cliff, the knowledge-formats guide with a scored grounding experiment, an agentic job-discovery system on open source, two OKF knowledge bundles, and interview preparation for a startup founder conversation. Two wiki products attempted and dropped in one evening; one experiment stopped on cost grounds mid-flight.
+*** W36
+    Week 36 — convergence week. The job tracker ships, the meetup archive is rebuilt around ten years of photos, and the small-models and knowledge-formats experiments produce the record's strongest published results.
+**** 01 September 2026 (Tuesday)
+     - 02:39: Committed and pushed the Emacs configuration and org files to their GitHub repositories
+     - 09:21: Generated the mobile agenda page for the day
+     - 09:23: Verified publication at janalogy.com/org/today.html — first a miss, then visible
+     - 09:24: Reported that even a five-minute follow-up task was rendering without visible text, and had it fixed (id 5809)
+
+**** 02 September 2026 (Wednesday)
+     - 01:19: Synced the Emacs configuration and org files from GitHub to the local machine
+     - 02:46: Built a Ramayana text corpus into the knowledge-bundles repository, choosing the Hari Prasad Shastri prose translation and assembling all 661 chapters into a 3.17 MB text, with the Griffith verse translation as a second option (session 20260902_024635_fbd9ac)
+     - 02:52: Cloned the Hermes agent repository and produced an architecture page with a Mermaid diagram explaining the four surfaces feeding the conversation core (session 20260902_025204_587a27)
+     - 12:11: Moved the system design path page into a new apps directory on the profile repo, then asked for the covered systems reorganised into four layers — clients, entry, business logic, data store (session 20260902_120901_badd30)
+     - 13:07: Re-opened the Hermes architecture page to check it
+     - 14:06: Researched MNP Canada and its Bengaluru GCC on culture, growth, AI stance, revenue and pay, then asked for a leadership salary band (session 20260902_140458_4cccb8)
+     - 16:21: Rejected the delivered book as a scope violation: he had asked for a decision tree per layer, not another book — the sharpest rebuke in the record, and a demand for questions before action
+     - 16:39: Wrote three items into the day's journal: a system design walkthrough with Sonia yielding a GCC contact, work on the AWS architecture, and a role lead passed on by Shyam (id 6885)
+     - 16:52: Merged the GitHub version of the day's journal with the local one, committed and pushed
+     - 18:47: Down-fitted the senior resume for a Lenovo manager role: factual Dell title kept, Director and startup phrasing removed, links deleted so viewers would not be led to the Director page (session 20260829_091604_84da08)
+     - 22:10: Configured Emacs to open TODO.org on startup and improved the repo status line to name the files out of sync (id 7201)
+     - 22:27: Asked how to open TODO.org with two levels expanded
+     - 23:13: Commissioned the job application tracker with status history, comments, persistent storage and a funding field, then seeded it from a CSV (session 20260902_231248_9a5817)
+     - 23:41: Built and verified GitHub sync for the tracker — personal access token, SHA-chained commits, conflict auto-merge, graceful bad-token fallback — with five browser tests passing
+
+**** 03 September 2026 (Thursday)
+     - 00:39: Published the tracker under the profile repository so it would serve from janalogy.com/jobs/index.html, choosing the existing repository route once it was clear a new one could not carry the custom domain
+     - 07:22: Asked for fine-grained token setup steps
+     - 07:30: Diagnosed a sync error from a screenshot, established that the first sync had actually succeeded, and fixed a wrong error mapping for HTTP 422
+     - 10:31: Asked which config line controls the autosave delay
+     - 10:35: Hit a file-notify error on save while editing the profile — the first sighting of a bug that took four more days to close
+     - 11:19: Asked how to link one org file from the diary
+     - 11:29: Asked for Gmail to be checked for responses to applications and the results written into a job-tracker org file (id 7835)
+     - 16:05: Established the rule that GitHub holds the authoritative version, with a proper comparison before any local commit (id at 16:05, session 20260902_231248_9a5817)
+     - 23:40: Pushed the Emacs configuration changes
+
+**** 04 September 2026 (Friday)
+     - 11:47: Asked to be de-aged on paper: drop the 29-year total and 20-year leadership claims, state the PhD is part-time so it does not read as a delivery risk, and flag any other age markers — suggestions first, no edits without approval (id 7940)
+     - 11:53: Worked out how to phrase delivery grounded in sound software engineering principles as the replacement (id 7970)
+     - 12:08: Asked about org-mode list continuation and how to get back to column one
+     - 12:25: Cleaned up the working-files repository — archive and photos folders — and pushed, confirming the visibility of never-pushed Lenovo application files before publishing them (id 8157)
+     - 23:54: Pushed a new communities folder to the profile repository
+
+**** 05 September 2026 (Saturday)
+     - 00:03: Committed and pushed the community insights page
+     - 07:33: Checked RSVPs for that day's event: 359 confirmed, zero waitlist, for the Quantum Computing event at AU-QUASAR (session 20260905_073324_1c86bf)
+     - 08:32: Reorganised org files into notes and journal folders by content and updated the configuration so new files land in the right tree (id 8306)
+     - 17:59: Started the ten-year meetup photo archive: scoped the albums, then harvested 346 photos across 47 event albums, working around bot walls and flaky scroll loads
+     - 19:36: Decided the scope and format, curated 64 photos, built the page from a generator and added the reverse link from the communities page
+     - 19:53: Committed the rebuilt meetup page with its gallery and a ten-year summary distilled from attendance data
+     - 21:53: Ran it locally to check it
+     - 21:59: Reported caption text spilling over the next row; the fix standardised tiles, moved captions below the image and corrected column breakpoints, verified across nine widths (id near 21:59)
+     - 22:25: Reverted the repo status line to a simple count — the file listing made Emacs startup too slow
+     - 23:25: Read TrenchSecurity's claim about a semantic layer in security and found it compelling enough to build overnight: a locally hosted Ramayana taxonomy and ontology explorer with 113 entities and 238 typed relations (session 20260905_232546_5b7bec)
+
+**** 06 September 2026 (Sunday)
+     - 10:34: Assessed the honesty of NeoSmith's Maestro technical report against external anchors rather than taking it at face value (session 20260906_103435_5e35bd)
+     - 10:38: Commissioned a browser extension to force a dark documentation site to light, and kept re-testing when the first toggle did not take effect (session 20260906_103822_63a87b)
+     - 11:48: QA on the ontology explorer: entity and relation counts, orphaned entities, a shadowed variable regression, then zoom controls and full-page views on every graphical surface
+     - 12:02: Commissioned the AI model lifecycle explorer — visual flows for each training stage, Mermaid code and rendered preview side by side, two scenarios compared at once (session 20260906_115428_bada80)
+     - 12:15: Fanned out nine parallel authoring tasks, one per scenario, against a shared schema
+     - 13:5x: Restructured the interface on review: code hidden behind a toggle, diagram left and step detail right on desktop
+     - 15:14: Started the local server and confirmed every asset returned 200
+     - 15:29: Began the portfolio rework for an AI-first audience, opening with a gap audit across the two public surfaces (session 20260906_152931_711851)
+     - 16:23: Set the working mode for the portfolio: suggestions only, every line edited by hand
+     - 16:24: Checked whether an agentic-AI-at-scale claim was defensible before keeping it
+     - 17:49: Moved the resume to a text master with the HTML generated from it, so edits happen in one place
+     - 18:22: Hunted the chat history for enterprise-scale projects to back the AI-first repositioning, an honest search that returned no finished list, then saved the recommendations and the prompt that produced them into an org note (session 20260906_182257_e9f7c1)
+     - 20:06: Calibrated the skills section against 18 job descriptions held in the notes folder
+     - 22:02: Fixed scope duplication in the resume and committed both repositories
+     - Late evening — Asked how an architect at a frontier lab would react to the NeoSmith report as a defence step for their own next model iteration
+
+*** W37
+    Week 37 — consolidation week. The work is digested, the portfolio is finished, an agentic system is built on open source, knowledge bundles are authored, and the reconstruction requested in this file begins.
+**** 07 September 2026 (Monday)
+     - 07:10: Closed the file-notify bug properly — diagnosed the auto-revert race, chose polling over watching, and pushed the fix with a separate autosave commit (session 20260907_071013_aab4a9)
+     - 07:16: Resumed the portfolio: hero paragraph coherence, grammar, and the decision to restore a career history section because recruiters look for it (session 20260906_152931_711851 continues)
+     - 07:45: Corrected the employment record detail by hand — role wording and company acquisition annotations
+     - 08:10: Chose 100 over 120 for the team-size claim, on the reasoning that a round number invites less scrutiny; normalised it across every page and pushed
+     - 08:39: Allowed a long autonomous design stretch and then ratified it: ten candidate themes built and tested, two ported in, one made default, the picker polished and persisted
+     - 10:13: Pushed the ten-theme visual system to the live site
+     - 11:41: Tightened the autosave interval to three seconds across all file buffers and pushed two separate commits (session 20260907_071013_aab4a9)
+     - 11:45: Commissioned a repo-sync checker skill, then used it to inventory nine local repositories, reconcile three out-of-sync ones and relocate the Emacs folder under github (session 20260907_114523_b7d506)
+     - 12:26: Completed the relocation with the configuration repointed and the agenda verified at 87 files
+     - 12:45: Opened the small-models workstream: fine-tuning versus knowledge-bundle grounding for high-risk, low-cognition enterprise tasks where cost, security, local data and latency matter (session 20260907_124541_f3b09c)
+     - 12:47: Wrote the career goal into a new private aboutme.md — the AI expert sought out in Bengaluru for consulting and a CTO role, the next thirty years in AI, earnings doubling every three years, three crore banked by 01 December 2029, work as worship (session 20260907_124729_956d0f)
+     - 12:56: Benchmarked six local models on the 8 GB machine and measured the context cliff — qwen3:4b falling from 19.5 tokens per second at 8K context to about 1 at 32K
+     - 15:46: Wrote the PDF figure-caption script and ran it, then catalogued six distinct API misuses by a small local model generating drawing code (session 20260907_154646_cdc737)
+     - 16:11: Fanned out three parallel research tasks on the small models — published benchmarks against vendor claims, commercial deployments and community sentiment, and technical model cards
+     - 16:20: Removed an unverified parameter figure from a model card before delivery
+     - 16:28: Integrated the research: eight models, ten deployments, twenty-one sources
+     - 16:33: Stopped the figure-caption experiment mid-flight on cost grounds, asking directly whether the difficulty was the model's limitation and stating no further credits would be spent
+     - 19:14: Commissioned the knowledge-formats guide — what knowledge is, why it matters for agents, taxonomy and ontology vocabulary, standards and non-standards, and a deep dive on OKF v0.1 and v0.2 with prior research attached (session 20260907_191419_e89f24)
+     - 20:25: Built and ran a scored experiment on it, and fixed an Ollama behaviour that was burning the token budget on hidden reasoning and returning empty answers
+     - 21:01: Delivered the 117 KB guide with the experiment inside it: one to two correct out of ten without a knowledge bundle, nine to ten with one, at single-digit latency cost
+
+**** 08 September 2026 (Tuesday)
+     - 12:10: Asked for a week of his own chat history to be reviewed and written into the Emacs journal by date, with intent, classification, references and pending items, and anything undecidable scheduled for Saturday (id 16819)
+     - 12:19: Nine parallel digest passes launched over the week's sessions, producing cited reconstructions of each day's work
+     - 15:51: Prepared for a second discussion with TrenchSecurity founder Mayur, naming the gap honestly: moving from sixteen years at Dell and HPE to a booting startup, with no SOC and no customer-facing experience to claim (session 20260908_155145_af3ce1)
+     - 18:59: Framed the pitch around trust rather than technology — helping customers navigate the confidence arc of handing work to AI, as a driver once had to be convinced to become a passenger
+     - 19:47: Stated his own value proposition in his own words: hiding the complexity of enterprise infrastructure behind an abstraction the customer can trust, and making them heroes in their own organisation (id 17951)
+     - 22:36: Opened the agentic AI build: asked for candidate use cases against AWS AgentCore, saying he would pick the one that interested him, then work through requirements, architecture, building blocks, wiring, testing, observability and troubleshooting (session 20260908_223653_7b8fe0)
+     - 22:37: Set the constraint that shaped everything after: open source software only, cloud permitted for GPU compute or LLM inference alone (id 17984)
+     - 23:14: Installed PostgreSQL with pgvector
+     - 23:18: Authenticated the GitHub CLI
+
+**** 09 September 2026 (Wednesday)
+     - 07:30: Continued the agentic build
+     - 08:01: Ran discovery across Hacker News, RSS and applicant tracking systems: 419 fetched, 415 new roles inserted
+     - 08:07: Asked how to see progress on the first two milestones
+     - 08:17: Reported that the schedule keystroke had changed behaviour on his Mac keyboard
+     - 09:34: Drafted the AI technology stack for his profile and asked what the agentic AI line should contain (id 20219)
+     - 09:39: Iterated the stack listing and separated research areas from tools, weighing where Hermes, the knowledge bundles and the multi-agent research belong (id 20223)
+     - 10:02: Caught a real omission himself: databases missing entirely from the stack (id 20278)
+     - 10:21: Worked through two genuine forks in the service layer before writing code
+     - 12:41: Asked whether the observability dashboard showed any real traction before proceeding to the next milestone (id 20803)
+     - 16:24: Proceeded to the next milestone
+     - 16:50: Asked for the README to carry an ASCII system design diagram with component descriptions, interfaces and purpose — and stated the purpose of the whole build: system architect skills to claim in interviews, with actual use secondary
+     - 16:50: Asked to be warned in advance whenever a repeated operation would burn tokens
+
+**** 10 September 2026 (Thursday)
+     - 08:22: Specified the first OKF v0.2 knowledge bundle: frontier model companies and their research journeys, post-2022 startups, YC-backed companies and their competitors, with founders, customers, teams and funding — and the downstream uses named in advance (session 20260910_082220_584cdb)
+     - 11:46: Reviewed chapter 10 code for Mastering TypeScript, set up the TypeScript toolchain and ran it, then followed the repository's existing chapter conventions (session 20260910_114607_b833fe)
+     - 12:26: Asked how to pin the cheaper DeepSeek version after a provider redirected the alias to a newer release (session 20260910_122631_547616)
+     - 20:02: Set up passwordless access to the SKULL Linux Mint machine, including mosh and tmux, and asked which steps he had to run himself (session 20260910_200253_90825c)
+
+**** 11 September 2026 (Friday)
+     - 00:17: Added company logos and founder images to the bundle and asked what the next incremental step should be (session 20260910_082220_584cdb)
+     - 01:49: Caught a gap in his own artifact: why had a recent leadership change at Google DeepMind not been recorded? (id 23753)
+     - 02:03: Interview preparation on agentic AI, starting from why 2023 to 2026 changed the calculus, then asking for the contributing factors (session 20260911_020312_1d4a18)
+     - 03:11: Tested Gemini 3.8 Flash on the same question and checked that the provider switch was working (session 20260911_031147_898de3)
+     - 16:02: Asked for the OpenAI founding cohort and added Yann LeCun, with a timeline folder to be maintained as a left-to-right Mermaid chart plus a nested text version for mobile reading (id 23848)
+     - 16:06: Saved the factors driving agentic AI as an org note with tags, action items and references
+     - 16:11: Prepared for an 8pm meeting with roughly three hours to work with, asking for a prioritised task list (session 20260908_155145_af3ce1)
+     - 16:15: Asked what to ask Mayur from a strategy background, and had his LinkedIn read to find common ground (id 24015)
+     - 17:44: Named five investors to add to the bundle with the companies they backed (session 20260910_082220_584cdb)
+     - 18:05: Attempted a self-hosted wiki as a local notes server (session 20260911_180554_c353a6)
+     - 18:12: Attempted a second wiki product as a container (session 20260911_181237_6cdffe)
+     - 18:32: Stopped both wiki attempts the same day and asked for a clean removal of whatever had been installed, with a request to be told before anything was deleted (ids 24470, 24743)
+     - 18:42: Asked for the knowledge-bundle work to be turned into a reusable skill and for instructions on invoking it on this machine (id 24502)
+     - 18:52: Commissioned a second bundle on the future of software development — roles, phases, and the companies investing in new methods — for papers, social posts, interview preparation and possibly a book (session 20260911_185151_889deb)
+     - 19:08: Built the 90-second and 30-second answers to "tell me about yourself", then the answers to fit and value questions he expected to be pressed on (session 20260908_155145_af3ce1)
+     - 19:51: Asked for Mayur's time zone before a late meeting
+
+**** 12 September 2026 (Saturday)
+     - 18:51: Asked for a reusable prompt to extract seven personal files plus a journal from the LLMs he has used over four years, to be merged locally — the origin of this reconstruction (session 20260912_185129_0a0eca)
+     - 18:55: Specified that the journal must be a single file in a four-level org datetree, with the exact hierarchy given as an example
+     - 19:00: Caught the risk that matters most to him: that the models were web-scraping instead of drawing on private conversation history, and required the prompt to forbid it (id 25228)
+     - 23:56: Narrowed the exercise to the Hermes conversations on this Mac mini alone, and required that pre-existing Emacs org-files not be read, to avoid recursion
+
+**** 13 September 2026 (Sunday)
+     - 00:18: Model switched to deepseek-flash for this chat
+     - 00:21: Asked for the eight files to be written, framed explicitly as one dimension of a wider analysis and not a complete portrait

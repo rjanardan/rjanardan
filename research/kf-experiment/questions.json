@@ -1,0 +1,35 @@
+{
+  "questions": [
+    {
+      "id": "q1",
+      "q": "What is the Open Knowledge Format (OKF)? Which company announced it, when, and which computing pattern does it formalize?"
+    },
+    {
+      "id": "q2",
+      "q": "Which frontmatter fields does OKF version 0.1 define for a document, and which field is required?"
+    },
+    {
+      "id": "q3",
+      "q": "Which trust signals did OKF version 0.2 add? Name the fields and the three trust tiers."
+    },
+    {
+      "id": "q4",
+      "q": "Describe the directory structure of an OKF knowledge bundle. What are index.md and log.md for, and what do links between files represent?"
+    },
+    {
+      "id": "q5",
+      "q": "What is an attested computation in OKF? Name its fields and explain how the attester works."
+    }
+  ],
+  "models": ["qwen3:1.7b", "qwen3:4b", "gemma4:e4b"],
+  "conditions": ["without", "with"],
+  "fixture": {
+    "engine": "ollama /api/generate",
+    "temperature": 0.1,
+    "num_predict": 700,
+    "num_ctx": 8192,
+    "think": false,
+    "date": "2026-09-07",
+    "host": "Apple silicon, 8 GB RAM"
+  }
+}

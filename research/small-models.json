@@ -1,0 +1,294 @@
+{
+  "title": "Small local models on the 8 GB Mac mini",
+  "generated": "2026-09-07",
+  "scope": "Comparison of the Ollama models installed on this machine for high-risk, low-cognitive enterprise tasks: cost, security, local data, latency. Companion page: small-models.html",
+  "host": {
+    "machine": "Apple Mac mini",
+    "ram_gb": 8,
+    "notes": "Unified memory. 4B-class models at Q4_K_M run acceptably only at short context; 1.7-3B models are the practical daily band."
+  },
+  "benchmark": {
+    "method": "ollama /api/generate, stream=false, temperature 0.1, num_predict 160, num_ctx 8192, Q4_K_M (F16 for the embedder)",
+    "note": "DeepSeek-R1 1.5B always emits reasoning tokens; its token/s includes them. qwen3:4b at 32K context was measured unusable (~1 tok/s) earlier; at 8K it reaches 19.5 tok/s. Context budget dominates latency on this machine."
+  },
+  "models": [
+    {
+      "id": "qwen3",
+      "local_tags": [
+        "qwen3:1.7b",
+        "qwen3:1.7b-64k (same weights, 64K ctx preset)"
+      ],
+      "family": "Qwen3 dense (Alibaba), Apache 2.0, Apr 2025",
+      "parameters": "2.0B total per Ollama (marketed 1.7B)",
+      "context": "Ollama build 40960; 32K native design, rope-scaled beyond",
+      "quantization": "Q4_K_M, 1.4 GB",
+      "corpus": "~36T tokens across the Qwen3 dense series; multilingual, code-heavy",
+      "goal": "Smallest practical Qwen3 tier for on-device and edge; hybrid thinking/quick modes; tool calling",
+      "measured": {
+        "gen_tok_s": 42.7,
+        "prompt_tok_s": 908,
+        "num_ctx": 8192
+      },
+      "enterprise_fit": "Local-data tier: extraction, classification, routing, summarisation under guardrails; fastest useful model here",
+      "license_note": "Apache 2.0, unrestricted commercial use"
+    },
+    {
+      "id": "qwen3-4b",
+      "local_tags": [
+        "qwen3:4b",
+        "qwen3:4b-32k (same weights, 32K ctx preset)",
+        "local-default:latest (same weights, num_ctx 8192)"
+      ],
+      "family": "Qwen3 dense (Alibaba), Apache 2.0, Apr 2025 (Instruct-2507 refresh exists)",
+      "parameters": "4.0B",
+      "context": "Ollama build 262144 rope; native 32K-class design",
+      "quantization": "Q4_K_M, 2.5 GB",
+      "corpus": "~36T tokens across the Qwen3 dense series; multilingual, code-heavy",
+      "goal": "Strongest Qwen3 on-device tier; hybrid thinking; agentic tool use",
+      "measured": {
+        "gen_tok_s": 19.5,
+        "prompt_tok_s": 136,
+        "num_ctx": 8192,
+        "note": "~1 tok/s at 32K context on this machine"
+      },
+      "enterprise_fit": "Server or workstation tier rather than this Mac mini at long context; grounded extraction and drafting where a 1.7-3B model underperforms",
+      "license_note": "Apache 2.0, unrestricted commercial use"
+    },
+    {
+      "id": "qwen2.5-3b",
+      "local_tags": [
+        "qwen2.5:3b"
+      ],
+      "family": "Qwen2.5 (Alibaba), Sep 2024",
+      "parameters": "3.1B",
+      "context": "32768 (Ollama build and native)",
+      "quantization": "Q4_K_M, 1.9 GB",
+      "corpus": "~18T tokens for the Qwen2.5 series",
+      "goal": "General small instruct model with tool calling; fine-tune-friendly base",
+      "measured": {
+        "gen_tok_s": 23.1,
+        "prompt_tok_s": 170,
+        "num_ctx": 8192
+      },
+      "enterprise_fit": "Fine for local experiments; commercial product use is restricted by license (research licence, see below)",
+      "license_note": "Qwen RESEARCH LICENSE (Sep 19 2024) per Ollama metadata and HF LICENSE file; not Apache. Verify terms before any commercial deployment"
+    },
+    {
+      "id": "qwen2.5-coder-3b",
+      "local_tags": [
+        "qwen2.5-coder:3b",
+        "qwen2.5-coder:3b-32k (same weights)"
+      ],
+      "family": "Qwen2.5-Coder (Alibaba), Oct 2024",
+      "parameters": "3.1B",
+      "context": "32768 (Ollama build and native)",
+      "quantization": "Q4_K_M, 1.9 GB",
+      "corpus": "~5.5T tokens, code-heavy mix on the Qwen2.5 base",
+      "goal": "Local code completion (FIM insert capability) and chat on low-memory machines",
+      "measured": {
+        "gen_tok_s": 24.8,
+        "prompt_tok_s": 250,
+        "num_ctx": 8192
+      },
+      "enterprise_fit": "Dev-tooling tier: autocomplete and code review assistants inside secure dev environments",
+      "license_note": "Qwen RESEARCH LICENSE per HF LICENSE file; verify terms before commercial deployment"
+    },
+    {
+      "id": "llama3.2-3b",
+      "local_tags": [
+        "llama3.2:3b",
+        "llama3.2:3b-32k (same weights)"
+      ],
+      "family": "Llama 3.2 (Meta), Llama 3.2 Community License, Sep 2024",
+      "parameters": "3.2B",
+      "context": "131072 (Ollama build and native 128K design)",
+      "quantization": "Q4_K_M, 2.0 GB",
+      "corpus": "~9T tokens per Meta for the 1B/3B pair; pruned and distilled from Llama 3.1 8B",
+      "goal": "Meta's mobile and edge tier: summarisation, rewriting, instruction following, on-device assistants; 8 languages incl. Hindi",
+      "measured": {
+        "gen_tok_s": 24.9,
+        "prompt_tok_s": 241,
+        "num_ctx": 8192
+      },
+      "enterprise_fit": "Local-data tier with the widest vendor ecosystem (day-one Qualcomm, MediaTek, Arm, ExecuTorch); on-prem assistants",
+      "license_note": "Llama 3.2 Community License; monthly active users over 700M need Meta approval"
+    },
+    {
+      "id": "deepseek-r1-1.5b",
+      "local_tags": [
+        "deepseek-r1:1.5b"
+      ],
+      "family": "DeepSeek-R1-Distill-Qwen-1.5B, MIT, Jan 2025",
+      "parameters": "1.8B",
+      "context": "Ollama build 131072 rope; 32K-class native (Qwen2.5-Math base)",
+      "quantization": "Q4_K_M, 1.1 GB",
+      "corpus": "Distilled on ~800K reasoning samples from R1-671B atop the Qwen2.5-Math-1.5B base",
+      "goal": "Bring chain-of-thought reasoning to small, local models: math, logic, single-turn code",
+      "measured": {
+        "gen_tok_s": 43.3,
+        "prompt_tok_s": 161,
+        "num_ctx": 8192,
+        "note": "Token/s includes reasoning tokens; useful output per second is lower"
+      },
+      "enterprise_fit": "Component model: local reasoning checks, numeric verification, low-risk logic steps inside pipelines",
+      "license_note": "MIT, unrestricted"
+    },
+    {
+      "id": "nomic-embed-text",
+      "local_tags": [
+        "nomic-embed-text:latest"
+      ],
+      "family": "Nomic Embed Text v1.5, Apache 2.0",
+      "parameters": "137M",
+      "context": "2048 model context; num_ctx 8192 preset",
+      "quantization": "F16, 274 MB",
+      "corpus": "~2.4B tokens, contrastive Matryoshka training (per Nomic technical report)",
+      "goal": "Local retrieval embeddings (768-dim) for RAG and knowledge-bundle search",
+      "measured": null,
+      "enterprise_fit": "Supporting model: the retrieval half of any grounded small-model setup on local data",
+      "license_note": "Apache 2.0"
+    },
+    {
+      "id": "gemma4-e4b",
+      "local_tags": [
+        "gemma4:e4b"
+      ],
+      "family": "Gemma 4 E4B (Google DeepMind), Apache 2.0, Apr 2026; E4B = effective-4B dense design, 8B total with embeddings (per-layer embeddings + vision/audio encoders)",
+      "parameters": "4.5B effective / 8.0B total (7,996,157,674)",
+      "context": "131072 build and native 128K design; hybrid 512-token sliding + global attention, shared KV in last 18 layers, p-RoPE",
+      "quantization": "Q4_K_M, 9.6 GB on disk (full multimodal bundle: text + image + audio input)",
+      "corpus": "Google-internal web/code/image/audio mix, cutoff Jan 2025, 140+ languages; token budget not published (tech report arXiv 2607.02770)",
+      "goal": "Google's on-device tier: multimodal understanding, configurable thinking mode, native function calling and JSON, agentic workflows at the edge",
+      "measured": {
+        "gen_tok_s": 13.2,
+        "prompt_tok_s": 95,
+        "num_ctx": 8192,
+        "note": "warm steady state, 11-15 gen tok/s across five runs, deterministic output; cold first load 8.0 gen / 32.5 prompt tok/s, ~39 s wall (9.6 GB bundle exceeds comfortable resident RAM on 8 GB)"
+      },
+      "enterprise_fit": "On-device class (effective 4B): the only installed model that takes image/audio input and the strongest on paper of the four chat families; on this Mac prefer Google's QAT / mobile builds (E4B ~3.65 GB in LiteRT-LM) over the 9.6 GB Q4 bundle",
+      "license_note": "Apache 2.0, unrestricted commercial use"
+    }
+  ],
+  "deployments": [
+    {
+      "model": "Qwen3-4B-Instruct-2507",
+      "company_or_product": "Qualcomm AI Hub on-device packs (Samsung Galaxy S25 family listed as supported target devices, not a confirmed Samsung ship)",
+      "task": "On-device assistant and agent workloads on Snapdragon 8 Elite / X Elite PCs and Dragonwing automotive / industrial targets",
+      "approach": "Modified: INT4 w4a16 quantisation to ~2.3 GB, exported to the Genie/GenieX NPU runtimes; LoRA fine-tuning supported via QAIRT",
+      "source": "Qualcomm AI Hub model cards and release notes"
+    },
+    {
+      "model": "Llama 3.2 1B/3B",
+      "company_or_product": "Meta edge ecosystem (Qualcomm, MediaTek, Arm, ExecuTorch)",
+      "task": "On-device summarisation, rewriting, instruction following; assistant features on phones and PCs",
+      "approach": "Mostly direct or vendor-quantised: Meta ships quantised variants (up to ~4x faster, ~56% smaller, ~41% less memory vs BF16); products integrate them via on-device runtimes",
+      "source": "Meta Llama 3.2 release materials"
+    },
+    {
+      "model": "Qwen2.5-Coder-3B",
+      "company_or_product": "Continue.dev and similar local coding tools (with Ollama)",
+      "task": "Code autocomplete and chat inside IDEs, fully local",
+      "approach": "Direct: unmodified GGUF weights served by Ollama; the 3B tier is the low-memory recommendation, larger tiers preferred when hardware allows",
+      "source": "Continue.dev documentation and community guides"
+    },
+    {
+      "model": "Qwen2.5-3B-Instruct",
+      "company_or_product": "Serverless hosting (Fireworks-class platforms) and vertical fine-tunes",
+      "task": "General chat, extraction; fine-tuned for domain Q&A in several verticals",
+      "approach": "Both: hosted as-is on-demand, or modified via LoRA fine-tunes for verticals",
+      "source": "Platform documentation; community fine-tune reports"
+    },
+    {
+      "model": "DeepSeek-R1-Distill-Qwen-1.5B",
+      "company_or_product": "Local stacks (LM Studio, Jan, Open WebUI presets with Ollama)",
+      "task": "Local reasoning: math, logic, code explanation",
+      "approach": "Direct; no flagship named enterprise product surfaced in this review, it is used as a component",
+      "source": "Ecosystem documentation; finding of this review"
+    },
+    {
+      "model": "Qwen3-1.7B",
+      "company_or_product": "Qualcomm AI Hub on-device pack (aihub.qualcomm.com/models/qwen3_1_7b)",
+      "task": "Dialogue and content generation on Snapdragon 8 Elite / X Elite, Dragonwing, Arduino VENTUNO Q; 4096-token context; on-device accuracy 73% vs 81.2% reference",
+      "approach": "Direct: original weights with QAIRT W4A16 / q4_0w4a16 quantization, no fine-tuning",
+      "source": "Qualcomm AI Hub model page; GenieX (NexaAI) README"
+    },
+    {
+      "model": "nomic-embed-text",
+      "company_or_product": "Ollama-based RAG tooling",
+      "task": "Embeddings for local retrieval",
+      "approach": "Direct",
+      "source": "Ollama ecosystem"
+    },
+    {
+      "model": "Gemma 4 E4B",
+      "company_or_product": "Gemini Nano 4 'Full' on Android (AICore Developer Preview)",
+      "task": "On-device assistant with highest-quality answers; Nano 4 'Fast' variant is E2B-based and ~3x faster; agentic prototyping via AICore",
+      "approach": "Direct-open foundation: Gemma 4 weights are Apache 2.0; Nano 4 ships as Google's product layer on top; code written for Gemma 4 runs on Nano 4 devices",
+      "source": "9to5Google (2 Apr 2026); Android AICore Developer Preview announcement"
+    },
+    {
+      "model": "Gemma 4 E4B",
+      "company_or_product": "Google AI Edge: LiteRT-LM and AI Edge Gallery",
+      "task": "Multi-step agentic skills fully on-device (AI Edge Gallery is one of the first such apps); E4B bundle 3.65 GB; per-device decode: Galaxy S26 Ultra 18-22 tok/s, Raspberry Pi 5 ~3 tok/s",
+      "approach": "Direct with Google's QAT and mobile quantized builds (E2B mobile format ~1 GB)",
+      "source": "ai.google.dev/edge/litert-lm/models/gemma-4; Google AI Edge agent-skills post"
+    },
+    {
+      "model": "Gemma 4 E4B (QAT)",
+      "company_or_product": "Ollama / llama.cpp day-one, Qualcomm GenieX, vLLM / SGLang / Unsloth",
+      "task": "Local serving of official QAT checkpoints (Q4_0 and mobile quantization formats); GenieX runs the QAT GGUF on Snapdragon NPU/GPU/CPU",
+      "approach": "Direct official QAT weights, no fine-tuning",
+      "source": "Google QAT release blog (Jun 2026); GenieX (NexaAI) README"
+    }
+  ],
+  "fleet_layers": [
+    {
+      "layer": "L0 rules and classifiers",
+      "role": "First pass on high-risk decisions; no LLM",
+      "installed": "none yet"
+    },
+    {
+      "layer": "L1 edge small 1-4B, local",
+      "role": "High-risk, low-cognitive tasks on private data: extraction, classification, routing, summarisation, form filling",
+      "installed": "qwen3:1.7b, llama3.2:3b, deepseek-r1:1.5b, qwen2.5-coder:3b, gemma4:e4b (effective-4B class; 9.6 GB Q4 bundle - cold start slow on 8 GB, ~13 tok/s warm)"
+    },
+    {
+      "layer": "L2 small server 4-8B",
+      "role": "Grounded drafting, structured extraction with more headroom",
+      "installed": "qwen3:4b (needs more than 8 GB for long context)"
+    },
+    {
+      "layer": "L3 mid 8-32B",
+      "role": "Judgement and planning; runs on servers not this Mac",
+      "installed": "none"
+    },
+    {
+      "layer": "L4 frontier/API",
+      "role": "Rare high-judgement escalations routed explicitly",
+      "installed": "none"
+    }
+  ],
+  "sources": [
+    "Ollama metadata via `ollama show` on this machine (arch, params, context, quantisation, licence)",
+    "Local benchmark run 2026-09-07 on this machine (see benchmark field)",
+    "Meta: Introducing Llama 3.2 (Sep 2024) - edge partners, quantised variants",
+    "Qualcomm AI Hub: Qwen3-4B-Instruct-2507 on-device models (Galaxy S25, X Elite, Dragonwing)",
+    "Hugging Face model cards and LICENSE files: Qwen2.5-3B-Instruct, Qwen2.5-Coder-3B-Instruct (Qwen Research License), Qwen3 (Apache 2.0), Llama 3.2 (community), DeepSeek-R1-Distill (MIT)",
+    "Qwen blog / technical reports: Qwen3 ~36T tokens, Qwen2.5 ~18T tokens, Qwen2.5-Coder ~5.5T tokens",
+    "DeepSeek-R1 paper: 800K distillation samples for the distill series",
+    "Google Cloud: Open Knowledge Format announcement (Jun 2026); spec in GoogleCloudPlatform/knowledge-catalog (okf/SPEC.md)",
+    "OKF explainers: smartscope.blog, geotoolbox.ai (v0.2 trust layer: provenance, verified-by, stale_after)",
+    "Nomic Embed technical report",
+    "Google: Gemma 4 E4B model card and benchmark table (HF google/gemma-4-E4B; ai.google.dev model_card_4): dense, 4.5B effective / 8B with embeddings, 128K ctx, Apache 2.0",
+    "Google: Gemma 4 launch blog (Apr 2026), Gemini Nano 4 on Android (9to5Google), QAT checkpoint release (Jun 2026), LiteRT-LM per-device numbers, Agent Skills / AI Edge Gallery",
+    "Ollama library gemma4 page: family sizes e2b / e4b / 12b / 26b / 31b; day-one tooling",
+    "Qwen3 Technical Report (arXiv 2505.09388): ~36T tokens, three-stage pretraining, strong-to-weak distillation for the small dense models (not direct RLVR); Qwen3-1.7B HF card (1.4B non-embedding params)",
+    "DeepSeek-R1 paper (arXiv 2501.12948): distill benchmarks AIME 2024 28.9 pass@1, MATH-500 83.9, GPQA-D 33.8; 800K R1-generated samples on Qwen2.5-Math-1.5B",
+    "Meta Llama 3.2 announcement: prune + logit distillation from Llama 3.1 8B/70B; edge partners Arm/MediaTek/Qualcomm; HF Llama-3.2-3B-Instruct eval table (MMLU 63.4, GPQA 32.8, IFEval 77.4, BFCL V2 67.0)",
+    "Qualcomm AI Hub: Qwen3-1.7B and Llama-v3.2-3B-Instruct on-device packs (W4A16; Galaxy S25 family listed as supported devices)",
+    "Independent runs: Artificial Analysis via BenchmarkList (Qwen3-1.7B chat: MMLU-Pro 41.1, GPQA 28.3, HLE 5.3, Terminal-Bench-Hard 0.0); LMArena Elo aggregator snapshot (Llama 3.2 3B ~1167)",
+    "r/LocalLLaMA and Hacker News: RAG collapse of 1.7B / R1-1.5B (thread 1ndj9sf), Gemma 3n E4B vs Qwen3-4B tests (1krpvwj), Gemma 4 vs Qwen 3.5 impressions (1sapl6k), Gemma 4 refusal behaviour (1saxvw2), R1-distill naming and reasoning-loss critique (1i7osek, 1i8ifxd, HN 42851317), Llama 3.2 3B praise (1hl1tso), 37-model MacBook benchmark (1se81a5), Gemma 4 launch thread (HN 47616361)",
+    "DeepSeek-R1 local guides: Jan app (6 GB VRAM -> 1.5B) and AMD Ryzen AI + LM Studio demo",
+    "Gemma 4 Technical Report (arXiv 2607.02770) and HF Gemma 4 blog (per-layer embeddings, shared KV cache, MTP drafters)"
+  ]
+}

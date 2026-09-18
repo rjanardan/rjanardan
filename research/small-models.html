@@ -1,0 +1,426 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Small local models on the 8 GB Mac mini</title>
+<style>
+  :root {
+    --ink: #1a1d21; --mut: #5c6470; --line: #d9dde3; --bg: #fbfaf7;
+    --acc: #0b57a6; --warn-bg: #fdf3e0; --warn-line: #e5c98f;
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.55 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  main { max-width: 1080px; margin: 0 auto; padding: 40px 28px 80px; }
+  h1 { font-size: 26px; line-height: 1.25; margin: 0 0 6px; }
+  h2 { font-size: 21px; margin: 44px 0 10px; padding-top: 18px; border-top: 1px solid var(--line); }
+  h3 { font-size: 16px; margin: 22px 0 6px; }
+  p  { margin: 8px 0; }
+  .sub { color: var(--mut); font-size: 13.5px; margin-bottom: 18px; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0 6px; font-size: 13.5px; }
+  th, td { border: 1px solid var(--line); padding: 7px 9px; vertical-align: top; text-align: left; }
+  th { background: #f1efe9; font-weight: 600; }
+  tr:nth-child(even) td { background: #f6f4ef; }
+  code, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; font-size: 12.5px; }
+  .tag { white-space: nowrap; }
+  .note { color: var(--mut); font-size: 13px; }
+  .warn { background: var(--warn-bg); border: 1px solid var(--warn-line); border-radius: 6px;
+    padding: 12px 14px; font-size: 13.5px; margin: 16px 0; }
+  ol.src { font-size: 13px; color: var(--mut); padding-left: 20px; }
+  ol.src li { margin: 3px 0; }
+  .num { text-align: right; white-space: nowrap; }
+  @media (max-width: 760px) {
+    .scroll { overflow-x: auto; }
+    table { min-width: 720px; }
+  }
+</style>
+</head>
+<body>
+<main>
+
+<h1>Small local models on the 8&nbsp;GB Mac&nbsp;mini</h1>
+<p class="sub">Comparison of the installed Ollama models for high-risk, low-cognitive enterprise tasks &mdash; cost, security, local data, latency. Generated 7 Sep 2026. Machine-readable data: <a href="small-models.json">small-models.json</a></p>
+
+<p>The seven unique chat models installed on this machine divide into three honest bands: a 1.7&ndash;3&nbsp;B band that runs comfortably, a 4&nbsp;B model whose usefulness collapses with context length, and Google&rsquo;s Gemma&nbsp;4 E4B &mdash; an effective-4B design that arrives as a 9.6&nbsp;GB Q4 bundle (8&nbsp;B total once embeddings and the vision/audio encoders count) and runs at roughly 13&nbsp;tok/s steady state. The single most important number below is still the qwen3:4b context cliff &mdash; roughly 1&nbsp;tok/s at 32&nbsp;K context against 19.5&nbsp;tok/s at 8&nbsp;K. For local data with latency as a requirement, context budgeting decides which models are usable at all, and file size decides how often a cold start costs you half a minute.</p>
+
+<h2>Where small models sit in a company fleet</h2>
+<table>
+  <tr><th style="width:18%">Layer</th><th style="width:47%">Role</th><th>Installed on this machine</th></tr>
+  <tr><td><code>L0</code> rules and classifiers</td><td>First pass on high-risk decisions before any LLM runs; deterministic where possible</td><td>none yet</td></tr>
+  <tr><td><code>L1</code> edge small, 1&ndash;4&nbsp;B</td><td>High-risk, low-cognitive tasks on private data: extraction, classification, routing, summarisation, form filling, log triage</td><td>qwen3:1.7b, llama3.2:3b, deepseek-r1:1.5b, qwen2.5-coder:3b, gemma4:e4b (effective-4B class; 9.6&nbsp;GB Q4 bundle &mdash; see the measured note on cold start)</td></tr>
+  <tr><td><code>L2</code> small server, 4&ndash;8&nbsp;B</td><td>Grounded drafting and structured extraction with more headroom than L1</td><td>qwen3:4b (needs more than 8&nbsp;GB for long context)</td></tr>
+  <tr><td><code>L3</code> mid, 8&ndash;32&nbsp;B</td><td>Judgement and planning; server hardware, not this machine</td><td>none</td></tr>
+  <tr><td><code>L4</code> frontier / API</td><td>Rare, high-judgement escalations, routed explicitly with cost attribution</td><td>none</td></tr>
+</table>
+<p class="note">Small models are not cheaper versions of large ones; they are a different tool. IBM's Granite line, Microsoft's Phi line and Meta's Llama 3.2 smalls are all positioned the same way: the 1&ndash;4&nbsp;B tier exists for latency- and privacy-bound tasks where the decision is narrow and the format is strict, while judgement tasks stay on bigger models reached through a router.</p>
+
+<h2>Model comparison</h2>
+<div class="scroll">
+<table>
+  <tr>
+    <th>Model (installed tags)</th>
+    <th>Parameters</th>
+    <th>Context</th>
+    <th>Corpus trained on</th>
+    <th>Goal of the model</th>
+    <th>Measured here (8&nbsp;K ctx)</th>
+    <th>Fit in the fleet</th>
+    <th>License</th>
+  </tr>
+  <tr>
+    <td><strong>Qwen3 1.7B</strong><br><span class="note">qwen3:1.7b, qwen3:1.7b-64k (same weights)</span></td>
+    <td>2.0&nbsp;B total (marketed 1.7&nbsp;B)</td>
+    <td>build 40960; 32&nbsp;K native design</td>
+    <td>~36T tokens, Qwen3 dense series; multilingual, code-heavy</td>
+    <td>Smallest practical Qwen3 for on-device; hybrid think / quick modes; tool calling</td>
+    <td class="num">42.7 tok/s gen, 908 tok/s prompt</td>
+    <td>L1 workhorse: extraction, classification, routing under guardrails</td>
+    <td>Apache 2.0</td>
+  </tr>
+  <tr>
+    <td><strong>Qwen3 4B</strong><br><span class="note">qwen3:4b, qwen3:4b-32k, local-default (all same weights)</span></td>
+    <td>4.0&nbsp;B</td>
+    <td>build 262144 rope; 32&nbsp;K-class native</td>
+    <td>~36T tokens, Qwen3 dense series; multilingual, code-heavy</td>
+    <td>Strongest Qwen3 on-device tier; hybrid thinking; agentic tool use</td>
+    <td class="num">19.5 tok/s at 8&nbsp;K; ~1 tok/s at 32&nbsp;K</td>
+    <td>L2: server or workstation, not this Mac at long context</td>
+    <td>Apache 2.0</td>
+  </tr>
+  <tr>
+    <td><strong>Qwen2.5 3B</strong><br><span class="note">qwen2.5:3b</span></td>
+    <td>3.1&nbsp;B</td>
+    <td>32768</td>
+    <td>~18T tokens, Qwen2.5 series</td>
+    <td>General small instruct model with tool calling; fine-tune base</td>
+    <td class="num">23.1 tok/s gen, 170 tok/s prompt</td>
+    <td>Fine for local experiments; product use restricted by license</td>
+    <td><strong>Qwen Research License</strong></td>
+  </tr>
+  <tr>
+    <td><strong>Qwen2.5-Coder 3B</strong><br><span class="note">qwen2.5-coder:3b, qwen2.5-coder:3b-32k (same weights)</span></td>
+    <td>3.1&nbsp;B</td>
+    <td>32768</td>
+    <td>~5.5T tokens, code-heavy, on Qwen2.5 base</td>
+    <td>Local code completion (FIM) and chat on low-memory machines</td>
+    <td class="num">24.8 tok/s gen, 250 tok/s prompt</td>
+    <td>Dev tooling tier inside secure environments</td>
+    <td><strong>Qwen Research License</strong></td>
+  </tr>
+  <tr>
+    <td><strong>Llama 3.2 3B</strong><br><span class="note">llama3.2:3b, llama3.2:3b-32k (same weights)</span></td>
+    <td>3.2&nbsp;B</td>
+    <td>131072 (128&nbsp;K native)</td>
+    <td>~9T tokens per Meta for the 1B/3B pair; pruned and distilled from Llama 3.1 8B</td>
+    <td>Meta's mobile / edge tier: summarisation, rewriting, instruction following; 8 languages incl. Hindi</td>
+    <td class="num">24.9 tok/s gen, 241 tok/s prompt</td>
+    <td>L1 with the widest vendor ecosystem; on-prem assistants</td>
+    <td>Llama 3.2 Community (&gt;700M MAU clause)</td>
+  </tr>
+  <tr>
+    <td><strong>DeepSeek-R1-Distill 1.5B</strong><br><span class="note">deepseek-r1:1.5b</span></td>
+    <td>1.8&nbsp;B</td>
+    <td>build 131072 rope; 32&nbsp;K-class native</td>
+    <td>~800K reasoning samples distilled from R1-671B on a Qwen2.5-Math-1.5B base</td>
+    <td>Bring chain-of-thought reasoning to small local models: math, logic, single-turn code</td>
+    <td class="num">43.3 tok/s incl. reasoning tokens</td>
+    <td>Component model: local logic checks and verification steps</td>
+    <td>MIT</td>
+  </tr>
+  <tr>
+    <td><strong>Gemma 4 E4B</strong><br><span class="note">gemma4:e4b (installed 7 Sep 2026)</span></td>
+    <td>4.5&nbsp;B effective / 8.0&nbsp;B total</td>
+    <td>131072 (128&nbsp;K native); hybrid 512-sliding + global attention</td>
+    <td>Google-internal web / code / image / audio mix, cutoff Jan&nbsp;2025, 140+ languages; token budget not published</td>
+    <td>Google&rsquo;s on-device tier: multimodal (vision + audio in), thinking mode, function calling, agentic workflows</td>
+    <td class="num">13.2 tok/s gen steady (11&ndash;15); 8.0 on a ~39&nbsp;s cold first load</td>
+    <td>L1/L2 boundary: effective-4B on-device class; the 9.6&nbsp;GB Q4 bundle fits this Mac only warm &mdash; prefer the QAT / mobile builds (~1&ndash;3.7&nbsp;GB)</td>
+    <td>Apache 2.0</td>
+  </tr>
+  <tr>
+    <td><strong>Nomic Embed Text v1.5</strong><br><span class="note">nomic-embed-text</span></td>
+    <td>137M</td>
+    <td>2048 model; 8192 preset</td>
+    <td>~2.4B tokens, contrastive Matryoshka training</td>
+    <td>Local retrieval embeddings (768-dim) for RAG and knowledge search</td>
+    <td class="num">&mdash;</td>
+    <td>Supporting model: the retrieval half of any grounded setup</td>
+    <td>Apache 2.0</td>
+  </tr>
+</table>
+</div>
+<p class="note">Thirteen installed tags collapse to seven unique chat models plus aliases: the <code>-32k</code> and <code>-64k</code> tags and <code>local-default</code> are context-preset variants of the same weights. Measured via <code>ollama /api/generate</code>, temperature 0.1, 160 output tokens, identical fixture for every model. DeepSeek-R1 always emits reasoning, so its useful output rate is lower than the raw number. Gemma 4 E4B is the newest arrival: its 9.6&nbsp;GB Q4 bundle cost roughly 35&ndash;39&nbsp;s on the first cold load (8.0&nbsp;tok/s), then settled at 11&ndash;15&nbsp;tok/s generation across five warm runs with deterministic, exactly-three-sentence output &mdash; plan for resident use or the smaller QAT / mobile builds.</p>
+
+<h2>Deployment examples: direct or modified</h2>
+<table>
+  <tr>
+    <th style="width:22%">Model</th>
+    <th style="width:26%">Company / product</th>
+    <th style="width:27%">Task</th>
+    <th style="width:25%">Deployed directly or modified</th>
+  </tr>
+  <tr>
+    <td>Qwen3-4B-Instruct-2507</td>
+    <td>Qualcomm AI Hub on-device packs &mdash; Snapdragon 8 Elite / X Elite, Dragonwing (Samsung Galaxy S25 family listed as supported target devices, not a confirmed Samsung ship)</td>
+    <td>On-device assistant and agent workloads on supported Snapdragon phones, PCs and automotive / industrial targets</td>
+    <td><strong>Modified</strong>: INT4 w4a16 quantisation (~2.3&nbsp;GB), exported to Genie / GenieX NPU runtimes; LoRA fine-tuning via QAIRT</td>
+  </tr>
+  <tr>
+    <td>Llama 3.2 1B / 3B</td>
+    <td>Meta edge ecosystem (Qualcomm, MediaTek, Arm, ExecuTorch)</td>
+    <td>On-device summarisation, rewriting, instruction following on phones and PCs</td>
+    <td><strong>Mostly direct or vendor-quantised</strong>: Meta ships quantised variants (&sim;4&times; faster, &sim;56% smaller, &sim;41% less memory vs BF16); products integrate via runtimes</td>
+  </tr>
+  <tr>
+    <td>Qwen2.5-Coder 3B</td>
+    <td>Continue.dev and similar local coding tools (with Ollama)</td>
+    <td>Code autocomplete and chat inside IDEs, fully local</td>
+    <td><strong>Direct</strong>: unmodified GGUF served by Ollama; the 3B tier is the low-memory recommendation</td>
+  </tr>
+  <tr>
+    <td>Qwen2.5-3B-Instruct</td>
+    <td>Serverless hosting platforms; vertical fine-tunes</td>
+    <td>General chat and extraction; domain Q&amp;A in several verticals</td>
+    <td><strong>Both</strong>: hosted as-is on demand, or modified via LoRA fine-tunes for verticals</td>
+  </tr>
+  <tr>
+    <td>DeepSeek-R1-Distill-Qwen-1.5B</td>
+    <td>Local stacks (LM Studio, Jan, Open WebUI presets)</td>
+    <td>Local reasoning: math, logic, code explanation</td>
+    <td><strong>Direct</strong>; no flagship named enterprise product surfaced &mdash; used as a component</td>
+  </tr>
+  <tr>
+    <td>Qwen3-1.7B</td>
+    <td>Qualcomm AI Hub on-device pack</td>
+    <td>Dialogue and content generation on Snapdragon 8 Elite / X Elite, Dragonwing, Arduino VENTUNO Q (4096-token context; on-device accuracy 73% vs 81.2% reference)</td>
+    <td><strong>Direct</strong>: original weights, QAIRT W4A16 / q4_0w4a16 quantisation, no fine-tuning</td>
+  </tr>
+  <tr>
+    <td>Gemma 4 E4B</td>
+    <td>Gemini Nano 4 &ldquo;Full&rdquo; on Android (AICore Developer Preview)</td>
+    <td>On-device assistant with highest-quality answers; the &ldquo;Fast&rdquo; variant is E2B-based and roughly 3&times; faster; agentic prototyping via AICore</td>
+    <td><strong>Direct-open foundation</strong>: Gemma 4 weights are Apache 2.0; Nano 4 ships as Google&rsquo;s product layer on top; code written for Gemma 4 runs on Nano 4 devices</td>
+  </tr>
+  <tr>
+    <td>Gemma 4 E4B</td>
+    <td>Google AI Edge: LiteRT-LM and AI Edge Gallery</td>
+    <td>Multi-step agentic skills fully on-device (AI Edge Gallery is one of the first such apps); E4B bundle 3.65&nbsp;GB; per-device decode: Galaxy S26 Ultra 18&ndash;22 tok/s, Raspberry Pi 5 ~3 tok/s</td>
+    <td><strong>Direct</strong> with Google&rsquo;s QAT and mobile quantised builds (E2B mobile format ~1&nbsp;GB)</td>
+  </tr>
+  <tr>
+    <td>Gemma 4 E4B (QAT)</td>
+    <td>Ollama / llama.cpp day-one, Qualcomm GenieX, vLLM / SGLang / Unsloth</td>
+    <td>Local serving of the official QAT checkpoints (Q4_0 and mobile formats); GenieX runs the QAT GGUF on Snapdragon NPU / GPU / CPU</td>
+    <td><strong>Direct</strong> official QAT weights, no fine-tuning</td>
+  </tr>
+</table>
+<p class="note">Pattern: edge silicon vendors modify (quantise, export to NPU runtimes); software products mostly deploy unmodified or lightly quantised weights; teams that need a specific output contract fine-tune. Nobody productises a 1&ndash;4&nbsp;B model without a guardrail or grounding layer around it.</p>
+
+<h2>Tuning for high-risk, low-cognitive tasks</h2>
+<p>The target slice &mdash; narrow decisions with strict formats where a wrong answer is costly &mdash; fails small models in three distinct ways, and each has a different fix:</p>
+<table>
+  <tr><th style="width:34%">Failure mode</th><th style="width:30%">Fix</th><th>Why</th></tr>
+  <tr>
+    <td>Wrong specific facts (thresholds, policy numbers, schema fields)</td>
+    <td><strong>Grounding &mdash; knowledge bundles in Google Open Knowledge Format (OKF)</strong>, then RAG for the long tail</td>
+    <td>Facts belong in retrievable, versioned documents, not in weights. OKF is a directory of Markdown files, one concept per file, with YAML frontmatter (<code>type</code>, <code>sources</code>, <code>verified</code>, <code>stale_after</code>) and links between concepts as the graph; the agent reads only the files it needs. That is small-model-sized context by design</td>
+  </tr>
+  <tr>
+    <td>Unstable format and behaviour (JSON drift, wrong tone, missing fields)</td>
+    <td><strong>Fine-tuning</strong> (LoRA / QLoRA) plus constrained decoding and schema enforcement</td>
+    <td>Fine-tune for the output contract and domain register, not for facts. 500&ndash;5,000 examples of the exact task shape, human-reviewed; then quantise to GGUF and import into Ollama</td>
+  </tr>
+  <tr>
+    <td>Not enough reasoning depth</td>
+    <td>Do not fine-tune. <strong>Route up</strong> to L2&ndash;L4 through the gateway</td>
+    <td>Small models cannot be trained into judgement; escalate and attribute the cost</td>
+  </tr>
+</table>
+
+<h3>OKF in practice on this machine</h3>
+<ul>
+  <li>One bundle per domain: policy and threshold lookups, schema definitions, runbooks, decision tables &mdash; the stable facts a decision must cite.</li>
+  <li>Add the trust fields from the OKF v0.2 layer (<code>verified: human:...</code>, <code>stale_after</code>) and treat them as audit hooks; for high-risk classes a human review of the bundle is the control, and <code>stale_after</code> dates drive re-review.</li>
+  <li>Keep bundles small: with the Mac mini's context economics, a bundle that fits in 4&ndash;8&nbsp;K tokens keeps qwen3:1.7b at ~40 tok/s and llama3.2:3b at ~25 tok/s. Long RAG dumps push prompt-processing time up and token/s down.</li>
+  <li>Use nomic-embed-text (already installed) to index bundle files and route: known-knowns read straight from the bundle graph; the long tail goes to RAG over the same embeddings; both feed a small re-ranker or simply the model's cited-context window.</li>
+  <li>The OKF spec is young (announced June 2026) and evolving &mdash; check the current spec under GoogleCloudPlatform/knowledge-catalog before committing tooling.</li>
+</ul>
+
+<h3>Fine-tuning in practice</h3>
+<ul>
+  <li>Fine-tune only after the grounding design exists, and keep facts out of the weights: facts change, weights do not, and re-training per policy update is the expensive path.</li>
+  <li>On this 8&nbsp;GB machine, LoRA / QLoRA on the 1.7&ndash;3&nbsp;B models is feasible locally (Unsloth or Llama-Factory); for a serious enterprise run, train on a cloud free tier and bring the quantised GGUF back.</li>
+  <li>License check before fine-tuning for a product: Qwen2.5-3B and Qwen2.5-Coder-3B carry the Qwen Research License; Qwen3 models are Apache 2.0, Llama 3.2 has a &gt;700M-MAU clause, DeepSeek-R1 is MIT.</li>
+  <li>Regression-test every fine-tune and every quantisation change against a golden task set before rollout; this is where a local eval harness earns its keep.</li>
+</ul>
+
+
+<h2>Critical comparison: Qwen3 1.7B vs Llama 3.2 3B vs DeepSeek-R1 1.5B</h2>
+<p class="note">Every claim below is grounded in the sources list: official model cards and technical reports, vendor launch material, Qualcomm AI Hub pages, independent benchmark runs, and r/LocalLLaMA / Hacker News threads. Local numbers are this machine&rsquo;s measured values from the table above.</p>
+<div class="scroll">
+<table>
+  <tr>
+    <th style="width:13%">Dimension</th>
+    <th style="width:29%">Qwen3 1.7B (Apr 2025)</th>
+    <th style="width:29%">Llama 3.2 3B (Sep 2024)</th>
+    <th style="width:29%">DeepSeek-R1-Distill 1.5B (Jan 2025)</th>
+  </tr>
+  <tr><td>Parameters</td>
+    <td>2.0&nbsp;B total, <strong>1.4&nbsp;B non-embedding</strong>; 28 layers; GQA 16Q/8KV; tied embeddings</td>
+    <td>3.21&nbsp;B total (non-embedding not published); 28 layers; GQA 24Q/8KV; tied embeddings</td>
+    <td>~1.8&nbsp;B total (marketed 1.5B); 28 layers; GQA 12Q/2KV; <strong>untied</strong> embeddings</td></tr>
+  <tr><td>Corpus</td>
+    <td>~36T tokens across the Qwen3 dense series (family budget): web in 119 languages, code, STEM, books, synthetic; three stages: ~30T general &rarr; ~5T reasoning-heavy &rarr; long-context stage to 32K</td>
+    <td>&ldquo;Up to 9T tokens&rdquo; of a fresh public-data mix for the 1B/3B pair; multilingual + code; knowledge cutoff Dec 2023</td>
+    <td>No pretraining of its own: 800K reasoning traces generated by R1-671B, SFT&rsquo;d onto the Qwen2.5-Math-1.5B base (math/STEM-heavy lineage)</td></tr>
+  <tr><td>Vocab &amp; context</td>
+    <td>Vocab 151,936; 32K native; YaRN + dual-chunk attention give ~4&times; at inference; RoPE base 1e6</td>
+    <td>Vocab 128,256; <strong>128K native</strong> (RoPE-scaled from 8K); official quantised checkpoints cap at 8K</td>
+    <td>Vocab 151,936 (Qwen2.5 tokenizer); config window 128K rope but ~32K-class in practice (evals cap at 32,768); sliding window defined but disabled</td></tr>
+  <tr><td>How it was made</td>
+    <td>Scratch pretraining; small dense models post-trained by <strong>strong-to-weak distillation</strong> from Qwen3-32B / 235B-A22B teachers (think + no-think responses, then logit alignment) &mdash; not direct RLVR; one model with an on/off thinking switch</td>
+    <td><strong>Single-shot structured prune of Llama 3.1 8B</strong>, logits from Llama 3.1 8B <em>and</em> 70B as pretraining targets; then SFT + rejection sampling + DPO</td>
+    <td><strong>Response distillation only</strong>: fine-tuned on R1-generated samples to copy the teacher&rsquo;s reasoning trace; no RL on the student; forced to open with a reasoning block at inference</td></tr>
+  <tr><td>Optimisation story</td>
+    <td>Dense; bf16; no first-party quantisations (GGUF is community); Q4 ~1.4&nbsp;GB; prompt processing extremely fast (908 tok/s here)</td>
+    <td>Dense; official <strong>QAT-LoRA w4a8</strong> and SpinQuant INT8 checkpoints; Q4_K_M ~2.0&nbsp;GB; 241 tok/s prompt here</td>
+    <td>Dense; 2 shared KV heads make it the KV-lightest of the four; no official quants; Q4 ~1.1&nbsp;GB</td></tr>
+  <tr><td>Company ethos &amp; license</td>
+    <td>Alibaba: &ldquo;maximal openness&rdquo; &mdash; open weights, recipes and technical reports every generation; <strong>Apache 2.0</strong></td>
+    <td>Meta: openness as an ecosystem play (day-one Arm / MediaTek / Qualcomm, ExecuTorch, Llama Stack, every major cloud); <strong>Llama 3.2 Community License</strong>, royalty-free, &gt;700M-MAU clause</td>
+    <td>DeepSeek: research-first openness &mdash; <strong>MIT</strong>, and the V3 ~$5.6M training-cost claim as ethos; weights explicitly allow distillation</td></tr>
+  <tr><td>Vendor&rsquo;s claim of best-at</td>
+    <td>Thinking / non-thinking in one model; agentic + tool calling; 119 languages; &ldquo;even a tiny model like Qwen3-4B can rival Qwen2.5-72B-Instruct&rdquo;</td>
+    <td>&ldquo;State of the art in their class for on-device &hellip; summarisation, instruction following, rewriting&rdquo;; beats Gemma 2 2.6B and Phi-3.5-mini on instruction following and tool use</td>
+    <td>Reasoning specialist: AIME 2024 28.9 pass@1, MATH-500 83.9, GPQA-D 33.8 &mdash; a distilled thinker, not a generalist</td></tr>
+  <tr><td>Commercial deployments</td>
+    <td>Qualcomm AI Hub on-device pack (W4A16, direct) for Snapdragon 8 Elite / X Elite / Dragonwing; GenieX runtime; no named end-user product yet</td>
+    <td>Meta edge partner program at launch (Qualcomm / MediaTek / Arm, ExecuTorch); Qualcomm pack lists Galaxy S25 family as supported devices; hosted by every major cloud</td>
+    <td>Local-runner stack: Ollama tag, Jan guide (6&nbsp;GB VRAM &rarr; 1.5B), AMD Ryzen AI demo via LM Studio, in-browser WebLLM; no named enterprise product</td></tr>
+  <tr><td>Real-user sentiment (Reddit / HN)</td>
+    <td>&ldquo;Incredibly fast on my phone, and with thinking mode it actually gives out really good&rdquo; results; but &ldquo;very chaotic&rdquo; without task fine-tuning; RAG made it <em>worse</em> in one logged test (43% &rarr; 28.9%); community consensus: 0.6B/1.7B are the draft tier, 4B is the agent floor</td>
+    <td>&ldquo;The first small model that has worked so well for me and it&rsquo;s usable&rdquo; (thread top comment ~123 pts); ~100 tok/s MLX claims on M1 Max; loses some 3B-tier votes to Qwen2.5-3B on summaries</td>
+    <td>&ldquo;Severe loss of intelligence/reasoning below 14B&rdquo; is the recurring verdict; RAG tanked it 17% &rarr; 3% in the same logged test; loud grudge against Ollama calling distills &ldquo;R1&rdquo; &mdash; demo / novelty tier in practice, while vendor guides still recommend it for 6&nbsp;GB machines</td></tr>
+  <tr><td>Measured on this Mac mini (8&nbsp;K ctx)</td>
+    <td class="num">42.7 gen tok/s, 908 prompt tok/s &mdash; fastest model here by ~1.7&times;</td>
+    <td class="num">24.9 gen tok/s, 241 prompt tok/s; 86 output tokens in the fixture</td>
+    <td class="num">43.3 gen tok/s <em>including reasoning</em> &mdash; at the 160-token budget it spent every token thinking and produced no answer</td></tr>
+  <tr><td>Role in a high-risk, low-cognitive fleet</td>
+    <td>L1 default for latency-critical extraction, classification, routing &mdash; under guardrails and with task grounding</td>
+    <td>L1 where format discipline and 128K native context matter; the ecosystem pick for on-prem assistants</td>
+    <td>Verification component only: logic checks with a generous <code>num_predict</code>; never the direct answer layer</td></tr>
+</table>
+</div>
+<p class="note">Caveats before treating the published scores as gospel: Qwen&rsquo;s report table covers the <em>pretrained base</em> checkpoint (chat numbers exist only from independent runs); DeepSeek&rsquo;s and Meta&rsquo;s math tests differ (MATH-500 vs MATH &mdash; do not compare those two cells); every vendor ran its own harness and few-shot setup. The honest cross-model comparisons are the independent ones (Artificial Analysis) and your own fixtures on your own hardware.</p>
+
+<h3>Gemma 4 E4B in the same frame</h3>
+<p>Gemma joins the fleet table above; against the trio it is a different generation (Apr 2026 vs 2024&ndash;2025) and resets several of the older trade-offs:</p>
+<ul>
+  <li><strong>Size semantics changed</strong>: &ldquo;E4B&rdquo; = 4.5B <em>effective</em> parameters of an 8.0B-total dense model &mdash; per-layer embeddings plus ~450M of vision/audio encoders inflate the file, not the active brain. Google is explicit: &ldquo;the E in E2B and E4B stands for effective parameters.&rdquo; It is not MoE.</li>
+  <li><strong>Built, not pruned or distilled</strong>: the card claims a from-scratch family built from &ldquo;the same world-class research and technology as Gemini 3&rdquo;; a configurable thinking mode, native function calling, JSON output and <code>system</code>-role support ship in the base instruct weights.</li>
+  <li><strong>Multimodal where the trio is text-only</strong>: image and audio input (140+ languages) make it the only installed model that could read a scanned form or a voice note without a pipeline.</li>
+  <li><strong>License reset</strong>: Apache 2.0 &mdash; Google&rsquo;s first Apache Gemma family, a deliberate move away from the old Gemma license, framed as &ldquo;developer flexibility and digital sovereignty.&rdquo;</li>
+  <li><strong>On paper it outclasses the trio</strong> (vendor table): MMLU-Pro 69.4, GPQA-D 58.6, AIME-2026 42.5, LiveCodeBench v6 52.0, MMMLU 76.6. None of the three rivals publishes numbers in that range at their size.</li>
+  <li><strong>On this machine it is the slowest of the four</strong>: ~13 tok/s warm, 8.0 tok/s on a ~39&nbsp;s cold first load, because the 9.6&nbsp;GB Q4 bundle exceeds comfortable resident RAM. The fix is Google&rsquo;s own QAT / mobile builds (E4B ~3.65&nbsp;GB under LiteRT-LM; E2B mobile format ~1&nbsp;GB) &mdash; that is the build worth benchmarking next, not the bundle installed today.</li>
+  <li><strong>Real-user signal is young but real</strong>: HN commenters expect E2B/E4B to &ldquo;move the pareto frontier&rdquo; once ranked; tool calling is the early complaint; and users report Gemma 4 is dramatically less refusal-prone than Gemma 3 out of the box.</li>
+</ul>
+
+<h3>What this decides for a high-risk, low-cognitive workload</h3>
+<ul>
+  <li>The latency-critical L1 default stays <code>qwen3:1.7b</code> on this machine &mdash; nearly 2&times; the generation speed of its nearest peer at a fraction of the RAM.</li>
+  <li>Reach for <code>llama3.2:3b</code> when the output contract is format-heavy or the context is long; it is the only 2024-vintage model here with a real vendor tooling and ecosystem story.</li>
+  <li><code>deepseek-r1:1.5b</code> is a reasoning component, not an answer model: at the 160-token fixture budget it produced zero visible output. If you keep it, budget 512+ tokens for thinking and parse the final block.</li>
+  <li><code>gemma4:e4b</code> deserves a re-test with the QAT build (roughly a third of the file size) before you judge it; at 9.6&nbsp;GB it is the wrong artifact for an 8&nbsp;GB daily driver, and its benchmark profile says the capability is worth the second look.</li>
+</ul>
+
+
+<h2>Metrics and benchmarks for evaluating small models</h2>
+<p>Benchmark families answer different questions, and at 1&ndash;4&nbsp;B scale some of them stop separating models while others stay sharp. This is the full map used for the comparison above, split into capability benchmarks and operational metrics &mdash; plus the honest caveats that keep the numbers from lying to you.</p>
+<h3>Capability benchmarks</h3>
+<div class="scroll">
+<table>
+  <tr><th style="width:22%">Benchmark</th><th style="width:44%">What it measures</th><th>At the 1&ndash;4&nbsp;B scale</th></tr>
+  <tr><td><strong>Knowledge</strong></td><td></td><td></td></tr>
+  <tr><td>MMLU / MMLU-Pro / MMLU-Redux</td><td>World knowledge and, for the Pro variant, multi-step reasoning over it; MMLU-Redux refreshes leaked questions</td><td>Still separates models (Qwen base 62.6 / Llama 63.4); Pro is the sharper of the three (Qwen 36.8 base vs Gemma 4 E4B 69.4)</td></tr>
+  <tr><td>GPQA-Diamond</td><td>Graduate-level science reasoning, expert-written</td><td>Compressed but discriminating: ~28&ndash;34 for the trio, 58.6 for Gemma 4 E4B</td></tr>
+  <tr><td>ARC-C / HellaSwag</td><td>Science QA and commonsense inference</td><td>Easy at this scale; useful as regression checks, weak as differentiators</td></tr>
+  <tr><td>HLE (Humanity&rsquo;s Last Exam)</td><td>Frontier expert questions</td><td>Floors: Qwen3-1.7B sits at 5.3%, near guess level; vendors do not run it below 12B</td></tr>
+  <tr><td><strong>Reasoning &amp; math</strong></td><td></td><td></td></tr>
+  <tr><td>GSM8K</td><td>Grade-school word problems</td><td>Meaningful; near-saturated at the top of the band</td></tr>
+  <tr><td>MATH / MATH-500</td><td>Competition math</td><td>Separates reasoning-trained smalls sharply &mdash; but note DeepSeek&rsquo;s 83.9 (MATH-500, reasoning mode) is not comparable to Llama&rsquo;s 48.0 (MATH, direct)</td></tr>
+  <tr><td>AIME (2024 / 2025 / 2026)</td><td>Hard competition math, the small-model reasoning test</td><td>Only reasoning-distilled smalls score meaningfully (R1-1.5B 28.9 on 2024; a non-reasoning 1.7B ~7.3 on 2025)</td></tr>
+  <tr><td>BBH / Tau2 / Big-Bench Extra Hard</td><td>Multi-step reasoning suites</td><td>Tau2-style agentic-hard rows separate 2026-generation smalls (E4B 42.2); BBH fine above ~2B</td></tr>
+  <tr><td><strong>Code</strong></td><td></td><td></td></tr>
+  <tr><td>HumanEval / MBPP / EvalPlus</td><td>Basic function-level Python</td><td>Meaningful but narrow; MBPP 55.4 for Qwen-1.7B base</td></tr>
+  <tr><td>LiveCodeBench / Codeforces Elo</td><td>Competitive programming, contamination-resistant</td><td>Meaningful, compressed at the bottom: LCB 16.9 (R1-1.5B) vs 52.0 (E4B); Codeforces ~940&ndash;954 for both, 2150 at the frontier</td></tr>
+  <tr><td>SWE-bench / Terminal-Bench-Hard</td><td>Agentic repo-scale coding</td><td>Floors: independent runs give Qwen3-1.7B 0.0 on Terminal-Bench-Hard; vendors do not publish SWE-bench below ~8B</td></tr>
+  <tr><td><strong>Instruction following &amp; chat</strong></td><td></td><td></td></tr>
+  <tr><td>IFEval</td><td>Verifiable instruction following (formats, constraints)</td><td>Directly relevant to your strict-format workloads; Llama 3.2 3B 77.4</td></tr>
+  <tr><td>MT-Bench / Arena-Hard</td><td>LLM-judged chat quality / harder preference pairs</td><td>Widely treated as saturated and noisy; rarely published below 8B</td></tr>
+  <tr><td>LMArena Elo (Chatbot Arena)</td><td>Crowd-voted head-to-head quality</td><td>Best real-human signal where ranked; Llama 3.2 3B ~1167 in an aggregator snapshot; E2B/E4B not yet ranked</td></tr>
+  <tr><td><strong>Tool use &amp; agentic</strong></td><td></td><td></td></tr>
+  <tr><td>BFCL v2/v3, Nexus</td><td>Function-calling correctness against schemas</td><td>Small models can score well (Llama 3.2 3B 67.0 on BFCL V2) &mdash; test the exact schema you ship</td></tr>
+  <tr><td>Agentic harnesses (&tau;-bench, WebArena-lite)</td><td>Multi-turn task completion</td><td>Mostly beyond 1&ndash;3B; run your own golden set instead</td></tr>
+  <tr><td><strong>Long context</strong></td><td></td><td></td></tr>
+  <tr><td>RULER / multi-needle (NIAH) / InfiniteBench / MRCR</td><td>Retrieval and reasoning across long windows</td><td>Needle tests overstate real recall; Google&rsquo;s 8-needle MRCR v2 at 128K gives E4B only 25.4% &mdash; treat long-context claims sceptically at this scale</td></tr>
+  <tr><td><strong>Multilingual &amp; multimodal</strong></td><td></td><td></td></tr>
+  <tr><td>MGSM / MMMLU</td><td>Math and knowledge in many languages</td><td>Separates the multilingual stories: Llama supports 8 languages officially; Qwen3 claims 119; Gemma 4 claims 140+</td></tr>
+  <tr><td>MMMU-Pro / MATH-Vision / FLEURS</td><td>Image understanding, audio / speech</td><td>Only relevant where the model takes that modality in &mdash; Gemma 4 E4B is the only installed model that can be tested here</td></tr>
+  <tr><td><strong>Safety &amp; robustness</strong></td><td></td><td></td></tr>
+  <tr><td>TruthfulQA / refusal rates / calibration (ECE)</td><td>Hallucination tendency, alignment behaviour, confidence accuracy</td><td>Rarely published for smalls &mdash; and for high-risk tasks your own refusal-and-format fixtures matter more than any leaderboard</td></tr>
+</table>
+</div>
+<h3>Operational metrics (the ones that decide local usability)</h3>
+<div class="scroll">
+<table>
+  <tr><th style="width:24%">Metric</th><th style="width:42%">What it captures</th><th>Measured here (8&nbsp;K ctx, Q4_K_M)</th></tr>
+  <tr><td>Generation tok/s</td><td>Steady-state decode speed</td><td>42.7 qwen3:1.7b &middot; 24.9 llama3.2:3b &middot; 24.8 coder &middot; 23.1 qwen2.5 &middot; 19.5 qwen3:4b &middot; 13.2 gemma4:e4b warm</td></tr>
+  <tr><td>Prompt tok/s (prefill / TTFT)</td><td>How fast documents and retrieved context are ingested; drives RAG latency</td><td>908 qwen3:1.7b &middot; 250 coder &middot; 241 llama &middot; 170 qwen2.5 &middot; ~95 gemma warm &middot; 32.5 gemma cold</td></tr>
+  <tr><td>End-to-end wall time incl. load</td><td>First-token experience including model load from disk</td><td>Gemma 4 E4B cold start ~35&ndash;39&nbsp;s vs ~2&ndash;12&nbsp;s for the others &mdash; the 9.6&nbsp;GB file, not the model, is the cost</td></tr>
+  <tr><td>File size / resident RAM</td><td>What actually fits alongside your OS and data</td><td>1.1&ndash;2.5&nbsp;GB for the useful band; 9.6&nbsp;GB gemma bundle is over budget on 8&nbsp;GB</td></tr>
+  <tr><td>Context-economics curve</td><td>tok/s as context grows &mdash; the metric that killed qwen3:4b here</td><td>19.5 tok/s at 8K &rarr; ~1 tok/s at 32K</td></tr>
+  <tr><td>Quantisation robustness</td><td>Quality loss from Q4 / Q8 / INT4, and whether the vendor ships QAT weights</td><td>Meta ships QAT-LoRA w4a8; Google ships QAT Q4_0 + mobile formats; Qwen/DeepSeek leave quants to the community</td></tr>
+  <tr><td>Determinism</td><td>Stable output at fixed temperature and seed &mdash; a requirement for audit trails</td><td>Gemma 4 E4B identical across six runs; the others were single-run measured</td></tr>
+  <tr><td>Reasoning-token overhead</td><td>Share of output spent thinking before an answer</td><td>DeepSeek-R1 1.5B: 100% at a 160-token budget; Qwen3/Gemma 4 thinking modes are switchable</td></tr>
+</table>
+</div>
+<p class="note"><strong>How to read any of this without being misled:</strong> (1) vendor-reported numbers come from each maker&rsquo;s own harness and few-shot setup &mdash; only same-harness runs (Artificial Analysis, your own) are directly comparable; (2) check whether a score is for the base or the instruct checkpoint; (3) reasoning-mode pass@1 and direct answers are different tests; (4) benchmarks drift across years (MATH vs MATH-500, AIME 2024 vs 2026), so compare like years only; (5) for high-risk work, the leaderboard is a filter, not a verdict &mdash; build a golden set of 8&ndash;12 of your own fixtures (real inputs, schema-checked outputs), score format compliance and field accuracy as well as answer correctness, and re-run it after every quantisation or fine-tune. That set is the only benchmark that predicts your deployment.</p>
+
+<h2>What is missing or worth focusing on</h2>
+<ol>
+  <li><strong>Task-level evaluation does not exist yet.</strong> The fleet has been measured for speed, not for capability on the actual tasks. Build a golden set of 8&ndash;12 fixtures from the real task classes and score the models before tuning anything. Until then, model choice is guesswork.</li>
+  <li><strong>The 8&nbsp;GB ceiling shapes the whole claim.</strong> This machine validates the L1 edge tier only. qwen3:4b at 32&nbsp;K context is unusable here; a 4&ndash;8&nbsp;B enterprise tier needs real hardware. Position the analysis accordingly and keep context budgets short.</li>
+  <li><strong>High-risk is a format and audit problem before it is an accuracy problem.</strong> Spend on constrained decoding, schema validation, guardrails, human checkpoints for the risky classes, and versioned knowledge &mdash; not on bigger models. Your GenAI Gateway (router, guardrails, eval, audit, cost dashboard) is the natural home for exactly this layer.</li>
+  <li><strong>Grounding vs fine-tuning is the wrong split.</strong> The productive split is: facts to OKF bundles and RAG, behaviour and format to fine-tuning, reasoning depth to routing up. Doing only one of these is the most common miss.</li>
+  <li><strong>Latency math includes retrieval and prompt processing.</strong> A small model with a bloated context loses its advantage. Measure end-to-end: retrieval + prompt + generation, per task, not just generation token/s.</li>
+  <li><strong>Licensing and drift are operational risks, not research questions.</strong> The two Qwen2.5-3B models are research-licensed; Llama 3.2 has an MAU clause. Track drift and staleness of the knowledge bundles as production controls.</li>
+</ol>
+
+<h2>Sources</h2>
+<ol class="src">
+  <li>Ollama metadata via <code>ollama show</code> on this machine (architecture, parameters, context, quantisation, license)</li>
+  <li>Local benchmark run 7 Sep 2026 on this machine (see benchmark note above)</li>
+  <li>Meta: Introducing Llama 3.2 (Sep 2024) &mdash; edge partners, quantised variants</li>
+  <li>Qualcomm AI Hub: Qwen3-4B-Instruct-2507 on-device models (Galaxy S25, X Elite, Dragonwing)</li>
+  <li>Hugging Face model cards and LICENSE files: Qwen2.5-3B-Instruct and Qwen2.5-Coder-3B-Instruct (Qwen Research License), Qwen3 (Apache 2.0), Llama 3.2 (community), DeepSeek-R1-Distill (MIT)</li>
+  <li>Qwen blog / technical reports: Qwen3 ~36T tokens, Qwen2.5 ~18T tokens, Qwen2.5-Coder ~5.5T tokens</li>
+  <li>DeepSeek-R1 paper: 800K distillation samples for the distill series</li>
+  <li>Google Cloud: Open Knowledge Format announcement (Jun 2026); spec in GoogleCloudPlatform/knowledge-catalog</li>
+  <li>OKF explainers: smartscope.blog, geotoolbox.ai (v0.2 trust layer: provenance, verified-by, stale_after)</li>
+  <li>Nomic Embed technical report</li>
+  <li>Google: Gemma 4 E4B model card and benchmark table (HF google/gemma-4-E4B; ai.google.dev/gemma/docs/core/model_card_4) &mdash; dense, 4.5B effective / 8B with embeddings, 128K context, Apache 2.0</li>
+  <li>Google: Gemma 4 launch blog (Apr 2026), Gemini Nano 4 on Android (9to5Google), QAT checkpoint release (Jun 2026), LiteRT-LM per-device numbers, Agent Skills / AI Edge Gallery</li>
+  <li>Ollama library gemma4 page: family sizes e2b / e4b / 12b / 26b / 31b; day-one tooling</li>
+  <li>Qwen3 Technical Report (arXiv 2505.09388): ~36T tokens, three-stage pretraining, strong-to-weak distillation for the small dense models; Qwen3-1.7B HF card (1.4B non-embedding parameters)</li>
+  <li>DeepSeek-R1 paper (arXiv 2501.12948): distill benchmark table; 800K R1-generated samples on the Qwen2.5-Math-1.5B base</li>
+  <li>Meta: Llama 3.2 announcement (prune + logit distillation from Llama 3.1 8B / 70B; edge partners); HF Llama-3.2-3B-Instruct eval table</li>
+  <li>Qualcomm AI Hub: Qwen3-1.7B and Llama-v3.2-3B-Instruct on-device packs (W4A16; Galaxy S25 family listed as supported devices)</li>
+  <li>Independent runs: Artificial Analysis via BenchmarkList (Qwen3-1.7B chat: MMLU-Pro 41.1, GPQA 28.3, HLE 5.3, Terminal-Bench-Hard 0.0); LMArena Elo aggregator snapshot (Llama 3.2 3B ~1167)</li>
+  <li>r/LocalLLaMA and Hacker News: RAG collapse of 1.7B / R1-1.5B (1ndj9sf), Gemma 3n E4B vs Qwen3-4B tests (1krpvwj), Gemma 4 vs Qwen 3.5 impressions (1sapl6k), Gemma 4 refusal behaviour (1saxvw2), R1-distill naming critique (1i8ifxd, HN 42851317), Llama 3.2 3B praise (1hl1tso), 37-model MacBook benchmark (1se81a5), Gemma 4 launch thread (HN 47616361)</li>
+  <li>DeepSeek-R1 local guides: Jan app (6 GB VRAM &rarr; 1.5B) and AMD Ryzen AI + LM Studio demo; Gemma 4 Technical Report (arXiv 2607.02770)</li>
+</ol>
+
+</main>
+</body>
+</html>

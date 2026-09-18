@@ -1,0 +1,1385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Knowledge formats for humans and agents — a research guide</title>
+<style>
+  :root {
+    --ink: #1a1d21; --mut: #5c6470; --line: #d9dde3; --bg: #fbfaf7;
+    --panel: #f4f1ea; --acc: #0b57a6; --acc-soft: #e7f0fa;
+    --green: #1e7145; --green-bg: #e9f4ee; --amber: #8a5a00; --amber-bg: #fdf3e0;
+    --red: #a63d2f; --red-bg: #fbece9;
+    --shadow: 0 1px 3px rgba(20,24,28,.08);
+  }
+  * { box-sizing: border-box; }
+  html { scroll-behavior: smooth; }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font: 15px/1.55 -apple-system, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; }
+  .layout { display: grid; grid-template-columns: 280px minmax(0, 1fr); }
+  header.mast { grid-column: 1 / -1; border-bottom: 1px solid var(--line);
+    background: var(--bg); }
+  header.mast .inner { max-width: 1280px; margin: 0 auto; padding: 26px 28px 18px; }
+  .kicker { font-size: 12.5px; letter-spacing: .12em; text-transform: uppercase;
+    color: var(--mut); margin: 0 0 8px; }
+  h1 { font-size: clamp(22px, 3vw, 30px); line-height: 1.22; margin: 0 0 10px; }
+  .dek { color: var(--mut); font-size: 15.5px; max-width: 72ch; margin: 0 0 14px; }
+  .meta { font-size: 13px; color: var(--mut); margin: 0; }
+  .meta b { color: var(--ink); font-weight: 600; }
+  /* Sidebar */
+  nav.toc { position: sticky; top: 0; height: 100vh; overflow-y: auto;
+    border-right: 1px solid var(--line); background: var(--bg);
+    padding: 18px 12px 40px 24px; font-size: 13px; scrollbar-width: thin; }
+  nav.toc .toc-title { font-size: 12px; letter-spacing: .1em; text-transform: uppercase;
+    color: var(--mut); margin: 4px 0 8px; }
+  nav.toc ol { list-style: none; margin: 0; padding: 0; }
+  nav.toc li { margin: 1px 0; }
+  nav.toc a { color: var(--ink); text-decoration: none; display: block;
+    padding: 3px 8px; border-radius: 6px; border-left: 2px solid transparent; }
+  nav.toc a:hover { background: var(--panel); }
+  nav.toc a.active { border-left-color: var(--acc); background: var(--acc-soft);
+    color: var(--acc); font-weight: 600; }
+  nav.toc .lvl2 { padding-left: 18px; font-size: 12.5px; color: var(--mut); }
+  nav.toc .sec-num { color: var(--mut); margin-right: 5px; font-size: 11.5px; }
+  nav.toc a.active .sec-num { color: var(--acc); }
+  /* Main */
+  main { max-width: 960px; padding: 8px 44px 90px 44px; min-width: 0; }
+  section { scroll-margin-top: 24px; padding-top: 34px; margin-top: 8px;
+    border-top: 1px solid var(--line); }
+  section:first-of-type { border-top: none; padding-top: 26px; }
+  h2 { font-size: clamp(18px, 2.4vw, 23px); line-height: 1.3; margin: 0 0 4px; }
+  .lead { color: var(--mut); font-size: 16px; margin: 2px 0 16px; }
+  h3 { font-size: 17px; margin: 26px 0 6px; line-height: 1.35; }
+  h4 { font-size: 15px; margin: 18px 0 4px; }
+  p { margin: 9px 0; }
+  ul, ol { margin: 8px 0; padding-left: 24px; }
+  li { margin: 4px 0; }
+  a { color: var(--acc); text-decoration: none; }
+  a:hover { text-decoration: underline; }
+  strong { font-weight: 650; }
+  code, pre, .mono { font-family: ui-monospace, "SF Mono", Menlo, Consolas, monospace; }
+  code { font-size: 12.5px; background: var(--panel); padding: 1px 4px; border-radius: 4px; }
+  pre { font-size: 12.5px; line-height: 1.5; background: #f2efe8;
+    border: 1px solid var(--line); border-radius: 8px; padding: 14px 16px;
+    overflow-x: auto; margin: 12px 0; }
+  pre code { background: none; padding: 0; }
+  table { border-collapse: collapse; width: 100%; margin: 14px 0 8px; font-size: 13.5px; }
+  th, td { border: 1px solid var(--line); padding: 6px 9px; vertical-align: top;
+    text-align: left; }
+  th { background: #f1efe9; font-weight: 600; }
+  tr:nth-child(even) td { background: #f6f4ef; }
+  .scroll { overflow-x: auto; margin: 10px 0; }
+  .scroll table { margin-top: 0; }
+  .num { text-align: right; white-space: nowrap; }
+  .ok { color: var(--green); font-weight: 600; }
+  .bad { color: var(--red); font-weight: 600; }
+  .note, .warn, .good { border-radius: 6px; padding: 11px 14px; font-size: 13.5px;
+    margin: 14px 0; }
+  .note { background: var(--panel); border: 1px solid var(--line); color: var(--mut); }
+  .warn { background: var(--amber-bg); border: 1px solid #e5c98f; }
+  .good { background: var(--green-bg); border: 1px solid #bfdcc9; }
+  blockquote { margin: 14px 0; padding: 2px 16px; border-left: 3px solid #b9c2cd;
+    color: #3a414b; font-size: 14.5px; }
+  blockquote p { margin: 8px 0; }
+  .ref { font-size: 13px; color: var(--mut); }
+  .ref a { color: var(--mut); text-decoration: underline; text-underline-offset: 2px; }
+  sup.refn { font-size: 11px; color: var(--acc); }
+  .tag { display: inline-block; font-size: 12px; color: var(--mut);
+    border: 1px solid var(--line); border-radius: 20px; padding: 1px 9px; margin: 1px 3px 1px 0;
+    background: #fff; white-space: nowrap; }
+  .fig { margin: 16px 0; }
+  .fig .cap { font-size: 13px; color: var(--mut); margin-top: 6px; }
+  .src { font-size: 12.5px; color: var(--mut); margin: 3px 0; }
+  .src code { font-size: 12px; }
+  .foot { font-size: 13px; color: var(--mut); margin-top: 40px;
+    border-top: 1px solid var(--line); padding-top: 14px; }
+  .nav-buttons { margin-top: 36px; display: flex; justify-content: space-between;
+    gap: 12px; font-size: 13.5px; }
+  .nav-buttons a { border: 1px solid var(--line); border-radius: 8px; padding: 7px 12px;
+    background: #fff; }
+  .nav-buttons a:hover { background: var(--acc-soft); text-decoration: none; }
+  @media (max-width: 1000px) {
+    .layout { grid-template-columns: 1fr; }
+    nav.toc { display: none; }
+    main { padding: 6px 20px 70px; }
+    header.mast .inner { padding: 20px 20px 14px; }
+    .scroll table { min-width: 640px; }
+  }
+  @media print {
+    nav.toc { display: none; }
+    .layout { grid-template-columns: 1fr; }
+    section { break-inside: auto; }
+  }
+</style>
+</head>
+<body>
+<div class="layout">
+<header class="mast">
+  <div class="inner">
+    <p class="kicker">Research guide · 7 September 2026 · Knowledge management &amp; applications</p>
+    <h1>Knowledge formats for humans and agents</h1>
+    <p class="dek">What knowledge is, how it is represented, why standardisation is arriving now, what
+    Google&rsquo;s Open Knowledge Format actually specifies, what a knowledge bundle does to a small model
+    in a controlled experiment, and how the knowledge life cycle and its economics work in the agentic era.</p>
+    <p class="meta"><b>Status:</b> complete draft with live experiment results · <b>Companion data:</b>
+    <a href="kf-experiment/">kf-experiment/</a> (bundle, questions, raw answers) ·
+    <b>Related prior work:</b> <a href="small-models.html">small-models.html</a> and
+    <a href="small-models.json">small-models.json</a> on this machine</p>
+  </div>
+</header>
+
+<nav class="toc" id="toc">
+  <p class="toc-title">Contents</p>
+  <ol>
+    <li><a href="#s1" data-t="1"><span class="sec-num">1</span>What is knowledge</a></li>
+    <li><a href="#s2" data-t="2"><span class="sec-num">2</span>Knowledge in the agentic-AI era</a></li>
+    <li><a href="#s3" data-t="3"><span class="sec-num">3</span>Knowledge and human communication</a></li>
+    <li><a href="#s4" data-t="4"><span class="sec-num">4</span>Vocabulary of knowledge</a></li>
+    <li><a href="#s5" data-t="5"><span class="sec-num">5</span>Representation standards and non-standards</a></li>
+    <li><a href="#s6" data-t="6"><span class="sec-num">6</span>Why standardisation is required</a></li>
+    <li><a href="#s7" data-t="7"><span class="sec-num">7</span>Deep dive: Google Open Knowledge Format</a></li>
+    <li class="lvl2"><a href="#s7-1" data-t="7.1">7.1&nbsp; The v0.1 pattern</a></li>
+    <li class="lvl2"><a href="#s7-2" data-t="7.2">7.2&nbsp; v0.2 trust signals</a></li>
+    <li class="lvl2"><a href="#s7-3" data-t="7.3">7.3&nbsp; What OKF is and is not</a></li>
+    <li><a href="#s8" data-t="8"><span class="sec-num">8</span>Experiments: with and without a bundle</a></li>
+    <li class="lvl2"><a href="#s8-1" data-t="8.1">8.1&nbsp; Method</a></li>
+    <li class="lvl2"><a href="#s8-2" data-t="8.2">8.2&nbsp; Results on this machine</a></li>
+    <li class="lvl2"><a href="#s8-3" data-t="8.3">8.3&nbsp; External comparisons</a></li>
+    <li><a href="#s9" data-t="9"><span class="sec-num">9</span>The knowledge life cycle</a></li>
+    <li><a href="#s10" data-t="10"><span class="sec-num">10</span>Discovery, communication, guardrails, efficiency</a></li>
+    <li><a href="#s11" data-t="11"><span class="sec-num">11</span>The economics of knowledge</a></li>
+    <li><a href="#a1" data-t="A"><span class="sec-num">A</span>Prior research on this machine</a></li>
+    <li><a href="#a2" data-t="B"><span class="sec-num">B</span>Reference shelf</a></li>
+    <li><a href="#a3" data-t="C"><span class="sec-num">C</span>Reading list</a></li>
+    <li><a href="#a4" data-t="D"><span class="sec-num">D</span>Companies in the space</a></li>
+    <li><a href="#a5" data-t="E"><span class="sec-num">E</span>Method notes and open questions</a></li>
+  </ol>
+</nav>
+
+<main id="content">
+
+<section id="s1">
+<h2>1&ensp;What is knowledge</h2>
+<p class="lead">Knowledge sits above data and information, and below wisdom. The useful definition for this
+guide is practical: knowledge is structured understanding that lets a person or a system act correctly.</p>
+
+<p>The classical ladder, popularised by the management theorist Russell Ackoff in 1989, treats the terms as a
+stack:<sup class="refn">[Ackoff 1989]</sup></p>
+<table>
+  <tr><th style="width:14%">Layer</th><th style="width:42%">Definition</th><th>Example in an enterprise setting</th></tr>
+  <tr><td><strong>Data</strong></td><td>Raw recorded signals with no interpretation</td><td>&ldquo;12,408 requests, 14:02&nbsp;UTC&rdquo;</td></tr>
+  <tr><td><strong>Information</strong></td><td>Data arranged to answer who, what, when, where</td><td>&ldquo;Requests from Bengaluru peaked at 14:02&rdquo;</td></tr>
+  <tr><td><strong>Knowledge</strong></td><td>Information plus interpretation: how things work, what to do</td><td>&ldquo;Peak-hour bursts are caused by the 14:00 report job; scale the read pool before 14:00&rdquo;</td></tr>
+  <tr><td><strong>Understanding / wisdom</strong></td><td>Judgement about why and whether; knowing when rules do not apply</td><td>&ldquo;The report job matters less than the new compliance query; change the schedule instead&rdquo;</td></tr>
+</table>
+
+<p>Philosophy adds a caution that matters for AI systems. The standard definition of knowledge as
+<em>justified true belief</em> collapses under cases where a belief happens to be true but is not justified
+(the Gettier problem, 1963). An agent that produces a correct answer for a wrong reason has a belief, not
+knowledge. This distinction is not academic: it is the difference between a model that answers correctly
+because it was given a verified source, and one that answers correctly by luck. The whole architecture of
+verification discussed in this guide exists to move systems from the second kind to the first.</p>
+
+<p>Michael Polanyi&rsquo;s distinction between <strong>tacit</strong> and <strong>explicit</strong> knowledge is the
+second foundation stone. &ldquo;We can know more than we can tell,&rdquo; Polanyi wrote in 1966: riding a bicycle,
+judging a weld, or estimating a schedule are things people know how to do without being able to write the
+procedure down.<sup class="refn">[Polanyi 1966]</sup> Organisational theorists Nonaka and Takeuchi built a whole
+school on converting tacit knowledge to explicit form and back, through socialisation, externalisation,
+combination and internalisation (the SECI cycle).<sup class="refn">[Nonaka &amp; Takeuchi 1995]</sup> Every
+&ldquo;knowledge management&rdquo; failure of the 1990s and 2000s was, at root, a failure of one of the two
+conversions: experts would not or could not externalise what they knew, or explicit documents were never
+internalised by the people who needed them.</p>
+
+<p>Knowledge representation research contributes a third distinction: knowledge as something that can be
+<em>encoded</em>. In that tradition knowledge is a set of statements about a domain &mdash; classes,
+individuals, relations, rules &mdash; written in a language with a defined syntax and semantics, so that a
+machine can store it, query it and reason over it.<sup class="refn">[Brachman &amp; Levesque 2004]</sup> This
+guide uses a working definition that sits at the intersection of all three traditions:</p>
+
+<div class="note"><strong>Working definition.</strong> Knowledge is justified, structured understanding of a
+domain &mdash; partly tacit, partly explicit &mdash; that enables correct action. Explicit knowledge becomes
+<em>machine-usable</em> only when it is encoded in a format whose conventions are shared between producer and
+consumer. The format is the contract; the knowledge is the content; the agent is a new kind of consumer.</div>
+
+<p>Four properties of knowledge recur throughout this guide:</p>
+<ul>
+  <li><strong>It is non-rivalrous.</strong> One person&rsquo;s use does not consume it; this drives its strange
+  economics (section&nbsp;11).</li>
+  <li><strong>It degrades.</strong> Facts go stale, procedures change, documents rot. Without a life cycle
+  (section&nbsp;9) it silently becomes misinformation.</li>
+  <li><strong>It is relational.</strong> A fact is only useful in a web of other facts &mdash; thresholds with
+  their owning team, policies with their effective dates, concepts with their definitions.</li>
+  <li><strong>It is now read by machines as first-class consumers.</strong> This is the change of the past
+  three years, and it is why the format of knowledge, not just its content, has become a strategic question.</li>
+</ul>
+</section>
+
+<section id="s2">
+<h2>2&ensp;Knowledge in the agentic-AI era</h2>
+<p class="lead">Agents have changed where knowledge lives: less of it can stay in model weights, and more of it
+must arrive in context at inference time, in a shape the agent can navigate.</p>
+
+<p>Three limits of parametric knowledge drive the shift. First, <strong>staleness</strong>: a model knows only
+what was in its training corpus up to its cutoff. The small models used in section&nbsp;8 were trained before
+mid-2026; Google&rsquo;s Open Knowledge Format was announced in June 2026, so <em>no</em> pretrained model of that
+vintage can answer a question about it from weights alone &mdash; they must be told. Second,
+<strong>hallucination</strong>: language models generate plausible continuations, and when a fact is absent or
+thinly represented they confabulate with the same fluency as when it is present. Third, <strong>mutable
+knowledge</strong>: thresholds, prices, policies and schemas change on a cadence no retraining cycle can
+match. The industry answer, arrived at independently by many teams, is to keep volatile knowledge in documents
+and retrieval systems, and keep the model as a reasoning engine over whatever context it is given. Retrieval-augmented
+generation, introduced in 2020 and surveyed by Gao et&nbsp;al., formalised the pattern of fetch-then-answer;<sup class="refn">[Gao et&nbsp;al. 2023, arXiv 2312.10997]</sup>
+graph-based variants such as Microsoft&rsquo;s GraphRAG added global, query-independent structure on top of local
+chunks.<sup class="refn">[Edge et&nbsp;al. 2024, arXiv 2404.16130]</sup></p>
+
+<p>The agentic turn goes further. An agent does not answer one question; it pursues a goal across many turns,
+calls tools, and decides what to read. Its working memory is the context window, and the discipline of deciding
+what goes into that window has acquired a name: <strong>context engineering</strong>. Anthropic&rsquo;s engineering
+team published the reference essay on the practice, and a research line has formed around
+<em>agentic</em> context engineering &mdash; models that decide for themselves which context to gather and
+retain.<sup class="refn">[Anthropic engineering 2025]</sup><sup class="refn">[Zhang et&nbsp;al. 2025, arXiv 2510.04618]</sup>
+Andrej Karpathy described the end-state most vividly in his mid-2025 &ldquo;LLM wiki&rdquo; writings, quoted in
+Google&rsquo;s announcement: &ldquo;LLMs don&rsquo;t get bored, don&rsquo;t forget to update a cross-reference, and can touch 15
+files in one pass.&rdquo; The bookkeeping that makes human-maintained wikis decay is exactly what agents are good
+at &mdash; if the knowledge is in files an agent can read.<sup class="refn">[Google Cloud 2026a]</sup></p>
+
+<p>Three consequences follow for knowledge management:</p>
+<ul>
+  <li><strong>Knowledge must be addressable.</strong> An agent cannot use knowledge it cannot find; it needs
+  file paths, filenames, titles, descriptions, tags &mdash; handles a retrieval system can surface and a model
+  can reason over. The Tenure benchmark of OKF (section&nbsp;8.3) showed that giving a model readable filenames
+  and frontmatter measurably beat opaque vector recall on alias-style queries (&ldquo;Mongo&rdquo; &rarr; the MongoDB
+  decision).<sup class="refn">[Tenure 2026]</sup></li>
+  <li><strong>Knowledge must be trustworthy before it is read.</strong> An agent that acts on a stale policy is
+  worse than an agent that asks. Provenance, verification and expiry metadata &mdash; the &ldquo;trust signals&rdquo; layer
+  of OKF v0.2 &mdash; let a consumer decide whether to even open a file (section&nbsp;7.2).</li>
+  <li><strong>Knowledge needs a standard shape.</strong> Tool interfaces standardised first &mdash; the Model
+  Context Protocol (MCP), released by Anthropic in November 2024, became a founding project of the Linux
+  Foundation&rsquo;s Agentic AI Foundation in December 2025; Google&rsquo;s agent-to-agent protocol A2A (April 2025)
+  followed into the same foundation in August 2026; OpenAI&rsquo;s AGENTS.md convention for agent instructions was a
+  third founding donation.<sup class="refn">[AAIF 2025]</sup><sup class="refn">[AAIF 2026]</sup> But the layer
+  where agents keep <em>truth</em> &mdash; memory, persistent knowledge, the record of what happened &mdash; still
+  has no standard. Commentators on the A2A transfer made the point explicitly: &ldquo;memory still has no
+  standard.&rdquo;<sup class="refn">[OpenZync 2026]</sup> OKF is Google Cloud&rsquo;s move into exactly that gap.</li>
+</ul>
+
+<p>The competitive context sharpens the point. Enterprise work-knowledge platforms (Glean, Hebbia,
+Contextual&nbsp;AI), model vendors&rsquo; memory products, and a layer of startups building &ldquo;agent memory&rdquo;
+infrastructure (Mem0, Letta, Zep, Cognee &mdash; surveyed in section&nbsp;D) are all racing to be the place where
+an organisation&rsquo;s knowledge lives for its agents. Whoever owns the format of that knowledge owns a durable
+migration cost on their side. Open formats are the counter-move: they make the knowledge portable even if the
+tool is not. That is the strategic bet of OKF, and it is why a guide about &ldquo;formats&rdquo; rather than about
+models is the right frame in 2026.</p>
+
+<p class="ref">Section 8 tests the core claim on small local models: does attaching a knowledge bundle change
+what a 1.7&ndash;4&nbsp;B model can answer, and at what cost in latency and honesty?</p>
+</section>
+<section id="s3">
+<h2>3&ensp;How knowledge helps humans in communication</h2>
+<p class="lead">Communication works because participants share knowledge they never state. The less shared
+knowledge exists, the more must be made explicit &mdash; and formats are the technology for making it explicit
+at scale.</p>
+
+<p>In the pragmatics tradition, every utterance rides on <strong>common ground</strong>: the beliefs both
+parties know they share.<sup class="refn">[Clark 1996]</sup> &ldquo;Ship it&rdquo; works in a team that knows what
+&ldquo;it&rdquo; is, what shipping means in this organisation, and what the risks are. Grice&rsquo;s maxims &mdash; say no more
+than needed, be relevant &mdash; are only affordable when the unstated substrate is large.<sup class="refn">[Grice 1975]</sup>
+Jargon is compression: a specialist term (a class name, a clinical code, a legal doctrine) folds a large
+shared understanding into one token. This is why vocabulary and taxonomy work (section&nbsp;4) are not
+pedantry; they are bandwidth technology for groups.</p>
+
+<p>Human groups scale their shared knowledge through <strong>externalisation</strong> &mdash; writing knowledge down
+so it survives the people who hold it. The sequence is familiar: oral tradition bound knowledge to memory and
+presence; writing freed it from both; print made it cheap; libraries made it findable; the web made it
+universal; wikis made it editable; git made it versioned. Each step raised how much knowledge a group could
+<em>assume</em> rather than re-derive. Nonaka and Takeuchi&rsquo;s SECI cycle describes the organisational version of
+the same movement: tacit insight, externalised into explicit documents, combined with other documents, and
+internalised by new people as skill.<sup class="refn">[Nonaka &amp; Takeuchi 1995]</sup></p>
+
+<p>In modern engineering organisations the coordination artifacts are well known: runbooks, architecture
+decision records, onboarding guides, incident postmortems, API documentation, READMEs. Anthropologist Susan
+Leigh Star called such shared artifacts <strong>boundary objects</strong> &mdash; things plastic enough to serve
+different communities&rsquo; purposes while stable enough to carry meaning across them.<sup class="refn">[Star &amp; Griesemer 1989]</sup>
+A runbook is a boundary object between an on-call engineer and the service owner; a clinical guideline is one
+between a physician and a hospital&rsquo;s quality team. The important shift of the 2020s is that the boundary
+object now has a third party reading it: the agent. The same document must remain legible to a human expert
+<em>and</em> be navigable, parseable and trustworthy to a machine that will act on it.</p>
+
+<p>Two human communication problems sharpen when agents join the conversation:</p>
+<ul>
+  <li><strong>The tacit floor.</strong> Polanyi&rsquo;s point cuts both ways: teams that rely on hallway knowledge
+  cannot hand it to agents, because it was never written down. &ldquo;Ask the team&rdquo; does not work for a model.
+  Documented knowledge stops being optional the moment automation is expected to act on it &mdash; this is the
+  least glamorous and most common reason agent projects stall.</li>
+  <li><strong>Asynchrony without loss.</strong> Text-based communities &mdash; open-source projects, forums,
+  wikis &mdash; coordinate across time zones precisely because their knowledge is written in a shared,
+  retrievable form.<sup class="refn">[Eghbal 2020]</sup> Agents inherit this property only if the artefacts they
+  read carry the same discipline: one concept per file, stable identifiers, links between related knowledge,
+  and metadata about freshness and trust. Those are format properties, not model properties.</li>
+</ul>
+
+<p>Section&nbsp;7&rsquo;s subject &mdash; a directory of markdown files, one concept per file, YAML frontmatter, links
+between files &mdash; should be read as the current best attempt to give boundary objects a shape that both
+humans and agents can inhabit comfortably. It is deliberately close to what human teams already write; that is
+its design bet.</p>
+</section>
+
+<section id="s4">
+<h2>4&ensp;The vocabulary of knowledge</h2>
+<p class="lead">Taxonomies, ontologies and knowledge graphs are increasingly formal ways of saying what exists
+and how it relates. They form the vocabulary ladder that the newer, lighter formats climb.</p>
+
+<h3>Controlled vocabularies and taxonomies</h3>
+<p>A <strong>controlled vocabulary</strong> is an agreed list of terms (product codes, statuses, region names)
+that removes the cost of synonyms. A <strong>taxonomy</strong> arranges terms in a hierarchy of
+parent&ndash;child relations: Linnaean biology, the Dewey Decimal Classification, an organisation chart, a folder
+tree. Taxonomies give a group shared nouns and a shared notion of generality. Their limits are that one term
+can belong in several places (a budget report is finance <em>and</em> programme management), which pure trees
+cannot express. <strong>Folksonomies</strong> &mdash; free-form tags &mdash; solve flexibility by abandoning
+control, at the price of synonymy (&ldquo;ml&rdquo;, &ldquo;ML&rdquo;, &ldquo;machine-learning&rdquo;) and inconsistency.</p>
+
+<h3>Ontologies</h3>
+<p>An <strong>ontology</strong> is a formal, explicit specification of a shared conceptualisation: the classes,
+properties, individuals and axioms of a domain, written in a language with defined semantics.<sup class="refn">[Gruber 1993]</sup>
+Where a taxonomy says &ldquo;A is a kind of B&rdquo;, an ontology adds arbitrary relations, cardinalities and logical
+constraints, so that a reasoner can derive facts that were never stated. The formal backbone is description
+logic; the practical encodings are the W3C family &mdash; RDF, RDFS, OWL, SKOS, SHACL &mdash; plus JSON-LD for
+embedding in web pages.<sup class="refn">[W3C stack; Allemang &amp; Hendler 2020]</sup> Mature examples include
+schema.org (the shared type system of the web&rsquo;s structured data), SNOMED&nbsp;CT and ICD in healthcare, the
+Gene Ontology in biology, and Dublin Core for documents. The price of formality is labour: ontologies are
+expensive to build and to keep aligned with the world, which is why most organisations never got past a
+taxonomy or a graph sketch.</p>
+
+<h3>Knowledge graphs</h3>
+<p>A <strong>knowledge graph</strong> is an ontology populated with data: nodes for entities, typed edges for
+relations, and a query layer over both.<sup class="refn">[Hogan et&nbsp;al. 2021]</sup> Google&rsquo;s 2012 knowledge
+graph popularised the term for search; Wikidata (2012, now well over 120&nbsp;million items) is the largest
+public one; enterprise graphs run on both RDF stores (Ontotext, Stardog) and property-graph databases (Neo4j,
+with the GQL standard arriving in 2024). Knowledge graphs shine at multi-hop questions, disambiguation and
+consistency; they cost more than documents to maintain.</p>
+
+<h3>Where the new file-based formats sit</h3>
+<p>The 2025&ndash;26 generation of formats &mdash; AGENTS.md, llms.txt, OKF &mdash; deliberately <em>descend</em>
+the formality ladder. They trade logical rigour for the properties agents actually need: plain-text
+addressability, cheap human maintenance, git-native versioning. OKF&rsquo;s graph is literally the links between
+markdown files; its &ldquo;ontology&rdquo; is an optional <code>type</code> field with suggested values, not enforced
+classes (section&nbsp;7.1). The ladder is not a competition &mdash; a team can hold a formal ontology for
+regulatory reporting and an OKF bundle for operational runbooks, and link the two. The useful mental model:</p>
+<table>
+  <tr><th style="width:18%">Layer</th><th style="width:30%">What it fixes</th><th style="width:26%">Cost</th><th>Agent affinity</th></tr>
+  <tr><td>Controlled vocab / taxonomy</td><td>Shared nouns, hierarchy</td><td>Low</td><td>Useful (tags, types)</td></tr>
+  <tr><td>Thesaurus / SKOS</td><td>Synonyms, related terms</td><td>Low&ndash;mid</td><td>Useful (alias handling)</td></tr>
+  <tr><td>Ontology (OWL etc.)</td><td>Formal semantics, inference</td><td>High to build and keep</td><td>Strong when maintained</td></tr>
+  <tr><td>Knowledge graph</td><td>Entities + relations at scale, multi-hop query</td><td>High ops</td><td>Strong for discovery</td></tr>
+  <tr><td>File-based knowledge (AGENTS.md, llms.txt, OKF)</td><td>Addressable, versioned, human-maintainable knowledge for agents</td><td>Low&ndash;mid</td><td><strong>Designed for it</strong></td></tr>
+</table>
+<p class="ref">The Tenure benchmark result that aliases resolve well (&ldquo;Mongo&rdquo; &rarr; the MongoDB document) is
+exactly the controlled-vocabulary benefit reappearing inside a file system: names, titles and tags give the
+model handles that raw embeddings lack.<sup class="refn">[Tenure 2026]</sup></p>
+</section>
+
+<section id="s5">
+<h2>5&ensp;Representation standards and non-standards</h2>
+<p class="lead">Knowledge representation has a forty-year standardisation history, a mature web-era stack, and a
+fast-moving set of 2025&ndash;26 conventions that are standards in all but name.</p>
+
+<h3>The legacy of knowledge representation</h3>
+<p>AI&rsquo;s first generation tried to encode knowledge directly: semantic networks (Quillian, 1960s), frames
+(Minsky, 1974), scripts (Schank &amp; Abelson, 1977), and the decade-long Cyc attempt to codify common sense
+(Lenat, from 1984).<sup class="refn">[Brachman &amp; Levesque 2004]</sup> These systems produced the vocabulary
+&mdash; classes, slots, inheritance, defaults &mdash; that later standardisation formalised, and taught the field
+its durable lesson: encoding is the bottleneck, and maintenance is the killer. The formal-logic tradition
+continued separately in description logics and in the KR&amp;R textbook canon.</p>
+
+<h3>The web-era standard stack (W3C and friends)</h3>
+<table>
+  <tr><th style="width:24%">Standard</th><th style="width:16%">Year(s)</th><th>Role</th></tr>
+  <tr><td>RDF / RDFS</td><td>1999 / 2000</td><td>Triple model of statements; the base layer of the semantic web</td></tr>
+  <tr><td>OWL / OWL 2</td><td>2004 / 2012</td><td>Ontology language with formal semantics and profiles (QL, EL, RL)</td></tr>
+  <tr><td>SPARQL</td><td>2008</td><td>Query language for RDF graphs</td></tr>
+  <tr><td>SKOS</td><td>2009</td><td>Simple knowledge organisation: concepts, labels, broader/narrower</td></tr>
+  <tr><td>PROV-O</td><td>2013</td><td>Provenance: entities, activities, agents &mdash; the ancestor of OKF&rsquo;s <code>sources</code>/<code>verified</code></td></tr>
+  <tr><td>JSON-LD</td><td>2014</td><td>Linked data in JSON, used by schema.org on most of the web</td></tr>
+  <tr><td>SHACL</td><td>2017</td><td>Shapes and constraints for validating RDF graphs</td></tr>
+  <tr><td>schema.org</td><td>2011&ndash;</td><td>Shared type vocabulary (Bing, Google, Yahoo!, Yandex); de facto web standard</td></tr>
+  <tr><td>GQL (ISO/IEC 39075)</td><td>2024</td><td>Standard query language for property graphs</td></tr>
+</table>
+<p class="ref">Adjacent metadata conventions: Dublin Core (documents), DCAT (data catalogs), model cards and
+datasheets for datasets (documenting ML artefacts), and the W3C Croissant effort for ML dataset metadata.<sup class="refn">[Mitchell et&nbsp;al. 2019]</sup><sup class="refn">[Gebru et&nbsp;al. 2021]</sup></p>
+
+<h3>The LLM-era conventions: standards in the making</h3>
+<p>The current frontier is not formal semantics but <em>file conventions that agents can rely on</em>. Most are
+single-page specs or documentation conventions, some have moved to neutral foundations:</p>
+<table>
+  <tr><th style="width:20%">Convention</th><th style="width:34%">Origin and status</th><th>What it standardises</th></tr>
+  <tr><td><code>AGENTS.md</code></td><td>OpenAI, Aug 2025; donated to the Agentic AI Foundation (AAIF), Dec 2025</td><td>A project-level instruction file agents read for build steps, tests and conventions</td></tr>
+  <tr><td><code>CLAUDE.md</code></td><td>Anthropic, 2025 (de facto)</td><td>Per-project guidance file for Claude Code; the pattern AGENTS.md generalised</td></tr>
+  <tr><td><code>llms.txt</code></td><td>Jeremy Howard / answer.ai, mid-2025; llmstxt.org directory</td><td>A site-level markdown index describing pages for LLM crawlers &mdash; &ldquo;robots.txt for LLMs&rdquo;</td></tr>
+  <tr><td>MCP</td><td>Anthropic, Nov 2024; AAIF founding project, Dec 2025</td><td>Wire protocol between agents and tools/data sources; the &ldquo;USB-C of agents&rdquo;</td></tr>
+  <tr><td>A2A</td><td>Google, Apr 2025; Linux Foundation Jun 2025; v1.0 Mar 2026; AAIF Aug 2026</td><td>Agent-to-agent communication protocol (150+ partner organisations at transfer)</td></tr>
+  <tr><td><strong>OKF</strong></td><td>Google Cloud, Jun 2026 (v0.1); v0.2 Jul 2026</td><td>Portable knowledge bundles: markdown + YAML frontmatter + links, with trust signals</td></tr>
+</table>
+<p>There is a clear sequencing logic in this table. The industry standardised <em>how agents act</em> (MCP for
+tool access, A2A for agent-to-agent), then <em>how agents are instructed</em> (AGENTS.md), and is now moving to
+<em>what agents should know</em> (OKF) and <em>how sites describe themselves to LLMs</em> (llms.txt). The
+foundation transfers &mdash; MCP, goose, AGENTS.md into AAIF in December 2025, A2A in August 2026 &mdash; are the
+moment each convention stopped belonging to one vendor. Google Cloud chose a different route for OKF: a spec in
+a public repository (<code>GoogleCloudPlatform/knowledge-catalog</code>, <code>okf/</code> directory) with a
+permissive license, community contributions and sample bundles, without (yet) a foundation transfer.</p>
+
+<h3>The non-standards that dominate practice</h3>
+<p>Most organisational knowledge today lives in formats with no agreed contract at all: bespoke wikis
+(&ldquo;each instance bespoke&rdquo;, in the words of the OKF announcement), chat transcripts treated as memory,
+exported PDFs, prompt files stuffed with context, private vector stores with no interchange format, and
+vendor-specific memory APIs whose contents cannot leave the product. The v0.1 announcement names the failure
+mode precisely: markdown wikis &ldquo;may all look alike, but none of them are intentionally designed to
+cooperate. There is no agreed-upon answer to what fields every document should carry, or what filenames mean
+what.&rdquo;<sup class="refn">[Google Cloud 2026a]</sup> Non-standards are not wrong &mdash; they are where
+conventions are born &mdash; but they are where knowledge goes to die when the tool that holds it is retired.</p>
+</section>
+
+<section id="s6">
+<h2>6&ensp;Why standardisation is required</h2>
+<p class="lead">Standardisation is a coordination technology: it lets independent producers and consumers
+cooperate without negotiating. In the agentic era the producers and consumers are often not even in the same
+organisation, and one of them is software.</p>
+
+<p>Six arguments, in increasing order of force:</p>
+<ul>
+  <li><strong>Portability and exit rights.</strong> Knowledge stored in a documented format can move between
+  tools, vendors and agents. Knowledge stored in a proprietary memory blob cannot. For enterprises this is the
+  difference between owning their knowledge and renting it (the economics are developed in section&nbsp;11).</li>
+  <li><strong>Producer/consumer independence.</strong> The OKF spec&rsquo;s own principle: a team that publishes
+  knowledge does not need to know which agent will read it, and an agent builder does not need to know which
+  team wrote it. A fixed minimum contract (<code>type</code>; later, optional trust fields) is all either side
+  needs.<sup class="refn">[OKF SPEC v0.2]</sup></li>
+  <li><strong>Agent economics.</strong> An agent facing N incompatible knowledge shapes must write N parsers or,
+  worse, guess. A standard shape makes retrieval cheaper, makes progressive disclosure possible (read the index,
+  then only the files you need), and lets a consumer apply policy <em>before</em> reading a file &mdash; OKF
+  v0.2&rsquo;s trust fields exist so that &ldquo;the consumer can decide whether to even open the document&rdquo;.<sup class="refn">[Google Cloud 2026b]</sup></li>
+  <li><strong>Governance and audit.</strong> Versioning, expiry, ownership and provenance are only enforceable
+  if the fields that carry them are predictable. The knowledge life cycle of section&nbsp;9 &mdash; creation,
+  review, deprecation, erasure &mdash; needs a substrate where those states are machine-readable. The OKF
+  community&rsquo;s &ldquo;erasure conformance&rdquo; contribution is a direct answer to privacy law: a profile that lets
+  a bundle prove a deletion happened.</li>
+  <li><strong>Network effects of shared vocabulary.</strong> Every tool that reads the same shape multiplies
+  the value of every document written in it (section&nbsp;4&rsquo;s vocabulary ladder, applied to machines). This
+  is why the foundation transfers of MCP, AGENTS.md and A2A happened: competitors donate plumbing to a neutral
+  steward rather than fragment the ecosystem &mdash; &ldquo;competitors do not hand their protocol plumbing to a
+  mutual steward unless the alternative, every vendor running its own incompatible stack, is worse.&rdquo;<sup class="refn">[OpenZync 2026]</sup></li>
+  <li><strong>Safety.</strong> Guardrails need inspectable knowledge. A policy that an agent must obey is only
+  auditable if it exists as a document with a defined shape, a verification record and an expiry date &mdash;
+  not if it is a pattern the model picked up from training data. Standardised, verified knowledge is the
+  difference between &ldquo;the agent should know this&rdquo; and &ldquo;we can prove the agent was told this, and that the
+  telling was current&rdquo; (section&nbsp;10).</li>
+</ul>
+
+<h3>The honest costs</h3>
+<p>Standardisation also has real costs, and the designers of OKF priced them explicitly. A heavy ontology
+imposes a vocabulary tax that kills adoption; OKF&rsquo;s answer is &ldquo;minimally opinionated&rdquo; &mdash; one required
+field, suggested rather than enforced types, and optional trust fields where &ldquo;absence carries meaning&rdquo;.<sup class="refn">[OKF SPEC v0.2]</sup>
+Premature standardisation locks in today&rsquo;s mistakes; the remedy is versioned, additive evolution (v0.1
+&rarr; v0.2 kept every v0.1 document valid, renaming <code>timestamp</code> to <code>generated.at</code> while
+preserving a fallback). And standards can become moats rather than commons &mdash; which is why governance
+neutrality (AAIF) and open repositories (knowledge-catalog) matter more than the spec text itself. The test of
+a healthy standard is whether the originator can no longer unilaterally change its direction, and whether the
+knowledge survives the tool.</p>
+</section>
+<section id="s7">
+<h2>7&ensp;Deep dive: Google&rsquo;s Open Knowledge Format</h2>
+<p class="lead">The Open Knowledge Format (OKF) is an open specification, first published by Google Cloud in June
+2026, for portable knowledge bundles that humans and agents can share. v0.1 fixed the shape; v0.2 added the
+trust layer. Both versions are defined in one normative document, <code>okf/SPEC.md</code> in the public
+<code>GoogleCloudPlatform/knowledge-catalog</code> repository, with reference tooling and four sample bundles
+(<code>acme_retail</code>, <code>ga4</code>, <code>stackoverflow</code>, <code>crypto_bitcoin</code>).<sup class="refn">[OKF SPEC v0.2]</sup></p>
+
+<h3 id="s7-1">7.1&nbsp; v0.1: the LLM-wiki pattern, made portable</h3>
+<p>OKF v0.1, announced 13 June 2026 by Sam McVeety and Amir Hormati of Google Cloud, is an answer to a
+fragmentation problem. Since 2025, teams had converged independently on the same shape for machine-readable
+knowledge: markdown files, one concept per file, YAML frontmatter, hyperlinks between files. Karpathy&rsquo;s
+&ldquo;LLM wiki&rdquo; made the idea famous &mdash; &ldquo;LLMs don&rsquo;t get bored, don&rsquo;t forget to update a cross-reference, and can
+touch 15 files in one pass&rdquo; &mdash; and Obsidian vaults, AGENTS.md conventions and internal wikis spread the
+pattern. But, as the announcement put it, the instances were bespoke: &ldquo;There is no agreed-upon answer to what
+fields every document should carry, or what filenames mean what.&rdquo; OKF v0.1 formalised the small set of
+conventions needed to make the pattern interoperable.<sup class="refn">[Google Cloud 2026a]</sup></p>
+
+<p>The v0.1 contract is deliberately tiny. A <strong>bundle</strong> is a directory tree of markdown files;
+each file is one <strong>concept</strong>, and links between files are the graph. Two filenames are reserved
+and optional: <code>index.md</code>, a directory listing that enables progressive disclosure, and
+<code>log.md</code>, a chronological, date-grouped change log.<sup class="refn">[OKF SPEC v0.2 §3, §8, §9]</sup>
+Frontmatter carries the metadata:</p>
+<pre><code>---
+type: BigQuery Table            # REQUIRED — the only required field
+title: Customer Orders          # recommended, human-readable
+description: One row per completed customer order across all channels.
+resource: https://console.cloud.google.com/bigquery?p=acme&amp;d=sales&amp;t=orders
+tags: [sales, orders, revenue]
+---</code></pre>
+<p><code>type</code> is free-form and unregistered: the spec&rsquo;s examples include <code>BigQuery Table</code>,
+<code>Metric</code>, <code>Playbook</code>, <code>API Endpoint</code>, <code>Reference</code> and
+<code>Attested Computation</code>, and consumers MUST tolerate unknown types by treating them as generic
+concepts. A concept carrying only <code>type</code> is fully conformant. Bodies are structural markdown with a
+few conventional headings (<code># Schema</code>, <code># Examples</code>, <code># Computation</code>) but no
+required sections. Three principles anchor the design: <strong>minimally opinionated</strong> (one required
+field, so adoption is cheap), <strong>producer/consumer independence</strong> (a writer need not know the
+reader), and <strong>format not platform</strong> (no runtime, no vendor, no lock-in).<sup class="refn">[OKF SPEC v0.2 §4]</sup></p>
+
+<p>The launch shipped reference tooling that made the format real rather than aspirational: a
+<strong>reference enrichment agent</strong> that turns BigQuery assets into concept markdown with citations, a
+static HTML visualiser for browsing bundles, and ingestion into Google&rsquo;s Knowledge Catalog. The tools were
+explicitly secondary: &ldquo;The format itself is the contribution.&rdquo;<sup class="refn">[Google Cloud 2026a]</sup>
+The accompanying sample bundles showed the intended reading experience: an agent (or human) opens
+<code>index.md</code>, sees the directory of concepts grouped by section, and reads only the files its task
+requires.</p>
+
+<h3 id="s7-2">7.2&nbsp; v0.2: trust signals</h3>
+<p>v0.2, published 25 July 2026 by the same authors, answers a question v0.1 left open: how does a consumer
+know whether a concept is <em>worth reading</em>? The design goal is stated in the announcement: make
+provenance, trust, freshness, lifecycle state and computational attestation answerable &ldquo;from frontmatter
+alone, before the consumer reads the body&rdquo; &mdash; trust filtering before any token is spent. All the new
+families are optional; the spec keeps the vocabulary, not the rules, and &ldquo;absence carries meaning.&rdquo;<sup class="refn">[Google Cloud 2026b]</sup>
+The normative details:<sup class="refn">[OKF SPEC v0.2 §5, §10]</sup></p>
+
+<ul>
+  <li><strong>Provenance &mdash; <code>sources</code>, not a score.</strong> A concept lists the materials it
+  derives from: <code>resource</code> (required within an entry), optional <code>id</code> for per-claim
+  attribution, <code>title</code>, and three objective credibility signals &mdash; <code>author</code> (an actor,
+  e.g. <code>team:ga4-docs</code>), <code>usage_count</code> over a <code>usage_window</code> (a liveness
+  signal, explicitly not a ranking score), and <code>last_modified</code>. The spec&rsquo;s refusal to store a
+  credibility score is deliberate: a score is subjective, unportable across consumers, and goes stale.
+  Attribution inside the body uses markdown footnotes keyed to <code>sources[].id</code> &mdash; keyed rather
+  than positional, because agents rewrite these documents and a positional index silently misattributes as
+  soon as the list is reordered.</li>
+  <li><strong>Trust &mdash; <code>generated</code> and <code>verified</code>.</strong> <code>generated:
+  {by, at}</code> records who or what wrote the current content; <code>verified</code> lists independent
+  confirmation events, each <code>{by, at}</code>. Writers and confirmers are kept distinct on purpose: who
+  authored a concept need not be who confirmed it. Consumers derive a three-tier trust ladder from
+  <code>verified</code>: no key &rarr; <strong>unverified</strong>; non-human verifiers only &rarr;
+  <strong>machine-confirmed</strong>; any <code>human:&lt;id&gt;</code> verifier &rarr; <strong>human-reviewed</strong>.
+  The actor convention reserves the <code>human:</code> prefix for hand-authored or human-confirmed content,
+  and tiers are advisory signals, never access control.</li>
+  <li><strong>Freshness &mdash; <code>stale_after</code>.</strong> An absolute ISO 8601 instant, compared as
+  <code>now &gt;= stale_after</code>. An absolute instant rather than a relative TTL keeps staleness a plain
+  comparison &ldquo;with no reference to when the concept was read&rdquo; &mdash; deterministic for agents that may be
+  offline or replaying.</li>
+  <li><strong>Lifecycle &mdash; <code>status</code>.</strong> <code>draft</code> | <code>stable</code> |
+  <code>deprecated</code>; absent means <code>stable</code>. Deprecated concepts stay in the tree for links
+  and history but are no longer current.</li>
+  <li><strong>Attested computations.</strong> A new concept type, <code>type: Attested Computation</code>,
+  carries &ldquo;not just what a value means but a sanctioned way to compute it.&rdquo; Its contract: a
+  <code>runtime</code> (required; <code>bigquery</code>, <code>postgres</code>, <code>dbt</code>,
+  <code>python</code> &hellip;), typed <code>parameters</code> (the only thing an agent may fill), the
+  computation itself (inline under <code># Computation</code> or in a file), an <code>executor</code> with a
+  declared <code>receipt</code> (e.g. BigQuery <code>job_id</code> plus the SQL that actually ran), and an
+  <code>attester</code> &mdash; deterministic, no-LLM code that re-derives the binding and compares it against
+  the receipt. A rewritten query, a swapped computation file or a mutated dependency fails the check. The
+  consumer flow is: discover, load, parameterise, execute, <em>attest</em>, gate &mdash; refusing to display a
+  failing attestation and warning when <code>stale_after</code> has passed. Verification and attestation are
+  distinct and both exist: <code>verified</code> confirms the <em>definition</em> still matches policy
+  (doc-level, slow, stored in the bundle); attestation confirms a single <em>run</em> produced the value the
+  sanctioned way (per-call, runtime, not stored). OKF records the computation and the means to check it; it
+  never executes anything itself.</li>
+</ul>
+
+<p>v0.2 is an additive minor bump with two deliberate exceptions: <code>timestamp</code> was renamed to
+<code>generated.at</code>, and the v0.1 body <code># Citations</code> list moved into frontmatter as
+<code>sources</code>; in both cases consumers MAY fall back to the v0.1 form, so every v0.1 bundle remains
+consumable.<sup class="refn">[OKF SPEC v0.2 §13]</sup> Community contributions listed in the announcement show
+the format is already evolving outside Google: typed relationship edges, agent-routing hints, an erasure
+conformance profile (deletion with proof, for privacy law), a <code>.okfignore</code>, more sample bundles,
+and a growing ecosystem catalog of third-party tools &mdash; Claude Code skills, builders and converters (see
+section&nbsp;D).</p>
+
+<h3 id="s7-3">7.3&nbsp; What OKF is, and is not</h3>
+<p>Positioning OKF honestly requires saying what it is not, because the failure modes are informative.</p>
+<p><strong>OKF is an interchange and discovery format, not a retrieval system.</strong> The Tenure benchmark
+(section&nbsp;8.3) put an OKF bundle inside a real AI tool and let the model choose which files to read:
+single-turn precision was 0.47, alias-style queries were strong (0.72 precision / 0.92 recall), but scope
+disambiguation, supersession and session continuity failed, and session-mode pass rate collapsed to 0.17. Its
+conclusion &mdash; &ldquo;OKF solves interchange. It does not solve selection&rdquo; &mdash; is the single most useful
+one-paragraph critique of the format published so far.<sup class="refn">[Tenure 2026]</sup></p>
+<p><strong>OKF is not an ontology, though it is graph-shaped.</strong> Its <code>type</code> vocabulary is
+unregistered and its edges are plain markdown links. There is no reasoner, no SHACL validation, no query
+language. Teams that need formal semantics still need the W3C stack; OKF&rsquo;s wager is that most agent knowledge
+does not. The SPEC&rsquo;s permissive conformance clause is explicit: consumers MUST NOT reject a bundle for
+missing optional fields, unknown types, unknown keys, broken links, or a missing <code>index.md</code>.<sup class="refn">[OKF SPEC v0.2 §11]</sup></p>
+<p><strong>OKF is a sibling of AGENTS.md, llms.txt and MCP, not a competitor.</strong> AGENTS.md instructs a
+coding agent about a repository; llms.txt tells crawlers what a website contains; MCP is the transport an
+agent uses to reach tools and data (an OKF bundle can be served over MCP &mdash; the AWS benchmark run in
+section&nbsp;8.3 consumed its bundle that way); OKF is the content layer: durable, curated knowledge with
+trust metadata. The layer above OKF &mdash; which files to retrieve, what to exclude, what is current for this
+turn, this user, this task &mdash; is still open, and is exactly where the memory-layer startups in section&nbsp;D
+are competing.<sup class="refn">[OpenZync 2026]</sup></p>
+<p><strong>What is genuinely new in OKF is the trust vocabulary.</strong> Markdown wikis existed; the field
+names, the human:/machine-confirmed trust ladder, the absolute-expiry rule, and the attester contract are the
+contribution. They convert &ldquo;trust this document&rdquo; from a vibe into a machine-readable decision, which is what
+an autonomous consumer needs. Whether the vocabulary is the right one will be decided by the ecosystem, not
+by the spec &mdash; and the fact that a spec this young already has third-party benchmarks, community skills and
+a v0.2 in six weeks is itself evidence that the shape meets a real need.</p>
+</section>
+
+<section id="s8">
+<h2>8&ensp;Experiments: without and with a knowledge bundle</h2>
+<p class="lead">The central empirical question of this guide, run live on 7 September 2026 on the same machine
+and fixture as the prior small-models benchmark: what changes when a small local model is given an OKF-style
+knowledge bundle?</p>
+
+<h3 id="s8-1">8.1&nbsp; Method</h3>
+<p><strong>The knowledge under test is post-training-cutoff.</strong> All three models were trained before
+June 2026 and therefore have no parametric knowledge of OKF at all. Without a bundle, any &ldquo;answer&rdquo; about
+OKF is necessarily confabulation or an honest admission of ignorance; with a bundle, the facts are present in
+context. This isolates the effect of the knowledge artifact from the effect of the model.</p>
+<ul>
+  <li><strong>Models:</strong> qwen3:1.7b (42.7&nbsp;tok/s measured), qwen3:4b (19.5&nbsp;tok/s at 8&nbsp;K),
+  gemma4:e4b (13.2&nbsp;tok/s warm) &mdash; the Apache-2.0 tiers installed on this 8&nbsp;GB Mac mini.</li>
+  <li><strong>Fixture:</strong> identical to the machine&rsquo;s prior benchmark (<code>small-models.json</code>):
+  Ollama <code>/api/generate</code>, temperature 0.1, num_ctx 8192, one-shot turns, no conversation history.
+  Output budget: 700 tokens &mdash; raised from an initial 200 after all three models consumed the whole
+  budget inside their reasoning blocks and returned empty answers (<code>think: false</code> is passed but the
+  installed builds ignore it). Three cells that still truncated or looped were re-run at 1,500&ndash;2,500-token
+  budgets; every anomaly is logged in Appendix&nbsp;E and in <code>kf-experiment/</code>.</li>
+  <li><strong>Bundle:</strong> a six-file, v0.2-shaped OKF bundle (~4&nbsp;KB, ~1,090 tokens) covering OKF
+  overview, v0.1 fields, v0.2 trust fields, bundle structure and attested computations, each concept a
+  markdown file with YAML frontmatter, plus an <code>index.md</code>; reproduced in
+  <a href="kf-experiment/bundle/">kf-experiment/bundle/</a>.</li>
+  <li><strong>Questions:</strong> five, each answerable entirely from the bundle: (1)&nbsp;what OKF is, who
+  announced it and when; (2)&nbsp;the v0.1 frontmatter fields and which is required; (3)&nbsp;the v0.2 trust
+  signals and the three tiers; (4)&nbsp;bundle structure and the roles of <code>index.md</code>/<code>log.md</code>;
+  (5)&nbsp;attested computation fields and how the attester works.</li>
+  <li><strong>Conditions:</strong> <em>without</em> (plain system prompt) vs <em>with</em> (same prompt plus
+  the bundle wrapped in <code>&lt;knowledge&gt;</code> tags, with instructions to answer only from the bundle and
+  reply &ldquo;Not in bundle&rdquo; otherwise). &ldquo;Without&rdquo; always ran first per model, so no answer could leak into
+  the other condition.</li>
+  <li><strong>Scoring:</strong> per-question rubric of required facts (e.g. Q2 requires
+  <code>type</code>/<code>title</code>/<code>description</code>/<code>resource</code>/<code>tags</code>/
+  <code>timestamp</code> and that <code>type</code> is the only required field); each answer was machine-checked
+  for rubric terms and read in full. Raw answers: <a href="kf-experiment/answers.md">kf-experiment/answers.md</a>.</li>
+</ul>
+<p class="note">Prior work on this machine established the baseline the bundle now operates against: the 7
+September benchmark (<a href="small-models.html">small-models.html</a>) found the 1.7&ndash;3&nbsp;B band reliable
+for extraction, classification and routing, the qwen3:4b context cliff (~1&nbsp;tok/s at 32&nbsp;K vs
+19.5&nbsp;tok/s at 8&nbsp;K) decisive for context budgeting, and gemma4:e4b&rsquo;s 9.6&nbsp;GB bundle the reason to
+keep bundles small. It also recommended OKF bundles as the grounding fix for small-model fact errors
+(section&nbsp;A). This run is that recommendation, tested.</p>
+
+<h3 id="s8-2">8.2&nbsp; Results on this machine</h3>
+<div id="live-results">
+<p><strong>Machine-graded scores (0&ndash;2 per question; 2 = all core facts present):</strong></p>
+<table>
+  <tr><th>Model</th><th>Condition</th><th class="num">Q1</th><th class="num">Q2</th><th class="num">Q3</th><th class="num">Q4</th><th class="num">Q5</th><th class="num">Score /10</th></tr>
+  <tr><td rowspan="2"><strong>qwen3:1.7b</strong></td><td>without bundle</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num"><strong>1</strong></td></tr>
+  <tr><td>with bundle</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num">2</td><td class="num"><strong>10</strong></td></tr>
+  <tr><td rowspan="2"><strong>qwen3:4b</strong></td><td>without bundle</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">1</td><td class="num">0</td><td class="num"><strong>1</strong></td></tr>
+  <tr><td>with bundle</td><td class="num">2</td><td class="num">2</td><td class="num">1</td><td class="num">2</td><td class="num">2</td><td class="num"><strong>9</strong></td></tr>
+  <tr><td rowspan="2"><strong>gemma4:e4b</strong></td><td>without bundle</td><td class="num">0</td><td class="num">0</td><td class="num">0</td><td class="num">2</td><td class="num">0</td><td class="num"><strong>2</strong></td></tr>
+  <tr><td>with bundle</td><td class="num">2</td><td class="num">2</td><td class="num">1</td><td class="num">2</td><td class="num">2</td><td class="num"><strong>9</strong></td></tr>
+</table>
+<p class="note">Without the bundle, no model could answer any question about OKF from parametric knowledge
+&mdash; expected, since all three were trained before the June 2026 announcement. The partial Q4 credits reflect
+generic markdown-wiki knowledge (index files, changelogs, links) that happens to match OKF because OKF is
+deliberately conventional &mdash; not knowledge of OKF. With the bundle, all five questions were answered
+correctly by the smallest model and four-and-a-half by the other two. The two partial Q3 scores (4b, gemma)
+named <code>sources</code>/<code>generated</code>/<code>verified</code> and the tiers but dropped
+<code>stale_after</code>; qwen3:4b&rsquo;s answer was additionally truncated at its token budget. Machine grades and
+keyword detail are reproducible with <a href="kf-experiment/score.py">score.py</a>.</p>
+
+<h4>What the &ldquo;without&rdquo; answers looked like</h4>
+<p>Fluent confabulation was the norm, honest ignorance the exception &mdash; 4 of 15 without-bundle answers
+admitted not knowing; the other 11 invented:</p>
+<ul>
+  <li><em>qwen3:1.7b, Q1:</em> &ldquo;announced by the <strong>Open Knowledge Foundation</strong> in
+  <strong>2012</strong> and formalizes a <strong>JSON-based data model</strong>&rdquo; &mdash; right acronym,
+  invented history.</li>
+  <li><em>qwen3:1.7b, Q3:</em> invented fields (&ldquo;Key Type, Validation Status, Issuer ID, Timestamp,
+  Signature&rdquo;) and tiers, closing with the classic tell: &ldquo;Note: specific details may vary based on official
+  documentation.&rdquo;</li>
+  <li><em>qwen3:4b, Q3:</em> &ldquo;<code>trust_signal_1</code>&hellip; these fields explicitly define the three trust
+  tiers in the OKF specification&rdquo; &mdash; entirely fabricated.</li>
+  <li><em>qwen3:4b, Q4:</em> a plausible bundle description capped with a fabricated citation: &ldquo;Source: OKF
+  specification v1.2&rdquo; (no such version exists).</li>
+  <li><em>gemma4:e4b, Q5:</em> a full zero-knowledge-proof treatise &ldquo;assuming OKF refers to a framework
+  utilizing verifiable or zero-knowledge proofs&rdquo; &mdash; coherent, confident, wrong.</li>
+  <li><em>Honest minority:</em> gemma4 on Q1/Q3 (&ldquo;I do not have information regarding a standardized or
+  widely recognized &lsquo;Open Knowledge Format&rsquo;&rdquo;) and qwen3:4b on Q5 refused outright; qwen3:4b on Q1 &mdash; after
+  burning a 2,500-token reasoning budget &mdash; denied the format exists and confused it with the real Open
+  Knowledge Foundation (2004).</li>
+</ul>
+
+<h4>What the &ldquo;with&rdquo; answers looked like</h4>
+<ul>
+  <li>Every model answered Q1 with the bundle&rsquo;s facts: &ldquo;Google Cloud announced it on 13 June 2026 (Sam
+  McVeety and Amir Hormati)&hellip; formalizes the LLM-wiki pattern popularized by Andrej Karpathy&rdquo;; most answers
+  opened with &ldquo;Based on the knowledge bundle&hellip;&rdquo; and qwen3:4b on Q4 quoted the bundle verbatim.</li>
+  <li>Zero hallucinations in the 15 with-bundle answers. Residual slips were small: two models omitted
+  <code>stale_after</code> from the v0.2 field list, and qwen3:1.7b glossed <code>runtime</code> as
+  &ldquo;computational time or duration&rdquo; (it is the execution environment, e.g. <code>bigquery</code>) &mdash; a
+  definitional error, not a confabulation.</li>
+</ul>
+
+<h4>Latency</h4>
+<table>
+  <tr><th>Model</th><th class="num">Without (5 answers)</th><th class="num">With (5 answers)</th><th>Note</th></tr>
+  <tr><td>qwen3:1.7b</td><td class="num">50 s total (~10 s/answer)</td><td class="num">54 s (~11 s/answer)</td><td>~1,090 prompt tokens add under a second at its ~900 tok/s prompt speed</td></tr>
+  <tr><td>qwen3:4b</td><td class="num">180 s</td><td class="num">158 s</td><td>inflated by the Q1 reasoning loop (three failed 700-token attempts plus a 63 s rerun); typical answers 18&ndash;35 s</td></tr>
+  <tr><td>gemma4:e4b</td><td class="num">222 s (first run)</td><td class="num">204 s</td><td>~35&ndash;50 s/answer warm; two truncated cells re-run at +98 s total</td></tr>
+</table>
+<p class="note">Latency was never the bottleneck in this comparison; correctness was. Attaching the bundle
+added single-digit percentages to wall time while changing the answer quality from 0&ndash;2/10 to 9&ndash;10/10.</p>
+
+<h4>Reading of the results</h4>
+<p>Three findings stand out. <strong>First, hallucination on unknown facts is not a property of the model but
+of the missing context:</strong> every confabulation above is a model doing what language models do &mdash;
+producing the most plausible continuation &mdash; and the same models, given the facts, stopped confabulating
+entirely. <strong>Second, grounding dominates scale at the small-model tier:</strong> the 1.7&nbsp;B model with the
+bundle outscored the 4&nbsp;B and effective-4&nbsp;B models without it, and matched them with it. For knowledge
+questions, the bundle is worth more than two doublings of parameter count at this tier. <strong>Third, the
+residual errors are the interesting ones:</strong> honest &ldquo;I don&rsquo;t know&rdquo; is rare without prompting for it,
+definitional slips survive grounding (runtime-as-duration), and nothing in this setup tests retrieval &mdash; the
+bundle was given whole, which is the favourable case. Selection, the layer Tenure found unsolved, is the next
+experiment (section&nbsp;E).</p>
+</div>
+
+<h3 id="s8-3">8.3&nbsp; External comparisons and interpretation</h3>
+<p>Two published results bracket the local run. <strong>AWS&rsquo;s sample OKF agent on BIRD mini_dev</strong>
+(the text-to-SQL benchmark) scored EX 74.0 across all 500 questions &mdash; above every published leaderboard
+entry under leaderboard conditions &mdash; with the agent reading <em>only</em> an OKF bundle over MCP: no
+<code>CREATE TABLE</code> statement was ever handed to it, and schema knowledge was reconstructed from the wiki
+alone at a mean of 4.47 reads per question, 96% of them structural (<code>read_page</code> +
+<code>list_directory</code>); <code>semantic_search</code> was available and never called. The authors are
+honest that the run differs from leaderboard rows in base model too, so it reads as &ldquo;agent + OKF as a system
+clears the bar,&rdquo; not as a model-controlled ablation.<sup class="refn">[AWS 2026]</sup></p>
+<p><strong>Tenure&rsquo;s benchmark</strong> is the counterweight: it tested what happens when the model itself
+decides which files to read across single turns and sessions. Alias resolution and ranking stability were
+clean wins for OKF&rsquo;s file surface; scope disambiguation (4/12 passing), supersession exclusion (0/3),
+type routing, budget eviction and session drift were not &mdash; the bundle described the knowledge but did not
+govern retrieval. &ldquo;Files are a format, not a retrieval policy.&rdquo;<sup class="refn">[Tenure 2026]</sup></p>
+<p class="ref">Taken together with the local run, the picture: a bundle reliably <em>grounds</em> a small
+model (facts it cannot otherwise know), an index and file names make <em>discovery</em> work without vector
+search, and the unsolved layer is <em>selection</em> &mdash; what belongs in context for this turn. That layer is
+where the next round of experiments and products belongs (section&nbsp;E).</p>
+</section>
+<section id="s9">
+<h2>9&ensp;The knowledge life cycle</h2>
+<p class="lead">Knowledge is perishable. Every organisation runs a life cycle for it, whether or not it is
+managed: things are created, used, drift, get rediscovered or rot. The agentic era makes the cycle
+machine-visible, because each stage now has a field in a frontmatter block.</p>
+
+<h3>9.1&nbsp; The cycle, mapped to fields</h3>
+<table>
+  <tr><th style="width:20%">Stage</th><th style="width:40%">What happens</th><th>Machine-readable home (OKF v0.2)</th></tr>
+  <tr><td><strong>Creation</strong></td><td>Knowledge is externalised: by experts writing, by pipelines extracting, by agents drafting from sources, by communities contributing</td><td><code>generated: {by, at}</code>; <code>sources</code> for what it was built from; <code>status: draft</code></td></tr>
+  <tr><td><strong>Review</strong></td><td>Content is checked against its sources and policy before it is trusted</td><td><code>verified</code> events; the human:/machine- tiers; <code>status: draft &rarr; stable</code></td></tr>
+  <tr><td><strong>Consumption</strong></td><td>Humans search and read; agents retrieve, cite and act; both re-distribute it</td><td><code>index.md</code> progressive disclosure; <code>usage_count</code> on sources; log entries</td></tr>
+  <tr><td><strong>Maintenance</strong></td><td>Correction, enrichment, link repair, re-verification on a cadence</td><td><code>log.md</code> entries; new <code>verified</code> events; <code>generated.at</code> bump</td></tr>
+  <tr><td><strong>Deprecation</strong></td><td>Content stops being current but is kept for links, history and audit</td><td><code>status: deprecated</code> (kept in tree); <code>stale_after</code> for planned expiry</td></tr>
+  <tr><td><strong>Erasure</strong></td><td>Content must disappear (privacy law, licensing, policy); deletion with proof</td><td>erasure conformance profile (community contribution); git history as the audit trail</td></tr>
+</table>
+
+<p><strong>Who creates knowledge</strong> has widened three times: from experts alone, to experts plus
+communities (wikis), to experts plus communities plus software (enrichment agents, pipelines, and now
+agent-authored drafts that humans verify). The OKF reference agent is the template: it extracts from a source
+of record (BigQuery), writes concepts, and attaches citations; a human then verifies. The v0.2 authors
+describe metrics/revenue.md in their sample bundle as &ldquo;authored by the reference agent and verified by the VP
+of Finance&rdquo; &mdash; creation by machine, authority by human.<sup class="refn">[Google Cloud 2026b]</sup></p>
+<p><strong>Who consumes</strong> has likewise widened. The consumers of a 2026 knowledge bundle are: humans
+searching, humans reading on a schedule, retrieval pipelines, agents deciding which files to read for a task,
+fine-tuning and evaluation pipelines, and audit systems checking what an agent was told and when. Each consumer
+class has different needs &mdash; an auditor needs the verification chain; an agent needs the file names and the
+staleness comparison; a human needs the title and description. A format that serves all four is the current
+design target.</p>
+
+<h3>9.2&nbsp; The past: how knowledge died</h3>
+<p>The failure modes are well documented across four decades of knowledge management. <strong>Capture
+failure</strong>: expertise stayed tacit because externalising it cost time with no visible return (the
+&ldquo;why should I write this down&rdquo; problem Nonaka&rsquo;s successors struggled with). <strong>Rot</strong>: documents
+that were accurate on creation day drifted as the world changed, with no mechanism to notice (Polanyi&rsquo;s floor,
+again: the correction lived in people&rsquo;s heads). <strong>Isolation</strong>: knowledge sat in tool-specific silos
+&mdash; a wiki here, a sharepoint there, a chat archive everywhere &mdash; each internally consistent, mutually
+incompatible, and unreachable at the moment of need. <strong>Version chaos</strong>: without a versioning
+discipline, the most recent copy and the most authoritative copy were different files. Enterprise KM systems
+of the 1990s&ndash;2000s tried to solve all of this by mandate and mostly failed, because they added a tax
+(filling in forms in a portal) to the people who held the knowledge and returned the benefit to people who did
+not. The wikis of the 2000s removed the tax but kept the rot: human maintenance is precisely what decays.</p>
+
+<h3>9.3&nbsp; The present: docs-as-code, agents as maintainers</h3>
+<p>The present solutions share one move: <strong>treat knowledge like code</strong>. Git gives versioning,
+diffing, blame, review and rollback; docs-as-code puts runbooks and policies next to the systems they describe;
+markdown keeps the human cost of writing low. On top of that substrate, three new mechanisms close the old
+gaps:</p>
+<ul>
+  <li><strong>Automated creation with citations.</strong> Enrichment agents draft concepts from sources of
+  record and attach per-claim provenance, so creation scales and the human review has something concrete to
+  check. The spec&rsquo;s keyed-footnote design exists because agents rewrite documents; the attribution must
+  survive rewriting.<sup class="refn">[OKF SPEC v0.2 §5.1]</sup></li>
+  <li><strong>Expiry as a first-class fact.</strong> <code>stale_after</code> turns &ldquo;is this current?&rdquo; into a
+  deterministic comparison that any consumer can run, and makes re-verification schedulable rather than
+  hopeful. Acme&rsquo;s finance concepts carry <code>stale_after: 2026-12-31</code> because policies are re-approved
+  every January; on 1 January the concepts require re-verification before serving.<sup class="refn">[Google Cloud 2026b]</sup></li>
+  <li><strong>Agents as the maintenance workforce.</strong> Karpathy&rsquo;s insight cuts both ways: the bookkeeping
+  that decays human wikis &mdash; updating cross-references, touching fifteen files to propagate a change &mdash; is
+  exactly what agents do reliably, given a verified source of truth and a review loop.</li>
+</ul>
+
+<h3>9.4&nbsp; The future: knowledge operations as a discipline</h3>
+<p>Three trends shape the next phase. First, <strong>agentic curation</strong>: agents will propose the
+majority of changes and humans will increasingly review diffs rather than author documents; the scarce skill
+becomes verification, not drafting. Second, <strong>live knowledge</strong>: the attested-computation concept
+points to knowledge that is not a static statement but a sanctioned procedure with a per-run verdict &mdash;
+numbers that are true <em>because they were computed the blessed way</em>, not because someone wrote them down.
+Third, <strong>federated and market-shaped knowledge</strong>: bundles that cross organisational boundaries,
+with trust tiers standing in for the personal relationships that used to vouch for knowledge (section&nbsp;11).
+The open question is the operating layer: who owns the retrieval policy, the re-verification cadence, the
+erasure obligations &mdash; a function that in 2026 does not yet have a standard name or a standard tool.</p>
+
+<h3>9.5&nbsp; How the cycle differs by industry</h3>
+<table>
+  <tr><th style="width:16%">Industry</th><th style="width:26%">Knowledge that matters</th><th style="width:22%">Who creates / verifies</th><th style="width:18%">Cadence &amp; deprecation</th><th>Distinctive trait</th></tr>
+  <tr><td>Software / platform</td><td>Code-adjacent: runbooks, ADRs, schemas, incident records</td><td>Engineers; now agent-authored drafts</td><td>Fast; tied to deploys</td><td>Docs-as-code native; highest agent adoption</td></tr>
+  <tr><td>Finance</td><td>Policy, model documentation, definitions of metrics (revenue, risk)</td><td>Finance + risk; human sign-off mandatory</td><td>Annual policy cycles; regulatory retention</td><td>Attested computation &amp; audit trail are the point</td></tr>
+  <tr><td>Healthcare / life sciences</td><td>Clinical evidence, protocols, drug data; ICD/SNOMED taxonomies</td><td>Clinicians, researchers, regulators</td><td>Slow, evidence-gated; long retention</td><td>Safety-critical verification; privacy dominates erasure</td></tr>
+  <tr><td>Legal</td><td>Precedent, jurisdiction rules, matter knowledge</td><td>Lawyers + paralegals</td><td>Medium; citation-critical</td><td>Provenance is the product</td></tr>
+  <tr><td>Manufacturing / energy</td><td>Engineering specs, equipment manuals, floor expertise</td><td>Engineers + operators (much tacit)</td><td>Asset-lifetime; slow</td><td>Tacit-to-explicit is the bottleneck</td></tr>
+  <tr><td>Retail / media</td><td>Catalogs, campaign knowledge, audience insight</td><td>Merchants, analysts; automated pipelines</td><td>Fast; season-driven</td><td>High automation, lower verification stakes</td></tr>
+  <tr><td>Public sector / research</td><td>Policy, evidence, bibliographic knowledge</td><td>Officials, scientists; peer review</td><td>Slow; archival duty</td><td>Openness mandates; FAIR principles in research</td></tr>
+</table>
+<p>The pattern across the table: <strong>the more regulated the industry, the more the life cycle is about
+verification, retention and erasure; the faster the industry, the more it is about automated creation and
+deprecation</strong>. A format whose fields cover both &mdash; <code>verified</code> and <code>stale_after</code>,
+<code>status</code> and the erasure profile &mdash; is built for exactly this spread.</p>
+</section>
+
+<section id="s10">
+<h2>10&ensp;Discovery, communication, guardrails, efficiency</h2>
+<p class="lead">Four benefits of structured, standardised knowledge recur in the sources for this guide; a
+fifth class of benefits &mdash; audit, continuity, evaluation &mdash; is less discussed but equally real.</p>
+
+<h3>Discovery</h3>
+<p>Knowledge is only as good as its findability, for humans and agents alike. The OKF design attacks
+discovery twice: <code>index.md</code> directories give an agent a map before it reads anything (progressive
+disclosure), and per-file <code>title</code>/<code>description</code>/<code>tags</code>/<code>type</code>
+frontmatter gives it handles to route on. The evidence that this works is concrete: in the AWS BIRD run the
+typical agent did a couple of directory traversals then read 2&ndash;4 documents, 96% of calls were structural,
+and <code>semantic_search</code> &mdash; though available &mdash; was never called once across 500 agents.<sup class="refn">[AWS 2026]</sup>
+Tenure found the same mechanism from the failure side: alias queries (&ldquo;GHA&rdquo; &rarr; GitHub Actions,
+&ldquo;Mongo&rdquo; &rarr; MongoDB) resolved at 0.72 precision because filenames and titles are better handles than
+embedding similarity for short, code-shaped queries.<sup class="refn">[Tenure 2026]</sup> For deep multi-hop
+discovery, knowledge graphs remain the stronger technology (GraphRAG&rsquo;s community summaries exist precisely
+because chunk-level retrieval misses global questions), which is why the pragmatic architecture is both:
+structure for navigation, embeddings for the long tail &mdash; the hybrid the machine&rsquo;s own research recommended
+for small models.<sup class="refn">[Edge et&nbsp;al. 2024]</sup><sup class="refn">[prior work, section A]</sup></p>
+
+<h3>Communication</h3>
+<p>Section 3&rsquo;s boundary objects get a machine member. A knowledge bundle is how a team talks to its future
+self and to its agents at once: the same file that onboards a human (title, description, readable markdown)
+briefs an agent (frontmatter, links, trust fields). Across organisations, standardised knowledge removes
+re-negotiation: two companies exchanging bundles need not exchange schemas or parsers. Within a team, the
+bundle is the antidote to the tacit floor &mdash; the difference between an agent that can be onboarded by reading
+the index and one that needs a hallway conversation no agent can have.</p>
+
+<h3>Guardrails</h3>
+<p>Structured knowledge is the substrate of control. Four mechanisms matter:</p>
+<ul>
+  <li><strong>Trust-tier filtering before reading.</strong> A consumer configured for human-reviewed content
+  can refuse unverified or machine-confirmed concepts before spending a token on them &mdash; policy enforced at
+  the metadata layer, not after the fact.<sup class="refn">[Google Cloud 2026b]</sup></li>
+  <li><strong>Expiry as a guard.</strong> <code>stale_after</code> makes &ldquo;act on current policy&rdquo; a checkable
+  property; a stale concept can be surfaced, quarantined or refused rather than silently obeyed.</li>
+  <li><strong>Attestation as an anti-improvising guard.</strong> An agent reporting a dollar figure must have
+  run the sanctioned computation; the attester&rsquo;s verdict gates display. This is the guardrail against the
+  most dangerous agent failure: confident improvisation of numbers that look right.<sup class="refn">[OKF SPEC v0.2 §10]</sup></li>
+  <li><strong>Grounding for small models.</strong> On this machine&rsquo;s L1 tier (1&ndash;4&nbsp;B models), wrong
+  specific facts are the primary failure mode, and the documented fix is a knowledge bundle: facts belong in
+  retrievable, versioned documents, not in weights (section&nbsp;8 tests exactly this).<sup class="refn">[prior work, section A]</sup></li>
+</ul>
+
+<h3>Efficiency</h3>
+<p>The efficiency case is arithmetic. On this machine, qwen3:1.7b generates at 42.7&nbsp;tok/s and processes
+prompts at ~900&nbsp;tok/s; qwen3:4b collapses from 19.5&nbsp;tok/s at 8&nbsp;K context to ~1&nbsp;tok/s at
+32&nbsp;K. Context is therefore the scarce resource, and bundles are a context technology: an index plus two
+concept files costs a few hundred tokens, not a retrieval dump. The AWS run quantifies the same economics for a
+capable agent: 4.47 reads per question on average, median 4, versus the alternative of shipping whole schemas
+or corpora into every prompt. Progressive disclosure is a latency and cost optimisation before it is anything
+else. Add the human side &mdash; one reviewed document consumed by many agents and many people, instead of each
+consumer re-deriving the knowledge &mdash; and the efficiency argument is complete.</p>
+
+<h3>The quieter benefits</h3>
+<ul>
+  <li><strong>Audit and compliance.</strong> &ldquo;What was the agent told, by whom, verified by whom, until
+  when&rdquo; becomes answerable from frontmatter and logs &mdash; the record an EU AI Act or model-risk examiner
+  asks for.</li>
+  <li><strong>Continuity.</strong> Knowledge that survives staff turnover, tool changes and vendor exits is
+  the difference between an organisation that learns and one that remembers.</li>
+  <li><strong>Evaluation.</strong> Curated bundles double as golden sets: the same verified content that
+  grounds an agent can score it, which closes the loop between knowledge management and model evaluation.</li>
+  <li><strong>IP boundary clarity.</strong> Explicit provenance separates what the organisation owns, what it
+  licenses and what is public &mdash; the precondition for the economics of section&nbsp;11.</li>
+</ul>
+</section>
+
+<section id="s11">
+<h2>11&ensp;The economics of knowledge</h2>
+<p class="lead">Can knowledge be sold? Can it be protected as intellectual property? Can it be open source?
+The short answers: yes, imperfectly, and increasingly &mdash; and the agentic era is changing all three markets at
+once.</p>
+
+<h3>Selling knowledge</h3>
+<p>Knowledge is the canonical <strong>information good</strong>: expensive to produce, nearly free to copy,
+non-rivalrous in use.<sup class="refn">[Shapiro &amp; Varian 1999]</sup> Markets for it are real and old &mdash;
+education, consulting, research and analytics, data licensing, expert networks, professional services, and now
+model fine-tunes and knowledge-as-a-service APIs. Information-good economics explains the observed pricing:
+sellers version (a summary is cheap, the verified bundle with audit trail is expensive), bundle (platform
+subscriptions), and sell scarcity of <em>attention, verification or access</em> rather than the facts
+themselves, because facts cannot be scarce. Two agentic-era wrinkles matter. First, the trust tiers of
+section&nbsp;7.2 are a pricing signal: <strong>verified knowledge is the product</strong>, and the
+human-reviewed tier is where the margin lives. Second, agents are becoming buyers &mdash; an agent that pays per
+attested computation or per verified bundle is a new customer class with no patience for unlicensed scrapes.
+The open question is whether payment rails (micro-payments, receipts) will mature before the market fragments
+into walled catalogs.</p>
+
+<h3>Protecting knowledge as intellectual property</h3>
+<p>The law protects <em>expression</em>, not <em>facts</em>. The US Supreme Court&rsquo;s Feist decision (1991)
+held that facts are not copyrightable and that &ldquo;sweat of the brow&rdquo; does not earn protection &mdash; a phone
+directory&rsquo;s listings could be copied because originality, not effort, is the test.<sup class="refn">[Feist v. Rural 1991]</sup>
+The practical map for a knowledge owner:</p>
+<ul>
+  <li><strong>Copyright</strong> protects the particular written expression of a concept (this article, a
+  playbook&rsquo;s wording), not the concept or the fact it states. Collections can be protected as compilations
+  &mdash; the selection and arrangement &mdash; which is how curated datasets are defensible even when their facts
+  are not.</li>
+  <li><strong>Database rights</strong> (EU sui generis right) protect substantial investment in obtaining and
+  verifying a database &mdash; closer to what a verified knowledge bundle actually is than copyright is.</li>
+  <li><strong>Trade secrets</strong> protect knowledge that is secret, valuable and reasonably protected:
+  algorithms, customer lists, pricing models, unreleased policy. This is the default regime for enterprise
+  bundles behind access control &mdash; and it is why provenance fields matter: a bundle that cannot prove where
+  its content came from cannot defend its secrecy either.</li>
+  <li><strong>Patents</strong> protect inventions and, in some jurisdictions, methods &mdash; relevant to the
+  <em>processes</em> of producing or attesting knowledge, not to the knowledge itself.</li>
+  <li><strong>Licences</strong> (proprietary, Creative Commons, open-source) are the actual technology of
+  knowledge transfer: they define what a buyer or recipient may do with expression, and they are the layer at
+  which OKF&rsquo;s permissive spec licence and a commercial &ldquo;verified bundle&rdquo; product can coexist.</li>
+</ul>
+<p>Two structural ironies follow. A format designed to make knowledge portable also makes it
+<em>exfiltratable</em>: the same bundle that leaves a vendor cleanly can leave an employer. And the law&rsquo;s
+fact/expression line means the most valuable layer of a knowledge product &mdash; the facts, the metrics, the
+definitions &mdash; is the least protectable, which pushes value toward the things the law does protect:
+verification, arrangement, timeliness and the human judgement in curation. The OKF authors&rsquo; decision to open
+the format while leaving content governance to producers fits this economics exactly.</p>
+
+<h3>Open-source knowledge</h3>
+<p>Knowledge can be open source, and the precedents are large: Wikipedia and Wikidata (CC BY-SA and CC0),
+open science and the FAIR data principles, open educational resources, and the open-weight model releases
+(Qwen3 and Gemma 4 are Apache 2.0; Llama carries a community licence with a scale clause; some small-model
+lineages remain research-only licences &mdash; a licensing lesson this machine&rsquo;s prior research documented
+first-hand).<sup class="refn">[Wilkinson et&nbsp;al. 2016]</sup><sup class="refn">[prior work, section A]</sup>
+The economics of openness are classical: knowledge is a public good with large spillovers (Romer&rsquo;s growth
+theory makes idea non-rivalry the engine of increasing returns), and commons governance can sustain shared
+resources without either the state or the market (Ostrom).<sup class="refn">[Romer 1990]</sup><sup class="refn">[Ostrom 1990]</sup>
+Openness also has business logic: an open standard is an ecosystem moat &mdash; Google open-sourced OKF not from
+altruism but because a portable format that hundreds of tools read increases demand for the clouds and
+catalogs that serve it best, the same playbook as Kubernetes, Chromium and MCP&rsquo;s foundation transfer. The
+risks are real: free-riding, quality drift, and sustainability of the maintainers (Wikipedia runs on
+donations; open-source knowledge has no R&amp;D tax credit). The emerging synthesis is hybrid: open format and
+open base knowledge, with revenue in verification, support, hosting and the human-reviewed tier &mdash; the same
+open-core pattern that dominates software.</p>
+
+<p class="ref">The bottom line across the three questions: knowledge is the one asset whose value increases
+when it is shared and whose protection is weakest exactly where its value is highest. Formats, trust layers
+and licences are the mechanisms that reconcile the two &mdash; which is why this guide is about formats at all.</p>
+</section>
+<section id="a1">
+<h2>A&ensp;Prior research on this machine</h2>
+<p class="lead">Research that already happened, referenced throughout the guide and extended by the live
+experiment of section&nbsp;8.</p>
+
+<p><strong>Small local models on the 8&nbsp;GB Mac mini</strong> (<a href="small-models.html">small-models.html</a>,
+7 Sep 2026, with machine-readable data in <a href="small-models.json">small-models.json</a>): a benchmark of the
+seven installed Ollama chat models for &ldquo;high-risk, low-cognitive&rdquo; enterprise tasks, with measured throughput,
+a five-layer fleet model (L0 rules &rarr; L4 frontier/API), deployment-example research, and a
+tuning playbook. Findings reused here:</p>
+<ul>
+  <li>Measured baselines at 8&nbsp;K context: qwen3:1.7b 42.7&nbsp;tok/s; llama3.2:3b 24.9; qwen2.5-coder:3b
+  24.8; deepseek-r1:1.5b 43.3 (incl. reasoning tokens); qwen3:4b 19.5 but ~1&nbsp;tok/s at 32&nbsp;K (the
+  &ldquo;context cliff&rdquo;); gemma4:e4b 13.2 warm (11&ndash;15 across runs), ~39&nbsp;s cold first load with its 9.6&nbsp;GB Q4
+  bundle on an 8&nbsp;GB machine.</li>
+  <li>Fleet logic: small models are not cheaper large models; the 1&ndash;4&nbsp;B tier exists for latency- and
+  privacy-bound tasks with narrow decisions and strict formats, while judgement routes up (L3&ndash;L4) through
+  the gateway.</li>
+  <li>The tuning playbook names three failure modes of small models and their fixes: wrong specific facts
+  &rarr; grounding in OKF knowledge bundles &ldquo;then RAG for the long tail&rdquo;; unstable format &rarr; fine-tuning
+  plus schema enforcement; shallow reasoning &rarr; routing up, never fine-tuning.</li>
+  <li>Its OKF-in-practice notes: one bundle per domain; treat v0.2 trust fields (<code>verified:
+  human:...</code>, <code>stale_after</code>) as audit hooks with human review as the control; keep bundles in
+  the 4&ndash;8&nbsp;K-token range so 1.7&ndash;3&nbsp;B models stay at full speed; use nomic-embed-text for
+  known-knowns routing and RAG for the long tail; check the spec under
+  <code>GoogleCloudPlatform/knowledge-catalog</code> before committing tooling (spec is young).</li>
+  <li>Licensing findings reused in section&nbsp;11: Qwen3 Apache 2.0; Gemma 4 Apache 2.0; Llama 3.2 community
+  licence (&gt;700M-MAU clause); Qwen2.5-3B and Qwen2.5-Coder-3B carry the Qwen Research License, not Apache;
+  DeepSeek-R1 MIT.</li>
+</ul>
+<p><strong>Adjacent experiments in this folder</strong> (source files kept alongside this guide):
+<code>pdf-edit-insert-fig-captions.py</code>, <code>add-figures-in-pdf.py</code>, <code>workflow-test.py</code>
+with their sample PDFs (<code>multi_para_input.pdf</code>, <code>final_output.pdf</code>,
+<code>final_structured_output.pdf</code>, <code>sample.pdf</code>) and PNG illustrations
+(<code>contextual_illustration.png</code>, <code>mars_roving_diagram.png</code>, <code>illustration.png</code>)
+&mdash; programmatic figure-and-caption insertion into PDFs, i.e. structured output applied to document
+artefacts. They are the document-engineering half of the same thesis: strict output contracts for narrow,
+high-risk tasks on local tooling.</p>
+<p><strong>The live experiment of section&nbsp;8</strong> extends this line: same machine, same fixture, but the
+independent variable is now the knowledge bundle. All assets are in <a href="kf-experiment/">kf-experiment/</a>:
+the bundle itself (<code>bundle/</code>), the question set and fixture (<code>questions.json</code>), raw
+answers (<code>answers.md</code>), and the runner (<code>run_experiment.py</code>).</p>
+</section>
+
+<section id="a2">
+<h2>B&ensp;Reference shelf</h2>
+<p class="lead">Every source cited in the guide, with links. Primary sources first; annotation marks what each
+was used for.</p>
+
+<h3>Primary: Open Knowledge Format</h3>
+<ol class="src">
+  <li><a href="https://cloud.google.com/blog/products/data-analytics/how-the-open-knowledge-format-can-improve-data-sharing">Google Cloud blog: Introducing the Open Knowledge Format</a> &mdash; McVeety &amp; Hormati, 13 Jun 2026. v0.1 announcement: motivation, LLM-wiki pattern, fields, principles, reference tooling. [Google Cloud 2026a]</li>
+  <li><a href="https://cloud.google.com/blog/products/data-analytics/okf-v0-2-adds-trust-signals">Google Cloud blog: OKF v0.2 tackles agentic trust</a> &mdash; McVeety &amp; Hormati, 25 Jul 2026. v0.2 announcement with the acme_retail worked example. [Google Cloud 2026b]</li>
+  <li><a href="https://github.com/GoogleCloudPlatform/knowledge-catalog/tree/main/okf">OKF specification (canonical repo)</a> &mdash; <code>okf/SPEC.md</code>, version 0.2; <code>okf/bundles/</code> holds the sample bundles (acme_retail, ga4, stackoverflow, crypto_bitcoin); <code>okf/src</code> holds the reference agent and visualiser. Local mirror used for this guide: <code>/tmp/okf-spec.md</code>. [OKF SPEC v0.2]</li>
+  <li><a href="https://raw.githubusercontent.com/GoogleCloudPlatform/knowledge-catalog/main/okf/SPEC.md">SPEC.md raw text</a> &mdash; direct link to the normative document.</li>
+</ol>
+
+<h3>Benchmarks and third-party evaluation</h3>
+<ol class="src" start="5">
+  <li><a href="https://raw.githubusercontent.com/aws-samples/sample-okf-llm-wiki/main/benchmark/mini_dev/RESULTS.md">AWS sample: agent + OKF on BIRD mini_dev</a> &mdash; EX 74.0, 500/500 completed, OKF bundle read over MCP with no raw schema given; mean 4.47 reads/question. [AWS 2026]</li>
+  <li><a href="https://tenureai.dev/writing/open-knowledge-format-ai-memory-benchmark/">Tenure: Open Knowledge Format benchmark</a> &mdash; OKF bundle inside an AI tool; single-turn precision 0.47, alias cases 0.72/0.92, session pass rate 0.17; &ldquo;OKF solves interchange, not selection.&rdquo; [Tenure 2026]</li>
+  <li><a href="https://arxiv.org/abs/2605.11325">Tenure paper</a> &mdash; the PrecisionMemBench methodology behind the OKF run.</li>
+  <li><a href="https://longmemeval.github.io/">LongMemEval</a> &mdash; long-term memory benchmark (ICLR 2025; arXiv 2410.10813); the evaluation substrate several memory vendors cite.</li>
+</ol>
+
+<h3>Standards, governance and the agent ecosystem</h3>
+<ol class="src" start="9">
+  <li><a href="https://modelcontextprotocol.io">Model Context Protocol</a> &mdash; Anthropic, Nov 2024; donated to the Agentic AI Foundation, 9 Dec 2025.</li>
+  <li><a href="https://aiwiki.ai/wiki/agentic_ai_foundation">Agentic AI Foundation (AAIF)</a> &mdash; Linux Foundation directed fund announced 9 Dec 2025 by Anthropic, Block and OpenAI, with platinum support from Google, Microsoft, AWS, Cloudflare, Bloomberg; founding projects MCP, goose, AGENTS.md. [AAIF 2025]</li>
+  <li><a href="https://openzync.tech/blog/mcp-a2a-memory-standard">MCP and A2A have a foundation now. Memory still has no standard</a> &mdash; Aug 2026 analysis of the A2A transfer and the missing memory layer. [OpenZync 2026]</li>
+  <li><a href="https://scottarmbruster.com/articles/a2a-agentic-ai-foundation-neutral-agent-standard-2026">A2A goes neutral</a> &mdash; A2A becomes an AAIF hosted project, 17 Aug 2026; foundation at 247&ndash;250+ organisations. [AAIF 2026]</li>
+  <li><a href="https://a2a-protocol.org">A2A protocol</a> &mdash; Google, Apr 2025; donated to the Linux Foundation Jun 2025; v1.0 Mar 2026; AAIF Aug 2026.</li>
+  <li><a href="https://llmstxt.org">llms.txt</a> &mdash; Jeremy Howard / answer.ai, mid-2025; directory and spec for LLM-friendly site indexes.</li>
+  <li><a href="https://agents.md">AGENTS.md</a> &mdash; project-level agent instruction convention; OpenAI, Aug 2025; AAIF founding donation.</li>
+  <li>W3C knowledge-representation stack: <a href="https://www.w3.org/RDF/">RDF</a>, <a href="https://www.w3.org/OWL/">OWL</a>, <a href="https://www.w3.org/TR/sparql11-query/">SPARQL</a>, <a href="https://www.w3.org/TR/skos-reference/">SKOS</a>, <a href="https://json-ld.org">JSON-LD</a>, <a href="https://www.w3.org/TR/shacl/">SHACL</a>, <a href="https://www.w3.org/TR/prov-o/">PROV-O</a>; <a href="https://schema.org">schema.org</a>.</li>
+</ol>
+
+<h3>Research papers</h3>
+<ol class="src" start="17">
+  <li>Gao et&nbsp;al. (2023). <a href="https://arxiv.org/abs/2312.10997">Retrieval-Augmented Generation for Large Language Models: A Survey</a>. arXiv 2312.10997.</li>
+  <li>Edge et&nbsp;al. (2024). <a href="https://arxiv.org/abs/2404.16130">From Local to Global: A Graph RAG Approach to Query-Focused Summarization</a> (Microsoft). arXiv 2404.16130.</li>
+  <li>Zhang et&nbsp;al. (2025). <a href="https://arxiv.org/abs/2510.04618">Agentic Context Engineering: Evolving Contexts for Self-Improving Language Models</a>. arXiv 2510.04618.</li>
+  <li><a href="https://arxiv.org/abs/2608.01269">ACE-GraphRAG: Agentic Context Engineering for Hierarchical GraphRAG</a> (2026). arXiv 2608.01269.</li>
+  <li><a href="https://arxiv.org/abs/2511.22850">Resolving Evidence Sparsity: Agentic Context Engineering for Long-Document Understanding</a> (2025). arXiv 2511.22850.</li>
+  <li>Packer et&nbsp;al. (2023). <a href="https://arxiv.org/abs/2310.08560">MemGPT: Towards LLMs as Operating Systems</a>. arXiv 2310.08560.</li>
+  <li>Guti&eacute;rrez et&nbsp;al. (2024). <a href="https://arxiv.org/abs/2410.10813">LongMemEval: Benchmarking Chat Assistants on Long-Term Interactive Memory</a> (ICLR 2025).</li>
+  <li>Guti&eacute;rrez et&nbsp;al. (2024). <a href="https://arxiv.org/abs/2405.14831">HippoRAG: Neurobiologically Inspired Long-Term Memory for Large Language Models</a>.</li>
+  <li>Liu et&nbsp;al. (2023). <a href="https://arxiv.org/abs/2307.03172">Lost in the Middle: How Language Models Use Long Contexts</a>.</li>
+  <li>Hogan et&nbsp;al. (2021). <a href="https://arxiv.org/abs/2003.02320">Knowledge Graphs</a> (Synthesis Lectures on Data Management). arXiv 2003.02320.</li>
+  <li>Gruber (1993). A Translation Approach to Portable Ontology Specifications. Knowledge Acquisition 5(2).</li>
+  <li>Mitchell et&nbsp;al. (2019). <a href="https://arxiv.org/abs/1810.03993">Model Cards for Model Reporting</a>. FAccT.</li>
+  <li>Gebru et&nbsp;al. (2021). <a href="https://arxiv.org/abs/1803.09010">Datasheets for Datasets</a>. CACM 64(12).</li>
+  <li>Wilkinson et&nbsp;al. (2016). <a href="https://www.nature.com/articles/sdata201618">The FAIR Guiding Principles for scientific data management and stewardship</a>. Scientific Data 3:160018.</li>
+</ol>
+
+<h3>Foundational books and essays cited inline</h3>
+<ol class="src" start="31">
+  <li>Ackoff (1989). From Data to Wisdom. Journal of Applied Systems Analysis 16.</li>
+  <li>Polanyi (1966). The Tacit Dimension. University of Chicago Press.</li>
+  <li>Nonaka &amp; Takeuchi (1995). The Knowledge-Creating Company. Oxford University Press.</li>
+  <li>Brachman &amp; Levesque (2004). Knowledge Representation and Reasoning. Morgan Kaufmann.</li>
+  <li>Clark (1996). Using Language. Cambridge University Press.</li>
+  <li>Grice (1975). Logic and Conversation. In Syntax and Semantics 3.</li>
+  <li>Star &amp; Griesemer (1989). Institutional Ecology, &lsquo;Translations&rsquo; and Boundary Objects. Social Studies of Science 19.</li>
+  <li>Eghbal (2020). Working in Public: The Making and Maintenance of Open Source Software. Stripe Press.</li>
+  <li>Shapiro &amp; Varian (1999). Information Rules: A Strategic Guide to the Network Economy. Harvard Business School Press.</li>
+  <li>Romer (1990). Endogenous Technological Change. Journal of Political Economy 98(5).</li>
+  <li>Ostrom (1990). Governing the Commons. Cambridge University Press.</li>
+  <li>Feist Publications v. Rural Telephone Service (1991). 499 U.S. 340.</li>
+</ol>
+
+<h3>Prior local research and experiment assets (this guide&rsquo;s companions)</h3>
+<ol class="src" start="43">
+  <li><a href="small-models.html">small-models.html</a> and <a href="small-models.json">small-models.json</a> &mdash; 7 Sep 2026 benchmark of small local models on this machine.</li>
+  <li><a href="kf-experiment/bundle/index.md">kf-experiment/bundle/</a> &mdash; the OKF v0.2-style bundle used in section&nbsp;8; <a href="kf-experiment/questions.json">questions.json</a>, <a href="kf-experiment/answers.md">answers.md</a>, <a href="kf-experiment/run_experiment.py">run_experiment.py</a>.</li>
+  <li>Anthropic engineering (2025). <a href="https://www.anthropic.com/engineering/effective-context-engineering-for-ai-agents">Effective context engineering for AI agents</a>.</li>
+  <li>OKF explainers tracked in the prior research: smartscope.blog and geotoolbox.ai posts on the v0.2 trust layer (provenance, verified-by, stale_after).</li>
+</ol>
+</section>
+
+<section id="a3">
+<h2>C&ensp;Reading list: toward subject-matter depth</h2>
+<p class="lead">A curated path from foundations to the frontier. The short route to competence is items 1, 2, 5,
+8, 10, 14; the full shelf makes the subject yours.</p>
+
+<h3>Foundations (read first)</h3>
+<ol class="src">
+  <li><strong>The OKF SPEC v0.2</strong> and both Google Cloud announcement posts (shelf B1&ndash;B4) &mdash; the
+  primary documents; nothing else substitutes for them.</li>
+  <li><strong>Anthropic engineering: Effective context engineering for AI agents</strong> &mdash; the canonical
+  essay on the discipline section&nbsp;2 is about.</li>
+  <li><strong>Polanyi, The Tacit Dimension</strong> and <strong>Nonaka &amp; Takeuchi, The Knowledge-Creating
+  Company</strong> &mdash; why knowledge is hard to capture and how organisations do it anyway.</li>
+  <li><strong>Ackoff, From Data to Wisdom</strong> &mdash; fifteen pages that still frame every KM discussion.</li>
+  <li><strong>Gruber, A Translation Approach to Portable Ontology Specifications</strong> and the
+  <strong>Hogan et&nbsp;al. Knowledge Graphs</strong> survey &mdash; the formal vocabulary of section&nbsp;4.</li>
+  <li><strong>Allemang &amp; Hendler, Semantic Web for the Working Ontologist</strong> (3rd ed.) &mdash; the
+  practical W3C-stack text.</li>
+  <li><strong>Brachman &amp; Levesque, Knowledge Representation and Reasoning</strong> &mdash; the KR canon in one
+  volume.</li>
+</ol>
+
+<h3>Agents, context and retrieval (the moving frontier)</h3>
+<ol class="src" start="8">
+  <li><strong>Gao et&nbsp;al., RAG survey</strong> (arXiv 2312.10997) &mdash; the field&rsquo;s taxonomy and history.</li>
+  <li><strong>Edge et&nbsp;al., GraphRAG</strong> (arXiv 2404.16130) and <strong>ACE-GraphRAG</strong>
+  (arXiv 2608.01269) &mdash; graph structure and agentic retrieval on top of it.</li>
+  <li><strong>Zhang et&nbsp;al., Agentic Context Engineering</strong> (arXiv 2510.04618) &mdash; models that
+  curate their own context; the research line behind section&nbsp;2.</li>
+  <li><strong>MemGPT</strong> (arXiv 2310.08560), <strong>HippoRAG</strong> (arXiv 2405.14831),
+  <strong>LongMemEval</strong> (arXiv 2410.10813) &mdash; memory architectures and the benchmark the vendors
+  compete on.</li>
+  <li><strong>Liu et&nbsp;al., Lost in the Middle</strong> (arXiv 2307.03172) &mdash; why context placement and
+  size matter; the paper behind &ldquo;context budgeting.&rdquo;</li>
+  <li><strong>Tenure&rsquo;s OKF benchmark and paper</strong> (shelf B6&ndash;B7) &mdash; the best critical reading of
+  OKF as a runtime artefact; read it before designing a retrieval layer.</li>
+  <li><strong>AWS sample-okf-llm-wiki results</strong> (shelf B5) &mdash; the strongest positive evidence for
+  bundles as complete knowledge sources.</li>
+</ol>
+
+<h3>Standards and governance</h3>
+<ol class="src" start="15">
+  <li><strong>The AAIF formation and A2A transfer coverage</strong> (shelf B10&ndash;B12) &mdash; how
+  agent-ecosystem standards get neutral governance, and the open &ldquo;memory&rdquo; gap.</li>
+  <li><strong>llms.txt spec and directory</strong>; <strong>AGENTS.md spec</strong>; <strong>MCP spec</strong>
+  &mdash; the sibling conventions OKF interoperates with.</li>
+  <li><strong>PROV-O</strong> and <strong>schema.org</strong> documentation &mdash; provenance and shared types
+  done at web scale; OKF&rsquo;s ancestors.</li>
+</ol>
+
+<h3>Blogs and online guides worth following</h3>
+<ol class="src" start="18">
+  <li>Google Cloud data-analytics blog (OKF posts; the authors&rsquo; series) &mdash; primary releases.</li>
+  <li>Anthropic engineering blog &mdash; context engineering and agent practices.</li>
+  <li>Tenure writing section &mdash; benchmarks of memory and OKF-in-tool behaviour.</li>
+  <li>openzync.tech and scottarmbruster.com &mdash; agent-standards governance analysis (MCP/A2A/AAIF).</li>
+  <li>smartscope.blog and geotoolbox.ai OKF explainers &mdash; third-party readings of the v0.2 trust layer.</li>
+  <li>llmstxt.org and the answer.ai blog &mdash; LLM-friendly content standards.</li>
+</ol>
+
+<h3>X / Twitter threads (searchable; dates are month-level)</h3>
+<ol class="src" start="24">
+  <li><strong>@karpathy</strong> &mdash; the &ldquo;LLMs as wikis&rdquo; / LLM-wiki posts (mid-2025) that seeded the
+  pattern OKF formalises; also his long-term-memory and context-engineering takes. Search &ldquo;LLM wiki&rdquo;.</li>
+  <li><strong>@jeremyphoward</strong> &mdash; llms.txt proposal and the &ldquo;LLMs can&rsquo;t read websites&rdquo; thread
+  (mid-2025).</li>
+  <li><strong>@GoogleCloud</strong> &mdash; OKF v0.1 (Jun 2026) and v0.2 (Jul 2026) announcements; A2A
+  launch (Apr 2025).</li>
+  <li><strong>@AnthropicAI</strong> &mdash; MCP announcement (Nov 2024) and foundation transfer (Dec 2025);
+  context-engineering essay threads (2025).</li>
+  <li><strong>@OpenAI</strong> &mdash; AGENTS.md introduction (Aug 2025).</li>
+  <li>Memory-layer vendors (@Mem0, @letta_ai, @getzep) &mdash; benchmark claims and product updates; treat
+  figures as vendor-reported until checked.</li>
+</ol>
+
+<h3>Books (the long shelf)</h3>
+<ol class="src" start="30">
+  <li>Allemang &amp; Hendler (2020). Semantic Web for the Working Ontologist, 3rd ed. ACM Books.</li>
+  <li>Barrasa, Webber &amp; Hodler (2023). Building Knowledge Graphs: A Practitioner&rsquo;s Guide. O&rsquo;Reilly.</li>
+  <li>Hogan et&nbsp;al. (2021). Knowledge Graphs. Morgan &amp; Claypool.</li>
+  <li>Davenport &amp; Prusak (1998). Working Knowledge. Harvard Business School Press &mdash; KM&rsquo;s still-best
+  business treatment.</li>
+  <li>Shapiro &amp; Varian (1999). Information Rules &mdash; the economics of section&nbsp;11, still unmatched.</li>
+  <li>Boldrin &amp; Levine (2008). Against Intellectual Monopoly. Cambridge University Press &mdash; the
+  strongest case that IP protection of ideas is harmful; read against Feist.</li>
+  <li>Benkler (2006). The Wealth of Networks. Yale University Press (free online) &mdash; commons-based
+  knowledge production.</li>
+  <li>Raymond (1999). The Cathedral &amp; the Bazaar &mdash; openness as an engineering method.</li>
+  <li>Eghbal (2020). Working in Public &mdash; the maintenance economics of open knowledge.</li>
+  <li>Pearl &amp; Mackenzie (2018). The Book of Why &mdash; causal structure as the next layer above
+  association; where knowledge graphs want to go.</li>
+  <li>Forte (2022). Building a Second Brain &mdash; the personal-knowledge-management practices the bundle
+  pattern industrialises.</li>
+</ol>
+</section>
+<section id="a4">
+<h2>D&ensp;Companies and standards in the knowledge-format space</h2>
+<p class="lead">The competitive map, by layer. &ldquo;Established&rdquo; = shipping before the OKF era;
+&ldquo;new&rdquo; = founded or repositioned in the 2024&ndash;26 agent-memory wave. Funding figures are as reported at the
+linked source and dated; verify before citing in a business context.</p>
+
+<h3>Hyperscaler and model-vendor platforms</h3>
+<table>
+  <tr><th style="width:18%">Player</th><th style="width:44%">Knowledge-relevant position</th><th>OKF relevance</th></tr>
+  <tr><td><strong>Google Cloud</strong></td><td>Publisher of the OKF spec; Knowledge Catalog (the AI-powered data catalog that succeeds Dataplex) ingests bundles; Vertex AI Search and Agentspace as the consuming agents; Gemini ecosystem</td><td><strong>Originator</strong>; owns the reference implementation and sample bundles</td></tr>
+  <tr><td><strong>Microsoft</strong></td><td>Copilot stack with enterprise graph, Fabric for data, memory features across M365; platinum AAIF member</td><td>Consumer and standards participant; MCP ecosystem supporter</td></tr>
+  <tr><td><strong>AWS</strong></td><td>Bedrock Knowledge Bases, Kendra, Agents for Amazon; published the OKF BIRD benchmark run (sample-okf-llm-wiki)</td><td>Adopter; demonstrated OKF over MCP at benchmark strength</td></tr>
+  <tr><td><strong>Salesforce</strong></td><td>Agentforce agents over Data Cloud; owns Atlas reasoning engine line</td><td>Enterprise-knowledge consumer; proprietary graph + retrieval</td></tr>
+  <tr><td><strong>OpenAI</strong></td><td>AGENTS.md convention (donated to AAIF); ChatGPT memory products</td><td>Standard-setter on the instructions layer; memory stays proprietary</td></tr>
+  <tr><td><strong>Anthropic</strong></td><td>Claude models, CLAUDE.md conventions, MCP creator (donated to AAIF); context-engineering thought leadership</td><td>Standards on the tool/context layers; strong voice on retrieval practice</td></tr>
+</table>
+
+<h3>Enterprise work-knowledge platforms (established and scale-up)</h3>
+<table>
+  <tr><th style="width:22%">Player</th><th style="width:46%">Position</th><th>Layer competed on</th></tr>
+  <tr><td><strong>Glean</strong></td><td>Enterprise search evolved into an agentic work assistant over company knowledge</td><td>Discovery + retrieval over the whole work corpus</td></tr>
+  <tr><td><strong>Hebbia</strong></td><td>Document-native AI workflows (finance, research); agents that organise and answer over large document sets</td><td>Document intelligence + agentic workflows</td></tr>
+  <tr><td><strong>Contextual&nbsp;AI</strong></td><td>&ldquo;RAG 2.0&rdquo; enterprise grounding: domain-adapted models over enterprise knowledge graphs</td><td>Grounding layer (graph-augmented generation)</td></tr>
+  <tr><td><strong>Notion, Atlassian (Rovo), ServiceNow</strong></td><td>Knowledge workspace incumbents adding agent surfaces over their document stores</td><td>Content + agent access in one product</td></tr>
+</table>
+
+<h3>Agent-memory layer (new, 2024&ndash;26 vintage)</h3>
+<table>
+  <tr><th style="width:16%">Player</th><th style="width:52%">Position (as reported)</th><th>Funding / traction signals</th></tr>
+  <tr><td><strong>Mem0</strong></td><td>Memory layer for agents: extraction, archival, retrieval APIs; large open-source following</td><td>$24M Series A (Oct 2025, Peak XV / Basis Set); ~48K GitHub stars; named exclusive memory provider for the AWS Agent SDK (vendor-reported)</td></tr>
+  <tr><td><strong>Letta</strong></td><td>MemGPT lineage; stateful agent framework with built-in memory</td><td>$10M seed (Sep 2024, Felicis; angel participation reported incl. Jeff Dean)</td></tr>
+  <tr><td><strong>Zep</strong></td><td>Long-term memory; Graphiti bi-temporal knowledge-graph engine; tops LongMemEval-style claims</td><td>24K+ GitHub stars (Graphiti); benchmark claims vendor-reported</td></tr>
+  <tr><td><strong>Cognee</strong></td><td>Memory as knowledge graphs for agentic systems</td><td>&euro;7.5M round (Feb 2026)</td></tr>
+  <tr><td><strong>Supermemory, Tenure</strong></td><td>Consumer/developer memory (Supermemory); agent memory + the PrecisionMemBench evaluation line and OKF critique (Tenure)</td><td>Seed-stage; Tenure publishes open benchmarks</td></tr>
+</table>
+<p class="note">The interesting fault line: the memory layer is exactly the &ldquo;no standard&rdquo; gap of section&nbsp;5.
+These companies compete on retrieval policy &mdash; what belongs in context for this turn &mdash; which OKF
+explicitly does not define. Expect either a de facto memory interchange to emerge, or consolidation behind a
+platform (sections 5, 7.3, E).</p>
+
+<h3>Vector and graph infrastructure (established)</h3>
+<table>
+  <tr><th style="width:26%">Layer</th><th>Players</th></tr>
+  <tr><td>Vector databases</td><td>Pinecone, Weaviate, Qdrant, Chroma, Milvus / Zilliz</td></tr>
+  <tr><td>Graph databases</td><td>Neo4j, Ontotext, Stardog, TigerGraph (RDF and property-graph camps; GQL standardisation under way)</td></tr>
+  <tr><td>Hybrid note</td><td>Neither camp owns the knowledge <em>format</em>; both are storage layers the bundle pattern can sit on top of</td></tr>
+</table>
+
+<h3>Data catalogs and metadata platforms</h3>
+<table>
+  <tr><th style="width:30%">Kind</th><th>Players</th></tr>
+  <tr><td>Commercial catalogs</td><td>Google Knowledge Catalog, Alation, Collibra, Atlan, data.world</td></tr>
+  <tr><td>Open-source metadata</td><td>DataHub (LinkedIn lineage), OpenMetadata</td></tr>
+  <tr><td>Note</td><td>Catalogs are the natural enterprise home for OKF bundles: ingestion, governance and discovery already live there</td></tr>
+</table>
+
+<h3>OKF-native early ecosystem (new)</h3>
+<table>
+  <tr><th style="width:30%">Project</th><th>What it is</th></tr>
+  <tr><td><code>GoogleCloudPlatform/knowledge-catalog</code> (<code>okf/</code>)</td><td>Canonical spec, sample bundles, reference enrichment agent and visualiser</td></tr>
+  <tr><td><code>win4r/okf-skill</code>, <code>scaccogatto/okf-skills</code>, <code>bks-fr/okf-skill</code>, <code>catancs/okf-skill</code></td><td>Claude Code / agent skills that create and maintain OKF bundles</td></tr>
+  <tr><td><code>eli-l/okf-builder</code></td><td>Bundle builder / converter tooling</td></tr>
+  <tr><td><code>aws-samples/sample-okf-llm-wiki</code></td><td>AWS reference implementation: OKF bundle served to an agent over MCP (BIRD run, shelf B5)</td></tr>
+  <tr><td><code>tenurehq/tenure</code></td><td>Agent memory + evaluation; publishes the OKF runtime benchmark and PrecisionMemBench</td></tr>
+</table>
+
+<h3>Standards owners (the governance layer)</h3>
+<ul>
+  <li><strong>W3C</strong> &mdash; RDF/OWL/SPARQL/SKOS/JSON-LD/SHACL/PROV-O; schema.org.</li>
+  <li><strong>Agentic AI Foundation (Linux Foundation)</strong> &mdash; MCP, AGENTS.md, goose, A2A; 247&ndash;250+
+  organisations by Aug 2026.</li>
+  <li><strong>ISO/IEC JTC&nbsp;1</strong> &mdash; GQL (ISO/IEC 39075) and metadata standards.</li>
+  <li><strong>llmstxt.org</strong> &mdash; community directory for LLM-friendly site indexes.</li>
+  <li><strong>Google Cloud (currently)</strong> &mdash; OKF governance still sits with the originator in a public
+  repo; the A2A precedent suggests foundation transfer as the maturity path (section&nbsp;6).</li>
+</ul>
+<p class="ref">Reading the map: every layer of the stack now has an open or de facto standard except
+<em>durable knowledge content</em> and <em>agent memory</em>. OKF occupies the first gap; the second is the
+most contested product space in the ecosystem.</p>
+</section>
+
+<section id="a5">
+<h2>E&ensp;Method notes and open questions</h2>
+<p class="lead">How the claims in this guide were produced, what they do not cover, and what to watch next.</p>
+
+<h3>Method notes</h3>
+<ul>
+  <li><strong>Article provenance.</strong> Written 7 September 2026 on an 8&nbsp;GB Apple-silicon Mac mini.
+  OKF content is grounded in the v0.2 SPEC and both Google Cloud announcements (shelf B1&ndash;B4); ecosystem
+  and standards claims carry dated sources. Figures marked &ldquo;as reported&rdquo; are vendor- or press-reported and
+  were not independently audited.</li>
+  <li><strong>Experiment fixture.</strong> Ollama <code>/api/generate</code>, non-streaming; temperature 0.1;
+  num_ctx 8192; <code>think: false</code> passed but not honoured by the installed builds &mdash; all three
+  models reason anyway, so the output budget had to cover reasoning tokens; one-shot turns; conditions ordered
+  without-then-with per model. Machine-readable: <a href="kf-experiment/questions.json">questions.json</a>,
+  <a href="kf-experiment/results.jsonl">results.jsonl</a>, raw log <a href="kf-experiment/answers.md">answers.md</a>,
+  runner <a href="kf-experiment/run_experiment.py">run_experiment.py</a>, scorer <a href="kf-experiment/score.py">score.py</a>.</li>
+  <li><strong>Run anomalies, disclosed.</strong> (1)&nbsp;The first full run used num_predict 200; every model
+  spent the whole budget inside reasoning blocks and returned empty answers (<code>eval_count == 200</code>
+  with empty <code>response</code>). (2)&nbsp;The second run at 700 tokens produced 29/30 valid answers;
+  qwen3:4b on &ldquo;without&rdquo; Q1 looped in reasoning mode across three attempts (700 tokens each, empty) and
+  only answered after a 2,500-token rerun, and three other cells truncated mid-answer at exactly the cap
+  (qwen3:4b &ldquo;with&rdquo; Q3, gemma4 &ldquo;without&rdquo; Q4/Q5), which were re-run at 1,500 tokens. Every rerun kept the
+  original system prompt and temperature. The anomalies are themselves findings: on these small models,
+  reasoning-mode token budgets must account for thinking overhead or answers silently vanish, and a 4&nbsp;B
+  model can loop indefinitely rather than admit ignorance on post-cutoff facts.</li>
+  <li><strong>Scoring.</strong> Each answer was checked against a per-question rubric of required facts
+  (field names, tiers, dates) both by string match and by full read; borderline cases were read twice. Rubrics
+  and full answers are in the experiment folder for audit.</li>
+  <li><strong>Limits.</strong> Five questions, one domain (OKF itself), one machine, three small models, one
+  bundle given whole in the prompt. Whole-bundle injection removes retrieval error, which is the favourable
+  case for OKF; it tests grounding, not selection. No vector-RAG baseline, no fine-tuned comparison, no
+  frontier models, no multi-turn sessions. External results (shelf B5&ndash;B7) cover some of those gaps;
+  none of them covers all.</li>
+</ul>
+
+<h3>Open questions</h3>
+<ol>
+  <li><strong>The selection layer.</strong> Who decides which files enter context for this turn, with scope,
+  supersession, recency and budget control? (Tenure&rsquo;s &ldquo;interchange, not selection.&rdquo;) The strongest
+  candidates: agentic retrieval (ACE line), graph engines (Graphiti, GraphRAG), and the memory-layer startups
+  &mdash; none standardised yet.</li>
+  <li><strong>Discovery across bundles.</strong> index.md works inside a bundle; nothing yet indexes bundles
+  across teams and organisations. A registry layer (llms.txt-style for bundles?) is missing.</li>
+  <li><strong>Vocabulary governance.</strong> OKF type values are unregistered by design; at scale, shared
+  types (Metric, Playbook, Attested Computation) will drift across producers. Watch for community registries
+  or SKOS-style bridges.</li>
+  <li><strong>Version negotiation.</strong> <code>okf_version</code> declares a target; consumers do best-effort.
+  How bundles migrate across minor and major versions at fleet scale is untested.</li>
+  <li><strong>Memory interchange.</strong> The &ldquo;memory has no standard&rdquo; gap (section&nbsp;5): session memory,
+  long-term memory and knowledge bundles are three different things with one disputed name. The standard that
+  separates them cleanly will shape the next product cycle.</li>
+  <li><strong>Evaluation standards.</strong> LongMemEval and PrecisionMemBench score memory and retrieval;
+  there is no agreed benchmark for &ldquo;agent grounded in a knowledge bundle&rdquo; that varies bundle quality, trust
+  tiers and staleness. The experiment in section&nbsp;8 is a first step, not a standard.</li>
+  <li><strong>Erasure and law.</strong> The erasure-conformance profile answers deletion with proof; how it
+  interacts with retrieval caches, embeddings and agent logs is unresolved and will meet the EU AI Act and
+  GDPR head-on.</li>
+  <li><strong>Economics of verified knowledge.</strong> If human-reviewed bundles carry the margin
+  (section&nbsp;11), who certifies the reviewers, and does the trust tier become a market signal or a
+  marketing label?</li>
+</ol>
+</section>
+
+<p class="foot">Knowledge formats for humans and agents &mdash; research guide, compiled 7 September 2026 on an
+8&nbsp;GB Mac mini (Apple silicon). Facts about OKF are current to SPEC v0.2 (25 July 2026); the agent-standards
+landscape moves monthly and the sources in Appendix&nbsp;B are the checkpoint. Companion files in this folder:
+<a href="small-models.html">small-models.html</a>, <a href="small-models.json">small-models.json</a>,
+<a href="kf-experiment/">kf-experiment/</a>.</p>
+</main>
+</div>
+
+<script>
+(function () {
+  var links = Array.prototype.slice.call(document.querySelectorAll('nav.toc a'));
+  var map = {};
+  links.forEach(function (a) {
+    var id = a.getAttribute('href').slice(1);
+    var el = document.getElementById(id);
+    if (el) map[id] = { link: a, el: el };
+  });
+  if ('IntersectionObserver' in window) {
+    var visible = {};
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (e) {
+        if (e.isIntersecting) visible[e.target.id] = true;
+        else delete visible[e.target.id];
+        var ids = Object.keys(visible);
+        if (!ids.length) return;
+        var topId = ids.sort(function (x, y) {
+          return map[x] && map[y] ? map[x].el.getBoundingClientRect().top - map[y].el.getBoundingClientRect().top : 0;
+        })[0];
+        links.forEach(function (a) { a.classList.remove('active'); });
+        if (map[topId]) map[topId].link.classList.add('active');
+      });
+    }, { rootMargin: '-10% 0px -70% 0px' });
+    Object.keys(map).forEach(function (id) { io.observe(map[id].el); });
+  }
+})();
+</script>
+</body>
+</html>

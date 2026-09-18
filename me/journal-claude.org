@@ -1,0 +1,263 @@
+#+TITLE: Janardan Revuru — Reconstructed Journal
+#+STARTUP: overview
+# Reconstructed strictly from dates, timestamps, and stated timelines found in
+# private conversation history with Claude. Where only a month or a general
+# timeframe is evident, entries are aggregated at that level rather than
+# assigned to an invented day. Pre-2025 career context (not independently
+# dated within the conversation history, so not entered as a dated node):
+# career start January 1997; prior employers Wipro, Motorola, Avaya, HPE,
+# then Dell; ~a decade ago, co-founded a JavaScript meetup in Bengaluru.
+
+* 2025
+  Earliest dated material on record. A comparatively thin year in the archive
+  relative to 2026 — visible activity concentrates around personal/creative
+  exploration in January and a significant community-leadership handover in
+  June, when he took over organizing responsibility for two of his three
+  current meetup communities.
+
+** January
+   Early exploratory conversations: general life-skills content generation
+   and a genuine, unprompted interest in comparative film-directing craft.
+
+*** W01
+**** 04 January 2025
+     - Built structured educational content on essential life skills rarely
+       taught formally (emotional intelligence, financial literacy, critical
+       thinking, adaptability), including practical acquisition steps for
+       each — an early instance of the same educational-content instinct
+       later formalized in the 2026 CSE Student's Guide project.
+
+*** W04
+**** 26 January 2025
+     - Requested a rigorously sourced, journalistic-style comparative
+       analysis of Indian and Hollywood director styles along a
+       planning-versus-improvisation spectrum, referencing guerrilla
+       filmmaking case studies (Rodriguez, Ram Gopal Varma, Sean Baker).
+
+** June
+   A pivotal month for his community-organizer identity: within two days he
+   picked up organizing responsibility for two of the three meetup
+   communities he now leads.
+
+*** W25
+**** 21 June 2025
+     - Took over organizing Data Science, AI, Research and Learning
+       (DARLing) — later relaunched and rebranded under his leadership.
+**** 22 June 2025
+     - Took over organizing Byte of Python.
+
+* 2026
+  By far the densest year in the record, and the year in which nearly every
+  major thread of his life — the PhD, the TypeScript book, the AIL patent,
+  the family startup, the household finances, the community events, and
+  ultimately a job loss and career transition — becomes active and
+  visible in close succession, largely from March onward.
+
+** March
+   PhD coursework (Research and Publication Ethics) and a second patent
+   draft both surface this month, alongside the creation of an original
+   engineering-values framework.
+
+*** W11
+**** 14 March 2026
+     - Worked through Research and Publication Ethics (RPE) coursework
+       questions mandated for PhD scholars — COPE/WAME guidelines,
+       conflict-of-interest policy design, predatory-journal detection, and
+       open-access publication recognition concerns — requesting an
+       interactive, vim-keybinding-navigable HTML reference.
+
+*** W12
+**** 22 March 2026
+     - Reviewed a detailed second patent draft document (building on a
+       first, already-filed invention) covering dynamic GPU resource
+       optimization and distributed AI-training-job orchestration use
+       cases, in paragraph-format Word document form with ASCII diagram
+       placeholders for later PowerPoint recreation.
+
+*** W13/14
+**** 28–29 March 2026
+     - Authored LIQUID, an original companion framework to SOLID for
+       system-level (rather than class-level) software design: Uniform
+       Vocabulary, Queryable State, Incremental Replaceability, Intentional
+       Defaults, Demand-Driven Design.
+
+** April
+   Two threads converge this month: formal IEEE-paper planning for PhD
+   research, and the deliberate start of a structured personal journaling
+   practice — itself a case study in "intentional living," his own
+   recurring phrase.
+
+*** W15
+**** 12 April 2026
+     - Planned a short, focused schedule for drafting an original IEEE
+       research paper connecting his Dell context to his research interests.
+
+*** W18
+**** 30 April 2026
+     - Began a formal, dated journaling practice with Claude, insisting on
+       a strict, clearly labelled separation between his own words and
+       Claude's commentary in every entry.
+     - Logged an investment-journal entry: from a ~₹42L Dell RSU-plus-salary
+       corpus, deployed into a Liquid Fund, Nifty IT Index Fund, Parag
+       Parikh Flexi Cap, and a Silver ETF, with a tax reserve set aside and
+       the remainder earmarked for staggered SIP deployment.
+     - Noted, in the same journal entry, that he was simultaneously building
+       a similar goals/journaling/reflection web application at work using
+       remaining Windsurf credits.
+
+** May
+   Journaling continues; PhD coursework work on higher-order conceptual
+   material appears; and, separately, the PhD thesis identity — title,
+   objectives, and scope — is formally locked for the period.
+
+*** W18
+**** 01 May 2026
+     - Continued the journaling practice (second dated entry).
+**** 03 May 2026
+     - Journaled a specific "intentional living" dilemma: whether to keep
+       using several subscribed newspapers and learning-platform
+       subscriptions (The Hindu, Indian Express, Times of India, The New
+       York Times, Mint, The Wall Street Journal; Educative.io, IxDF,
+       DataCamp) that were going largely unread, ultimately favoring a
+       deliberate declutter over sunk-cost continuation.
+
+*** W19
+**** 08 May 2026
+     - Worked through conceptual material for higher-order (Bloom's
+       taxonomy) exam-style questions for PhD-adjacent coursework, using
+       named case studies (Lysenko, Blondlot's N-rays, Pruitt-Igoe) as
+       cross-disciplinary vehicles for research-design error patterns.
+
+*** Month-level (exact day not established)
+     - PhD thesis identity locked for this period: title "Designing and
+       Developing Agent-to-Agent Communication Architectures," under
+       Dr. Nimrita Koul at REVA University, with three objectives (O1
+       characterise, O2 design, O3 develop/benchmark) and the central
+       construct — later evolving further — spanning HIACS's four-level
+       Goal/Workflow/Task/Action hierarchy grounded in the Chomsky
+       computational classes.
+
+** June
+   Google's Open Knowledge Format (OKF v0.1) is released and quickly
+   absorbed into his own research vocabulary; household financial
+   reallocation planning continues; and he personally rebuilds his son
+   Anshul's professional online presence.
+
+*** Month-level
+     - Google's Open Knowledge Format (OKF v0.1) released; adopted into his
+       PhD research vocabulary and his Python Knowledge Bundle project.
+     - Developed a three-bucket (~50% principal-safe / ~40% growth-index /
+       ~10% high-risk) reallocation plan for the post-tax investable corpus
+       from a Dell stock sale.
+
+*** W26
+**** 28 June 2026
+     - Rebuilt Anshul's LinkedIn profile end-to-end: headline, About
+       section, both internship descriptions, a new Projects section for
+       the IoMT capstone, restructured Skills, and a new Volunteer
+       Experience entry for the JS meetup.
+
+** July
+   The busiest single month on record for volume of distinct threads:
+   hardware research, AI-adoption/tokenomics strategy at Dell, a
+   substantive personal-philosophy conversation, a large public meetup, and
+   routine household financial and telecom administration.
+
+*** W27
+**** 04 July 2026
+     - Researched MacBook Air vs. Pro configurations during a Prime Day sale
+       window for a mixed dev/local-inference/meetup-travel use case.
+
+*** W28
+**** 09 July 2026
+     - Discussed AI's broader impact on software engineering jobs and
+       workforce transition, drawing on his own research background for
+       AI-assisted management/evaluation framing.
+**** 10 July 2026
+     - Worked through the business case for an internal "spec verification"
+       AI-native engineering pipeline at Dell (Data Domain), explicitly
+       framed as dual-purpose: a production engineering deliverable and a
+       parallel, IEEE-publishable research contribution.
+**** 11 July 2026
+     - Discussed the philosophical distinction between happiness and
+       enjoyment (Aristotle's hedone/eudaimonia), then shared his
+       self-authored 8-fold personal philosophy for commentary (see SOUL.md).
+**** 15 July 2026
+     - Evaluated a headless Mac Mini M4 Pro vs. a custom GPU desktop as a
+       home AI inference server, including RAM-tier trade-offs for local
+       LLM and image-generation workloads and a BESCOM electricity-cost TCO
+       comparison.
+
+*** W29
+**** 17 July 2026
+     - Organized and reflected on a 200+ attendee data science/AI meetup
+       hosted at Meesho's offices, refining both a speaker's talk title and
+       his own LinkedIn recap post.
+**** 27 July 2026
+     - Worked through downloading capital-gains and tax statements across
+       ICICI Bank, ET Money, CAMS, and KFintech for both his wife Jyoti's
+       individual filings and a family HUF (Hindu Undivided Family) entity.
+**** 28 July 2026
+     - Sorted out household broadband and OTT-bundle plan questions
+       (Airtel 200 Mbps plan terms, JioHotstar ad-tier behavior).
+
+** August
+   The month his Dell career visibly turns: patent-portfolio documentation,
+   a household device reshuffle, and — mid-month — direct engagement with
+   being personally affected by a workforce reduction.
+
+*** W32
+**** 06 August 2026
+     - Earliest tracked job application on record in his own job-search
+       system, marking the practical start of active search activity.
+**** 07 August 2026
+     - Documented and publicized his full patent portfolio (3 granted US
+       patents across 2 invention families; 1 published, pending
+       application) for LinkedIn and resume use, with precise
+       granted-vs-published phrasing maintained throughout.
+
+*** W33
+**** 09 August 2026
+     - Sought guidance on ethically supporting fellow impacted engineers,
+       via a peer WhatsApp group, during his own Dell layoff notice period
+       — while still formally on payroll.
+
+*** W34
+**** 17 August 2026
+     - Executed a household device handover: erased and reassigned an
+       iPhone 13 Pro Max to his wife Jyoti following his own upgrade to a
+       Samsung Galaxy S26, then repurposed the returned iPhone 12.
+
+** September
+   His last working date at Dell falls in early September; job-search
+   infrastructure and a public community event both come to a head in the
+   same week.
+
+*** Month-level
+     - Last working date at Dell Technologies, early September 2026,
+       following the workforce-reduction notice period begun in August.
+
+*** W36
+**** 03 September 2026
+     - Diagnosed and fixed a sync gap between his primary and backup job
+       application trackers (a code change edited locally had never been
+       pushed live, silently downgrading several tracked application
+       statuses).
+     - Prepared roundtable questions for a JavaScript-meetup quantum
+       computing event at Alliance University, Bengaluru, researching the
+       AU-QUASAR/QpiAI/NVIDIA lab partnership in detail ahead of the
+       session.
+**** 05 September 2026 [planned]
+     - Quantum computing community event at Alliance University, Bengaluru
+       (JS meetup), with speaker outreach previously targeting QpiAI,
+       BosonQ Psi, QNu Labs, IBM Quantum India, and IISc/IIIT Bangalore
+       academic contacts.
+
+*** W37
+**** 12 September 2026
+     - Saved a link for later reading.
+**** 13 September 2026
+     - Commissioned this comprehensive, cross-conversation personal
+       synthesis — SOUL.md, Identity.md, Knowledge.md, Skills.md,
+       Interests.md, Relations.md, Janardan.md, and this journal —
+       explicitly scoped to private conversation history only.
