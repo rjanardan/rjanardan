@@ -9,9 +9,9 @@ Hosted at `https://janalogy.com/apps/md2slides/` — no install, no account, no 
 Storage is the visitor's own browser. Nothing is uploaded anywhere.
 
 **v2 shipped 2026-09-17.** This document is the design target; the shipped build is `index.html`
-(1556 lines). Since the rename the build added: a header with an **Examples ▾ menu** and an
-*Open .md…* button; the superset **"All features"** default starter deck plus a **Markdown tutorial**
-deck; a **two-column slide** (exactly two `##` under one `#` — fence-aware); a **resizable pane
+(1556 lines). Since the rename the build added: a header with a **Slides ▾ menu** and an
+*Open .md…* button; the superset **"All features"** deck (merged from the earlier tutorial, feature and
+starter decks); a **two-column slide** (exactly two `##` under one `#` — fence-aware); a **resizable pane
 divider**; the keyboard set (`z` zen · `v` slides-only · `s` slideshow from current · `S` from first ·
 `/` slideshow search · digits jump 1–999); **mobile swipe** navigation; **no-wrap** navigation at the
 ends; and full-text search that also indexes code fences and diagram source. Storage is the **single
@@ -129,7 +129,7 @@ janalogy.com  ──►  GitHub Pages, user-site repo `rjanardan` (custom domain
                        │   ├── index.html            the app          → /apps/md2slides/
                        │   ├── SPEC.md               this document
                        │   ├── SPEC-LLM.md           deck-writing rules for an LLM
-                       │   └── examples/             worked decks
+                       │   └── slides/              worked decks
                        └── markdown-cards/
                            └── index.html            redirect stub   → /apps/md2slides/
 ```
@@ -423,9 +423,9 @@ since LinkedIn rejects a PDF with mixed page sizes.
 ### 8.1 Synchronisation, the part that carries the product
 
 The two panes are separated by a **draggable divider** — the preview pane resizes (clamped 20–72 %,
-remembered in `janalogy.mdcards.split`, hidden below 900 px). The toolbar carries an **Examples ▾**
-menu (All features, Markdown tutorial, capabilities, llms.txt carousel, starter — embedded, so they
-load offline) and an **Open .md…** button.
+remembered in `janalogy.mdcards.split`, hidden below 900 px). The toolbar carries a **Slides ▾**
+menu (All features, llms.txt carousel, CSIVIT — each deck fetched from `slides/` when online, with an
+embedded copy as the offline fallback) and an **Open .md…** button.
 
 - Typing a new `#` heading creates a card immediately and switches the preview to it, before the author
   types the title. Perceived as instant: the preview shows an empty styled card with the caret in place.
@@ -508,7 +508,7 @@ with `pypdf`.
 | A25 | Full-deck slide search | `/` in slideshow lists matching titles, bullets, paragraphs, code fences and Mermaid source with their slide numbers; `/` in edit mode does nothing |
 | A26 | Resizable panes | dragging the divider changes `--split` (clamped 20–72 %) and persists to `janalogy.mdcards.split`; the divider is hidden below 900 px |
 | A27 | No-wrap navigation | `←`/`→`, `Space`, PageUp/Down, the ‹ / › buttons and swipe stop at the first and last slide instead of circling |
-| A28 | Default deck | a fresh load with no saved state opens the superset "All features" starter (10 cards, zero overflow) |
+| A28 | Default deck | a fresh load with no saved state opens the merged "All features" deck (10 cards, zero overflow) |
 
 A16–A17 are the security gate; A18 is the exit gate. A19 records the closing-card decision: both
 bookends — title and closing — carry no footer, so no page number refers to a card that is not a page

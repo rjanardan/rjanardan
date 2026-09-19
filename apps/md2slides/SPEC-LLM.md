@@ -230,7 +230,7 @@ Working rules:
 
 ## 11. Worked example
 
-`examples/llms-txt-carousel.md` is a measured 8-card square deck: it fits at 1:1
+`slides/llms-txt-carousel.md` is a measured 8-card square deck: it fits at 1:1
 and 4:5 with no overflow in any card, and exports as an 8-page, 810 × 810 pt PDF.
 
 ```
@@ -250,9 +250,10 @@ One file asks machines to leave. The other hands them a map. Twenty-eight percen
 - Its whole job is subtraction. It was never a way to be seen, and nobody pretended otherwise.
 ```
 
-Other worked decks ship in `examples/`: `capabilities.md` (images, three diagram
-types, a two-column slide) and `markdown-tutorial.md` (a beginner Markdown course).
-The default starter deck on a fresh load is the superset "every feature in one deck".
+Other worked decks ship in `slides/`: `llms-txt-carousel.md` (an 8-card square deck),
+`all-features.md` (the merged superset: text marks, code fence, three diagram kinds,
+remote and local images, a two-column slide) and `CSIVIT-OpenSourceTalk.md` (a live talk).
+The default deck on a fresh load is the merged "every feature in one deck".
 
 ## 12. Limits of this build
 
