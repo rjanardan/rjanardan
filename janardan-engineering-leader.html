@@ -92,6 +92,14 @@
     font-size:9.8pt;line-height:1.55;color:var(--ink);text-align:justify;
   }
 
+  /* Mobile: keep content inside the sheet */
+  @media (max-width:640px){
+    .sheet{padding:28px 20px;}
+    h1{font-size:19pt;}
+    .edu-grid td{display:block;width:auto;padding:6px 0;}
+    .edu-grid td + td{padding-left:0;}
+  }
+
   /* Print: A4, no shadows, tight margins */
   @page{ size:A4; margin:14mm 14mm; }
   @media print{
